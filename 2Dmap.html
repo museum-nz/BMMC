@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Photo Map with Dual Year Slider</title>
+
+  <!-- Leaflet CSS & Plugins -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+  <style>
+    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: #aad3df; }
+    #map { width: 100vw; height: 100vh; background: #aad3df; }
+
+    /* 1. 75px x 75px Photo Thumbnail Icon (White Background) */
+    .single-photo-wrapper {
+      width: 75px;
+      height: 75px;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+      cursor: pointer;
+    }
+    .single-photo-wrapper:hover {
+      transform: scale(1.15);
+      z-index: 1000 !important;
+      border-color: #0284c7;
+    }
+    .single-photo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* 2. Number Badge for Clusters */
+    .cluster-number-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .cluster-number-badge:hover {
+      transform: scale(1.15);
+      background: linear-gradient(135deg, #0369a1, #075985);
+      border-color: #38bdf8;
+    }
+
+    /* 3. Popup Window Styling */
+    .leaflet-popup-content-wrapper {
+      padding: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      width: 440px !important;
+      max-width: 82vw !important;
+    }
+    .photo-card-large {
+      padding: 14px;
+      background: #ffffff;
+      text-align: center;
+    }
+    .photo-card-large h3 {
+      margin: 0 0 4px 0;
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .photo-card-large p {
+      margin: 0 0 10px 0;
+      font-size: 13px;
+      color: #0284c7;
+      font-weight: 600;
+    }
+    .photo-card-large .img-container {
+      width: 100%;
+      height: 280px;
+      border-radius: 8px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    .photo-card-large .img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* DESKTOP LAYOUT (Default): Slider docked at Bottom-Left */
+    .year-slider-container {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 12px 18px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #f8fafc;
+      width: 290px;
+      box-sizing: border-box;
+    }
+
+    /* MOBILE SPECIFIC OVERRIDES */
+    @media (max-width: 768px) {
+      /* Mobile Slider: Centered at Bottom */
+      .year-slider-container {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 15px !important;
+        width: 85vw !important;
+        max-width: 320px !important;
+      }
+
+      /* Mobile Enlarge Popup: Docks to Bottom-Left */
+      .leaflet-popup {
+        position: fixed !important;
+        bottom: 85px !important;
+        left: 12px !important;
+        top: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+        z-index: 1500 !important;
+      }
+      .leaflet-popup-content-wrapper {
+        max-width: 78vw !important;
+        border-radius: 12px;
+      }
+      .leaflet-popup-tip-container {
+        display: none !important;
+      }
+
+      /* Shrink Leaflet Branding & Controls by 20% on Mobile */
+      .leaflet-control-container .leaflet-control-attribution {
+        font-size: 9px !important;
+        padding: 2px 6px !important;
+        transform: scale(0.8);
+        transform-origin: bottom right;
+      }
+      .leaflet-control-zoom {
+        transform: scale(0.8);
+        transform-origin: top left;
+      }
+    }
+
+    /* 4. Single Continuous Track with Blue Highlight Span */
+    .year-slider-header {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .year-slider-header span { color: #38bdf8; font-weight: 700; font-size: 14px; }
+
+    .dual-slider-track-wrapper {
+      position: relative;
+      width: 100%;
+      height: 22px;
+      display: flex;
+      align-items: center;
+    }
+
+    .slider-track-bg {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Blue highlighted span between the two slider thumbs */
+    .slider-track-fill {
+      position: absolute;
+      height: 6px;
+      background: #0284c7;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0%;
+      width: 100%;
+    }
+
+    .dual-slider-track-wrapper input[type="range"] {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+
+    /* Custom Webkit Thumb */
+    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #0284c7;
+      pointer-events: auto;
+      -webkit-appearance: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      transition: transform 0.1s ease;
+    }
+    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Custom Firefox Thumb */
+    .dual-slider-track-wrapper input[type="range"]::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #0284c7;
+      pointer-events: auto;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .no-img-marker {
+      width: 28px;
+      height: 28px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <!-- Dual-Thumb Range Slider with Blue Span Line -->
+  <div class="year-slider-container">
+    <div class="year-slider-header">
+      <div>Year Range</div>
+      <span id="yearRangeText">Loading...</span>
+    </div>
+    <div class="dual-slider-track-wrapper">
+      <div class="slider-track-bg"></div>
+      <div class="slider-track-fill" id="sliderTrackFill"></div>
+      <input type="range" id="minYearSlider" min="1800" max="2026" value="1800" step="1" oninput="updateYearFilter(event)">
+      <input type="range" id="maxYearSlider" min="1800" max="2026" value="2026" step="1" oninput="updateYearFilter(event)">
+    </div>
+  </div>
+
+  <!-- Canvas2D warning fix -->
+  <script>
+    try {
+      const origGetContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function(type, attribs) {
+        if (type === '2d') {
+          attribs = attribs || {};
+          attribs.willReadFrequently = true;
+        }
+        return origGetContext.call(this, type, attribs);
+      };
+    } catch(e) {}
+  </script>
+
+  <!-- JS Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+  <script>
+    const CSV_URL_PRIMARY  = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1146027655';
+    const CSV_URL_FALLBACK = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
+
+    const isMobile = window.innerWidth <= 768;
+
+    // STEP 1: Initialize Map
+    const initialZoom = isMobile ? 2 : 3;
+    const worldBounds = [[-89, -180], [89, 180]];
+
+    const map = L.map('map', {
+      closePopupOnClick: true,
+      maxBounds: worldBounds,
+      maxBoundsViscosity: 1.0,
+      minZoom: 2,
+      worldCopyJump: false
+    }).setView([-10, 135], initialZoom);
+
+    // Carto Voyager English Tile Server
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap contributors, © CARTO',
+      maxZoom: 19,
+      subdomains: 'abcd',
+      noWrap: true
+    }).addTo(map);
+
+    // STEP 2: Initialize Plugins
+    let markers = L.markerClusterGroup({
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      spiderfyDistanceMultiplier: isMobile ? 2.8 : 2.2,
+      maxClusterRadius: isMobile ? 38 : 55,
+      
+      iconCreateFunction: function(cluster) {
+        const totalCount = cluster.getChildCount();
+        return L.divIcon({
+          html: `<div class="cluster-number-badge">${totalCount}</div>`,
+          className: 'custom-cluster-number-icon',
+          iconSize: [48, 48],
+          iconAnchor: [24, 24]
+        });
+      }
+    });
+
+    markers.on('clusterclick', function(a) {
+      if (a.layer && typeof a.layer.spiderfy === 'function') {
+        a.layer.spiderfy();
+      }
+    });
+
+    let heatLayer = null;
+    let allPhotoRecords = [];
+    let globalMinYear = 1800;
+    let globalMaxYear = 2026;
+
+    // Helper Functions
+    function extractDriveId(url) {
+      if (!url) return '';
+      url = url.trim();
+      const match = url.match(/(?:id=|\/d\/|thumbnail\?id=)([a-zA-Z0-9_-]+)/);
+      return (match && match[1]) ? match[1] : '';
+    }
+
+    function formatImgUrl(url) {
+      if (!url) return '';
+      const fileId = extractDriveId(url);
+      if (fileId) {
+        return `https://lh3.googleusercontent.com/d/${fileId}`;
+      }
+      return url.trim();
+    }
+
+    function getCellValStrict(row, possibleNames, colIndex) {
+      for (let name of possibleNames) {
+        const cleanName = name.trim().toLowerCase();
+        for (let key in row) {
+          if (!row[key]) continue;
+          const cleanKey = key.trim().toLowerCase();
+          if (cleanKey === cleanName) {
+            return row[key].toString().trim();
+          }
+        }
+      }
+      const keys = Object.keys(row);
+      if (colIndex !== undefined && keys[colIndex] && row[keys[colIndex]]) {
+        return row[keys[colIndex]].toString().trim();
+      }
+      return '';
+    }
+
+    function isValidImgUrl(url) {
+      if (!url || typeof url !== 'string') return false;
+      url = url.trim();
+      if (/^(img1|img:1|n\/a|none|null|undefined)$/i.test(url)) return false;
+      if (
+        url.startsWith('http://') || 
+        url.startsWith('https://') || 
+        url.includes('drive.google') || 
+        url.includes('googleusercontent') || 
+        url.includes('thumbnail') || 
+        url.includes('id=')
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function parseCoord(val) {
+      if (!val) return NaN;
+      const clean = val.replace(',', '.').replace(/[^0-9.-]/g, '');
+      const num = parseFloat(clean);
+      if (isNaN(num) || num === 0) return NaN;
+      return num;
+    }
+
+    function getColCTitle(row) {
+      const rawVal = getCellValStrict(row, ['Title Details', 'Title'], 2);
+      if (!rawVal) return '';
+      return rawVal.split('#')[0].trim();
+    }
+
+    // Render dataset onto map
+    function renderDataset(records) {
+      markers.clearLayers();
+      if (heatLayer) map.removeLayer(heatLayer);
+
+      const heatPoints = [];
+
+      records.forEach(item => {
+        heatPoints.push([item.lat, item.lng, 0.9]);
+
+        const customIconHTML = `<div class="single-photo-wrapper"><img src="${item.imgUrl}" ${item.fallbackAttr} loading="eager" alt="Photo"/></div>`;
+
+        const photoIcon = L.divIcon({
+          html: customIconHTML,
+          className: 'custom-single-photo-icon',
+          iconSize: [75, 75],
+          iconAnchor: [37.5, 37.5]
+        });
+
+        const locationYearText = item.location 
+          ? (item.year ? `📍 ${item.location} &bull; ${item.year}` : `📍 ${item.location}`)
+          : (item.year ? `📅 ${item.year}` : '');
+
+        const popupHTML = `
+          <div class="photo-card-large">
+            ${item.title ? `<h3>${item.title}</h3>` : ''}
+            ${locationYearText ? `<p>${locationYearText}</p>` : ''}
+            <div class="img-container"><img src="${item.imgUrl}" ${item.fallbackAttr} loading="eager" alt="Photo"/></div>
+          </div>
+        `;
+
+        const marker = L.marker([item.lat, item.lng], { icon: photoIcon, imgUrl: item.imgUrl });
+        
+        marker.bindPopup(popupHTML, {
+          autoPan: true,
+          keepInView: true,
+          autoClose: true,
+          closeOnClick: true
+        });
+
+        markers.addLayer(marker);
+      });
+
+      if (typeof L.heatLayer === 'function' && heatPoints.length > 0) {
+        heatLayer = L.heatLayer(heatPoints, {
+          radius: isMobile ? 22 : 30,
+          blur: 16,
+          maxZoom: 6,
+          gradient: { 0.4: 'blue', 0.65: 'yellow', 1: 'red' }
+        }).addTo(map);
+
+        map.on('zoomend', function() {
+          if (map.getZoom() >= 6) {
+            if (map.hasLayer(heatLayer)) map.removeLayer(heatLayer);
+          } else {
+            if (!map.hasLayer(heatLayer)) map.addLayer(heatLayer);
+          }
+        });
+      }
+
+      map.addLayer(markers);
+    }
+
+    // Initialize Dual Slider with Min/Max Years from Dataset
+    function initYearSliderUI() {
+      const years = allPhotoRecords
+        .map(r => parseInt(r.year, 10))
+        .filter(y => !isNaN(y) && y > 1500 && y <= 2026);
+
+      if (years.length > 0) {
+        globalMinYear = Math.min(...years);
+        globalMaxYear = Math.max(...years);
+      }
+
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+
+      minSlider.min = globalMinYear;
+      minSlider.max = globalMaxYear;
+      minSlider.value = globalMinYear;
+
+      maxSlider.min = globalMinYear;
+      maxSlider.max = globalMaxYear;
+      maxSlider.value = globalMaxYear;
+
+      updateYearFilter();
+    }
+
+    // Dynamic Dual Slider Update & Blue Span Bar Position
+    function updateYearFilter(evt) {
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+      const trackFill = document.getElementById('sliderTrackFill');
+
+      let minVal = parseInt(minSlider.value, 10);
+      let maxVal = parseInt(maxSlider.value, 10);
+
+      // Prevent thumbs from crossing
+      if (minVal > maxVal) {
+        if (evt && evt.target === minSlider) {
+          minSlider.value = maxVal;
+          minVal = maxVal;
+        } else {
+          maxSlider.value = minVal;
+          maxVal = minVal;
+        }
+      }
+
+      // Update Blue Line Fill Width & Left Position
+      const minRange = parseInt(minSlider.min, 10);
+      const maxRange = parseInt(minSlider.max, 10);
+      const rangeSpan = (maxRange - minRange) || 1;
+
+      const leftPercent = ((minVal - minRange) / rangeSpan) * 100;
+      const rightPercent = ((maxVal - minRange) / rangeSpan) * 100;
+
+      trackFill.style.left = leftPercent + '%';
+      trackFill.style.width = (rightPercent - leftPercent) + '%';
+
+      document.getElementById('yearRangeText').innerText = `${minVal} – ${maxVal}`;
+
+      // Filter Photo Dataset
+      const filtered = allPhotoRecords.filter(item => {
+        const y = parseInt(item.year, 10);
+        if (isNaN(y)) return true; // Keep items without a year
+        return y >= minVal && y <= maxVal;
+      });
+
+      renderDataset(filtered);
+    }
+
+    // Data Parser Function
+    function loadMapData(url, isRetry = false) {
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: 'greedy',
+        complete: function(results) {
+          allPhotoRecords = [];
+
+          if (results.data && results.data.length > 0) {
+            results.data.forEach(row => {
+              const title = getColCTitle(row);
+              const imgRaw = getCellValStrict(row, ['Img1', '1st Image'], 17);
+              const location = getCellValStrict(row, ['Made', 'Location'], 20);
+              const year = getCellValStrict(row, ['Year'], 21); // Column Y (Year)
+              const latStr = getCellValStrict(row, ['Lat', 'Latitude'], 23);
+              const lngStr = getCellValStrict(row, ['Lng', 'Longitude'], 24);
+
+              if (!latStr && !lngStr && !imgRaw && !location && !title) return;
+
+              const lat = parseCoord(latStr);
+              const lng = parseCoord(lngStr);
+
+              if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+              if (!isValidImgUrl(imgRaw)) return;
+
+              const imgUrl = formatImgUrl(imgRaw);
+              const fileId = extractDriveId(imgRaw);
+              const fallbackAttr = fileId ? `onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=${fileId}';"` : '';
+
+              allPhotoRecords.push({
+                lat: lat,
+                lng: lng,
+                title: title,
+                location: location,
+                year: year,
+                imgUrl: imgUrl,
+                fallbackAttr: fallbackAttr
+              });
+            });
+          }
+
+          if (allPhotoRecords.length === 0 && !isRetry) {
+            loadMapData(CSV_URL_FALLBACK, true);
+            return;
+          }
+
+          initYearSliderUI();
+        },
+        error: function() {
+          if (!isRetry) {
+            loadMapData(CSV_URL_FALLBACK, true);
+          }
+        }
+      });
+    }
+
+    // Load data
+    loadMapData(CSV_URL_PRIMARY);
+  </script>
+</body>
+</html>

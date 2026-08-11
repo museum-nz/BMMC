@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+  <title>BMMC Showcase — Museum & Gramophone Archive</title>
+
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Concurrent Non-blocking Libraries CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .solid-header { background-color: rgba(255, 255, 255, 0.88); }
+    .dark .solid-header { background-color: rgba(15, 23, 42, 0.88); }
+    
+    @keyframes barPulse {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+    .eq-bar {
+      display: inline-block;
+      width: 3px;
+      background-color: currentColor;
+      border-radius: 9999px;
+      animation: barPulse 0.8s infinite ease-in-out;
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    @keyframes spin3d {
+      to { transform: rotate(360deg); }
+    }
+    .spinner-3d {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(2, 132, 199, 0.15);
+      border-top-color: #0284c7;
+      border-radius: 50%;
+      animation: spin3d 1s linear infinite;
+    }
+  </style>
+
+  <!-- Application Logic -->
+  <script defer src="app.js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-slate-100/80 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+
+  <!-- Header Section -->
+  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
+      
+      <!-- Top Header Row -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <a href="#" id="brandLogoLink" class="group flex items-center gap-2.5">
+          <span class="text-2xl sm:text-3xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🏛️</span>
+          <div>
+            <h1 class="text-lg sm:text-2xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent tracking-tight" id="headerTitleText">
+              BMMC Showcase
+            </h1>
+            <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">Bonniefields Museum Catalog</p>
+          </div>
+        </a>
+        
+        <!-- Action Buttons Bar -->
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <button id="btnBrowseAllHeader" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 active:scale-95">
+            <span>🌐 Browse All</span>
+          </button>
+
+          <button id="btnStatsHeader" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-emerald-500/20 active:scale-95">
+            <span>ℹ️ Info</span>
+          </button>
+
+          <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-purple-500/20 active:scale-95">
+            <span>👓 3D Only</span>
+          </button>
+
+          <button id="btnHotOnly" title="Filter to Hot Items Only" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-amber-500/20 active:scale-95">
+            <span>🔥 Hot</span>
+          </button>
+
+          <button id="btnSurprise" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-pink-500/20 active:scale-95">
+            <span>✨ Surprise Me!</span>
+          </button>
+
+          <button id="btnFavorites" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
+            <span id="favHeartIcon">🤍</span>
+            <span id="favCountText">Saved (0)</span>
+          </button>
+
+          <button id="btnThemeToggle" aria-label="Toggle Mode" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
+            <span id="themeToggleIcon">☀️</span>
+            <span id="themeToggleText" class="hidden sm:inline">Mode</span>
+          </button>
+
+          <button id="toggleControlsBtn" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+            <span class="hidden xs:inline">Controls</span>
+            <span id="toggleChevron" class="transition-transform duration-200 text-slate-400">▼</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Collapsible Controls -->
+      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
+        <p id="subheadingText" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+          Discover historical artifacts, equipment, and memorabilia at the Bonniefields Museum.
+        </p>
+
+        <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="flex items-center justify-between sm:justify-start gap-3 shrink-0">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount"></p>
+            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+              <label for="sortBy" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
+              <select id="sortBy" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+                <option value="default" class="dark:bg-slate-900">Default</option>
+                <option value="title-asc" class="dark:bg-slate-900">Title (A-Z)</option>
+                <option value="title-desc" class="dark:bg-slate-900">Title (Z-A)</option>
+                <option value="age-oldest" class="dark:bg-slate-900">Age / Year (Oldest First)</option>
+                <option value="age-newest" class="dark:bg-slate-900">Age / Year (Newest First)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="activeFiltersBar" class="hidden flex-wrap items-center gap-1.5 flex-1 min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Active:</span>
+            <div id="activeFiltersContainer" class="flex flex-wrap gap-1 flex-1 min-w-0"></div>
+            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
+          </div>
+          
+          <div class="w-full sm:w-72 relative shrink-0">
+            <input type="text" id="searchInput" placeholder="Fuzzy search items, details, artists..." aria-label="Search catalog" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <svg class="w-4 h-4 text-blue-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
+          </div>
+        </div>
+
+        <!-- Museum Filter Grid -->
+        <div id="exhibitsFilterGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+          <div>
+            <label for="filterAge" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Era / Age</label>
+            <select id="filterAge" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Eras / Ages</option></select>
+          </div>
+          <div>
+            <label for="filterType" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Type</label>
+            <select id="filterType" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Types</option></select>
+          </div>
+          <div>
+            <label for="filterCategory" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Category</label>
+            <select id="filterCategory" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Categories</option></select>
+          </div>
+          <div>
+            <label for="filterSubcategory" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Subcategory</label>
+            <select id="filterSubcategory" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Subcategories</option></select>
+          </div>
+        </div>
+
+        <!-- Gramophone Filter Grid -->
+        <div id="gramophoneFilterGrid" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div>
+            <label for="filterArtist" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Artist</label>
+            <select id="filterArtist" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Artists</option></select>
+          </div>
+          <div>
+            <label for="filterLabel" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Record Label</label>
+            <select id="filterLabel" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Labels</option></select>
+          </div>
+          <div>
+            <label for="filterFormat" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Format</label>
+            <select id="filterFormat" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Formats</option></select>
+          </div>
+          <div>
+            <label for="filterYear" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Release Year</label>
+            <select id="filterYear" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Years</option></select>
+          </div>
+        </div>
+
+        <!-- Collection Hubs -->
+        <div id="collectionHubsSection" class="hidden pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div id="hubsGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"></div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full z-10">
+    
+    <!-- Skeleton Loader -->
+    <div id="loading" class="py-6 hidden">
+      <div class="flex items-center justify-center gap-2 mb-8">
+        <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+        <span class="text-sm font-semibold text-slate-500">Fetching catalog archive...</span>
+      </div>
+    </div>
+    
+    <!-- Initial Prompt -->
+    <div id="gridPrompt" class="text-center py-16 sm:py-20 bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 shadow-sm backdrop-blur-sm hidden">
+      <div class="max-w-md mx-auto px-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/80 dark:to-indigo-950/80 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-blue-200/60 dark:border-blue-800/60 shadow-inner" id="promptIcon">🔍</div>
+        <h3 class="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100" id="promptTitle">Ready to Explore Exhibits</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-6 leading-relaxed" id="promptDesc">Select a Collection Hub above, search by keyword, or view all items in the BMMC archive.</p>
+        <button id="btnBrowseAllPrompt" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition active:scale-95">Browse All →</button>
+      </div>
+    </div>
+
+    <!-- Exhibit Cards Grid -->
+    <div id="gridSection">
+      <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
+    </div>
+
+    <!-- Stats Dashboard Section -->
+    <div id="statsSection" class="hidden space-y-6">
+      <!-- Top Intro Card -->
+      <div id="statIntroCard" class="hidden bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md">
+        <div class="absolute -right-10 -top-10 w-52 h-52 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -bottom-10 w-52 h-52 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-4xl">
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-3.5">Welcome to the Bonniefields Museum Catalog</h2>
+          <p id="statIntroText" class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal whitespace-pre-line"></p>
+        </div>
+      </div>
+
+      <!-- Interactive 2D Map -->
+      <div id="statMapCard" class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md flex flex-col gap-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h3 class="text-base sm:text-lg font-black text-blue-300 uppercase tracking-wider flex items-center gap-2"><span>🗺️</span> Map of item origin</h3>
+          <button onclick="openEnlargeModal('https://dvdbaird.github.io/BMMC/2Dmap', true)" title="Open Map in Full Scale Pop-Up" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-md border border-blue-400/40 transition flex items-center gap-1 active:scale-95">Enlarge ↗</button>
+        </div>
+        <div class="w-full h-[400px] sm:h-[520px] relative overflow-hidden rounded-2xl bg-slate-900 border border-indigo-500/30 shadow-inner">
+          <iframe src="https://dvdbaird.github.io/BMMC/2Dmap" class="w-full h-full border-0 rounded-2xl bg-white" title="Map of item origin" loading="lazy"></iframe>
+        </div>
+      </div>
+
+      <!-- Primary KPI Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/50 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Items</span>
+              <span class="p-1.5 bg-blue-50 dark:bg-blue-950/80 text-blue-600 rounded-xl text-base border border-blue-100 dark:border-blue-900/60">🏛️</span>
+            </div>
+            <div class="text-2xl font-black text-blue-600 dark:text-blue-400" id="statTotalItems">1,193</div>
+          </div>
+        </div>
+
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-amber-500/50 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Date Span</span>
+              <span class="p-1.5 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-xl text-base border border-amber-100 dark:border-amber-900/60">⏳</span>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400" id="statDateRange">--</div>
+          </div>
+        </div>
+
+        <!-- Pre / Post 1950 Dual Metrics Card with Colored Results Text -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/50 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Era Distribution</span>
+              <span class="p-1.5 bg-purple-50 dark:bg-purple-950/80 text-purple-600 rounded-xl text-base border border-purple-100 dark:border-purple-900/60">📜</span>
+            </div>
+            <div class="space-y-0.5 mt-1">
+              <div class="text-sm font-black text-slate-900 dark:text-white" id="statPre1950">Pre 1950: <span class="text-purple-600 dark:text-purple-400">--</span></div>
+              <div class="text-sm font-black text-slate-900 dark:text-white" id="statPost1950">Post 1950: <span class="text-pink-600 dark:text-pink-400">--</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/50 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Highlighted Links</span>
+              <span class="p-1.5 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 rounded-xl text-base border border-emerald-100 dark:border-emerald-900/60">🔗</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 min-h-[32px]">
+              <a id="statDocLink" href="#" target="_blank" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Documentation ↗</a>
+              <a id="statWebLink" href="#" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">🌐 Web Info ↗</a>
+              <span id="statNoLinks" class="text-xs text-slate-400 italic">No links recorded</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Breakdown Banner -->
+      <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>⏳</span> Timeline Breakdown
+            </h3>
+          </div>
+        </div>
+        <div id="timelineEraGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between backdrop-blur-sm">
+          <div class="mb-4">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Item Date by Type</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Distribution of artifacts by decade (post-1800)</p>
+          </div>
+          <div class="chart-container relative h-[380px] w-full">
+            <canvas id="chartStackedDateType"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between backdrop-blur-sm">
+          <div class="mb-4">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">Origin Locations (Where Made)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Top manufacturing places</p>
+          </div>
+          <div class="chart-container relative h-[380px] w-full">
+            <canvas id="chartLocations"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subcategories Breakdown Chart -->
+      <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+        <div class="mb-4">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Subcategories Breakdown</h3>
+        </div>
+        <div class="chart-container relative h-[480px] w-full">
+          <canvas id="chartSubcatCategory"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification System -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <!-- Fullscale Enlarge Modal Pop-Up -->
+  <div id="enlargeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[70] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
+        <h3 class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Full Scale Interactive View</h3>
+        <button id="closeEnlargeModal" onclick="closeEnlargeModal()" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+      </div>
+      <div id="enlargeModalBody" class="w-full h-full flex items-center justify-center bg-slate-950 p-2 overflow-auto"></div>
+    </div>
+  </div>
+
+  <!-- Floating Mobile Jump Pill -->
+  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
+    <span>⬇️ View Archive</span>
+  </button>
+
+  <!-- Item Detail Pop-up Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
+      <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <button id="modalPrevBtn" title="Previous Item" aria-label="Previous Item" class="p-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
+            <span>←</span> <span class="hidden sm:inline">Prev</span>
+          </button>
+          <span id="modalCounter" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-300 px-2"></span>
+          <button id="modalNextBtn" title="Next Item" aria-label="Next Item" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
+            <span class="hidden sm:inline">Next</span> <span>→</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnShareExhibit" title="Copy Link" aria-label="Copy Link" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition">🔗</button>
+          <button id="closeModal" title="Close (Esc)" aria-label="Close modal" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold transition">✕</button>
+        </div>
+      </div>
+      <div id="modalContent" class="px-4 sm:px-8 pt-4 pb-6 sm:pb-8"></div>
+    </div>
+  </div>
+
+  <!-- Standalone 3D Lightbox Modal -->
+  <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[60] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <span class="text-xl">👓</span>
+          <h3 id="lightboxTitle" class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Interactive 3D Model</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnToggleLightboxSkybox" onclick="toggleModal3DSkybox(event)" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">☀️ Light Sky</button>
+          <button id="close3DLightbox" title="Close 3D View" aria-label="Close 3D View" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+        </div>
+      </div>
+
+      <div id="lightbox3DContainer" class="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden transition-colors duration-300">
+        <div id="lightboxSpinner" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/90 z-20 transition-opacity duration-300">
+          <div class="spinner-3d"></div>
+          <p class="text-xs font-bold text-sky-400">Loading High-Resolution 3D Model...</p>
+        </div>
+
+        <!-- Dynamic 3D Lightbox Scale Reference Overlay -->
+        <div class="absolute bottom-4 left-4 z-20 bg-slate-900/80 text-white backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 text-[10px] font-bold flex items-center gap-2 shadow-lg pointer-events-none">
+          <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+          <span id="lightboxScaleText">Calculating Dimensions...</span>
+        </div>
+
+        <model-viewer id="lightboxViewer" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" touch-action="pan-y" style="width: 100%; height: 100%; display: block; --poster-color: transparent;" class="w-full h-full"></model-viewer>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
