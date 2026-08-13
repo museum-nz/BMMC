@@ -112,8 +112,8 @@
       animation: seasonSkyCycle 60s linear infinite;
     }
 
-    /* Celestial Skyline Arc Motion */
-    @keyframes skylineArcDrift {
+    /* Celestial Poppy Skyline Arc Motion */
+    @keyframes poppyArcDrift {
       0% {
         transform: translate(0, 0) rotate(0deg);
       }
@@ -131,20 +131,20 @@
       }
     }
 
-    /* Pure Opacity Twinkle */
-    @keyframes starBurstTwinkle {
-      0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 2px rgba(15, 23, 42, 0.35)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)); }
-      50% { opacity: 1.0; filter: drop-shadow(0 0 3px rgba(15, 23, 42, 0.45)) drop-shadow(0 0 12px rgba(255, 255, 255, 1)); }
+    /* Gentle Poppy Flutter */
+    @keyframes poppyFlutter {
+      0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 3px rgba(220, 38, 38, 0.4)); transform: translateY(0px) rotate(-3deg); }
+      50% { opacity: 1.0; filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.7)); transform: translateY(-4px) rotate(4deg); }
     }
 
-    .star-skyline-drift {
+    .poppy-skyline-drift {
       width: 200vw;
       height: 80vh;
-      animation: skylineArcDrift 15s linear infinite;
+      animation: poppyArcDrift 18s linear infinite;
     }
 
-    .starburst-twinkle {
-      animation: starBurstTwinkle 3s ease-in-out infinite alternate;
+    .poppy-flutter {
+      animation: poppyFlutter 3.5s ease-in-out infinite alternate;
     }
   </style>
 
@@ -153,110 +153,152 @@
 </head>
 <body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
-  <!-- Moving Time & Seasons Sky Background with Mt Cook Silhouette -->
+  <!-- Moving Time & Seasons Sky Background with WW1 Silhouette -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
     
     <!-- 60-Second Seasonal Gradient Cycle -->
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0"></div>
 
-    <!-- Skyline Arcing Starbursts Container (Top 66% Screen Height, 15s Arc Motion) -->
-    <div class="star-skyline-drift absolute top-0 left-0 flex z-10">
+    <!-- Skyline Arcing WW1 Poppies Container (Top 66% Screen Height) -->
+    <div class="poppy-skyline-drift absolute top-0 left-0 flex z-10">
       
-      <!-- Twinkle Child Container -->
-      <div class="starburst-twinkle w-full h-full flex">
+      <!-- Flutter Child Container -->
+      <div class="poppy-flutter w-full h-full flex">
         
-        <!-- Tile 1 (Dense 100% 4-Point Starbursts across Top 66% Height) -->
-        <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="#ffffff">
+        <!-- Tile 1 (WW1 Remembrance Poppies) -->
+        <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+          <defs>
+            <!-- Remembrance Poppy Vector Symbol -->
+            <g id="poppySymbol">
+              <path fill="#dc2626" opacity="0.95" d="M 0,-16 C -10,-16 -16,-9 -16,0 C -16,5 -11,9 -7,11 C -11,16 -4,18 0,16 C 4,18 11,16 7,11 C 11,9 16,5 16,0 C 16,-9 10,-16 0,-16 Z"/>
+              <path fill="#ef4444" opacity="0.85" d="M -2,-2 C -8,-2 -11,2 -10,8 C -6,11 6,11 10,8 C 11,2 8,-2 -2,-2 Z"/>
+              <circle cx="0" cy="0" r="4.5" fill="#09090b"/>
+              <circle cx="0" cy="0" r="2" fill="#27272a"/>
+            </g>
+            <g id="poppySmall">
+              <use href="#poppySymbol" transform="scale(0.65)" />
+            </g>
+            <g id="poppyLarge">
+              <use href="#poppySymbol" transform="scale(1.25)" />
+            </g>
+          </defs>
+
           <!-- Band 1 (Top Sky: y 20 - 110) -->
-          <path d="M 100,28 Q 100,40 112,40 Q 100,40 100,52 Q 100,40 88,40 Q 100,40 100,28 Z" opacity="0.95" />
-          <path d="M 250,70 Q 250,80 260,80 Q 250,80 250,90 Q 250,80 240,80 Q 250,80 250,70 Z" opacity="0.8" />
-          <path d="M 420,16 Q 420,30 434,30 Q 420,30 420,44 Q 420,30 406,30 Q 420,30 420,16 Z" opacity="1" />
-          <path d="M 580,84 Q 580,95 591,95 Q 580,95 580,106 Q 580,95 569,95 Q 580,95 580,84 Z" opacity="0.85" />
-          <path d="M 740,32 Q 740,45 753,45 Q 740,45 740,58 Q 740,45 727,45 Q 740,45 740,32 Z" opacity="0.9" />
-          <path d="M 910,75 Q 910,85 920,85 Q 910,85 910,95 Q 910,85 900,85 Q 910,85 910,75 Z" opacity="0.8" />
+          <use href="#poppyLarge" x="100" y="40" opacity="0.95" />
+          <use href="#poppySymbol" x="250" y="80" opacity="0.85" />
+          <use href="#poppyLarge" x="420" y="30" opacity="1" />
+          <use href="#poppySmall" x="580" y="95" opacity="0.8" />
+          <use href="#poppySymbol" x="740" y="45" opacity="0.9" />
+          <use href="#poppyLarge" x="910" y="85" opacity="0.85" />
 
           <!-- Band 2 (Upper Middle Sky: y 120 - 210) -->
-          <path d="M 80,149 Q 80,160 91,160 Q 80,160 80,171 Q 80,160 69,160 Q 80,160 80,149 Z" opacity="0.85" />
-          <path d="M 210,117 Q 210,130 223,130 Q 210,130 210,143 Q 210,130 197,130 Q 210,130 210,117 Z" opacity="1" />
-          <path d="M 360,180 Q 360,190 370,190 Q 360,190 360,200 Q 360,190 350,190 Q 360,190 360,180 Z" opacity="0.75" />
-          <path d="M 510,128 Q 510,140 522,140 Q 510,140 510,152 Q 510,140 498,140 Q 510,140 510,128 Z" opacity="0.9" />
-          <path d="M 670,166 Q 670,180 684,180 Q 670,180 670,194 Q 670,180 656,180 Q 670,180 670,166 Z" opacity="0.95" />
-          <path d="M 820,135 Q 820,145 830,145 Q 820,145 820,155 Q 820,145 810,145 Q 820,145 820,135 Z" opacity="0.8" />
-          <path d="M 950,163 Q 950,175 962,175 Q 950,175 950,187 Q 950,175 938,175 Q 950,175 950,163 Z" opacity="0.9" />
+          <use href="#poppySymbol" x="80" y="160" opacity="0.85" />
+          <use href="#poppyLarge" x="210" y="130" opacity="0.95" />
+          <use href="#poppySmall" x="360" y="190" opacity="0.75" />
+          <use href="#poppySymbol" x="510" y="140" opacity="0.9" />
+          <use href="#poppyLarge" x="670" y="180" opacity="1" />
+          <use href="#poppySmall" x="820" y="145" opacity="0.8" />
+          <use href="#poppySymbol" x="950" y="175" opacity="0.9" />
 
           <!-- Band 3 (Middle Sky: y 220 - 320) -->
-          <path d="M 140,228 Q 140,240 152,240 Q 140,240 140,252 Q 140,240 128,240 Q 140,240 140,228 Z" opacity="0.9" />
-          <path d="M 300,270 Q 300,280 310,280 Q 300,280 300,290 Q 300,280 290,280 Q 300,280 300,270 Z" opacity="0.8" />
-          <path d="M 460,217 Q 460,230 473,230 Q 460,230 460,243 Q 460,230 447,230 Q 460,230 460,217 Z" opacity="1" />
-          <path d="M 610,279 Q 610,290 621,290 Q 610,290 610,301 Q 610,290 599,290 Q 610,290 610,279 Z" opacity="0.85" />
-          <path d="M 760,238 Q 760,250 772,250 Q 760,250 760,262 Q 760,250 748,250 Q 760,250 760,238 Z" opacity="0.95" />
-          <path d="M 890,275 Q 890,285 900,285 Q 890,285 890,295 Q 890,285 880,285 Q 890,285 890,275 Z" opacity="0.75" />
+          <use href="#poppyLarge" x="140" y="240" opacity="0.9" />
+          <use href="#poppySmall" x="300" y="280" opacity="0.8" />
+          <use href="#poppySymbol" x="460" y="230" opacity="1" />
+          <use href="#poppyLarge" x="610" y="290" opacity="0.85" />
+          <use href="#poppySymbol" x="760" y="250" opacity="0.95" />
+          <use href="#poppySmall" x="890" y="275" opacity="0.75" />
 
           <!-- Band 4 (Lower Middle Sky: y 330 - 430 -> Completes Top 66% Screen Coverage) -->
-          <path d="M 90,350 Q 90,360 100,360 Q 90,360 90,370 Q 90,360 80,360 Q 90,360 90,350 Z" opacity="0.85" />
-          <path d="M 230,328 Q 230,340 242,340 Q 230,340 230,352 Q 230,340 218,340 Q 230,340 230,328 Z" opacity="0.9" />
-          <path d="M 380,379 Q 380,390 391,390 Q 380,390 380,401 Q 380,390 369,390 Q 380,390 380,379 Z" opacity="0.8" />
-          <path d="M 530,337 Q 530,350 543,350 Q 530,350 530,363 Q 530,350 517,350 Q 530,350 530,337 Z" opacity="1" />
-          <path d="M 690,400 Q 690,410 700,410 Q 690,410 690,420 Q 690,410 680,410 Q 690,410 690,400 Z" opacity="0.75" />
-          <path d="M 840,358 Q 840,370 852,370 Q 840,370 840,382 Q 840,370 828,370 Q 840,370 840,358 Z" opacity="0.9" />
-          <path d="M 960,389 Q 960,400 971,400 Q 960,400 960,411 Q 960,400 949,400 Q 960,400 960,389 Z" opacity="0.8" />
+          <use href="#poppySmall" x="90" y="360" opacity="0.85" />
+          <use href="#poppySymbol" x="230" y="340" opacity="0.9" />
+          <use href="#poppyLarge" x="380" y="390" opacity="0.8" />
+          <use href="#poppySymbol" x="530" y="350" opacity="1" />
+          <use href="#poppySmall" x="690" y="410" opacity="0.75" />
+          <use href="#poppyLarge" x="840" y="370" opacity="0.9" />
+          <use href="#poppySymbol" x="960" y="400" opacity="0.85" />
         </svg>
 
-        <!-- Tile 2 (Seamless Duplicate for Smooth 15s Celestial Arc Loop) -->
-        <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="#ffffff">
+        <!-- Tile 2 (Seamless Duplicate for Infinite Poppy Arc Loop) -->
+        <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <!-- Band 1 (Top Sky: y 20 - 110) -->
-          <path d="M 100,28 Q 100,40 112,40 Q 100,40 100,52 Q 100,40 88,40 Q 100,40 100,28 Z" opacity="0.95" />
-          <path d="M 250,70 Q 250,80 260,80 Q 250,80 250,90 Q 250,80 240,80 Q 250,80 250,70 Z" opacity="0.8" />
-          <path d="M 420,16 Q 420,30 434,30 Q 420,30 420,44 Q 420,30 406,30 Q 420,30 420,16 Z" opacity="1" />
-          <path d="M 580,84 Q 580,95 591,95 Q 580,95 580,106 Q 580,95 569,95 Q 580,95 580,84 Z" opacity="0.85" />
-          <path d="M 740,32 Q 740,45 753,45 Q 740,45 740,58 Q 740,45 727,45 Q 740,45 740,32 Z" opacity="0.9" />
-          <path d="M 910,75 Q 910,85 920,85 Q 910,85 910,95 Q 910,85 900,85 Q 910,85 910,75 Z" opacity="0.8" />
+          <use href="#poppyLarge" x="100" y="40" opacity="0.95" />
+          <use href="#poppySymbol" x="250" y="80" opacity="0.85" />
+          <use href="#poppyLarge" x="420" y="30" opacity="1" />
+          <use href="#poppySmall" x="580" y="95" opacity="0.8" />
+          <use href="#poppySymbol" x="740" y="45" opacity="0.9" />
+          <use href="#poppyLarge" x="910" y="85" opacity="0.85" />
 
           <!-- Band 2 (Upper Middle Sky: y 120 - 210) -->
-          <path d="M 80,149 Q 80,160 91,160 Q 80,160 80,171 Q 80,160 69,160 Q 80,160 80,149 Z" opacity="0.85" />
-          <path d="M 210,117 Q 210,130 223,130 Q 210,130 210,143 Q 210,130 197,130 Q 210,130 210,117 Z" opacity="1" />
-          <path d="M 360,180 Q 360,190 370,190 Q 360,190 360,200 Q 360,190 350,190 Q 360,190 360,180 Z" opacity="0.75" />
-          <path d="M 510,128 Q 510,140 522,140 Q 510,140 510,152 Q 510,140 498,140 Q 510,140 510,128 Z" opacity="0.9" />
-          <path d="M 670,166 Q 670,180 684,180 Q 670,180 670,194 Q 670,180 656,180 Q 670,180 670,166 Z" opacity="0.95" />
-          <path d="M 820,135 Q 820,145 830,145 Q 820,145 820,155 Q 820,145 810,145 Q 820,145 820,135 Z" opacity="0.8" />
-          <path d="M 950,163 Q 950,175 962,175 Q 950,175 950,187 Q 950,175 938,175 Q 950,175 950,163 Z" opacity="0.9" />
+          <use href="#poppySymbol" x="80" y="160" opacity="0.85" />
+          <use href="#poppyLarge" x="210" y="130" opacity="0.95" />
+          <use href="#poppySmall" x="360" y="190" opacity="0.75" />
+          <use href="#poppySymbol" x="510" y="140" opacity="0.9" />
+          <use href="#poppyLarge" x="670" y="180" opacity="1" />
+          <use href="#poppySmall" x="820" y="145" opacity="0.8" />
+          <use href="#poppySymbol" x="950" y="175" opacity="0.9" />
 
           <!-- Band 3 (Middle Sky: y 220 - 320) -->
-          <path d="M 140,228 Q 140,240 152,240 Q 140,240 140,252 Q 140,240 128,240 Q 140,240 140,228 Z" opacity="0.9" />
-          <path d="M 300,270 Q 300,280 310,280 Q 300,280 300,290 Q 300,280 290,280 Q 300,280 300,270 Z" opacity="0.8" />
-          <path d="M 460,217 Q 460,230 473,230 Q 460,230 460,243 Q 460,230 447,230 Q 460,230 460,217 Z" opacity="1" />
-          <path d="M 610,279 Q 610,290 621,290 Q 610,290 610,301 Q 610,290 599,290 Q 610,290 610,279 Z" opacity="0.85" />
-          <path d="M 760,238 Q 760,250 772,250 Q 760,250 760,262 Q 760,250 748,250 Q 760,250 760,238 Z" opacity="0.95" />
-          <path d="M 890,275 Q 890,285 900,285 Q 890,285 890,295 Q 890,285 880,285 Q 890,285 890,275 Z" opacity="0.75" />
+          <use href="#poppyLarge" x="140" y="240" opacity="0.9" />
+          <use href="#poppySmall" x="300" y="280" opacity="0.8" />
+          <use href="#poppySymbol" x="460" y="230" opacity="1" />
+          <use href="#poppyLarge" x="610" y="290" opacity="0.85" />
+          <use href="#poppySymbol" x="760" y="250" opacity="0.95" />
+          <use href="#poppySmall" x="890" y="275" opacity="0.75" />
 
           <!-- Band 4 (Lower Middle Sky: y 330 - 430 -> Completes Top 66% Screen Coverage) -->
-          <path d="M 90,350 Q 90,360 100,360 Q 90,360 90,370 Q 90,360 80,360 Q 90,360 90,350 Z" opacity="0.85" />
-          <path d="M 230,328 Q 230,340 242,340 Q 230,340 230,352 Q 230,340 218,340 Q 230,340 230,328 Z" opacity="0.9" />
-          <path d="M 380,379 Q 380,390 391,390 Q 380,390 380,401 Q 380,390 369,390 Q 380,390 380,379 Z" opacity="0.8" />
-          <path d="M 530,337 Q 530,350 543,350 Q 530,350 530,363 Q 530,350 517,350 Q 530,350 530,337 Z" opacity="1" />
-          <path d="M 690,400 Q 690,410 700,410 Q 690,410 690,420 Q 690,410 680,410 Q 690,410 690,400 Z" opacity="0.75" />
-          <path d="M 840,358 Q 840,370 852,370 Q 840,370 840,382 Q 840,370 828,370 Q 840,370 840,358 Z" opacity="0.9" />
-          <path d="M 960,389 Q 960,400 971,400 Q 960,400 960,411 Q 960,400 949,400 Q 960,400 960,389 Z" opacity="0.8" />
+          <use href="#poppySmall" x="90" y="360" opacity="0.85" />
+          <use href="#poppySymbol" x="230" y="340" opacity="0.9" />
+          <use href="#poppyLarge" x="380" y="390" opacity="0.8" />
+          <use href="#poppySymbol" x="530" y="350" opacity="1" />
+          <use href="#poppySmall" x="690" y="410" opacity="0.75" />
+          <use href="#poppyLarge" x="840" y="370" opacity="0.9" />
+          <use href="#poppySymbol" x="960" y="400" opacity="0.85" />
         </svg>
 
       </div>
     </div>
 
-    <!-- Silhouette of Mount Cook (Aoraki), NZ -->
+    <!-- WW1 Silhouette Remembrance Scene (Horizon Bottom) -->
     <div class="absolute bottom-0 left-0 right-0 w-full leading-none z-20 opacity-85 dark:opacity-95 pointer-events-none">
-      <svg class="w-full h-32 sm:h-48 md:h-64 object-cover" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Far Background Ridge -->
-        <path d="M0,320 L0,220 L150,180 L280,210 L410,150 L520,190 L680,130 L800,180 L950,140 L1100,190 L1200,160 L1200,320 Z" 
+      <svg class="w-full h-36 sm:h-52 md:h-72 object-cover" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        
+        <!-- Far Background Battlefield Ridge -->
+        <path d="M0,320 L0,220 L180,210 L340,230 L490,200 L680,225 L840,205 L1020,230 L1200,210 L1200,320 Z" 
               fill="currentColor" class="text-slate-700/30 dark:text-slate-950/60" />
 
-        <!-- Mount Cook (Aoraki) Main Alpine Silhouette -->
-        <path d="M0,320 L0,200 L90,170 L180,210 L260,160 L380,230 L460,140 
-                 L580,30 L620,70 L670,20 L760,110 L840,160 L920,120 L1020,180 L1120,150 L1200,190 L1200,320 Z" 
-              fill="currentColor" class="text-slate-800/60 dark:text-slate-950/85" />
+        <!-- Middle Ground Ridge with Wooden Memorial Crosses & Barren Tree -->
+        <g fill="currentColor" class="text-slate-800/60 dark:text-slate-950/85">
+          <path d="M0,320 L0,235 L120,225 L240,245 L380,215 L520,240 L690,210 L830,235 L1010,215 L1200,225 L1200,320 Z" />
+          
+          <!-- Cross 1 -->
+          <path d="M178,205 H184 V235 H178 Z M174,213 H188 V217 H174 Z" />
+          <!-- Cross 2 -->
+          <path d="M203,212 H209 V237 H203 Z M199,218 H213 V222 H199 Z" />
+          <!-- Cross 3 -->
+          <path d="M878,210 H884 V238 H878 Z M874,216 H888 V220 H874 Z" />
+          
+          <!-- Barren Tree Trunk Silhouette -->
+          <path d="M1110,230 Q1112,180 1105,140 L1109,140 Q1115,175 1114,230 Z M1108,160 Q1090,145 1075,140 L1076,138 Q1091,143 1109,158 Z M1111,180 Q1130,165 1145,155 L1146,157 Q1131,167 1111,182 Z" />
+        </g>
 
-        <!-- Foreground Ridge Line -->
-        <path d="M0,320 L0,240 L120,220 L240,250 L340,200 L490,260 L610,180 L730,230 L880,190 L1000,240 L1130,210 L1200,230 L1200,320 Z" 
-              fill="currentColor" class="text-slate-900/80 dark:text-slate-950/95" />
+        <!-- Foreground Terrain + ANZAC / WW1 Marching Soldiers Silhouette -->
+        <g fill="currentColor" class="text-slate-900/80 dark:text-slate-950/95">
+          <!-- Foreground Hill Curve -->
+          <path d="M0,320 L0,250 L140,235 L310,255 L480,235 L660,250 L840,230 L1030,250 L1200,235 L1200,320 Z" />
+          
+          <!-- SOLDIERS MARCHING IN SINGLE FILE (Brodie Helmets, Packs, Sloped Rifles) -->
+          <!-- Soldier 1 -->
+          <path d="M345,212 C342,212 338,214 338,217 C338,219 342,219 345,219 C348,219 352,219 352,217 C352,214 348,212 345,212 Z M344,219 L342,228 L339,242 H342 L345,229 L348,242 H351 L347,227 L349,219 Z M338,220 L354,232 L356,231 L340,219 Z" />
+          
+          <!-- Soldier 2 -->
+          <path d="M375,210 C372,210 368,212 368,215 C368,217 372,217 375,217 C378,217 382,217 382,215 C382,212 378,210 375,210 Z M374,217 L372,226 L369,240 H372 L375,227 L378,240 H381 L377,225 L379,217 Z M368,218 L384,230 L386,229 L370,217 Z" />
+          
+          <!-- Soldier 3 -->
+          <path d="M405,211 C402,211 398,213 398,216 C398,218 402,218 405,218 C408,218 412,218 412,216 C412,213 408,211 405,211 Z M404,218 L402,227 L399,241 H402 L405,228 L408,241 H411 L407,226 L409,218 Z M398,219 L414,231 L416,230 L400,218 Z" />
+
+          <!-- Sentry Guard Soldier (Right Hill) -->
+          <path d="M785,206 C782,206 778,208 778,211 C778,213 782,213 785,213 C788,213 792,213 792,211 C792,208 788,206 785,206 Z M784,213 L783,224 L781,237 H784 L785,225 L787,237 H790 L788,223 L789,213 Z M789,208 L789,235 H790 L790,208 Z" />
+        </g>
       </svg>
     </div>
 
@@ -585,60 +627,4 @@
   </div>
 
   <!-- Floating Mobile Jump Pill -->
-  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
-    <span>⬇️ View Archive</span>
-  </button>
-
-  <!-- Item Detail Pop-up Modal -->
-  <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
-      <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-1.5">
-          <button id="modalPrevBtn" title="Previous Item" aria-label="Previous Item" class="p-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
-            <span>←</span> <span class="hidden sm:inline">Prev</span>
-          </button>
-          <span id="modalCounter" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-300 px-2"></span>
-          <button id="modalNextBtn" title="Next Item" aria-label="Next Item" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
-            <span class="hidden sm:inline">Next</span> <span>→</span>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button id="btnShareExhibit" title="Copy Link" aria-label="Copy Link" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition">🔗</button>
-          <button id="closeModal" title="Close (Esc)" aria-label="Close modal" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold transition">✕</button>
-        </div>
-      </div>
-      <div id="modalContent" class="px-4 sm:px-8 pt-4 pb-6 sm:pb-8"></div>
-    </div>
-  </div>
-
-  <!-- Standalone 3D Lightbox Modal -->
-  <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[60] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
-    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
-      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
-        <div class="flex items-center gap-2 overflow-hidden">
-          <span class="text-xl">👓</span>
-          <h3 id="lightboxTitle" class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Interactive 3D Model</h3>
-        </div>
-        <div class="flex items-center gap-2">
-          <button id="btnToggleLightboxSkybox" onclick="toggleModal3DSkybox(event)" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">☀️ Light Sky</button>
-          <button id="close3DLightbox" title="Close 3D View" aria-label="Close 3D View" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
-        </div>
-      </div>
-
-      <div id="lightbox3DContainer" class="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden transition-colors duration-300">
-        <div id="lightboxSpinner" class="absolute z-10 flex flex-col items-center justify-center gap-3 transition-opacity duration-300">
-          <div class="spinner-3d"></div>
-          <span class="text-xs font-bold text-slate-300">Loading 3D Model...</span>
-        </div>
-        <model-viewer id="lightboxViewer" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" style="width: 100%; height: 100%; display: block;" class="w-full h-full"></model-viewer>
-        <span id="lightboxScaleBadge" class="absolute bottom-4 right-4 bg-slate-900/85 text-white backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-xl z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-2">
-          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-          <span id="lightboxScaleText">Scale Reference Available</span>
-        </span>
-      </div>
-    </div>
-  </div>
-
-</body>
-</html>
+  <button id="float
