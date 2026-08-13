@@ -112,19 +112,19 @@
       animation: seasonSkyCycle 60s linear infinite;
     }
 
-    /* Curved Celestial Skyline Arc Motion */
+    /* Celestial Skyline Arc Motion */
     @keyframes skylineArcDrift {
       0% {
         transform: translate(0, 0) rotate(0deg);
       }
       25% {
-        transform: translate(-12.5%, -4vh) rotate(-1deg);
+        transform: translate(-12.5%, -8vh) rotate(-2deg);
       }
       50% {
-        transform: translate(-25%, -7vh) rotate(0deg);
+        transform: translate(-25%, -14vh) rotate(0deg);
       }
       75% {
-        transform: translate(-37.5%, -4vh) rotate(1deg);
+        transform: translate(-37.5%, -8vh) rotate(2deg);
       }
       100% {
         transform: translate(-50%, 0) rotate(0deg);
@@ -133,13 +133,13 @@
 
     /* Pure Opacity Twinkle */
     @keyframes starBurstTwinkle {
-      0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 2px rgba(15, 23, 42, 0.3)) drop-shadow(0 0 5px rgba(255, 255, 255, 0.9)); }
-      50% { opacity: 1.0; filter: drop-shadow(0 0 3px rgba(15, 23, 42, 0.4)) drop-shadow(0 0 10px rgba(255, 255, 255, 1)); }
+      0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 2px rgba(15, 23, 42, 0.35)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)); }
+      50% { opacity: 1.0; filter: drop-shadow(0 0 3px rgba(15, 23, 42, 0.45)) drop-shadow(0 0 12px rgba(255, 255, 255, 1)); }
     }
 
     .star-skyline-drift {
       width: 200vw;
-      height: 70vh;
+      height: 80vh;
       animation: skylineArcDrift 15s linear infinite;
     }
 
@@ -151,7 +151,7 @@
   <!-- Application Logic -->
   <script defer src="app.js"></script>
 </head>
-<body class="text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+<body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
   <!-- Moving Time & Seasons Sky Background with Mt Cook Silhouette -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
@@ -159,62 +159,84 @@
     <!-- 60-Second Seasonal Gradient Cycle -->
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0"></div>
 
-    <!-- Skyline Arcing Starbursts Container (15s Celestial Arc Motion) -->
+    <!-- Skyline Arcing Starbursts Container (Top 66% Screen Height, 15s Arc Motion) -->
     <div class="star-skyline-drift absolute top-0 left-0 flex z-10">
       
       <!-- Twinkle Child Container -->
       <div class="starburst-twinkle w-full h-full flex">
         
-        <!-- Tile 1 (100% 4-Point Starbursts) -->
+        <!-- Tile 1 (Dense 100% 4-Point Starbursts across Top 66% Height) -->
         <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="#ffffff">
-          <!-- Large Feature Starbursts -->
-          <path d="M 120,52 Q 120,64 132,64 Q 120,64 120,76 Q 120,64 108,64 Q 120,64 120,52 Z" />
-          <path d="M 280,133 Q 280,145 292,145 Q 280,145 280,157 Q 280,145 268,145 Q 280,145 280,133 Z" />
-          <path d="M 450,72 Q 450,84 462,84 Q 450,84 450,96 Q 450,84 438,84 Q 450,84 450,72 Z" />
-          <path d="M 680,183 Q 680,195 692,195 Q 680,195 680,207 Q 680,195 668,195 Q 680,195 680,183 Z" />
-          <path d="M 830,102 Q 830,114 842,114 Q 830,114 830,126 Q 830,114 818,114 Q 830,114 830,102 Z" />
-          <path d="M 940,203 Q 940,215 952,215 Q 940,215 940,227 Q 940,215 928,215 Q 940,215 940,203 Z" />
-          <path d="M 360,242 Q 360,254 372,254 Q 360,254 360,266 Q 360,254 348,254 Q 360,254 360,242 Z" />
+          <!-- Band 1 (Top Sky: y 20 - 110) -->
+          <path d="M 100,28 Q 100,40 112,40 Q 100,40 100,52 Q 100,40 88,40 Q 100,40 100,28 Z" opacity="0.95" />
+          <path d="M 250,70 Q 250,80 260,80 Q 250,80 250,90 Q 250,80 240,80 Q 250,80 250,70 Z" opacity="0.8" />
+          <path d="M 420,16 Q 420,30 434,30 Q 420,30 420,44 Q 420,30 406,30 Q 420,30 420,16 Z" opacity="1" />
+          <path d="M 580,84 Q 580,95 591,95 Q 580,95 580,106 Q 580,95 569,95 Q 580,95 580,84 Z" opacity="0.85" />
+          <path d="M 740,32 Q 740,45 753,45 Q 740,45 740,58 Q 740,45 727,45 Q 740,45 740,32 Z" opacity="0.9" />
+          <path d="M 910,75 Q 910,85 920,85 Q 910,85 910,95 Q 910,85 900,85 Q 910,85 910,75 Z" opacity="0.8" />
 
-          <!-- Medium & Small Starbursts -->
-          <path d="M 70,171 Q 70,180 79,180 Q 70,180 70,189 Q 70,180 61,180 Q 70,180 70,171 Z" opacity="0.9" />
-          <path d="M 190,213 Q 190,220 197,220 Q 190,220 190,227 Q 190,220 183,220 Q 190,220 190,213 Z" opacity="0.75" />
-          <path d="M 230,79 Q 230,90 241,90 Q 230,90 230,101 Q 230,90 219,90 Q 230,90 230,79 Z" opacity="0.95" />
-          <path d="M 340,152 Q 340,160 348,160 Q 340,160 340,168 Q 340,160 332,160 Q 340,160 340,152 Z" opacity="0.8" />
-          <path d="M 410,200 Q 410,210 420,210 Q 410,210 410,220 Q 410,210 400,210 Q 410,210 410,200 Z" opacity="0.9" />
-          <path d="M 520,112 Q 520,120 528,120 Q 520,120 520,128 Q 520,120 512,120 Q 520,120 520,112 Z" opacity="0.85" />
-          <path d="M 590,218 Q 590,230 602,230 Q 590,230 590,242 Q 590,230 578,230 Q 590,230 590,218 Z" opacity="1" />
-          <path d="M 640,62 Q 640,70 648,70 Q 640,70 640,78 Q 640,70 632,70 Q 640,70 640,62 Z" opacity="0.75" />
-          <path d="M 730,130 Q 730,140 740,140 Q 730,140 730,150 Q 730,140 720,140 Q 730,140 730,130 Z" opacity="0.9" />
-          <path d="M 790,234 Q 790,240 796,240 Q 790,240 790,246 Q 790,240 784,240 Q 790,240 790,234 Z" opacity="0.7" />
-          <path d="M 880,149 Q 880,160 891,160 Q 880,160 880,171 Q 880,160 869,160 Q 880,160 880,149 Z" opacity="0.95" />
-          <path d="M 50,101 Q 50,110 59,110 Q 50,110 50,119 Q 50,110 41,110 Q 50,110 50,101 Z" opacity="0.85" />
+          <!-- Band 2 (Upper Middle Sky: y 120 - 210) -->
+          <path d="M 80,149 Q 80,160 91,160 Q 80,160 80,171 Q 80,160 69,160 Q 80,160 80,149 Z" opacity="0.85" />
+          <path d="M 210,117 Q 210,130 223,130 Q 210,130 210,143 Q 210,130 197,130 Q 210,130 210,117 Z" opacity="1" />
+          <path d="M 360,180 Q 360,190 370,190 Q 360,190 360,200 Q 360,190 350,190 Q 360,190 360,180 Z" opacity="0.75" />
+          <path d="M 510,128 Q 510,140 522,140 Q 510,140 510,152 Q 510,140 498,140 Q 510,140 510,128 Z" opacity="0.9" />
+          <path d="M 670,166 Q 670,180 684,180 Q 670,180 670,194 Q 670,180 656,180 Q 670,180 670,166 Z" opacity="0.95" />
+          <path d="M 820,135 Q 820,145 830,145 Q 820,145 820,155 Q 820,145 810,145 Q 820,145 820,135 Z" opacity="0.8" />
+          <path d="M 950,163 Q 950,175 962,175 Q 950,175 950,187 Q 950,175 938,175 Q 950,175 950,163 Z" opacity="0.9" />
+
+          <!-- Band 3 (Middle Sky: y 220 - 320) -->
+          <path d="M 140,228 Q 140,240 152,240 Q 140,240 140,252 Q 140,240 128,240 Q 140,240 140,228 Z" opacity="0.9" />
+          <path d="M 300,270 Q 300,280 310,280 Q 300,280 300,290 Q 300,280 290,280 Q 300,280 300,270 Z" opacity="0.8" />
+          <path d="M 460,217 Q 460,230 473,230 Q 460,230 460,243 Q 460,230 447,230 Q 460,230 460,217 Z" opacity="1" />
+          <path d="M 610,279 Q 610,290 621,290 Q 610,290 610,301 Q 610,290 599,290 Q 610,290 610,279 Z" opacity="0.85" />
+          <path d="M 760,238 Q 760,250 772,250 Q 760,250 760,262 Q 760,250 748,250 Q 760,250 760,238 Z" opacity="0.95" />
+          <path d="M 890,275 Q 890,285 900,285 Q 890,285 890,295 Q 890,285 880,285 Q 890,285 890,275 Z" opacity="0.75" />
+
+          <!-- Band 4 (Lower Middle Sky: y 330 - 430 -> Completes Top 66% Screen Coverage) -->
+          <path d="M 90,350 Q 90,360 100,360 Q 90,360 90,370 Q 90,360 80,360 Q 90,360 90,350 Z" opacity="0.85" />
+          <path d="M 230,328 Q 230,340 242,340 Q 230,340 230,352 Q 230,340 218,340 Q 230,340 230,328 Z" opacity="0.9" />
+          <path d="M 380,379 Q 380,390 391,390 Q 380,390 380,401 Q 380,390 369,390 Q 380,390 380,379 Z" opacity="0.8" />
+          <path d="M 530,337 Q 530,350 543,350 Q 530,350 530,363 Q 530,350 517,350 Q 530,350 530,337 Z" opacity="1" />
+          <path d="M 690,400 Q 690,410 700,410 Q 690,410 690,420 Q 690,410 680,410 Q 690,410 690,400 Z" opacity="0.75" />
+          <path d="M 840,358 Q 840,370 852,370 Q 840,370 840,382 Q 840,370 828,370 Q 840,370 840,358 Z" opacity="0.9" />
+          <path d="M 960,389 Q 960,400 971,400 Q 960,400 960,411 Q 960,400 949,400 Q 960,400 960,389 Z" opacity="0.8" />
         </svg>
 
-        <!-- Tile 2 (Seamless Duplicate for Infinite Celestial Arc Loop) -->
+        <!-- Tile 2 (Seamless Duplicate for Smooth 15s Celestial Arc Loop) -->
         <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="#ffffff">
-          <!-- Large Feature Starbursts -->
-          <path d="M 120,52 Q 120,64 132,64 Q 120,64 120,76 Q 120,64 108,64 Q 120,64 120,52 Z" />
-          <path d="M 280,133 Q 280,145 292,145 Q 280,145 280,157 Q 280,145 268,145 Q 280,145 280,133 Z" />
-          <path d="M 450,72 Q 450,84 462,84 Q 450,84 450,96 Q 450,84 438,84 Q 450,84 450,72 Z" />
-          <path d="M 680,183 Q 680,195 692,195 Q 680,195 680,207 Q 680,195 668,195 Q 680,195 680,183 Z" />
-          <path d="M 830,102 Q 830,114 842,114 Q 830,114 830,126 Q 830,114 818,114 Q 830,114 830,102 Z" />
-          <path d="M 940,203 Q 940,215 952,215 Q 940,215 940,227 Q 940,215 928,215 Q 940,215 940,203 Z" />
-          <path d="M 360,242 Q 360,254 372,254 Q 360,254 360,266 Q 360,254 348,254 Q 360,254 360,242 Z" />
+          <!-- Band 1 (Top Sky: y 20 - 110) -->
+          <path d="M 100,28 Q 100,40 112,40 Q 100,40 100,52 Q 100,40 88,40 Q 100,40 100,28 Z" opacity="0.95" />
+          <path d="M 250,70 Q 250,80 260,80 Q 250,80 250,90 Q 250,80 240,80 Q 250,80 250,70 Z" opacity="0.8" />
+          <path d="M 420,16 Q 420,30 434,30 Q 420,30 420,44 Q 420,30 406,30 Q 420,30 420,16 Z" opacity="1" />
+          <path d="M 580,84 Q 580,95 591,95 Q 580,95 580,106 Q 580,95 569,95 Q 580,95 580,84 Z" opacity="0.85" />
+          <path d="M 740,32 Q 740,45 753,45 Q 740,45 740,58 Q 740,45 727,45 Q 740,45 740,32 Z" opacity="0.9" />
+          <path d="M 910,75 Q 910,85 920,85 Q 910,85 910,95 Q 910,85 900,85 Q 910,85 910,75 Z" opacity="0.8" />
 
-          <!-- Medium & Small Starbursts -->
-          <path d="M 70,171 Q 70,180 79,180 Q 70,180 70,189 Q 70,180 61,180 Q 70,180 70,171 Z" opacity="0.9" />
-          <path d="M 190,213 Q 190,220 197,220 Q 190,220 190,227 Q 190,220 183,220 Q 190,220 190,213 Z" opacity="0.75" />
-          <path d="M 230,79 Q 230,90 241,90 Q 230,90 230,101 Q 230,90 219,90 Q 230,90 230,79 Z" opacity="0.95" />
-          <path d="M 340,152 Q 340,160 348,160 Q 340,160 340,168 Q 340,160 332,160 Q 340,160 340,152 Z" opacity="0.8" />
-          <path d="M 410,200 Q 410,210 420,210 Q 410,210 410,220 Q 410,210 400,210 Q 410,210 410,200 Z" opacity="0.9" />
-          <path d="M 520,112 Q 520,120 528,120 Q 520,120 520,128 Q 520,120 512,120 Q 520,120 520,112 Z" opacity="0.85" />
-          <path d="M 590,218 Q 590,230 602,230 Q 590,230 590,242 Q 590,230 578,230 Q 590,230 590,218 Z" opacity="1" />
-          <path d="M 640,62 Q 640,70 648,70 Q 640,70 640,78 Q 640,70 632,70 Q 640,70 640,62 Z" opacity="0.75" />
-          <path d="M 730,130 Q 730,140 740,140 Q 730,140 730,150 Q 730,140 720,140 Q 730,140 730,130 Z" opacity="0.9" />
-          <path d="M 790,234 Q 790,240 796,240 Q 790,240 790,246 Q 790,240 784,240 Q 790,240 790,234 Z" opacity="0.7" />
-          <path d="M 880,149 Q 880,160 891,160 Q 880,160 880,171 Q 880,160 869,160 Q 880,160 880,149 Z" opacity="0.95" />
-          <path d="M 50,101 Q 50,110 59,110 Q 50,110 50,119 Q 50,110 41,110 Q 50,110 50,101 Z" opacity="0.85" />
+          <!-- Band 2 (Upper Middle Sky: y 120 - 210) -->
+          <path d="M 80,149 Q 80,160 91,160 Q 80,160 80,171 Q 80,160 69,160 Q 80,160 80,149 Z" opacity="0.85" />
+          <path d="M 210,117 Q 210,130 223,130 Q 210,130 210,143 Q 210,130 197,130 Q 210,130 210,117 Z" opacity="1" />
+          <path d="M 360,180 Q 360,190 370,190 Q 360,190 360,200 Q 360,190 350,190 Q 360,190 360,180 Z" opacity="0.75" />
+          <path d="M 510,128 Q 510,140 522,140 Q 510,140 510,152 Q 510,140 498,140 Q 510,140 510,128 Z" opacity="0.9" />
+          <path d="M 670,166 Q 670,180 684,180 Q 670,180 670,194 Q 670,180 656,180 Q 670,180 670,166 Z" opacity="0.95" />
+          <path d="M 820,135 Q 820,145 830,145 Q 820,145 820,155 Q 820,145 810,145 Q 820,145 820,135 Z" opacity="0.8" />
+          <path d="M 950,163 Q 950,175 962,175 Q 950,175 950,187 Q 950,175 938,175 Q 950,175 950,163 Z" opacity="0.9" />
+
+          <!-- Band 3 (Middle Sky: y 220 - 320) -->
+          <path d="M 140,228 Q 140,240 152,240 Q 140,240 140,252 Q 140,240 128,240 Q 140,240 140,228 Z" opacity="0.9" />
+          <path d="M 300,270 Q 300,280 310,280 Q 300,280 300,290 Q 300,280 290,280 Q 300,280 300,270 Z" opacity="0.8" />
+          <path d="M 460,217 Q 460,230 473,230 Q 460,230 460,243 Q 460,230 447,230 Q 460,230 460,217 Z" opacity="1" />
+          <path d="M 610,279 Q 610,290 621,290 Q 610,290 610,301 Q 610,290 599,290 Q 610,290 610,279 Z" opacity="0.85" />
+          <path d="M 760,238 Q 760,250 772,250 Q 760,250 760,262 Q 760,250 748,250 Q 760,250 760,238 Z" opacity="0.95" />
+          <path d="M 890,275 Q 890,285 900,285 Q 890,285 890,295 Q 890,285 880,285 Q 890,285 890,275 Z" opacity="0.75" />
+
+          <!-- Band 4 (Lower Middle Sky: y 330 - 430 -> Completes Top 66% Screen Coverage) -->
+          <path d="M 90,350 Q 90,360 100,360 Q 90,360 90,370 Q 90,360 80,360 Q 90,360 90,350 Z" opacity="0.85" />
+          <path d="M 230,328 Q 230,340 242,340 Q 230,340 230,352 Q 230,340 218,340 Q 230,340 230,328 Z" opacity="0.9" />
+          <path d="M 380,379 Q 380,390 391,390 Q 380,390 380,401 Q 380,390 369,390 Q 380,390 380,379 Z" opacity="0.8" />
+          <path d="M 530,337 Q 530,350 543,350 Q 530,350 530,363 Q 530,350 517,350 Q 530,350 530,337 Z" opacity="1" />
+          <path d="M 690,400 Q 690,410 700,410 Q 690,410 690,420 Q 690,410 680,410 Q 690,410 690,400 Z" opacity="0.75" />
+          <path d="M 840,358 Q 840,370 852,370 Q 840,370 840,382 Q 840,370 828,370 Q 840,370 840,358 Z" opacity="0.9" />
+          <path d="M 960,389 Q 960,400 971,400 Q 960,400 960,411 Q 960,400 949,400 Q 960,400 960,389 Z" opacity="0.8" />
         </svg>
 
       </div>
