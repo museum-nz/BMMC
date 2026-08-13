@@ -22,8 +22,6 @@ const TIMELINE_CUSTOM_IMAGES = {
   "WWII": "https://lh3.googleusercontent.com/d/1EoNqpgXzJoT6g8xsl2hPp9CBloibQEB0=s200",
   "Post War": "https://lh3.googleusercontent.com/d/1BLA99VbyIAhyBgcAjOl-VLUHv9Tpy1bE=s200",
   "Modern": "https://lh3.googleusercontent.com/d/1Eez4R63VdHFSWnVNBqaWiBH_2SrhNrnF=s200",
-  "Items of interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200",
-  "Items of Interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200",
   "Itmes of Interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200"
 };
 
