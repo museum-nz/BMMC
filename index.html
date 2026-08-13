@@ -5,8 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Showcase — Museum & Gramophone Archive</title>
 
+  <!-- Preconnect for Image & Media CDN Performance -->
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://drive.google.com" crossorigin>
+
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+
+  <!-- Umami Tracking Script -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="dfdc416e-ad5f-4752-9c46-b426a92e30b3"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -81,6 +88,9 @@
   <script defer src="app.js"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-slate-100/80 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+
+  <!-- Full-Screen Floating Particle Canvas -->
+  <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
   <!-- Header Section -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
@@ -246,6 +256,23 @@
       </div>
     </div>
 
+    <!-- Hidden Site Analytics Dashboard Section (Accessible via #analytics) -->
+    <div id="adminAnalyticsSection" class="hidden space-y-4">
+      <div class="flex items-center justify-between bg-white/90 dark:bg-slate-900/90 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📊</span>
+          <div>
+            <h2 class="text-base font-black text-slate-900 dark:text-white">Live Website Analytics</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Visitor traffic, pageviews, and referrer insights</p>
+          </div>
+        </div>
+        <button onclick="browseAllExhibits()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">← Back to Museum</button>
+      </div>
+      <div class="w-full h-[750px] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-900">
+        <iframe src="https://cloud.umami.is/share/dfdc416e-ad5f-4752-9c46-b426a92e30b3" class="w-full h-full border-0" title="Live Website Analytics Dashboard" loading="lazy"></iframe>
+      </div>
+    </div>
+
     <!-- Exhibit Cards Grid -->
     <div id="gridSection">
       <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
@@ -274,6 +301,11 @@
         </div>
       </div>
 
+      <!-- Timeline Era Breakdown Grid -->
+      <div id="timelineEraSection" class="pt-1 border-t border-slate-200/60 dark:border-slate-800/80">
+        <div id="timelineEraGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"></div>
+      </div>
+
       <!-- Primary KPI Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/50 transition">
@@ -298,7 +330,7 @@
           </div>
         </div>
 
-        <!-- Pre / Post 1950 Dual Metrics Card with Colored Results Text -->
+        <!-- Pre / Post 1950 Dual Metrics Card -->
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/50 transition">
           <div class="w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 absolute top-0 left-0"></div>
           <div>
@@ -326,20 +358,6 @@
               <span id="statNoLinks" class="text-xs text-slate-400 italic">No links recorded</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Timeline Breakdown Banner -->
-      <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <div>
-            <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>⏳</span> Timeline Breakdown
-            </h3>
-          </div>
-        </div>
-        <div id="timelineEraGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-          <!-- Dynamically populated via JS -->
         </div>
       </div>
 
@@ -439,18 +457,15 @@
       </div>
 
       <div id="lightbox3DContainer" class="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden transition-colors duration-300">
-        <div id="lightboxSpinner" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/90 z-20 transition-opacity duration-300">
+        <div id="lightboxSpinner" class="absolute z-10 flex flex-col items-center justify-center gap-3 transition-opacity duration-300">
           <div class="spinner-3d"></div>
-          <p class="text-xs font-bold text-sky-400">Loading High-Resolution 3D Model...</p>
+          <span class="text-xs font-bold text-slate-300">Loading 3D Model...</span>
         </div>
-
-        <!-- Dynamic 3D Lightbox Scale Reference Overlay -->
-        <div class="absolute bottom-4 left-4 z-20 bg-slate-900/80 text-white backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 text-[10px] font-bold flex items-center gap-2 shadow-lg pointer-events-none">
-          <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-          <span id="lightboxScaleText">Calculating Dimensions...</span>
-        </div>
-
-        <model-viewer id="lightboxViewer" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" touch-action="pan-y" style="width: 100%; height: 100%; display: block; --poster-color: transparent;" class="w-full h-full"></model-viewer>
+        <model-viewer id="lightboxViewer" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" style="width: 100%; height: 100%; display: block;" class="w-full h-full"></model-viewer>
+        <span id="lightboxScaleBadge" class="absolute bottom-4 right-4 bg-slate-900/85 text-white backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-xl z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-2">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+          <span id="lightboxScaleText">Scale Reference Available</span>
+        </span>
       </div>
     </div>
   </div>

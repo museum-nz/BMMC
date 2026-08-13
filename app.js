@@ -5,13 +5,26 @@ const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
 
 const HUB_CUSTOM_IMAGES = {
-  "War": "https://drive.google.com/thumbnail?id=1MPsC_RvHj1FoYs9qY1uszeKAD8nJjnCl&sz=s200",
-  "Photography": "https://drive.google.com/thumbnail?id=1wG9HuJovMcF0FV_rucdU2D9Bo0-XBBdm&sz=s200",
-  "Survey": "https://drive.google.com/thumbnail?id=1ynhpt7nlIWCEaE-VGQ0xqvT8LPR4YEU2&sz=s200",
-  "General": "https://drive.google.com/thumbnail?id=1yYyeT3Gdf0CFJCdAUBHhr0oYNxmKlxv5&sz=s200",
-  "Documentation": "https://drive.google.com/thumbnail?id=1VHPNsMSdCsWTL3bjOJ1haOSwV0_1hOgx&sz=s200",
-  "Household": "https://drive.google.com/thumbnail?id=1YpCxkPq6yCiVK-lNBDHC4qbI-ypmuGJ-&sz=s200",
-  "Collections": "https://drive.google.com/thumbnail?id=1cJOXAc-8l8J9R1NXt9P-wKbtxHcAjlvC&sz=s200"
+  "War": "https://lh3.googleusercontent.com/d/1MPsC_RvHj1FoYs9qY1uszeKAD8nJjnCl=s200",
+  "Photography": "https://lh3.googleusercontent.com/d/1wG9HuJovMcF0FV_rucdU2D9Bo0-XBBdm=s200",
+  "Survey": "https://lh3.googleusercontent.com/d/1ynhpt7nlIWCEaE-VGQ0xqvT8LPR4YEU2=s200",
+  "General": "https://lh3.googleusercontent.com/d/1yYyeT3Gdf0CFJCdAUBHhr0oYNxmKlxv5=s200",
+  "Documentation": "https://lh3.googleusercontent.com/d/1VHPNsMSdCsWTL3bjOJ1haOSwV0_1hOgx=s200",
+  "Household": "https://lh3.googleusercontent.com/d/1YpCxkPq6yCiVK-lNBDHC4qbI-ypmuGJ-=s200",
+  "Collections": "https://lh3.googleusercontent.com/d/1cJOXAc-8l8J9R1NXt9P-wKbtxHcAjlvC=s200"
+};
+
+const TIMELINE_CUSTOM_IMAGES = {
+  "Prehistory": "https://lh3.googleusercontent.com/d/1P2FMOTE6v8UeOowUc6OTq-B6OpmqnXMm=s200",
+  "Victorian": "https://lh3.googleusercontent.com/d/1yzhHrM_yEJFpFrQgCSpWTNo1PIrfX65C=s200",
+  "WWI": "https://lh3.googleusercontent.com/d/1MPsC_RvHj1FoYs9qY1uszeKAD8nJjnCl=s200",
+  "Interwar": "https://lh3.googleusercontent.com/d/1cswXC3Ia74sbjpUpGTRuPr6yGIAk1Ec2=s200",
+  "WWII": "https://lh3.googleusercontent.com/d/1EoNqpgXzJoT6g8xsl2hPp9CBloibQEB0=s200",
+  "Post War": "https://lh3.googleusercontent.com/d/1BLA99VbyIAhyBgcAjOl-VLUHv9Tpy1bE=s200",
+  "Modern": "https://lh3.googleusercontent.com/d/1Eez4R63VdHFSWnVNBqaWiBH_2SrhNrnF=s200",
+  "Items of interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200",
+  "Items of Interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200",
+  "Itmes of Interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200"
 };
 
 const CATEGORY_PALETTE = {
@@ -37,12 +50,89 @@ const TIMELINE_ERAS = [
   { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
 ];
 
+function initParticleCanvas() {
+  const canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width = 0;
+  let height = 0;
+  let particles = [];
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    createParticles();
+  }
+
+  function createParticles() {
+    particles = [];
+    const count = Math.min(Math.floor((width * height) / 16000), 75);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7,
+        radius: Math.random() * 1.8 + 1,
+        alpha: Math.random() * 0.4 + 0.2
+      });
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, width, height);
+    const isDark = document.documentElement.classList.contains('dark');
+    const rgbColor = isDark ? '129, 140, 248' : '59, 130, 246';
+
+    const maxDist = 130;
+    for (let i = 0; i < particles.length; i++) {
+      const p1 = particles[i];
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          const lineAlpha = (1 - dist / maxDist) * 0.22;
+          ctx.strokeStyle = `rgba(${rgbColor}, ${lineAlpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < 0) p.x = width;
+      if (p.x > width) p.x = 0;
+      if (p.y < 0) p.y = height;
+      if (p.y > height) p.y = 0;
+
+      ctx.fillStyle = `rgba(${rgbColor}, ${p.alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  render();
+}
+
 function getEraByYear(yearNum) {
   if (yearNum === null || yearNum === undefined || isNaN(yearNum)) return null;
   return TIMELINE_ERAS.find(e => yearNum >= e.min && yearNum <= e.max) || null;
 }
 
-// Strictly extracts year ONLY from Column Y ("Year")
 function getEraByRow(row) {
   if (!row) return null;
   const yearStr = getVal(row, colIdx.year);
@@ -417,20 +507,31 @@ function updateFavoritesBadge() {
   }
 }
 
-function formatImageUrl(url) {
+function formatGoogleLh3Url(url, size = 's200') {
   if (!url) return '';
   url = String(url).trim();
-  if (url.includes('drive.google.com/thumbnail') || url.includes('docs.google.com/spreadsheets') || url.includes('pubchart')) return url;
+  if (!url) return '';
+  if (url.startsWith('data:image/')) return url;
+
   if (url.includes('dropbox.com')) {
-    url = url.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
-    if (!url.includes('raw=1')) url += (url.includes('?') ? '&raw=1' : '?raw=1');
-    return url;
+    let cleanUrl = url.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
+    if (!cleanUrl.includes('raw=1')) cleanUrl += (cleanUrl.includes('?') ? '&raw=1' : '?raw=1');
+    return cleanUrl;
   }
+
+  const isDrive = url.includes('drive.google.com') || url.includes('lh3.googleusercontent.com') || url.includes('docs.google.com');
+  if (isDrive) {
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || 
+                  url.match(/id=([a-zA-Z0-9_-]+)/) || 
+                  url.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      const fileId = match[1];
+      const sz = String(size).startsWith('s') ? size : `s${size}`;
+      return `https://lh3.googleusercontent.com/d/${fileId}=${sz}`;
+    }
+  }
+
   if (!url.startsWith('http://') && !url.startsWith('https://')) return '';
-  if (url.includes('drive.google.com')) {
-    const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-    if (driveMatch && driveMatch[1]) return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
-  }
   return url;
 }
 
@@ -483,14 +584,14 @@ function isItemHot(row) {
 }
 
 function getImagesForItem(row) {
-  let img1 = formatImageUrl(getVal(row, colIdx.img1));
-  let img2 = formatImageUrl(getVal(row, colIdx.img2));
+  let img1 = getVal(row, colIdx.img1);
+  let img2 = getVal(row, colIdx.img2);
   if (!img1 && row) {
     for (let i = 2; i < row.length; i++) {
       const val = getVal(row, i);
       if (val && val.startsWith('http') && (val.includes('drive.google') || val.includes('lh3.google') || val.includes('dropbox') || /\.(jpg|jpeg|png|webp|gif)/i.test(val))) {
-        if (!img1) img1 = formatImageUrl(val);
-        else if (!img2 && val !== img1) { img2 = formatImageUrl(val); break; }
+        if (!img1) img1 = val;
+        else if (!img2 && val !== img1) { img2 = val; break; }
       }
     }
   }
@@ -553,7 +654,7 @@ function setTab(tabName) {
   currentTab = tabName;
   stopAudioGuide();
   hideLoadingSpinner();
-  if (tabName !== 'stats' && window.location.hash === '#stats') window.history.replaceState(null, '', window.location.pathname);
+  if (tabName !== 'stats' && tabName !== 'analytics' && window.location.hash === '#stats') window.history.replaceState(null, '', window.location.pathname);
 
   const exhibitsFilterGrid = document.getElementById('exhibitsFilterGrid');
   const gramophoneFilterGrid = document.getElementById('gramophoneFilterGrid');
@@ -561,9 +662,12 @@ function setTab(tabName) {
   const gridPrompt = document.getElementById('gridPrompt');
   const gridSection = document.getElementById('gridSection');
   const statsSection = document.getElementById('statsSection');
+  const adminAnalyticsSection = document.getElementById('adminAnalyticsSection');
   const headerTitle = document.getElementById('headerTitleText');
   const headerIcon = document.getElementById('headerLogoIcon');
   const subhead = document.getElementById('subheadingText');
+
+  if (adminAnalyticsSection) adminAnalyticsSection.classList.add('hidden');
 
   if (tabName === 'exhibits') {
     statsSection.classList.add('hidden'); gridSection.classList.remove('hidden');
@@ -587,9 +691,15 @@ function setTab(tabName) {
     headerTitle.textContent = 'Museum Insights Live'; headerIcon.textContent = 'ℹ️';
     subhead.textContent = 'Explore live analytics, origin distribution, and chronological evolution from the Bonniefields Museum catalog.';
     renderMuseumStatistics();
+  } else if (tabName === 'analytics') {
+    gridPrompt.classList.add('hidden'); gridSection.classList.add('hidden'); statsSection.classList.add('hidden');
+    exhibitsFilterGrid.classList.add('hidden'); gramophoneFilterGrid.classList.add('hidden'); searchSortBar.classList.add('hidden');
+    if (adminAnalyticsSection) adminAnalyticsSection.classList.remove('hidden');
+    headerTitle.textContent = 'Site Traffic Dashboard'; headerIcon.textContent = '📊';
+    subhead.textContent = 'Live visitor statistics, pageviews, and visitor interactions tracked by Umami.';
   }
   updateFavoritesBadge();
-  if (tabName !== 'stats') { updateDynamicDropdowns(); filterCatalog(true); }
+  if (tabName !== 'stats' && tabName !== 'analytics') { updateDynamicDropdowns(); filterCatalog(true); }
 }
 
 function initFuseSearch() {
@@ -669,7 +779,8 @@ async function loadCatalogData() {
 
 function checkUrlHashForExhibit() {
   const hash = window.location.hash;
-  if (hash === '#stats') setTab('stats');
+  if (hash === '#analytics' || hash === '#admin-stats') setTab('analytics');
+  else if (hash === '#stats') setTab('stats');
   else if (hash && hash.startsWith('#exhibit-')) {
     const index = parseInt(hash.replace('#exhibit-', ''), 10);
     if (!isNaN(index) && rawExhibitsRows[index]) { filterCatalog(true); openModalByOriginalIndex(index); }
@@ -684,15 +795,21 @@ function renderCollectionHubs(rows) {
   if (!hubsGrid) return;
   hubsGrid.innerHTML = '';
 
+  const totalExhibitsCount = rows.length;
+
   MAIN_HUB_CATEGORIES.forEach(catName => {
     const baseName = catName.toLowerCase().replace(/s$/, '');
     const matchingRows = rows.filter(r => getVal(r, colIdx.category).toLowerCase().includes(baseName) || getVal(r, colIdx.type).toLowerCase().includes(baseName));
     const count = matchingRows.length;
     if (count === 0) return;
 
+    const pctNum = totalExhibitsCount > 0 ? (count / totalExhibitsCount * 100) : 0;
+    const pctDisplay = pctNum > 0 && pctNum < 1 ? pctNum.toFixed(1) : Math.round(pctNum);
+
     const customImg = HUB_CUSTOM_IMAGES[catName];
     const firstImgRow = matchingRows.find(r => getVal(r, colIdx.img1) !== '');
-    const previewImg = customImg ? formatImageUrl(customImg) : (formatImageUrl(firstImgRow ? getVal(firstImgRow, colIdx.img1) : '') || NO_IMAGE_SVG);
+    const rawPreviewUrl = customImg || (firstImgRow ? getVal(firstImgRow, colIdx.img1) : '');
+    const previewImg = formatGoogleLh3Url(rawPreviewUrl, 's200') || NO_IMAGE_SVG;
     const theme = getCategoryTheme(baseName);
 
     const hubCard = document.createElement('div');
@@ -701,7 +818,10 @@ function renderCollectionHubs(rows) {
     hubCard.innerHTML = `
       <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: ${theme.hex}25;">
         <img src="${previewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="${catName}" />
-        <span class="absolute top-1.5 right-1.5 text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${theme.hex}; color: ${theme.text};">${count}</span>
+        <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
+          <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${theme.hex}; color: ${theme.text};">${count}</span>
+          <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${pctDisplay}%</span>
+        </div>
       </div>
       <div class="p-2.5 flex-1 flex flex-col justify-between">
         <h3 class="font-black text-xs line-clamp-1" style="color: ${theme.hex};">${catName}</h3>
@@ -732,13 +852,20 @@ function renderCollectionHubs(rows) {
   });
 
   const gramTheme = CATEGORY_PALETTE.gramophones;
+  const totalCatalogItems = totalExhibitsCount + rawGramophoneRows.length;
+  const gramPctNum = totalCatalogItems > 0 ? (rawGramophoneRows.length / totalCatalogItems * 100) : 0;
+  const gramPctDisplay = gramPctNum > 0 && gramPctNum < 1 ? gramPctNum.toFixed(1) : Math.round(gramPctNum);
+
   const gramophoneHubCard = document.createElement('div');
   gramophoneHubCard.className = 'bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative';
   gramophoneHubCard.style.borderColor = gramTheme.hex;
   gramophoneHubCard.innerHTML = `
     <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5 text-3xl" style="background-color: ${gramTheme.hex}25;">
       🎵
-      <span class="absolute top-1.5 right-1.5 text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${gramTheme.hex}; color: ${gramTheme.text};">${rawGramophoneRows.length}</span>
+      <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
+        <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${gramTheme.hex}; color: ${gramTheme.text};">${rawGramophoneRows.length}</span>
+        <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${gramPctDisplay}%</span>
+      </div>
     </div>
     <div class="p-2.5 flex-1 flex flex-col justify-between">
       <h3 class="font-black text-xs line-clamp-1" style="color: ${gramTheme.hex};">Gramophones</h3>
@@ -1134,15 +1261,20 @@ function renderExhibitsGrid() {
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
 
+    const thumbImg1 = formatGoogleLh3Url(img1, 's200');
+    const thumbImg2 = formatGoogleLh3Url(img2, 's200');
+    const fullImg1 = formatGoogleLh3Url(img1, 's1000');
+    const fullImg2 = formatGoogleLh3Url(img2, 's1000');
+
     let slots = [];
     if (d3d) {
       slots.push({ type: '3d', url: d3d });
-      if (img1) slots.push({ type: 'img', url: img1 });
-      if (img2) slots.push({ type: 'img', url: img2 });
+      if (img1) slots.push({ type: 'img', thumbUrl: thumbImg1, fullUrl: fullImg1 });
+      if (img2) slots.push({ type: 'img', thumbUrl: thumbImg2, fullUrl: fullImg2 });
     } else {
-      if (img1) slots.push({ type: 'img', url: img1 });
-      if (img2) slots.push({ type: 'img', url: img2 });
-      if (slots.length === 0) slots.push({ type: 'img', url: NO_IMAGE_SVG });
+      if (img1) slots.push({ type: 'img', thumbUrl: thumbImg1, fullUrl: fullImg1 });
+      if (img2) slots.push({ type: 'img', thumbUrl: thumbImg2, fullUrl: fullImg2 });
+      if (slots.length === 0) slots.push({ type: 'img', thumbUrl: NO_IMAGE_SVG, fullUrl: NO_IMAGE_SVG });
     }
 
     const totalSlots = slots.length;
@@ -1168,8 +1300,8 @@ function renderExhibitsGrid() {
       } else {
         mediaItemsHTML += `
           <div class="card-media-item ${isHidden} w-full h-full items-center justify-center relative group/img" data-slot-idx="${slotNum}">
-            <a href="${s.url}" target="_blank" onclick="event.stopPropagation()" title="Open image in new tab" class="w-full h-full flex items-center justify-center">
-              <img src="${s.url}" class="max-w-full max-h-full object-contain group-hover/img:scale-105 transition-transform duration-300 drop-shadow-md" alt="${displayTitle}" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'" />
+            <a href="${s.fullUrl}" target="_blank" onclick="event.stopPropagation()" title="Open full image in new tab" class="w-full h-full flex items-center justify-center">
+              <img src="${s.thumbUrl}" class="max-w-full max-h-full object-contain group-hover/img:scale-105 transition-transform duration-300 drop-shadow-md" alt="${displayTitle}" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'" />
             </a>
           </div>`;
       }
@@ -1296,7 +1428,7 @@ function openEnlargeModal(url, isInteractive) {
   const body = document.getElementById('enlargeModalBody');
   if (!modal || !body) return;
   if (isInteractive) body.innerHTML = `<iframe src="${url}" class="w-full h-full border-0 bg-white rounded-2xl shadow-2xl" title="Full Scale View"></iframe>`;
-  else body.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl" alt="Full Scale Image" />`;
+  else body.innerHTML = `<img src="${formatGoogleLh3Url(url, 's1000')}" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl" alt="Full Scale Image" />`;
   modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden');
 }
 
@@ -1389,25 +1521,41 @@ function renderMuseumStatistics() {
 
   const timelineEraGrid = document.getElementById('timelineEraGrid');
   if (timelineEraGrid) {
+    timelineEraGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5";
     timelineEraGrid.innerHTML = '';
-    TIMELINE_ERAS.forEach(e => {
-      const count = eraCounts[e.short] || 0;
-      const pct = itemsSumQty > 0 ? Math.round((count / itemsSumQty) * 100) : 0;
+
+    const totalMuseumItems = rawExhibitsRows.length;
+    const eraColors = ['#7c3aed', '#d97706', '#dc2626', '#059669', '#e11d48', '#0284c7', '#4f46e5'];
+
+    TIMELINE_ERAS.forEach((e, idx) => {
+      const eraRows = rawExhibitsRows.filter(r => {
+        const era = getEraByRow(r);
+        return era && era.short === e.short;
+      });
+      const count = eraRows.length;
+      const pctNum = totalMuseumItems > 0 ? (count / totalMuseumItems * 100) : 0;
+      const pctDisplay = pctNum > 0 && pctNum < 1 ? pctNum.toFixed(1) : Math.round(pctNum);
+
+      const customImg = TIMELINE_CUSTOM_IMAGES[e.key] || TIMELINE_CUSTOM_IMAGES[e.short];
+      const firstImgRow = eraRows.find(r => getVal(r, colIdx.img1) !== '');
+      const rawPreviewUrl = customImg || (firstImgRow ? getVal(firstImgRow, colIdx.img1) : '');
+      const previewImg = formatGoogleLh3Url(rawPreviewUrl, 's200') || NO_IMAGE_SVG;
+      const hexColor = eraColors[idx % eraColors.length];
+
       const card = document.createElement('div');
-      card.className = 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 p-2.5 rounded-2xl cursor-pointer hover:border-blue-500 transition flex flex-col justify-between group shadow-sm';
+      card.className = 'bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative';
+      card.style.borderColor = hexColor;
       card.innerHTML = `
-        <div>
-          <div class="text-xs font-black text-slate-500 dark:text-slate-400 group-hover:text-blue-500 transition truncate">${e.short}</div>
-          <div class="text-[10px] text-slate-400 dark:text-slate-500 font-medium truncate">${e.full.split('(')[1]?.replace(')', '') || ''}</div>
-          <div class="flex items-center justify-between mt-1">
-            <div class="text-base font-black text-blue-600 dark:text-blue-400">${count} <span class="text-[10px] font-normal text-slate-400">items</span></div>
-            <div class="text-xs font-bold text-slate-500 dark:text-slate-400">${pct}%</div>
+        <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: ${hexColor}25;">
+          <img src="${previewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="${e.short}" />
+          <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
+            <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${hexColor}; color: #ffffff;">${count}</span>
+            <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${pctDisplay}%</span>
           </div>
         </div>
-        <div class="mt-2">
-          <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-            <div class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-          </div>
+        <div class="p-2.5 flex-1 flex flex-col justify-between">
+          <h3 class="font-black text-xs line-clamp-1" style="color: ${hexColor};">${e.short}</h3>
+          <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5" style="color: ${hexColor};">Explore →</span>
         </div>
       `;
       card.addEventListener('click', () => {
@@ -1418,6 +1566,47 @@ function renderMuseumStatistics() {
       });
       timelineEraGrid.appendChild(card);
     });
+
+    const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
+    const interestCount = interestRows.length;
+    const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
+    const interestPctDisplay = interestPctNum > 0 && interestPctNum < 1 ? interestPctNum.toFixed(1) : Math.round(interestPctNum);
+    const interestCustomImg = TIMELINE_CUSTOM_IMAGES["Items of interest"] || TIMELINE_CUSTOM_IMAGES["Items of Interest"] || TIMELINE_CUSTOM_IMAGES["Itmes of Interest"];
+    const firstInterestImgRow = interestRows.find(r => getVal(r, colIdx.img1) !== '');
+    const rawInterestUrl = interestCustomImg || (firstInterestImgRow ? getVal(firstInterestImgRow, colIdx.img1) : '');
+    const interestPreviewImg = formatGoogleLh3Url(rawInterestUrl, 's200') || NO_IMAGE_SVG;
+    const interestColor = '#D97706';
+
+    const interestCard = document.createElement('div');
+    interestCard.className = 'bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative';
+    interestCard.style.borderColor = interestColor;
+    interestCard.innerHTML = `
+      <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: ${interestColor}25;">
+        <img src="${interestPreviewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="Items of interest" />
+        <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
+          <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${interestColor}; color: #ffffff;">${interestCount}</span>
+          <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${interestPctDisplay}%</span>
+        </div>
+      </div>
+      <div class="p-2.5 flex-1 flex flex-col justify-between">
+        <h3 class="font-black text-xs line-clamp-1" style="color: ${interestColor};">Items of interest</h3>
+        <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5" style="color: ${interestColor};">Explore →</span>
+      </div>
+    `;
+    interestCard.addEventListener('click', () => {
+      setTab('exhibits');
+      const typeSelect = document.getElementById('filterType');
+      if (typeSelect) {
+        typeSelect.value = '';
+        for (let opt of typeSelect.options) {
+          if (opt.value.toLowerCase().includes('item') && opt.value.toLowerCase().includes('interest')) {
+            typeSelect.value = opt.value; break;
+          }
+        }
+      }
+      updateDynamicDropdowns(); filterCatalog(true); scrollToGrid();
+    });
+    timelineEraGrid.appendChild(interestCard);
   }
 
   document.getElementById('statTotalItems').textContent = itemsSumQty > 0 ? itemsSumQty.toLocaleString() : '1,193';
@@ -1483,7 +1672,6 @@ function renderMuseumStatistics() {
       });
     }
 
-    // Vertical Graph with Subcategories on Y-axis, stacked by Categories (showing ALL subcategories without skipping)
     const categoriesArray = Array.from(allCategoriesSet);
     const subcatsArray = Array.from(allSubcatsSet);
 
@@ -1580,10 +1768,8 @@ function open3DLightbox(rawUrl, rawTitle) {
     }
   }
 
-  // Unhide modal immediately so canvas has layout size in DOM
   modal.classList.remove('hidden');
 
-  // If viewer already has this exact src
   if (viewer.src === url || viewer.getAttribute('src') === url) {
     hideSpinner();
     if (viewer.loaded) {
@@ -1674,6 +1860,11 @@ function openModal(row, originalIndex) {
     const cleanedDetails = cleanDetailsForModal(details);
     const theme = getCategoryTheme(category || type || subcategory);
 
+    const modalImg1 = formatGoogleLh3Url(img1, 's600');
+    const modalImg2 = formatGoogleLh3Url(img2, 's600');
+    const fullImg1 = formatGoogleLh3Url(img1, 's1000');
+    const fullImg2 = formatGoogleLh3Url(img2, 's1000');
+
     modalContainer.style.borderColor = theme.hex; modalContainer.style.borderWidth = '3px';
     modalContainer.style.backgroundColor = getSolidTint(theme.hex, isDark);
 
@@ -1757,8 +1948,8 @@ function openModal(row, originalIndex) {
             ${img1 ? `
               <div class="w-full">
                 <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Second Media (Image 1)' : 'Primary Image'}</p>
-                <a href="${img1}" target="_blank" title="Click to view full image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
-                  <img src="${img1}" class="w-full ${!img2 ? 'max-h-[520px] min-h-[220px]' : 'h-52 sm:h-56'} object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" />
+                <a href="${fullImg1 || modalImg1}" target="_blank" title="Click to view full image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
+                  <img src="${modalImg1}" class="w-full ${!img2 ? 'max-h-[520px] min-h-[220px]' : 'h-52 sm:h-56'} object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" />
                   <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                 </a>
               </div>` : ''}
@@ -1766,8 +1957,8 @@ function openModal(row, originalIndex) {
             ${img2 ? `
               <div class="w-full">
                 <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image'}</p>
-                <a href="${img2}" target="_blank" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
-                  <img src="${img2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" />
+                <a href="${fullImg2 || modalImg2}" target="_blank" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
+                  <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" />
                   <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                 </a>
               </div>` : ''}
@@ -1779,7 +1970,6 @@ function openModal(row, originalIndex) {
     if (btnMain) btnMain.onclick = () => googleItemSearch(displayTitle, category, details);
     populateVoiceDropdown();
 
-    // Dynamically calculate dimensions for pop-up modal 3D viewer
     const modalViewer = document.getElementById('modal3DViewer');
     const modalScaleText = document.getElementById('modal3DScaleText');
     if (modalViewer) {
@@ -1896,6 +2086,7 @@ function closeModal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  initParticleCanvas();
   document.getElementById('brandLogoLink').addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader').addEventListener('click', browseAllExhibits);
   document.getElementById('btnBrowseAllPrompt').addEventListener('click', browseAllExhibits);
@@ -1903,7 +2094,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnSurprise').addEventListener('click', () => {
     const rows = (currentTab === 'gramophone') ? rawGramophoneRows : rawExhibitsRows;
     if (!rows || rows.length === 0) return;
-    if (currentTab === 'stats') setTab('exhibits');
+    if (currentTab === 'stats' || currentTab === 'analytics') setTab('exhibits');
     if (!isGridActive) filterCatalog(true);
     openModalByOriginalIndex(Math.floor(Math.random() * rows.length));
   });
