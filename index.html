@@ -139,7 +139,7 @@
 
     .poppy-skyline-drift {
       width: 200vw;
-      height: 80vh;
+      height: 100vh;
       animation: poppyArcDrift 18s linear infinite;
     }
 
@@ -159,13 +159,13 @@
     <!-- 60-Second Seasonal Gradient Cycle -->
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
 
-    <!-- Skyline Arcing WW1 Poppies Container (Top 66% Screen Height) -->
+    <!-- Skyline Arcing WW1 Poppies Container (100% Full Screen Height Coverage) -->
     <div class="poppy-skyline-drift absolute top-0 left-0 flex z-10 pointer-events-none">
       
       <!-- Flutter Child Container -->
       <div class="poppy-flutter w-full h-full flex pointer-events-none">
         
-        <!-- Tile 1 (WW1 Remembrance Poppies) -->
+        <!-- Tile 1 (80% Density WW1 Poppies across 100% Height) -->
         <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <defs>
             <!-- Remembrance Poppy Vector Symbol -->
@@ -183,76 +183,70 @@
             </g>
           </defs>
 
-          <!-- Band 1 (Top Sky: y 20 - 110) -->
-          <use href="#poppyLarge" x="100" y="40" opacity="0.95" />
-          <use href="#poppySymbol" x="250" y="80" opacity="0.85" />
-          <use href="#poppyLarge" x="420" y="30" opacity="1" />
-          <use href="#poppySmall" x="580" y="95" opacity="0.8" />
-          <use href="#poppySymbol" x="740" y="45" opacity="0.9" />
-          <use href="#poppyLarge" x="910" y="85" opacity="0.85" />
+          <!-- Band 1 (y: 20 - 100) -->
+          <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
+          <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
+          <use href="#poppyLarge" x="620" y="30" opacity="1" />
+          <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
 
-          <!-- Band 2 (Upper Middle Sky: y 120 - 210) -->
-          <use href="#poppySymbol" x="80" y="160" opacity="0.85" />
-          <use href="#poppyLarge" x="210" y="130" opacity="0.95" />
-          <use href="#poppySmall" x="360" y="190" opacity="0.75" />
-          <use href="#poppySymbol" x="510" y="140" opacity="0.9" />
-          <use href="#poppyLarge" x="670" y="180" opacity="1" />
-          <use href="#poppySmall" x="820" y="145" opacity="0.8" />
-          <use href="#poppySymbol" x="950" y="175" opacity="0.9" />
+          <!-- Band 2 (y: 110 - 190) -->
+          <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
+          <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
+          <use href="#poppySmall" x="720" y="120" opacity="0.75" />
+          <use href="#poppySymbol" x="940" y="180" opacity="0.9" opacity="0.85" />
 
-          <!-- Band 3 (Middle Sky: y 220 - 320) -->
-          <use href="#poppyLarge" x="140" y="240" opacity="0.9" />
-          <use href="#poppySmall" x="300" y="280" opacity="0.8" />
-          <use href="#poppySymbol" x="460" y="230" opacity="1" />
-          <use href="#poppyLarge" x="610" y="290" opacity="0.85" />
-          <use href="#poppySymbol" x="760" y="250" opacity="0.95" />
-          <use href="#poppySmall" x="890" y="275" opacity="0.75" />
+          <!-- Band 3 (y: 200 - 290) -->
+          <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
+          <use href="#poppySmall" x="310" y="220" opacity="0.8" />
+          <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
+          <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
 
-          <!-- Band 4 (Lower Middle Sky: y 330 - 430 -> Completes Top 66% Screen Coverage) -->
-          <use href="#poppySmall" x="90" y="360" opacity="0.85" />
-          <use href="#poppySymbol" x="230" y="340" opacity="0.9" />
-          <use href="#poppyLarge" x="380" y="390" opacity="0.8" />
-          <use href="#poppySymbol" x="530" y="350" opacity="1" />
-          <use href="#poppySmall" x="690" y="410" opacity="0.75" />
-          <use href="#poppyLarge" x="840" y="370" opacity="0.9" />
-          <use href="#poppySymbol" x="960" y="400" opacity="0.85" />
+          <!-- Band 4 (y: 300 - 390) -->
+          <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
+          <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
+          <use href="#poppySmall" x="680" y="320" opacity="0.75" />
+          <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
+
+          <!-- Band 5 (y: 400 - 480 -> Completes 100% Screen Height Coverage) -->
+          <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
+          <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
+          <use href="#poppySmall" x="540" y="470" opacity="0.8" />
+          <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
+          <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
         </svg>
 
         <!-- Tile 2 (Seamless Duplicate for Infinite Poppy Arc Loop) -->
         <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-          <!-- Band 1 (Top Sky: y 20 - 110) -->
-          <use href="#poppyLarge" x="100" y="40" opacity="0.95" />
-          <use href="#poppySymbol" x="250" y="80" opacity="0.85" />
-          <use href="#poppyLarge" x="420" y="30" opacity="1" />
-          <use href="#poppySmall" x="580" y="95" opacity="0.8" />
-          <use href="#poppySymbol" x="740" y="45" opacity="0.9" />
-          <use href="#poppyLarge" x="910" y="85" opacity="0.85" />
+          <!-- Band 1 (y: 20 - 100) -->
+          <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
+          <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
+          <use href="#poppyLarge" x="620" y="30" opacity="1" />
+          <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
 
-          <!-- Band 2 (Upper Middle Sky: y 120 - 210) -->
-          <use href="#poppySymbol" x="80" y="160" opacity="0.85" />
-          <use href="#poppyLarge" x="210" y="130" opacity="0.95" />
-          <use href="#poppySmall" x="360" y="190" opacity="0.75" />
-          <use href="#poppySymbol" x="510" y="140" opacity="0.9" />
-          <use href="#poppyLarge" x="670" y="180" opacity="1" />
-          <use href="#poppySmall" x="820" y="145" opacity="0.8" />
-          <use href="#poppySymbol" x="950" y="175" opacity="0.9" />
+          <!-- Band 2 (y: 110 - 190) -->
+          <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
+          <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
+          <use href="#poppySmall" x="720" y="120" opacity="0.75" />
+          <use href="#poppySymbol" x="940" y="180" opacity="0.85" />
 
-          <!-- Band 3 (Middle Sky: y 220 - 320) -->
-          <use href="#poppyLarge" x="140" y="240" opacity="0.9" />
-          <use href="#poppySmall" x="300" y="280" opacity="0.8" />
-          <use href="#poppySymbol" x="460" y="230" opacity="1" />
-          <use href="#poppyLarge" x="610" y="290" opacity="0.85" />
-          <use href="#poppySymbol" x="760" y="250" opacity="0.95" />
-          <use href="#poppySmall" x="890" y="275" opacity="0.75" />
+          <!-- Band 3 (y: 200 - 290) -->
+          <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
+          <use href="#poppySmall" x="310" y="220" opacity="0.8" />
+          <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
+          <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
 
-          <!-- Band 4 (Lower Middle Sky: y 330 - 430 -> Completes Top 66% Screen Coverage) -->
-          <use href="#poppySmall" x="90" y="360" opacity="0.85" />
-          <use href="#poppySymbol" x="230" y="340" opacity="0.9" />
-          <use href="#poppyLarge" x="380" y="390" opacity="0.8" />
-          <use href="#poppySymbol" x="530" y="350" opacity="1" />
-          <use href="#poppySmall" x="690" y="410" opacity="0.75" />
-          <use href="#poppyLarge" x="840" y="370" opacity="0.9" />
-          <use href="#poppySymbol" x="960" y="400" opacity="0.85" />
+          <!-- Band 4 (y: 300 - 390) -->
+          <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
+          <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
+          <use href="#poppySmall" x="680" y="320" opacity="0.75" />
+          <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
+
+          <!-- Band 5 (y: 400 - 480 -> Completes 100% Screen Height Coverage) -->
+          <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
+          <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
+          <use href="#poppySmall" x="540" y="470" opacity="0.8" />
+          <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
+          <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
         </svg>
 
       </div>
