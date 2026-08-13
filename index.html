@@ -157,16 +157,16 @@
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
     
     <!-- 60-Second Seasonal Gradient Cycle -->
-    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0"></div>
+    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
 
     <!-- Skyline Arcing WW1 Poppies Container (Top 66% Screen Height) -->
-    <div class="poppy-skyline-drift absolute top-0 left-0 flex z-10">
+    <div class="poppy-skyline-drift absolute top-0 left-0 flex z-10 pointer-events-none">
       
       <!-- Flutter Child Container -->
-      <div class="poppy-flutter w-full h-full flex">
+      <div class="poppy-flutter w-full h-full flex pointer-events-none">
         
         <!-- Tile 1 (WW1 Remembrance Poppies) -->
-        <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+        <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <defs>
             <!-- Remembrance Poppy Vector Symbol -->
             <g id="poppySymbol">
@@ -219,7 +219,7 @@
         </svg>
 
         <!-- Tile 2 (Seamless Duplicate for Infinite Poppy Arc Loop) -->
-        <svg class="w-1/2 h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+        <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <!-- Band 1 (Top Sky: y 20 - 110) -->
           <use href="#poppyLarge" x="100" y="40" opacity="0.95" />
           <use href="#poppySymbol" x="250" y="80" opacity="0.85" />
@@ -260,7 +260,7 @@
 
     <!-- WW1 Silhouette Remembrance Scene (Horizon Bottom) -->
     <div class="absolute bottom-0 left-0 right-0 w-full leading-none z-20 opacity-85 dark:opacity-95 pointer-events-none">
-      <svg class="w-full h-36 sm:h-52 md:h-72 object-cover" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="w-full h-36 sm:h-52 md:h-72 object-cover pointer-events-none" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         
         <!-- Far Background Battlefield Ridge -->
         <path d="M0,320 L0,220 L180,210 L340,230 L490,200 L680,225 L840,205 L1020,230 L1200,210 L1200,320 Z" 
@@ -448,7 +448,7 @@
   </header>
 
   <!-- Main Content Area -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full z-10">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10">
     
     <!-- Skeleton Loader -->
     <div id="loading" class="py-6 hidden">
@@ -627,4 +627,60 @@
   </div>
 
   <!-- Floating Mobile Jump Pill -->
-  <button id="float
+  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
+    <span>⬇️ View Archive</span>
+  </button>
+
+  <!-- Item Detail Pop-up Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
+      <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <button id="modalPrevBtn" title="Previous Item" aria-label="Previous Item" class="p-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
+            <span>←</span> <span class="hidden sm:inline">Prev</span>
+          </button>
+          <span id="modalCounter" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-300 px-2"></span>
+          <button id="modalNextBtn" title="Next Item" aria-label="Next Item" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
+            <span class="hidden sm:inline">Next</span> <span>→</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnShareExhibit" title="Copy Link" aria-label="Copy Link" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition">🔗</button>
+          <button id="closeModal" title="Close (Esc)" aria-label="Close modal" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold transition">✕</button>
+        </div>
+      </div>
+      <div id="modalContent" class="px-4 sm:px-8 pt-4 pb-6 sm:pb-8"></div>
+    </div>
+  </div>
+
+  <!-- Standalone 3D Lightbox Modal -->
+  <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[60] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <span class="text-xl">👓</span>
+          <h3 id="lightboxTitle" class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Interactive 3D Model</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnToggleLightboxSkybox" onclick="toggleModal3DSkybox(event)" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">☀️ Light Sky</button>
+          <button id="close3DLightbox" title="Close 3D View" aria-label="Close 3D View" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+        </div>
+      </div>
+
+      <div id="lightbox3DContainer" class="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden transition-colors duration-300">
+        <div id="lightboxSpinner" class="absolute z-10 flex flex-col items-center justify-center gap-3 transition-opacity duration-300">
+          <div class="spinner-3d"></div>
+          <span class="text-xs font-bold text-slate-300">Loading 3D Model...</span>
+        </div>
+        <model-viewer id="lightboxViewer" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" style="width: 100%; height: 100%; display: block;" class="w-full h-full"></model-viewer>
+        <span id="lightboxScaleBadge" class="absolute bottom-4 right-4 bg-slate-900/85 text-white backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-xl z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-2">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+          <span id="lightboxScaleText">Scale Reference Available</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
