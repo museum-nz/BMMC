@@ -50,89 +50,12 @@ const TIMELINE_ERAS = [
   { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
 ];
 
-function initParticleCanvas() {
-  const canvas = document.getElementById('particleCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let width = 0;
-  let height = 0;
-  let particles = [];
-
-  function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    createParticles();
-  }
-
-  function createParticles() {
-    particles = [];
-    const count = Math.min(Math.floor((width * height) / 16000), 75);
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7,
-        radius: Math.random() * 1.8 + 1,
-        alpha: Math.random() * 0.4 + 0.2
-      });
-    }
-  }
-
-  function render() {
-    ctx.clearRect(0, 0, width, height);
-    const isDark = document.documentElement.classList.contains('dark');
-    const rgbColor = isDark ? '129, 140, 248' : '59, 130, 246';
-
-    const maxDist = 130;
-    for (let i = 0; i < particles.length; i++) {
-      const p1 = particles[i];
-      for (let j = i + 1; j < particles.length; j++) {
-        const p2 = particles[j];
-        const dx = p1.x - p2.x;
-        const dy = p1.y - p2.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < maxDist) {
-          const lineAlpha = (1 - dist / maxDist) * 0.22;
-          ctx.strokeStyle = `rgba(${rgbColor}, ${lineAlpha})`;
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < 0) p.x = width;
-      if (p.x > width) p.x = 0;
-      if (p.y < 0) p.y = height;
-      if (p.y > height) p.y = 0;
-
-      ctx.fillStyle = `rgba(${rgbColor}, ${p.alpha})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    requestAnimationFrame(render);
-  }
-
-  window.addEventListener('resize', resize);
-  resize();
-  render();
-}
-
 function getEraByYear(yearNum) {
   if (yearNum === null || yearNum === undefined || isNaN(yearNum)) return null;
   return TIMELINE_ERAS.find(e => yearNum >= e.min && yearNum <= e.max) || null;
 }
 
+// Strictly extracts year ONLY from Column Y ("Year")
 function getEraByRow(row) {
   if (!row) return null;
   const yearStr = getVal(row, colIdx.year);
@@ -507,6 +430,7 @@ function updateFavoritesBadge() {
   }
 }
 
+// Converts any Google Drive image link to lh3.googleusercontent.com/d/FILE_ID=sSIZE format
 function formatGoogleLh3Url(url, size = 's200') {
   if (!url) return '';
   url = String(url).trim();
@@ -1519,6 +1443,7 @@ function renderMuseumStatistics() {
     }
   });
 
+  // Populate Timeline Era Grid (Styled like Category Hubs, 7 Eras + 1 Items of interest)
   const timelineEraGrid = document.getElementById('timelineEraGrid');
   if (timelineEraGrid) {
     timelineEraGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5";
@@ -1567,6 +1492,7 @@ function renderMuseumStatistics() {
       timelineEraGrid.appendChild(card);
     });
 
+    // 8th Button: Items of interest (Filtered strictly by Type: Items of interest)
     const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
     const interestCount = interestRows.length;
     const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
@@ -1672,6 +1598,7 @@ function renderMuseumStatistics() {
       });
     }
 
+    // Vertical Graph with Subcategories on Y-axis, stacked by Categories
     const categoriesArray = Array.from(allCategoriesSet);
     const subcatsArray = Array.from(allSubcatsSet);
 
@@ -2086,7 +2013,6 @@ function closeModal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initParticleCanvas();
   document.getElementById('brandLogoLink').addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader').addEventListener('click', browseAllExhibits);
   document.getElementById('btnBrowseAllPrompt').addEventListener('click', browseAllExhibits);
