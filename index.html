@@ -137,13 +137,13 @@
       50% { opacity: 1.0; filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.7)); transform: translateY(-4px) rotate(4deg); }
     }
 
-    /* OFF BY DEFAULT: Completely hidden & unrendered for 0% processor usage */
+    /* OFF BY DEFAULT: Guaranteed hidden on load */
     .poppy-skyline-drift {
       width: 200vw;
       height: 100vh;
       animation: poppyArcDrift 18s linear infinite;
       animation-play-state: paused;
-      display: none; 
+      display: none !important;
     }
 
     .poppy-flutter {
@@ -151,9 +151,9 @@
       animation-play-state: paused;
     }
 
-    /* Turned ON & animating when Dynamic mode is activated */
+    /* Revealed & animating when Dynamic mode button is clicked */
     .poppies-animated .poppy-skyline-drift {
-      display: flex;
+      display: flex !important;
       animation-play-state: running;
     }
 
@@ -173,8 +173,8 @@
     <!-- 60-Second Seasonal Gradient Cycle -->
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
 
-    <!-- Skyline Arcing WW1 Poppies Container (100% Full Screen Height Coverage) -->
-    <div class="poppy-skyline-drift absolute top-0 left-0 flex z-10 pointer-events-none">
+    <!-- Skyline Arcing WW1 Poppies Container (Hidden on load) -->
+    <div class="poppy-skyline-drift absolute top-0 left-0 z-10 pointer-events-none">
       
       <!-- Flutter Child Container -->
       <div class="poppy-flutter w-full h-full flex pointer-events-none">
