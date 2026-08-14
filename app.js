@@ -117,6 +117,7 @@ let hotOnlyActive = false;
 let showingFavoritesOnly = false;
 let isGridActive = false;
 let is3DSkyboxLight = false;
+let isPoppyMotionActive = false;
 let currentSpeechUtterance = null;
 let availableVoices = [];
 
@@ -226,7 +227,6 @@ async function fetchCSVWithCache(url, cacheKey) {
   const text = await res.text();
   const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
 
-  // Safety Guard: Only cache if valid data with rows was fetched
   if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 1) {
     try {
       localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
@@ -443,7 +443,6 @@ function updateFavoritesBadge() {
   }
 }
 
-// Converts any Google Drive image link to lh3.googleusercontent.com/d/FILE_ID=sSIZE format
 function formatGoogleLh3Url(url, size = 's200') {
   if (!url) return '';
   url = String(url).trim();
@@ -556,6 +555,32 @@ function toggleModal3DSkybox(event) {
   update3DSkyboxUI();
 }
 
+function togglePoppyMotion() {
+  isPoppyMotionActive = !isPoppyMotionActive;
+  const skyBg = document.getElementById('timeSkyBackground');
+  const btn = document.getElementById('btnTogglePoppyMotion');
+
+  if (skyBg) {
+    if (isPoppyMotionActive) {
+      skyBg.classList.add('poppies-animated');
+    } else {
+      skyBg.classList.remove('poppies-animated');
+    }
+  }
+
+  if (btn) {
+    if (isPoppyMotionActive) {
+      btn.classList.add('ring-2', 'ring-rose-300', 'bg-rose-700');
+      btn.innerHTML = '🌺 Dynamic: On';
+    } else {
+      btn.classList.remove('ring-2', 'ring-rose-300', 'bg-rose-700');
+      btn.innerHTML = '🌺 Dynamic';
+    }
+  }
+
+  showToast(isPoppyMotionActive ? 'Poppy background motion enabled' : 'Poppy background motion paused', '🌺');
+}
+
 function update3DSkyboxUI() {
   const modalBox = document.getElementById('modal3DContainer');
   const lightboxBox = document.getElementById('lightbox3DContainer');
@@ -659,11 +684,9 @@ function initFuseSearch() {
 async function loadCatalogData() {
   initTheme();
   try {
-    // Fetch both datasets concurrently in the background
     const exhibitsPromise = fetchCSVWithCache(EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
     const gramophonePromise = fetchCSVWithCache(GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
 
-    // 1. Process Main Exhibits first and render UI immediately
     const exhibitsData = await exhibitsPromise;
     if (exhibitsData && exhibitsData.length > 0) {
       exhibitsData[0].forEach((cell, idx) => {
@@ -691,7 +714,6 @@ async function loadCatalogData() {
       populateInitialDropdowns();
     }
 
-    // Main site is now fully interactive! Unhide UI & hide spinner right away
     renderCollectionHubs(rawExhibitsRows);
     updateDynamicDropdowns();
     document.getElementById('gridPrompt')?.classList.remove('hidden');
@@ -699,7 +721,6 @@ async function loadCatalogData() {
     checkUrlHashForExhibit();
     hideLoadingSpinner(); 
 
-    // 2. Process Gramophone records as soon as background fetch completes
     const gramophoneData = await gramophonePromise;
     if (gramophoneData && gramophoneData.length > 0) {
       rawGramophoneRows = gramophoneData.filter(r => {
@@ -709,7 +730,6 @@ async function loadCatalogData() {
       });
     }
 
-    // Refresh search index and update Gramophone hub count
     initFuseSearch();
     renderCollectionHubs(rawExhibitsRows);
 
@@ -1413,12 +1433,9 @@ function renderMuseumStatistics() {
     const webUrl = getVal(targetRow2, colIdx.web);
     const docElem = document.getElementById('statDocLink');
     const webElem = document.getElementById('statWebLink');
-    const noLinksElem = document.getElementById('statNoLinks');
-    let hasAnyLink = false;
 
-    if (docUrl && (docUrl.startsWith('http') || docUrl.length > 5)) { docElem.href = docUrl.startsWith('http') ? docUrl : `https://${docUrl}`; docElem.classList.remove('hidden'); hasAnyLink = true; }
-    if (webUrl && (webUrl.startsWith('http') || webUrl.length > 5)) { webElem.href = webUrl.startsWith('http') ? webUrl : `https://${webUrl}`; webElem.classList.remove('hidden'); hasAnyLink = true; }
-    if (hasAnyLink && noLinksElem) noLinksElem.classList.add('hidden');
+    if (docUrl && (docUrl.startsWith('http') || docUrl.length > 5)) { docElem.href = docUrl.startsWith('http') ? docUrl : `https://${docUrl}`; docElem.classList.remove('hidden'); }
+    if (webUrl && (webUrl.startsWith('http') || webUrl.length > 5)) { webElem.href = webUrl.startsWith('http') ? webUrl : `https://${webUrl}`; webElem.classList.remove('hidden'); }
   }
 
   rawExhibitsRows.forEach(row => {
@@ -1467,7 +1484,6 @@ function renderMuseumStatistics() {
     }
   });
 
-  // Populate Timeline Era Grid (Styled like Category Hubs, 7 Eras + 1 Items of interest)
   const timelineEraGrid = document.getElementById('timelineEraGrid');
   if (timelineEraGrid) {
     timelineEraGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5";
@@ -1516,7 +1532,6 @@ function renderMuseumStatistics() {
       timelineEraGrid.appendChild(card);
     });
 
-    // 8th Button: Items of interest (Filtered strictly by Type: Items of interest)
     const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
     const interestCount = interestRows.length;
     const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
@@ -1622,7 +1637,6 @@ function renderMuseumStatistics() {
       });
     }
 
-    // Vertical Graph with Subcategories on Y-axis, stacked by Categories
     const categoriesArray = Array.from(allCategoriesSet);
     const subcatsArray = Array.from(allSubcatsSet);
 

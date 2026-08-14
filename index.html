@@ -141,10 +141,18 @@
       width: 200vw;
       height: 100vh;
       animation: poppyArcDrift 18s linear infinite;
+      animation-play-state: paused; /* Static by default */
     }
 
     .poppy-flutter {
       animation: poppyFlutter 3.5s ease-in-out infinite alternate;
+      animation-play-state: paused; /* Static by default */
+    }
+
+    /* Activated when Dynamic mode is toggled on */
+    .poppies-animated .poppy-skyline-drift,
+    .poppies-animated .poppy-flutter {
+      animation-play-state: running;
     }
   </style>
 
@@ -551,17 +559,18 @@
           </div>
         </div>
 
+        <!-- Highlighted Links & Background Motion Controls -->
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/50 transition">
           <div class="w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 absolute top-0 left-0"></div>
           <div>
             <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Highlighted Links</span>
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Highlighted Links & Controls</span>
               <span class="p-1.5 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 rounded-xl text-base border border-emerald-100 dark:border-emerald-900/60">🔗</span>
             </div>
             <div class="flex flex-wrap items-center gap-2 min-h-[32px]">
               <a id="statDocLink" href="#" target="_blank" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Documentation ↗</a>
               <a id="statWebLink" href="#" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">🌐 Web Info ↗</a>
-              <span id="statNoLinks" class="text-xs text-slate-400 italic">No links recorded</span>
+              <button id="btnTogglePoppyMotion" onclick="togglePoppyMotion()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1 active:scale-95">🌺 Dynamic</button>
             </div>
           </div>
         </div>
