@@ -48,6 +48,27 @@ const TIMELINE_ERAS = [
   { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
 ];
 
+// Helper to load heavy external scripts dynamically on demand
+function loadScript(src, isModule = false) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const script = document.createElement('script');
+    script.src = src;
+    if (isModule) script.type = 'module';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+function loadModelViewerIfNeeded() {
+  return loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js', true);
+}
+
+function loadChartJsIfNeeded() {
+  return loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js');
+}
+
 function getEraByYear(yearNum) {
   if (yearNum === null || yearNum === undefined || isNaN(yearNum)) return null;
   return TIMELINE_ERAS.find(e => yearNum >= e.min && yearNum <= e.max) || null;
@@ -224,19 +245,25 @@ async function fetchCSVWithCache(url, cacheKey) {
 
   const res = await fetch(url);
   const text = await res.text();
-  const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
 
-  // Safety Guard: Only cache if valid data with rows was fetched
-  if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 1) {
-    try {
-      localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
-      localStorage.setItem(`${cacheKey}_time`, Date.now());
-    } catch (e) {
-      console.warn('localStorage write error:', e);
-    }
-  }
-
-  return parsed.data;
+  return new Promise((resolve, reject) => {
+    Papa.parse(text, {
+      header: false,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (results.data && Array.isArray(results.data) && results.data.length > 1) {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(results.data));
+            localStorage.setItem(`${cacheKey}_time`, Date.now());
+          } catch (e) {
+            console.warn('localStorage write error:', e);
+          }
+        }
+        resolve(results.data);
+      },
+      error: (err) => reject(err)
+    });
+  });
 }
 
 function parseDiscogsVal(raw) {
@@ -659,11 +686,9 @@ function initFuseSearch() {
 async function loadCatalogData() {
   initTheme();
   try {
-    // Fetch both datasets concurrently in the background
     const exhibitsPromise = fetchCSVWithCache(EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
     const gramophonePromise = fetchCSVWithCache(GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
 
-    // 1. Process Main Exhibits first and render UI immediately
     const exhibitsData = await exhibitsPromise;
     if (exhibitsData && exhibitsData.length > 0) {
       exhibitsData[0].forEach((cell, idx) => {
@@ -691,7 +716,6 @@ async function loadCatalogData() {
       populateInitialDropdowns();
     }
 
-    // Main site is now fully interactive! Unhide UI & hide spinner right away
     renderCollectionHubs(rawExhibitsRows);
     updateDynamicDropdowns();
     document.getElementById('gridPrompt')?.classList.remove('hidden');
@@ -699,7 +723,6 @@ async function loadCatalogData() {
     checkUrlHashForExhibit();
     hideLoadingSpinner(); 
 
-    // 2. Process Gramophone records as soon as background fetch completes
     const gramophoneData = await gramophonePromise;
     if (gramophoneData && gramophoneData.length > 0) {
       rawGramophoneRows = gramophoneData.filter(r => {
@@ -709,7 +732,6 @@ async function loadCatalogData() {
       });
     }
 
-    // Refresh search index and update Gramophone hub count
     initFuseSearch();
     renderCollectionHubs(rawExhibitsRows);
 
@@ -1188,6 +1210,8 @@ function renderExhibitsGrid() {
     return;
   }
 
+  let has3DItemInGrid = false;
+
   for (let arrayIndex = 0; arrayIndex < currentFilteredRows.length; arrayIndex++) {
     const { row, originalIndex } = currentFilteredRows[arrayIndex];
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
@@ -1206,6 +1230,8 @@ function renderExhibitsGrid() {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
+    if (d3d) has3DItemInGrid = true;
+
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
 
@@ -1297,6 +1323,8 @@ function renderExhibitsGrid() {
     card.addEventListener('click', () => openModalByFilteredIndex(arrayIndex));
     grid.appendChild(card);
   }
+
+  if (has3DItemInGrid) loadModelViewerIfNeeded();
   updateAudioUI();
 }
 
@@ -1388,7 +1416,8 @@ function closeEnlargeModal() {
   document.body.classList.remove('overflow-hidden');
 }
 
-function renderMuseumStatistics() {
+async function renderMuseumStatistics() {
+  await loadChartJsIfNeeded();
   if (typeof Chart === 'undefined' || !rawExhibitsRows || rawExhibitsRows.length === 0) return;
   const isDark = document.documentElement.classList.contains('dark');
   const textColor = isDark ? '#cbd5e1' : '#334155';
@@ -1467,7 +1496,6 @@ function renderMuseumStatistics() {
     }
   });
 
-  // Populate Timeline Era Grid (Styled like Category Hubs, 7 Eras + 1 Items of interest)
   const timelineEraGrid = document.getElementById('timelineEraGrid');
   if (timelineEraGrid) {
     timelineEraGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5";
@@ -1516,7 +1544,6 @@ function renderMuseumStatistics() {
       timelineEraGrid.appendChild(card);
     });
 
-    // 8th Button: Items of interest (Filtered strictly by Type: Items of interest)
     const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
     const interestCount = interestRows.length;
     const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
@@ -1622,7 +1649,6 @@ function renderMuseumStatistics() {
       });
     }
 
-    // Vertical Graph with Subcategories on Y-axis, stacked by Categories
     const categoriesArray = Array.from(allCategoriesSet);
     const subcatsArray = Array.from(allSubcatsSet);
 
@@ -1673,7 +1699,9 @@ function renderMuseumStatistics() {
   }, 50);
 }
 
-function open3DLightbox(rawUrl, rawTitle) {
+async function open3DLightbox(rawUrl, rawTitle) {
+  await loadModelViewerIfNeeded();
+
   const modal = document.getElementById('lightbox3DModal');
   const titleElem = document.getElementById('lightboxTitle');
   const viewer = document.getElementById('lightboxViewer');
@@ -1777,7 +1805,7 @@ function openModalByFilteredIndex(filteredIndex) {
   openModal(row, originalIndex);
 }
 
-function openModal(row, originalIndex) {
+async function openModal(row, originalIndex) {
   stopAudioGuide();
   const modalContainer = document.getElementById('modalContainer');
   const modalContent = document.getElementById('modalContent');
@@ -1805,6 +1833,8 @@ function openModal(row, originalIndex) {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
+    if (d3d) loadModelViewerIfNeeded();
+
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
     const ageBadgeClass = getAgeBadgeStyle(eraDisplay);
