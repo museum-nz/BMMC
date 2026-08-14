@@ -137,20 +137,26 @@
       50% { opacity: 1.0; filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.7)); transform: translateY(-4px) rotate(4deg); }
     }
 
+    /* OFF BY DEFAULT: Completely hidden & unrendered for 0% processor usage */
     .poppy-skyline-drift {
       width: 200vw;
       height: 100vh;
       animation: poppyArcDrift 18s linear infinite;
-      animation-play-state: paused; /* Static by default */
+      animation-play-state: paused;
+      display: none; 
     }
 
     .poppy-flutter {
       animation: poppyFlutter 3.5s ease-in-out infinite alternate;
-      animation-play-state: paused; /* Static by default */
+      animation-play-state: paused;
     }
 
-    /* Activated when Dynamic mode is toggled on */
-    .poppies-animated .poppy-skyline-drift,
+    /* Turned ON & animating when Dynamic mode is activated */
+    .poppies-animated .poppy-skyline-drift {
+      display: flex;
+      animation-play-state: running;
+    }
+
     .poppies-animated .poppy-flutter {
       animation-play-state: running;
     }
