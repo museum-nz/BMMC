@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Showcase — Museum & Gramophone Archive</title>
 
-  <!-- Early Preconnect for Critical CSV Data & Images -->
+  <!-- Preconnect for Data, CDN, Image & Media Performance -->
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://drive.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
@@ -37,13 +40,13 @@
     };
   </script>
 
-  <!-- Essential Core Libraries (Deferred) -->
+  <!-- Libraries CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-  <!-- Google Font: Inter with font-display: swap -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Google Font: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -99,6 +102,7 @@
       will-change: background;
     }
 
+    /* Celestial Poppy Skyline Arc Motion */
     @keyframes poppyArcDrift {
       0% { transform: translate(0, 0) rotate(0deg); }
       25% { transform: translate(-12.5%, -8vh) rotate(-2deg); }
@@ -107,6 +111,7 @@
       100% { transform: translate(-50%, 0) rotate(0deg); }
     }
 
+    /* Gentle Poppy Flutter */
     @keyframes poppyFlutter {
       0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 3px rgba(220, 38, 38, 0.4)); transform: translateY(0px) rotate(-3deg); }
       50% { opacity: 1.0; filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.7)); transform: translateY(-4px) rotate(4deg); }
@@ -130,40 +135,61 @@
 </head>
 <body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
-  <!-- Moving Time & Seasons Sky Background -->
+  <!-- Moving Time & Seasons Sky Background with WW1 Silhouette -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
+    
+    <!-- 60-Second Seasonal Gradient Cycle -->
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
 
+    <!-- Skyline Arcing WW1 Poppies Container -->
     <div class="poppy-skyline-drift absolute top-0 left-0 flex z-10 pointer-events-none">
+      
+      <!-- Flutter Child Container -->
       <div class="poppy-flutter w-full h-full flex pointer-events-none">
+        
+        <!-- Tile 1 -->
         <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <defs>
+            <!-- Remembrance Poppy Vector Symbol -->
             <g id="poppySymbol">
               <path fill="#dc2626" opacity="0.95" d="M 0,-16 C -10,-16 -16,-9 -16,0 C -16,5 -11,9 -7,11 C -11,16 -4,18 0,16 C 4,18 11,16 7,11 C 11,9 16,5 16,0 C 16,-9 10,-16 0,-16 Z"/>
               <path fill="#ef4444" opacity="0.85" d="M -2,-2 C -8,-2 -11,2 -10,8 C -6,11 6,11 10,8 C 11,2 8,-2 -2,-2 Z"/>
               <circle cx="0" cy="0" r="4.5" fill="#09090b"/>
               <circle cx="0" cy="0" r="2" fill="#27272a"/>
             </g>
-            <g id="poppySmall"><use href="#poppySymbol" transform="scale(0.65)" /></g>
-            <g id="poppyLarge"><use href="#poppySymbol" transform="scale(1.25)" /></g>
+            <g id="poppySmall">
+              <use href="#poppySymbol" transform="scale(0.65)" />
+            </g>
+            <g id="poppyLarge">
+              <use href="#poppySymbol" transform="scale(1.25)" />
+            </g>
           </defs>
 
+          <!-- Band 1 -->
           <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
           <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
           <use href="#poppyLarge" x="620" y="30" opacity="1" />
           <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
+
+          <!-- Band 2 -->
           <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
           <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
           <use href="#poppySmall" x="720" y="120" opacity="0.75" />
           <use href="#poppySymbol" x="940" y="180" opacity="0.85" />
+
+          <!-- Band 3 -->
           <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
           <use href="#poppySmall" x="310" y="220" opacity="0.8" />
           <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
           <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
+
+          <!-- Band 4 -->
           <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
           <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
           <use href="#poppySmall" x="680" y="320" opacity="0.75" />
           <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
+
+          <!-- Band 5 -->
           <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
           <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
           <use href="#poppySmall" x="540" y="470" opacity="0.8" />
@@ -171,6 +197,7 @@
           <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
         </svg>
 
+        <!-- Tile 2 -->
         <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
           <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
@@ -194,10 +221,11 @@
           <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
           <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
         </svg>
+
       </div>
     </div>
 
-    <!-- WW1 Silhouette Horizon Scene -->
+    <!-- WW1 Silhouette Remembrance Scene -->
     <div class="absolute bottom-0 left-0 right-0 w-full leading-none z-20 opacity-85 dark:opacity-95 pointer-events-none">
       <svg class="w-full h-36 sm:h-52 md:h-72 object-cover pointer-events-none" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0,320 L0,220 L180,210 L340,230 L490,200 L680,225 L840,205 L1020,230 L1200,210 L1200,320 Z" fill="currentColor" class="text-slate-700/30 dark:text-slate-950/60" />
@@ -217,12 +245,14 @@
         </g>
       </svg>
     </div>
+
   </div>
 
   <!-- Header Section -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
       
+      <!-- Top Header Row -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <a href="#" id="brandLogoLink" class="group flex items-center gap-2.5">
           <span class="text-2xl sm:text-3xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🏛️</span>
@@ -234,6 +264,7 @@
           </div>
         </a>
         
+        <!-- Action Buttons Bar -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button id="btnBrowseAllHeader" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 active:scale-95">
             <span>🌐 Browse All</span>
@@ -311,6 +342,7 @@
           </div>
         </div>
 
+        <!-- Museum Filter Grid -->
         <div id="exhibitsFilterGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
           <div>
             <label for="filterAge" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Era / Age</label>
@@ -330,6 +362,7 @@
           </div>
         </div>
 
+        <!-- Gramophone Filter Grid -->
         <div id="gramophoneFilterGrid" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div>
             <label for="filterArtist" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Artist</label>
@@ -349,6 +382,7 @@
           </div>
         </div>
 
+        <!-- Collection Hubs -->
         <div id="collectionHubsSection" class="hidden pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
           <div id="hubsGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"></div>
         </div>
@@ -360,6 +394,7 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10">
     
+    <!-- Skeleton Loader -->
     <div id="loading" class="py-6 hidden">
       <div class="flex items-center justify-center gap-2 mb-8">
         <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
@@ -367,6 +402,7 @@
       </div>
     </div>
     
+    <!-- Initial Prompt -->
     <div id="gridPrompt" class="text-center py-16 sm:py-20 bg-white/35 dark:bg-slate-950/40 rounded-3xl border border-white/50 dark:border-slate-800/60 shadow-xl backdrop-blur-md hidden">
       <div class="max-w-md mx-auto px-4">
         <div class="w-16 h-16 bg-white/60 dark:bg-slate-900/60 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/60 dark:border-slate-800/80 shadow-inner" id="promptIcon">🔍</div>
@@ -376,6 +412,7 @@
       </div>
     </div>
 
+    <!-- Hidden Site Analytics Dashboard Section -->
     <div id="adminAnalyticsSection" class="hidden space-y-4">
       <div class="flex items-center justify-between bg-white/90 dark:bg-slate-900/90 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex items-center gap-2">
@@ -392,11 +429,14 @@
       </div>
     </div>
 
+    <!-- Exhibit Cards Grid -->
     <div id="gridSection">
       <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
     </div>
 
+    <!-- Stats Dashboard Section -->
     <div id="statsSection" class="hidden space-y-6">
+      <!-- Top Intro Card -->
       <div id="statIntroCard" class="hidden bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md">
         <div class="absolute -right-10 -top-10 w-52 h-52 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -left-10 -bottom-10 w-52 h-52 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -406,6 +446,7 @@
         </div>
       </div>
 
+      <!-- Interactive 2D Map -->
       <div id="statMapCard" class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md flex flex-col gap-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <h3 class="text-base sm:text-lg font-black text-blue-300 uppercase tracking-wider flex items-center gap-2"><span>🗺️</span> Map of item origin</h3>
@@ -416,10 +457,12 @@
         </div>
       </div>
 
+      <!-- Timeline Era Breakdown Grid -->
       <div id="timelineEraSection" class="pt-1 border-t border-slate-200/60 dark:border-slate-800/80">
         <div id="timelineEraGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"></div>
       </div>
 
+      <!-- Primary KPI Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/50 transition">
           <div class="w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 absolute top-0 left-0"></div>
@@ -443,6 +486,7 @@
           </div>
         </div>
 
+        <!-- Pre / Post 1950 Dual Metrics Card -->
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/50 transition">
           <div class="w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 absolute top-0 left-0"></div>
           <div>
@@ -473,6 +517,7 @@
         </div>
       </div>
 
+      <!-- Charts Section -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between backdrop-blur-sm">
           <div class="mb-4">
@@ -495,6 +540,7 @@
         </div>
       </div>
 
+      <!-- Subcategories Breakdown Chart -->
       <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
         <div class="mb-4">
           <h3 class="text-base font-bold text-slate-900 dark:text-white">Subcategories Breakdown</h3>
@@ -507,11 +553,13 @@
 
   </main>
 
+  <!-- Toast Notification System -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification message</span>
   </div>
 
+  <!-- Fullscale Enlarge Modal Pop-Up -->
   <div id="enlargeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[70] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
@@ -522,10 +570,12 @@
     </div>
   </div>
 
+  <!-- Floating Mobile Jump Pill -->
   <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
     <span>⬇️ View Archive</span>
   </button>
 
+  <!-- Item Detail Pop-up Modal -->
   <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
       <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -548,6 +598,7 @@
     </div>
   </div>
 
+  <!-- Standalone 3D Lightbox Modal -->
   <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[60] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">

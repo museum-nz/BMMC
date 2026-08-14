@@ -48,27 +48,6 @@ const TIMELINE_ERAS = [
   { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
 ];
 
-// Helper to load heavy external scripts dynamically on demand
-function loadScript(src, isModule = false) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) return resolve();
-    const script = document.createElement('script');
-    script.src = src;
-    if (isModule) script.type = 'module';
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-function loadModelViewerIfNeeded() {
-  return loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js', true);
-}
-
-function loadChartJsIfNeeded() {
-  return loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js');
-}
-
 function getEraByYear(yearNum) {
   if (yearNum === null || yearNum === undefined || isNaN(yearNum)) return null;
   return TIMELINE_ERAS.find(e => yearNum >= e.min && yearNum <= e.max) || null;
@@ -1210,8 +1189,6 @@ function renderExhibitsGrid() {
     return;
   }
 
-  let has3DItemInGrid = false;
-
   for (let arrayIndex = 0; arrayIndex < currentFilteredRows.length; arrayIndex++) {
     const { row, originalIndex } = currentFilteredRows[arrayIndex];
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
@@ -1230,7 +1207,6 @@ function renderExhibitsGrid() {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
-    if (d3d) has3DItemInGrid = true;
 
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
@@ -1324,7 +1300,6 @@ function renderExhibitsGrid() {
     grid.appendChild(card);
   }
 
-  if (has3DItemInGrid) loadModelViewerIfNeeded();
   updateAudioUI();
 }
 
@@ -1416,8 +1391,7 @@ function closeEnlargeModal() {
   document.body.classList.remove('overflow-hidden');
 }
 
-async function renderMuseumStatistics() {
-  await loadChartJsIfNeeded();
+function renderMuseumStatistics() {
   if (typeof Chart === 'undefined' || !rawExhibitsRows || rawExhibitsRows.length === 0) return;
   const isDark = document.documentElement.classList.contains('dark');
   const textColor = isDark ? '#cbd5e1' : '#334155';
@@ -1699,9 +1673,7 @@ async function renderMuseumStatistics() {
   }, 50);
 }
 
-async function open3DLightbox(rawUrl, rawTitle) {
-  await loadModelViewerIfNeeded();
-
+function open3DLightbox(rawUrl, rawTitle) {
   const modal = document.getElementById('lightbox3DModal');
   const titleElem = document.getElementById('lightboxTitle');
   const viewer = document.getElementById('lightboxViewer');
@@ -1805,7 +1777,7 @@ function openModalByFilteredIndex(filteredIndex) {
   openModal(row, originalIndex);
 }
 
-async function openModal(row, originalIndex) {
+function openModal(row, originalIndex) {
   stopAudioGuide();
   const modalContainer = document.getElementById('modalContainer');
   const modalContent = document.getElementById('modalContent');
@@ -1833,7 +1805,6 @@ async function openModal(row, originalIndex) {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
-    if (d3d) loadModelViewerIfNeeded();
 
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
