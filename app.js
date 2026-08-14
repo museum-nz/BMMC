@@ -1436,6 +1436,38 @@ function renderMuseumStatistics() {
 
     if (docUrl && (docUrl.startsWith('http') || docUrl.length > 5)) { docElem.href = docUrl.startsWith('http') ? docUrl : `https://${docUrl}`; docElem.classList.remove('hidden'); }
     if (webUrl && (webUrl.startsWith('http') || webUrl.length > 5)) { webElem.href = webUrl.startsWith('http') ? webUrl : `https://${webUrl}`; webElem.classList.remove('hidden'); }
+
+    // Title Details Section: Column C Row 2 (everything after #, first line 200% bold)
+    const titleDetailsCard = document.getElementById('statTitleDetailsCard');
+    const titleDetailsContent = document.getElementById('statTitleDetailsContent');
+
+    if (titleDetailsCard && titleDetailsContent) {
+      let rawTitleColC = unescapeHTML(getVal(targetRow2, colIdx.title) || getVal(targetRow2, 2) || '');
+      if (rawTitleColC) {
+        let postHashText = rawTitleColC;
+        if (postHashText.includes('#')) {
+          postHashText = postHashText.substring(postHashText.indexOf('#') + 1).trim();
+        }
+
+        const lines = postHashText.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length > 0) {
+          const firstLine = lines[0];
+          const restLines = lines.slice(1).join('\n');
+          
+          let formattedHTML = `<div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">${escapeHTML(firstLine)}</div>`;
+          if (restLines) {
+            formattedHTML += `<div class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-line">${escapeHTML(restLines)}</div>`;
+          }
+          
+          titleDetailsContent.innerHTML = formattedHTML;
+          titleDetailsCard.classList.remove('hidden');
+        } else {
+          titleDetailsCard.classList.add('hidden');
+        }
+      } else {
+        titleDetailsCard.classList.add('hidden');
+      }
+    }
   }
 
   rawExhibitsRows.forEach(row => {
@@ -1535,7 +1567,7 @@ function renderMuseumStatistics() {
     const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
     const interestCount = interestRows.length;
     const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
-    const interestPctDisplay = interestPctNum > 0 && interestPctNum < 1 ? interestPctNum.toFixed(1) : Math.round(interestPctNum);
+    const interestPctDisplay = interestPctNum > 0 && interestPctNum < 1 ? interestPctDisplay.toFixed(1) : Math.round(interestPctNum);
     const interestCustomImg = TIMELINE_CUSTOM_IMAGES["Items of interest"] || TIMELINE_CUSTOM_IMAGES["Items of Interest"] || TIMELINE_CUSTOM_IMAGES["Itmes of Interest"];
     const firstInterestImgRow = interestRows.find(r => getVal(r, colIdx.img1) !== '');
     const rawInterestUrl = interestCustomImg || (firstInterestImgRow ? getVal(firstInterestImgRow, colIdx.img1) : '');
