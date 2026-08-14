@@ -1,5 +1,5 @@
-const EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhFvwkKqXJDvguJb8LcEd40pTB5ErmPZ-oU-67RsPpks_k_mCFs_MkMB-93Ooo_3M4fIwn6bwItp_P/pub?gid=1146027655&single=true&output=csv';
-const GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRhFvwkKqXJDvguJb8LcEd40pTB5ErmPZ-oU-67RsPpks_k_mCFs_MkMB-93Ooo_3M4fIwn6bwItp_P/pub?gid=606568772&single=true&output=csv';
+const EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
+const GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=606568772';
 const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
@@ -224,25 +224,19 @@ async function fetchCSVWithCache(url, cacheKey) {
 
   const res = await fetch(url);
   const text = await res.text();
+  const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
 
-  return new Promise((resolve, reject) => {
-    Papa.parse(text, {
-      header: false,
-      skipEmptyLines: true,
-      complete: (results) => {
-        if (results.data && Array.isArray(results.data) && results.data.length > 1) {
-          try {
-            localStorage.setItem(cacheKey, JSON.stringify(results.data));
-            localStorage.setItem(`${cacheKey}_time`, Date.now());
-          } catch (e) {
-            console.warn('localStorage write error:', e);
-          }
-        }
-        resolve(results.data);
-      },
-      error: (err) => reject(err)
-    });
-  });
+  // Safety Guard: Only cache if valid data with rows was fetched
+  if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 1) {
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+      localStorage.setItem(`${cacheKey}_time`, Date.now());
+    } catch (e) {
+      console.warn('localStorage write error:', e);
+    }
+  }
+
+  return parsed.data;
 }
 
 function parseDiscogsVal(raw) {
@@ -665,9 +659,11 @@ function initFuseSearch() {
 async function loadCatalogData() {
   initTheme();
   try {
+    // Fetch both datasets concurrently in the background
     const exhibitsPromise = fetchCSVWithCache(EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
     const gramophonePromise = fetchCSVWithCache(GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
 
+    // 1. Process Main Exhibits first and render UI immediately
     const exhibitsData = await exhibitsPromise;
     if (exhibitsData && exhibitsData.length > 0) {
       exhibitsData[0].forEach((cell, idx) => {
@@ -695,6 +691,7 @@ async function loadCatalogData() {
       populateInitialDropdowns();
     }
 
+    // Main site is now fully interactive! Unhide UI & hide spinner right away
     renderCollectionHubs(rawExhibitsRows);
     updateDynamicDropdowns();
     document.getElementById('gridPrompt')?.classList.remove('hidden');
@@ -702,6 +699,7 @@ async function loadCatalogData() {
     checkUrlHashForExhibit();
     hideLoadingSpinner(); 
 
+    // 2. Process Gramophone records as soon as background fetch completes
     const gramophoneData = await gramophonePromise;
     if (gramophoneData && gramophoneData.length > 0) {
       rawGramophoneRows = gramophoneData.filter(r => {
@@ -711,6 +709,7 @@ async function loadCatalogData() {
       });
     }
 
+    // Refresh search index and update Gramophone hub count
     initFuseSearch();
     renderCollectionHubs(rawExhibitsRows);
 
@@ -1207,7 +1206,6 @@ function renderExhibitsGrid() {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
-
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
 
@@ -1299,7 +1297,6 @@ function renderExhibitsGrid() {
     card.addEventListener('click', () => openModalByFilteredIndex(arrayIndex));
     grid.appendChild(card);
   }
-
   updateAudioUI();
 }
 
@@ -1470,6 +1467,7 @@ function renderMuseumStatistics() {
     }
   });
 
+  // Populate Timeline Era Grid (Styled like Category Hubs, 7 Eras + 1 Items of interest)
   const timelineEraGrid = document.getElementById('timelineEraGrid');
   if (timelineEraGrid) {
     timelineEraGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5";
@@ -1518,6 +1516,7 @@ function renderMuseumStatistics() {
       timelineEraGrid.appendChild(card);
     });
 
+    // 8th Button: Items of interest (Filtered strictly by Type: Items of interest)
     const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
     const interestCount = interestRows.length;
     const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
@@ -1623,6 +1622,7 @@ function renderMuseumStatistics() {
       });
     }
 
+    // Vertical Graph with Subcategories on Y-axis, stacked by Categories
     const categoriesArray = Array.from(allCategoriesSet);
     const subcatsArray = Array.from(allSubcatsSet);
 
@@ -1805,7 +1805,6 @@ function openModal(row, originalIndex) {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
-
     const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
     const ageBadgeClass = getAgeBadgeStyle(eraDisplay);
