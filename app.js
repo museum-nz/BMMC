@@ -1449,14 +1449,30 @@ function renderMuseumStatistics() {
           postHashText = postHashText.substring(postHashText.indexOf('#') + 1).trim();
         }
 
-        const lines = postHashText.split('\n').map(l => l.trim()).filter(Boolean);
-        if (lines.length > 0) {
-          const firstLine = lines[0];
-          const restLines = lines.slice(1).join('\n');
+        // Normalize carriage returns (\r\n -> \n)
+        postHashText = postHashText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+
+        // Separate the first line from the rest of the text
+        const firstBreak = postHashText.indexOf('\n');
+        let firstLine = '';
+        let bodyText = '';
+
+        if (firstBreak !== -1) {
+          firstLine = postHashText.substring(0, firstBreak).trim();
+          bodyText = postHashText.substring(firstBreak + 1).trim();
+        } else {
+          firstLine = postHashText;
+        }
+
+        if (firstLine) {
+          let formattedHTML = `<div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">${escapeHTML(firstLine)}</div>`;
           
-          let formattedHTML = `<div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">${escapeHTML(firstLine)}</div>`;
-          if (restLines) {
-            formattedHTML += `<div class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-line">${escapeHTML(restLines)}</div>`;
+          if (bodyText) {
+            // Split by paragraph (empty lines) and wrap each in a spaced paragraph
+            const paragraphs = bodyText.split(/\n\s*\n/);
+            formattedHTML += paragraphs
+              .map(p => `<p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed font-normal mb-4 last:mb-0 whitespace-pre-line">${escapeHTML(p.trim())}</p>`)
+              .join('');
           }
           
           titleDetailsContent.innerHTML = formattedHTML;
