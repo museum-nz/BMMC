@@ -103,7 +103,7 @@ function getSolidTint(hex, isDark) {
   }
 }
 
-const CACHE_TTL_MS = 60 * 60 * 1000;
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 let currentTab = 'exhibits';
 let rawExhibitsRows = [];
 let rawGramophoneRows = [];
@@ -209,18 +209,33 @@ function toggleCollapsibleControls(show) {
 }
 
 async function fetchCSVWithCache(url, cacheKey) {
-  const cached = sessionStorage.getItem(cacheKey);
-  const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
-  if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
-    try { return JSON.parse(cached); } catch (e) {}
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+    if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
+      const parsedData = JSON.parse(cached);
+      if (Array.isArray(parsedData) && parsedData.length > 1) {
+        return parsedData;
+      }
+    }
+  } catch (e) {
+    console.warn('localStorage read error:', e);
   }
+
   const res = await fetch(url);
   const text = await res.text();
   const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-  try {
-    sessionStorage.setItem(cacheKey, JSON.stringify(parsed.data));
-    sessionStorage.setItem(`${cacheKey}_time`, Date.now());
-  } catch (e) {}
+
+  // Safety Guard: Only cache if valid data with rows was fetched
+  if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 1) {
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+      localStorage.setItem(`${cacheKey}_time`, Date.now());
+    } catch (e) {
+      console.warn('localStorage write error:', e);
+    }
+  }
+
   return parsed.data;
 }
 
@@ -644,11 +659,12 @@ function initFuseSearch() {
 async function loadCatalogData() {
   initTheme();
   try {
-    const [exhibitsData, gramophoneData] = await Promise.all([
-      fetchCSVWithCache(EXHIBITS_CSV_URL, 'bMMC_cached_exhibits'),
-      fetchCSVWithCache(GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone')
-    ]);
+    // Fetch both datasets concurrently in the background
+    const exhibitsPromise = fetchCSVWithCache(EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
+    const gramophonePromise = fetchCSVWithCache(GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
 
+    // 1. Process Main Exhibits first and render UI immediately
+    const exhibitsData = await exhibitsPromise;
     if (exhibitsData && exhibitsData.length > 0) {
       exhibitsData[0].forEach((cell, idx) => {
         const c = String(cell).toLowerCase().trim();
@@ -675,6 +691,16 @@ async function loadCatalogData() {
       populateInitialDropdowns();
     }
 
+    // Main site is now fully interactive! Unhide UI & hide spinner right away
+    renderCollectionHubs(rawExhibitsRows);
+    updateDynamicDropdowns();
+    document.getElementById('gridPrompt')?.classList.remove('hidden');
+    updateFavoritesBadge();
+    checkUrlHashForExhibit();
+    hideLoadingSpinner(); 
+
+    // 2. Process Gramophone records as soon as background fetch completes
+    const gramophoneData = await gramophonePromise;
     if (gramophoneData && gramophoneData.length > 0) {
       rawGramophoneRows = gramophoneData.filter(r => {
         const c0 = getVal(r, 0).toLowerCase();
@@ -683,9 +709,9 @@ async function loadCatalogData() {
       });
     }
 
-    initFuseSearch(); renderCollectionHubs(rawExhibitsRows); updateDynamicDropdowns();
-    document.getElementById('gridPrompt').classList.remove('hidden');
-    updateFavoritesBadge(); checkUrlHashForExhibit();
+    // Refresh search index and update Gramophone hub count
+    initFuseSearch();
+    renderCollectionHubs(rawExhibitsRows);
 
   } catch (err) {
     console.error("Failed to load catalog data:", err);
@@ -693,7 +719,7 @@ async function loadCatalogData() {
       <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900">
         <p class="text-rose-600 dark:text-rose-400 font-bold text-base mb-1">Error loading Google Sheet data</p>
         <p class="text-xs text-slate-500 mb-4">Please check your connection or retry fetching the catalog archive.</p>
-        <button onclick="sessionStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Retry Fetching</button>
+        <button onclick="localStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Retry Fetching</button>
       </div>
     `;
   } finally { hideLoadingSpinner(); }
