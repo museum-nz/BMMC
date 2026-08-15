@@ -168,10 +168,10 @@
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-6">
     
     <!-- Three Curated Overview Filter Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
       
       <!-- WWII - Alan -->
       <div id="cardWW2" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-amber-500" onclick="switchHall('ww2-alan')">
@@ -220,7 +220,7 @@
 
     </section>
 
-    <!-- Alan Starling Audio & Exhibits Section -->
+    <!-- Alan Starling Audio & Exhibits Section (Visible only on 'All' and 'Alan War') -->
     <section id="alanMediaSection" class="space-y-4">
       <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-5 backdrop-blur-md space-y-4">
         
@@ -355,10 +355,10 @@
 
     <!-- Photographic Archives Section -->
     <section id="photoGridSection" class="space-y-4">
-      <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-md space-y-4">
+      <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-md space-y-4">
         
         <!-- Controls Header Row -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-3">
           <div>
             <div class="flex items-center gap-2">
               <span class="text-xl">📷</span>
@@ -369,17 +369,29 @@
             </p>
           </div>
 
-          <!-- Search & Filter Controls -->
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <!-- Search, Category & Sort Controls -->
+          <div class="flex flex-wrap items-center gap-2">
+            
+            <!-- Sort Selector Dropdown -->
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700">
+              <label for="gallerySortSelect" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
+              <select id="gallerySortSelect" onchange="filterGalleryCards()" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+                <option value="default">Default</option>
+                <option value="title-asc">Title (A–Z)</option>
+                <option value="title-desc">Title (Z–A)</option>
+                <option value="category-asc">Tag / Category (A–Z)</option>
+              </select>
+            </div>
+
             <!-- Category Dropdown Filter -->
-            <select id="galleryCategoryFilter" onchange="filterGalleryCards()" class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500">
-              <option value="">All Categories</option>
+            <select id="galleryCategoryFilter" onchange="filterGalleryCards()" class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500">
+              <option value="">All Tags / Categories</option>
             </select>
 
             <!-- Search input -->
-            <div class="relative min-w-[220px]">
-              <input type="text" id="gallerySearchInput" oninput="filterGalleryCards()" placeholder="Search photo title, details..." class="w-full pl-8 pr-3 py-2 text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-medium"/>
-              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative min-w-[200px]">
+              <input type="text" id="gallerySearchInput" oninput="filterGalleryCards()" placeholder="Search photo title, details..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-medium"/>
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>
             </div>
@@ -392,8 +404,8 @@
           <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Loading photographs from archive...</span>
         </div>
 
-        <!-- Photos Cards Grid Container -->
-        <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 hidden"></div>
+        <!-- Photos Cards Grid Container (Vertically Optimized) -->
+        <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 hidden"></div>
 
         <!-- No Results Fallback -->
         <div id="galleryNoResults" class="hidden text-center py-12 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
@@ -466,7 +478,7 @@
     <span id="toastMsg">Notification</span>
   </div>
 
-  <!-- Script: Photo Gallery, Speech Synthesis, Favorites & Filtering -->
+  <!-- Script: Photo Gallery, Speech Synthesis, Favorites, Sorting & Tag Filtering -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1741478537';
     const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
@@ -482,7 +494,7 @@
     let currentlySpeakingIndex = null;
     let currentSpeechUtterance = null;
 
-    // Helper: Toast alerts
+    // Toast alert helper
     function showToast(msg, icon = '✨') {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toastMsg');
@@ -496,7 +508,7 @@
       }, 2500);
     }
 
-    // Helper: format Google Drive / lh3 URL
+    // Google Drive / lh3 URL Formatter
     function formatGoogleLh3Url(url, size = 's500') {
       if (!url) return '';
       url = String(url).trim();
@@ -525,9 +537,9 @@
       return url;
     }
 
-    // Helper: Parse details in format "Title #Category ## Details"
+    // Details Parser: Extracts Title, #Category/Tag, and ## Details
     function parseGalleryDetails(raw) {
-      if (!raw) return { title: 'Untitled Photo', category: 'General', details: '' };
+      if (!raw) return { title: 'Untitled Photo', category: '', details: '' };
       let str = String(raw).trim();
       let title = '', category = '', details = '';
 
@@ -557,7 +569,7 @@
       }
 
       title = title.replace(/^[#\*\-]+\s*/, '').trim() || 'Untitled Photo';
-      category = category.replace(/^[#\*\-]+\s*/, '').trim() || 'General';
+      category = category.replace(/^[#\*\-]+\s*/, '').trim();
       details = details.replace(/^[#\*\-]+\s*/, '').trim();
 
       return { title, category, details };
@@ -642,7 +654,7 @@
       }
     }
 
-    // --- Speech Synthesis / Audio Guide ---
+    // --- Speech Synthesis (Strictly reads details after ##) ---
     function loadVoices() {
       if (!('speechSynthesis' in window)) return;
       const voices = speechSynthesis.getVoices();
@@ -700,9 +712,10 @@
       const item = rawGalleryItems[itemIndex];
       if (!item) return;
 
-      const narration = `${item.title}. ${item.category ? 'Category: ' + item.category + '.' : ''} ${item.details || ''}`.trim();
+      // STRICTLY read only what is in the details section (after ## in input)
+      const narration = (item.details || '').trim();
       if (!narration) {
-        showToast('No descriptive details available to narrate', 'ℹ️');
+        showToast('No descriptive details available to read', 'ℹ️');
         return;
       }
 
@@ -750,7 +763,7 @@
         if (currentlySpeakingIndex === id && isSpeaking) {
           btn.classList.add('bg-blue-600', 'text-white', 'animate-pulse');
           btn.classList.remove('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600');
-          btn.innerHTML = `<span class="flex items-center gap-1 text-[10px] px-1 font-bold">🔊 <span class="eq-bar"></span><span class="eq-bar"></span></span>`;
+          btn.innerHTML = `<span class="flex items-center gap-0.5 text-[9px] px-1 font-bold">🔊 <span class="eq-bar"></span><span class="eq-bar"></span></span>`;
         } else {
           btn.classList.remove('bg-blue-600', 'text-white', 'animate-pulse');
           btn.classList.add('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600');
@@ -818,7 +831,7 @@
       }
     }
 
-    // Populate Category Dropdown Filter
+    // Populate Category / Tag Dropdown Filter
     function populateCategoryFilter(items) {
       const select = document.getElementById('galleryCategoryFilter');
       if (!select) return;
@@ -829,7 +842,7 @@
         counts[cat] = (counts[cat] || 0) + 1;
       });
 
-      select.innerHTML = '<option value="">All Categories</option>';
+      select.innerHTML = '<option value="">All Tags / Categories</option>';
       Object.keys(counts).sort().forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat;
@@ -838,44 +851,30 @@
       });
     }
 
-    // Checks if item matches the selected Hall / Collection
+    // Matcher: Matches item against strict collection tags
     function matchesHall(item, hallKey) {
       if (hallKey === 'all') return true;
 
-      const combinedText = `${item.title} ${item.category} ${item.details}`.toLowerCase();
+      const catLower = (item.category || '').toLowerCase().trim();
 
       if (hallKey === 'ww2-alan') {
-        return combinedText.includes('alan') || 
-               combinedText.includes('ww2') || 
-               combinedText.includes('wwii') || 
-               combinedText.includes('war') || 
-               combinedText.includes('military') || 
-               combinedText.includes('starling') || 
-               combinedText.includes('navy') || 
-               combinedText.includes('soldier');
+        // Tag: WWII - Alan
+        return catLower.includes('wwii - alan') || catLower.includes('ww2 - alan') || catLower.includes('wwii') || catLower.includes('alan war');
       } else if (hallKey === 'bonniefields-1920s') {
-        return combinedText.includes('bonniefields') || 
-               combinedText.includes('dun') || 
-               combinedText.includes('farm') || 
-               combinedText.includes('harvest') || 
-               combinedText.includes('homestead') || 
-               combinedText.includes('machinery') || 
-               combinedText.includes('1920');
+        // Tag: Dun and Bonniefields photos
+        return catLower.includes('dun and bonniefields') || catLower.includes('bonniefields') || catLower.includes('dun');
       } else if (hallKey === 'maitland-school') {
-        return combinedText.includes('maitland') || 
-               combinedText.includes('school') || 
-               combinedText.includes('chatton') || 
-               combinedText.includes('pupil') || 
-               combinedText.includes('class') || 
-               combinedText.includes('village');
+        // Tag: Maitland East Chatton and Village
+        return catLower.includes('maitland east chatton') || catLower.includes('maitland') || catLower.includes('east chatton');
       }
       return true;
     }
 
-    // Filter and Render Photo Cards
+    // Filter, Sort and Render Photo Cards
     function filterGalleryCards() {
       const searchVal = (document.getElementById('gallerySearchInput')?.value || '').toLowerCase().trim();
       const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
+      const sortBy = document.getElementById('gallerySortSelect')?.value || 'default';
       const favs = getFavorites();
 
       filteredGalleryItems = rawGalleryItems.filter(item => {
@@ -890,10 +889,19 @@
         return matchHall && matchSearch && matchCat && matchFav;
       });
 
+      // Apply Sorting
+      if (sortBy === 'title-asc') {
+        filteredGalleryItems.sort((a, b) => a.title.localeCompare(b.title));
+      } else if (sortBy === 'title-desc') {
+        filteredGalleryItems.sort((a, b) => b.title.localeCompare(a.title));
+      } else if (sortBy === 'category-asc') {
+        filteredGalleryItems.sort((a, b) => (a.category || '').localeCompare(b.category || '') || a.title.localeCompare(b.title));
+      }
+
       renderGalleryCards();
     }
 
-    // Render Gallery Grid Cards
+    // Render Gallery Grid Cards (Vertically optimized with reduced spacing)
     function renderGalleryCards() {
       const grid = document.getElementById('galleryGrid');
       const noResults = document.getElementById('galleryNoResults');
@@ -916,35 +924,37 @@
       filteredGalleryItems.forEach((item, index) => {
         const isFav = favs.includes(item.id);
         const card = document.createElement('div');
-        card.className = 'bg-slate-50 dark:bg-slate-950/80 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative';
+        card.className = 'bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative';
 
         card.innerHTML = `
           <div>
-            <div class="h-48 bg-slate-900 relative overflow-hidden flex items-center justify-center p-2">
+            <div class="h-44 sm:h-48 bg-slate-900 relative overflow-hidden flex items-center justify-center p-1.5">
               <img src="${item.thumbUrl}" alt="${item.title}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'"/>
               
-              ${item.category ? `<span class="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-sm text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow z-10">${item.category}</span>` : ''}
+              ${item.category ? `<span class="absolute top-2 left-2 bg-slate-900/85 backdrop-blur-sm text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow z-10 truncate max-w-[65%]">${item.category}</span>` : ''}
 
               <!-- Action buttons on Card Image -->
-              <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10" onclick="event.stopPropagation()">
-                <button onclick="toggleFavorite(${item.id}, event)" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
+              <div class="absolute top-2 right-2 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
+                <button onclick="toggleFavorite(${item.id}, event)" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
                   ${isFav ? '❤️' : '🤍'}
                 </button>
-                <button data-gallery-speak-id="${item.id}" onclick="speakPhotoDetails(${item.id}, event)" title="Listen to narration" class="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
+                ${item.details ? `<button data-gallery-speak-id="${item.id}" onclick="speakPhotoDetails(${item.id}, event)" title="Listen to details" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
                   🔊
-                </button>
+                </button>` : ''}
               </div>
             </div>
 
-            <div class="p-3.5 space-y-1.5">
-              <h4 class="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
+            <!-- Compact Details Section -->
+            <div class="p-2.5 space-y-1">
+              <h4 class="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
                 ${item.title}
               </h4>
-              ${item.details ? `<p class="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed font-normal">${item.details}</p>` : ''}
+              ${item.details ? `<p class="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal">${item.details}</p>` : ''}
             </div>
           </div>
 
-          <div class="p-3 pt-0 flex items-center justify-between border-t border-slate-200/60 dark:border-slate-800/60 mt-2">
+          <!-- Tightened Footer Actions -->
+          <div class="px-2.5 pb-2 pt-1 flex items-center justify-between border-t border-slate-200/60 dark:border-slate-800/60">
             <span class="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
               View Photo ↗
             </span>
@@ -964,8 +974,10 @@
     function resetGalleryFilters() {
       const search = document.getElementById('gallerySearchInput');
       const cat = document.getElementById('galleryCategoryFilter');
+      const sort = document.getElementById('gallerySortSelect');
       if (search) search.value = '';
       if (cat) cat.value = '';
+      if (sort) sort.value = 'default';
       showingFavoritesOnly = false;
       switchHall('all');
     }
@@ -1044,10 +1056,11 @@
     function switchHall(hallKey) {
       activeHall = hallKey;
 
-      // Update Section Titles & Subheading
+      // Update Section Titles & Alan Audio Visibility
       const titleElem = document.getElementById('gallerySectionTitle');
       const alanMediaSection = document.getElementById('alanMediaSection');
 
+      // The Alan Starling audio & exhibit section only shows on 'All' and 'Alan War'
       if (alanMediaSection) {
         alanMediaSection.style.display = (hallKey === 'ww2-alan' || hallKey === 'all') ? 'block' : 'none';
       }
@@ -1076,7 +1089,7 @@
       if (hallKey === 'bonniefields-1920s' && tabBNF) tabBNF.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-500 text-slate-950 border-emerald-600 shadow-sm';
       if (hallKey === 'maitland-school' && tabMTL) tabMTL.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-blue-500 text-white border-blue-600 shadow-sm';
 
-      // Update Cards Highlighting
+      // Update Overview Card Highlighting
       const cardWW2 = document.getElementById('cardWW2');
       const cardBNF = document.getElementById('cardBNF');
       const cardMTL = document.getElementById('cardMTL');
@@ -1212,7 +1225,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Sync Dark Mode with main site
       const savedTheme = localStorage.getItem('bMMC_theme');
       if (savedTheme === 'dark') document.documentElement.classList.add('dark');
       else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
