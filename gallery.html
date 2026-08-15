@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Photo Archives — Historical Photographic Galleries</title>
 
-  <!-- Preconnect for Image & Drive CDN -->
+  <!-- Preconnect for Image & Media CDN -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
   <link rel="preconnect" href="https://www.dropbox.com" crossorigin>
@@ -47,6 +47,21 @@
     
     .solid-header { background-color: rgba(255, 255, 255, 0.90); }
     .dark .solid-header { background-color: rgba(15, 23, 42, 0.90); }
+
+    /* Equalizer animation for speech narration */
+    @keyframes barPulse {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+    .eq-bar {
+      display: inline-block;
+      width: 3px;
+      background-color: currentColor;
+      border-radius: 9999px;
+      animation: barPulse 0.8s infinite ease-in-out;
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
 
     /* Ambient Seasonal Background */
     @keyframes seasonSkyCycle {
@@ -102,6 +117,7 @@
         
         <!-- Navigation Buttons -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          
           <a href="https://museum-nz.github.io/BMMC/" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 active:scale-95">
             <span>🏛️ Museum Exhibits</span>
           </a>
@@ -110,6 +126,13 @@
             <span>ℹ️ Info</span>
           </a>
 
+          <!-- Saved Favorites Button -->
+          <button id="btnFavorites" onclick="toggleFavoritesFilter()" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm">
+            <span id="favHeartIcon">🤍</span>
+            <span id="favCountText">Saved (0)</span>
+          </button>
+
+          <!-- Theme Toggle -->
           <button id="btnThemeToggle" aria-label="Toggle Theme" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm">
             <span id="themeToggleIcon">☀️</span>
             <span id="themeToggleText" class="hidden sm:inline">Mode</span>
@@ -117,12 +140,17 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs (Switches Live Drive Explorer) -->
+      <!-- Navigation Tabs (Filter Collection) -->
       <div class="mt-3 pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
         <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">Collection:</span>
           
-          <button id="tabBtnWW2" class="hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-amber-500 text-slate-950 border-amber-600 shadow-sm" onclick="switchHall('ww2-alan')">
+          <!-- All Collections Button -->
+          <button id="tabBtnAll" class="hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-600 text-white border-emerald-700 shadow-sm" onclick="switchHall('all')">
+            <span>🌐 All Collections</span>
+          </button>
+
+          <button id="tabBtnWW2" class="hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-amber-500" onclick="switchHall('ww2-alan')">
             <span>🪖 Alan War</span>
           </button>
 
@@ -142,57 +170,57 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-8">
     
-    <!-- Three Curated Overview Cards -->
+    <!-- Three Curated Overview Filter Cards -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
       
       <!-- WWII - Alan -->
-      <div id="cardWW2" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-amber-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-amber-500/30" onclick="switchHall('ww2-alan')">
+      <div id="cardWW2" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-amber-500" onclick="switchHall('ww2-alan')">
         <div class="absolute -right-8 -top-8 w-28 h-28 bg-amber-500/10 rounded-full blur-xl"></div>
         <div>
           <div class="flex items-center justify-between gap-2 mb-3">
             <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">1939 – 1945</span>
           </div>
-          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-600">Alan War</h2>
+          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Alan War</h2>
           <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Photographs documenting Alan's wartime military service, comrades, uniforms, training camps, audio recordings, and overseas deployments.</p>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-amber-700 dark:text-amber-400">
-          <span>Viewing Repository ⬇</span>
+        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+          <span>Click to Filter Archive →</span>
         </div>
       </div>
 
       <!-- Dun and Bonniefields photos -->
-      <div id="cardBNF" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden" onclick="switchHall('bonniefields-1920s')">
+      <div id="cardBNF" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-emerald-500" onclick="switchHall('bonniefields-1920s')">
         <div class="absolute -right-8 -top-8 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl"></div>
         <div>
           <div class="flex items-center justify-between gap-2 mb-3">
             <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">1920s Heritage</span>
           </div>
-          <h2 class="text-lg font-black text-slate-900 dark:text-white">Dun & Bonniefields</h2>
+          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Dun & Bonniefields</h2>
           <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">The homestead, farming life, early harvesting & farm machinery, and rural domestic heritage at Bonniefields.</p>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
-          <span>Click to View →</span>
+          <span>Click to Filter Archive →</span>
         </div>
       </div>
 
       <!-- Maitland East Chatton and Village -->
-      <div id="cardMTL" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden" onclick="switchHall('maitland-school')">
+      <div id="cardMTL" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-blue-500" onclick="switchHall('maitland-school')">
         <div class="absolute -right-8 -top-8 w-28 h-28 bg-blue-500/10 rounded-full blur-xl"></div>
         <div>
           <div class="flex items-center justify-between gap-2 mb-3">
             <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800">School & Village</span>
           </div>
-          <h2 class="text-lg font-black text-slate-900 dark:text-white">Maitland East Chatton</h2>
+          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Maitland East Chatton</h2>
           <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Historical class photos, pupil group portraits, East Chatton village gatherings, and rural schoolhouse celebrations.</p>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
-          <span>Click to View →</span>
+          <span>Click to Filter Archive →</span>
         </div>
       </div>
 
     </section>
 
-    <!-- Alan Starling Audio & Exhibits Section (Active for Alan War) -->
+    <!-- Alan Starling Audio & Exhibits Section -->
     <section id="alanMediaSection" class="space-y-4">
       <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-5 backdrop-blur-md space-y-4">
         
@@ -325,7 +353,7 @@
       </div>
     </section>
 
-    <!-- NEW: Live Photo Archives & Details Section (CSV Sheet gid=1741478537) -->
+    <!-- Photographic Archives Section -->
     <section id="photoGridSection" class="space-y-4">
       <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-md space-y-4">
         
@@ -334,10 +362,10 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="text-xl">📷</span>
-              <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Photographic Archive Catalog</h3>
+              <h3 id="gallerySectionTitle" class="text-base sm:text-lg font-black text-slate-900 dark:text-white">All Photographic Collections</h3>
             </div>
             <p id="galleryCountText" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Historical photographs with detailed descriptions and categorisation.
+              Historical photographs with detailed descriptions, speech narration, and archival notes.
             </p>
           </div>
 
@@ -370,31 +398,10 @@
         <!-- No Results Fallback -->
         <div id="galleryNoResults" class="hidden text-center py-12 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
           <span class="text-3xl block mb-1">🔍</span>
-          <p class="text-sm font-bold text-slate-600 dark:text-slate-400">No photographic records match your search.</p>
-          <button onclick="resetGalleryFilters()" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Filter</button>
+          <p class="text-sm font-bold text-slate-600 dark:text-slate-400">No photographic records match your selected filter.</p>
+          <button onclick="resetGalleryFilters()" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
         </div>
 
-      </div>
-    </section>
-
-    <!-- Active Live Drive Explorer Section -->
-    <section class="space-y-4">
-      <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-md">
-        
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
-          <div>
-            <h3 id="currentHallTitle" class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>🪖 Alan War Collection</span>
-            </h3>
-            <p id="currentHallSubtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Live photographic repository — click any photo below to inspect, view, or zoom.
-            </p>
-          </div>
-        </div>
-
-        <div class="w-full h-[75vh] min-h-[580px] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-inner relative">
-          <iframe id="driveFolderIframe" src="https://drive.google.com/embeddedfolderview?id=19ZgM9p1EAzAq48dJqpR8kd0uMVjAtfgM#grid" class="w-full h-full border-0 bg-white" title="Google Drive Folder Explorer" loading="lazy"></iframe>
-        </div>
       </div>
     </section>
 
@@ -417,6 +424,9 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button id="modalFavBtn" onclick="toggleModalFavorite()" class="px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200">
+            <span id="modalFavIcon">🤍</span> <span id="modalFavText">Save</span>
+          </button>
           <a id="modalOpenTabBtn" href="#" target="_blank" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-black transition flex items-center gap-1">
             <span>Full Image ↗</span>
           </a>
@@ -430,10 +440,19 @@
           <img id="modalPhotoImage" src="" alt="Full view" class="max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl" />
         </div>
 
-        <div class="space-y-2">
-          <div class="flex items-center gap-2 flex-wrap">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
             <span id="modalPhotoCategory" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 uppercase tracking-wider"></span>
+            
+            <!-- Speech Narration Controls -->
+            <div class="flex items-center gap-1.5">
+              <button id="btnModalSpeak" onclick="toggleModalSpeech()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-black transition shadow flex items-center gap-1">
+                <span>🔊 Listen</span>
+              </button>
+              <select id="modalVoiceSelect" onchange="onVoiceSelected(this.value)" class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-1 font-medium max-w-[120px] truncate outline-none"></select>
+            </div>
           </div>
+
           <h2 id="modalPhotoTitle" class="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-snug"></h2>
           <div id="modalPhotoDetails" class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 font-normal"></div>
         </div>
@@ -441,7 +460,13 @@
     </div>
   </div>
 
-  <!-- Script: Photo Gallery Data Loader & Modal Controller -->
+  <!-- Toast Notification System -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <!-- Script: Photo Gallery, Speech Synthesis, Favorites & Filtering -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1741478537';
     const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
@@ -449,6 +474,27 @@
     let rawGalleryItems = [];
     let filteredGalleryItems = [];
     let currentModalPhotoIdx = -1;
+    let activeHall = 'all';
+    let showingFavoritesOnly = false;
+
+    // Speech synthesis state
+    let availableVoices = [];
+    let currentlySpeakingIndex = null;
+    let currentSpeechUtterance = null;
+
+    // Helper: Toast alerts
+    function showToast(msg, icon = '✨') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = msg;
+      if (toastIcon) toastIcon.textContent = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 2500);
+    }
 
     // Helper: format Google Drive / lh3 URL
     function formatGoogleLh3Url(url, size = 's500') {
@@ -517,7 +563,223 @@
       return { title, category, details };
     }
 
-    // Fetch and parse Gallery CSV
+    // Favorites Logic
+    function getFavorites() {
+      try {
+        return JSON.parse(localStorage.getItem('bMMC_gallery_favorites') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function toggleFavorite(itemId, event) {
+      if (event) event.stopPropagation();
+      let favs = getFavorites();
+      const adding = !favs.includes(itemId);
+      if (adding) {
+        favs.push(itemId);
+        showToast('Saved photo to your collection', '❤️');
+      } else {
+        favs = favs.filter(id => id !== itemId);
+        showToast('Removed from saved photos', '🤍');
+      }
+      localStorage.setItem('bMMC_gallery_favorites', JSON.stringify(favs));
+      updateFavoritesBadge();
+      filterGalleryCards();
+    }
+
+    function toggleModalFavorite() {
+      if (currentModalPhotoIdx === -1 || !filteredGalleryItems[currentModalPhotoIdx]) return;
+      const item = filteredGalleryItems[currentModalPhotoIdx];
+      toggleFavorite(item.id);
+      updateModalFavButton(item.id);
+    }
+
+    function updateModalFavButton(itemId) {
+      const favs = getFavorites();
+      const isFav = favs.includes(itemId);
+      const icon = document.getElementById('modalFavIcon');
+      const text = document.getElementById('modalFavText');
+      const btn = document.getElementById('modalFavBtn');
+
+      if (icon) icon.textContent = isFav ? '❤️' : '🤍';
+      if (text) text.textContent = isFav ? 'Saved' : 'Save';
+      if (btn) {
+        if (isFav) {
+          btn.className = 'px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-rose-500 text-white border-rose-500 shadow-sm';
+        } else {
+          btn.className = 'px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200';
+        }
+      }
+    }
+
+    function toggleFavoritesFilter() {
+      showingFavoritesOnly = !showingFavoritesOnly;
+      updateFavoritesBadge();
+      filterGalleryCards();
+      if (showingFavoritesOnly) {
+        showToast('Showing saved favorite photos only', '❤️');
+      }
+    }
+
+    function updateFavoritesBadge() {
+      const favs = getFavorites();
+      const icon = document.getElementById('favHeartIcon');
+      const count = document.getElementById('favCountText');
+      const btn = document.getElementById('btnFavorites');
+
+      if (count) count.textContent = `Saved (${favs.length})`;
+      if (icon) icon.textContent = favs.length > 0 ? '❤️' : '🤍';
+
+      if (btn) {
+        if (showingFavoritesOnly) {
+          btn.classList.add('bg-rose-600', 'text-white', 'border-rose-600');
+          btn.classList.remove('bg-white/80', 'dark:bg-slate-800/80', 'text-slate-700', 'dark:text-slate-200');
+        } else {
+          btn.classList.remove('bg-rose-600', 'text-white', 'border-rose-600');
+          btn.classList.add('bg-white/80', 'dark:bg-slate-800/80', 'text-slate-700', 'dark:text-slate-200');
+        }
+      }
+    }
+
+    // --- Speech Synthesis / Audio Guide ---
+    function loadVoices() {
+      if (!('speechSynthesis' in window)) return;
+      const voices = speechSynthesis.getVoices();
+      availableVoices = voices.filter(v => v.lang.startsWith('en'));
+      const keywords = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'];
+      availableVoices.sort((a, b) => {
+        const aScore = keywords.some(k => a.name.toLowerCase().includes(k)) ? 1 : 0;
+        const bScore = keywords.some(k => b.name.toLowerCase().includes(k)) ? 1 : 0;
+        return bScore - aScore;
+      });
+      populateVoiceDropdown();
+    }
+
+    function getSelectedVoice() {
+      if (availableVoices.length === 0) return null;
+      const savedName = localStorage.getItem('bMMC_selectedVoiceName');
+      if (savedName) {
+        const found = availableVoices.find(v => v.name === savedName);
+        if (found) return found;
+      }
+      return availableVoices[0];
+    }
+
+    function populateVoiceDropdown() {
+      const select = document.getElementById('modalVoiceSelect');
+      if (!select) return;
+      select.innerHTML = '';
+      const currentVoice = getSelectedVoice();
+
+      availableVoices.forEach(voice => {
+        const opt = document.createElement('option');
+        opt.value = voice.name;
+        const isNatural = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'].some(k => voice.name.toLowerCase().includes(k));
+        opt.textContent = `${voice.name} ${isNatural ? '✨' : ''}`;
+        if (currentVoice && currentVoice.name === voice.name) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function onVoiceSelected(voiceName) {
+      localStorage.setItem('bMMC_selectedVoiceName', voiceName);
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        stopSpeech();
+        toggleModalSpeech();
+      }
+    }
+
+    function speakPhotoDetails(itemIndex, event) {
+      if (event) event.stopPropagation();
+      if (currentlySpeakingIndex === itemIndex && window.speechSynthesis && window.speechSynthesis.speaking) {
+        stopSpeech();
+        return;
+      }
+
+      const item = rawGalleryItems[itemIndex];
+      if (!item) return;
+
+      const narration = `${item.title}. ${item.category ? 'Category: ' + item.category + '.' : ''} ${item.details || ''}`.trim();
+      if (!narration) {
+        showToast('No descriptive details available to narrate', 'ℹ️');
+        return;
+      }
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        currentlySpeakingIndex = itemIndex;
+        currentSpeechUtterance = new SpeechSynthesisUtterance(narration);
+        const chosenVoice = getSelectedVoice();
+        if (chosenVoice) currentSpeechUtterance.voice = chosenVoice;
+        currentSpeechUtterance.rate = 0.92;
+        currentSpeechUtterance.pitch = 1.0;
+
+        currentSpeechUtterance.onend = () => {
+          currentlySpeakingIndex = null;
+          updateSpeechUI();
+        };
+        currentSpeechUtterance.onerror = () => {
+          currentlySpeakingIndex = null;
+          updateSpeechUI();
+        };
+
+        window.speechSynthesis.speak(currentSpeechUtterance);
+        updateSpeechUI();
+      }
+    }
+
+    function stopSpeech() {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      currentlySpeakingIndex = null;
+      updateSpeechUI();
+    }
+
+    function toggleModalSpeech() {
+      if (currentModalPhotoIdx === -1 || !filteredGalleryItems[currentModalPhotoIdx]) return;
+      const item = filteredGalleryItems[currentModalPhotoIdx];
+      speakPhotoDetails(item.id);
+    }
+
+    function updateSpeechUI() {
+      const isSpeaking = window.speechSynthesis && window.speechSynthesis.speaking;
+
+      // Update grid speech buttons
+      document.querySelectorAll('[data-gallery-speak-id]').forEach(btn => {
+        const id = parseInt(btn.getAttribute('data-gallery-speak-id'), 10);
+        if (currentlySpeakingIndex === id && isSpeaking) {
+          btn.classList.add('bg-blue-600', 'text-white', 'animate-pulse');
+          btn.classList.remove('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600');
+          btn.innerHTML = `<span class="flex items-center gap-1 text-[10px] px-1 font-bold">🔊 <span class="eq-bar"></span><span class="eq-bar"></span></span>`;
+        } else {
+          btn.classList.remove('bg-blue-600', 'text-white', 'animate-pulse');
+          btn.classList.add('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600');
+          btn.innerHTML = '🔊';
+        }
+      });
+
+      // Update modal speech button
+      const modalSpeakBtn = document.getElementById('btnModalSpeak');
+      if (modalSpeakBtn && currentModalPhotoIdx !== -1 && filteredGalleryItems[currentModalPhotoIdx]) {
+        const currentItem = filteredGalleryItems[currentModalPhotoIdx];
+        if (currentlySpeakingIndex === currentItem.id && isSpeaking) {
+          modalSpeakBtn.innerHTML = `<span class="flex items-center gap-1.5"><span class="inline-flex items-center gap-0.5 text-blue-200"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span><span>Stop</span></span>`;
+          modalSpeakBtn.classList.remove('bg-blue-600');
+          modalSpeakBtn.classList.add('bg-rose-600');
+        } else {
+          modalSpeakBtn.innerHTML = '<span>🔊 Listen</span>';
+          modalSpeakBtn.classList.remove('bg-rose-600');
+          modalSpeakBtn.classList.add('bg-blue-600');
+        }
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      loadVoices();
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    // --- Fetch and Parse Gallery CSV (gid=1741478537) ---
     async function loadGalleryData() {
       const loadingEl = document.getElementById('galleryLoading');
       const gridEl = document.getElementById('galleryGrid');
@@ -528,7 +790,6 @@
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
 
         if (parsed.data && parsed.data.length > 1) {
-          // Column F is index 5 (Image), Column J is index 9 (Details)
           rawGalleryItems = parsed.data.slice(1).map((row, idx) => {
             const rawImg = row[5] ? String(row[5]).trim() : '';
             const rawDetails = row[9] ? String(row[9]).trim() : (row[8] || row[2] || '');
@@ -547,6 +808,7 @@
 
           populateCategoryFilter(rawGalleryItems);
           filterGalleryCards();
+          updateFavoritesBadge();
         }
       } catch (err) {
         console.error('Failed to load gallery sheet:', err);
@@ -576,18 +838,56 @@
       });
     }
 
+    // Checks if item matches the selected Hall / Collection
+    function matchesHall(item, hallKey) {
+      if (hallKey === 'all') return true;
+
+      const combinedText = `${item.title} ${item.category} ${item.details}`.toLowerCase();
+
+      if (hallKey === 'ww2-alan') {
+        return combinedText.includes('alan') || 
+               combinedText.includes('ww2') || 
+               combinedText.includes('wwii') || 
+               combinedText.includes('war') || 
+               combinedText.includes('military') || 
+               combinedText.includes('starling') || 
+               combinedText.includes('navy') || 
+               combinedText.includes('soldier');
+      } else if (hallKey === 'bonniefields-1920s') {
+        return combinedText.includes('bonniefields') || 
+               combinedText.includes('dun') || 
+               combinedText.includes('farm') || 
+               combinedText.includes('harvest') || 
+               combinedText.includes('homestead') || 
+               combinedText.includes('machinery') || 
+               combinedText.includes('1920');
+      } else if (hallKey === 'maitland-school') {
+        return combinedText.includes('maitland') || 
+               combinedText.includes('school') || 
+               combinedText.includes('chatton') || 
+               combinedText.includes('pupil') || 
+               combinedText.includes('class') || 
+               combinedText.includes('village');
+      }
+      return true;
+    }
+
     // Filter and Render Photo Cards
     function filterGalleryCards() {
       const searchVal = (document.getElementById('gallerySearchInput')?.value || '').toLowerCase().trim();
       const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
+      const favs = getFavorites();
 
       filteredGalleryItems = rawGalleryItems.filter(item => {
+        const matchHall = matchesHall(item, activeHall);
         const matchSearch = !searchVal || 
                             item.title.toLowerCase().includes(searchVal) || 
                             item.details.toLowerCase().includes(searchVal) ||
                             item.category.toLowerCase().includes(searchVal);
         const matchCat = !catVal || item.category === catVal;
-        return matchSearch && matchCat;
+        const matchFav = !showingFavoritesOnly || favs.includes(item.id);
+
+        return matchHall && matchSearch && matchCat && matchFav;
       });
 
       renderGalleryCards();
@@ -598,6 +898,7 @@
       const grid = document.getElementById('galleryGrid');
       const noResults = document.getElementById('galleryNoResults');
       const countText = document.getElementById('galleryCountText');
+      const favs = getFavorites();
 
       if (!grid) return;
       grid.innerHTML = '';
@@ -613,14 +914,26 @@
       if (noResults) noResults.classList.add('hidden');
 
       filteredGalleryItems.forEach((item, index) => {
+        const isFav = favs.includes(item.id);
         const card = document.createElement('div');
-        card.className = 'bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer';
+        card.className = 'bg-slate-50 dark:bg-slate-950/80 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative';
 
         card.innerHTML = `
           <div>
             <div class="h-48 bg-slate-900 relative overflow-hidden flex items-center justify-center p-2">
               <img src="${item.thumbUrl}" alt="${item.title}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'"/>
-              ${item.category ? `<span class="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-sm text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow">${item.category}</span>` : ''}
+              
+              ${item.category ? `<span class="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-sm text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow z-10">${item.category}</span>` : ''}
+
+              <!-- Action buttons on Card Image -->
+              <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10" onclick="event.stopPropagation()">
+                <button onclick="toggleFavorite(${item.id}, event)" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
+                  ${isFav ? '❤️' : '🤍'}
+                </button>
+                <button data-gallery-speak-id="${item.id}" onclick="speakPhotoDetails(${item.id}, event)" title="Listen to narration" class="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
+                  🔊
+                </button>
+              </div>
             </div>
 
             <div class="p-3.5 space-y-1.5">
@@ -644,6 +957,8 @@
         card.addEventListener('click', () => openPhotoModal(index));
         grid.appendChild(card);
       });
+
+      updateSpeechUI();
     }
 
     function resetGalleryFilters() {
@@ -651,7 +966,8 @@
       const cat = document.getElementById('galleryCategoryFilter');
       if (search) search.value = '';
       if (cat) cat.value = '';
-      filterGalleryCards();
+      showingFavoritesOnly = false;
+      switchHall('all');
     }
 
     // Modal / Lightbox Logic
@@ -685,6 +1001,10 @@
       if (prevBtn) prevBtn.disabled = filteredIndex === 0;
       if (nextBtn) nextBtn.disabled = filteredIndex === filteredGalleryItems.length - 1;
 
+      updateModalFavButton(item.id);
+      populateVoiceDropdown();
+      updateSpeechUI();
+
       if (modal) {
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
@@ -692,6 +1012,7 @@
     }
 
     function navigatePhotoModal(dir) {
+      stopSpeech();
       const newIdx = currentModalPhotoIdx + dir;
       if (newIdx >= 0 && newIdx < filteredGalleryItems.length) {
         openPhotoModal(newIdx);
@@ -699,12 +1020,13 @@
     }
 
     function closePhotoModal() {
+      stopSpeech();
       const modal = document.getElementById('photoModal');
       if (modal) modal.classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
     }
 
-    // Global Keybindings (Esc, Left/Right navigation)
+    // Global Keybindings
     window.addEventListener('keydown', (e) => {
       const modal = document.getElementById('photoModal');
       if (modal && !modal.classList.contains('hidden')) {
@@ -718,41 +1040,80 @@
       if (e.target === document.getElementById('photoModal')) closePhotoModal();
     });
 
-    // Initialize gallery on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      loadGalleryData();
-    });
+    // Hall / Collection Switcher
+    function switchHall(hallKey) {
+      activeHall = hallKey;
+
+      // Update Section Titles & Subheading
+      const titleElem = document.getElementById('gallerySectionTitle');
+      const alanMediaSection = document.getElementById('alanMediaSection');
+
+      if (alanMediaSection) {
+        alanMediaSection.style.display = (hallKey === 'ww2-alan' || hallKey === 'all') ? 'block' : 'none';
+      }
+
+      if (titleElem) {
+        if (hallKey === 'all') titleElem.textContent = 'All Photographic Collections';
+        else if (hallKey === 'ww2-alan') titleElem.textContent = '🪖 Alan War Collection';
+        else if (hallKey === 'bonniefields-1920s') titleElem.textContent = '🌾 Dun & Bonniefields Collection';
+        else if (hallKey === 'maitland-school') titleElem.textContent = '🏫 Maitland East Chatton Collection';
+      }
+
+      // Update Tab Styles
+      const tabAll = document.getElementById('tabBtnAll');
+      const tabWW2 = document.getElementById('tabBtnWW2');
+      const tabBNF = document.getElementById('tabBtnBNF');
+      const tabMTL = document.getElementById('tabBtnMTL');
+
+      [tabAll, tabWW2, tabBNF, tabMTL].forEach(b => {
+        if (b) {
+          b.className = 'hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-400';
+        }
+      });
+
+      if (hallKey === 'all' && tabAll) tabAll.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-600 text-white border-emerald-700 shadow-sm';
+      if (hallKey === 'ww2-alan' && tabWW2) tabWW2.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-amber-500 text-slate-950 border-amber-600 shadow-sm';
+      if (hallKey === 'bonniefields-1920s' && tabBNF) tabBNF.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-500 text-slate-950 border-emerald-600 shadow-sm';
+      if (hallKey === 'maitland-school' && tabMTL) tabMTL.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-blue-500 text-white border-blue-600 shadow-sm';
+
+      // Update Cards Highlighting
+      const cardWW2 = document.getElementById('cardWW2');
+      const cardBNF = document.getElementById('cardBNF');
+      const cardMTL = document.getElementById('cardMTL');
+
+      [cardWW2, cardBNF, cardMTL].forEach(c => {
+        if (c) {
+          c.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-emerald-500';
+          const ind = c.querySelector('.border-t span');
+          if (ind) {
+            ind.textContent = 'Click to Filter Archive →';
+            ind.className = 'text-slate-500 dark:text-slate-400';
+          }
+        }
+      });
+
+      if (hallKey === 'ww2-alan' && cardWW2) {
+        cardWW2.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-amber-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-amber-500/30';
+        const ind = cardWW2.querySelector('.border-t span');
+        if (ind) { ind.textContent = 'Filtering Archive ⬇'; ind.className = 'text-amber-700 dark:text-amber-400 font-bold'; }
+      }
+      if (hallKey === 'bonniefields-1920s' && cardBNF) {
+        cardBNF.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-emerald-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-emerald-500/30';
+        const ind = cardBNF.querySelector('.border-t span');
+        if (ind) { ind.textContent = 'Filtering Archive ⬇'; ind.className = 'text-emerald-700 dark:text-emerald-400 font-bold'; }
+      }
+      if (hallKey === 'maitland-school' && cardMTL) {
+        cardMTL.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-blue-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-blue-500/30';
+        const ind = cardMTL.querySelector('.border-t span');
+        if (ind) { ind.textContent = 'Filtering Archive ⬇'; ind.className = 'text-blue-700 dark:text-blue-400 font-bold'; }
+      }
+
+      filterGalleryCards();
+    }
   </script>
 
-  <!-- Script: Drive Folder Switcher & Audio Controller -->
+  <!-- Script: Alan Audio Player Controller & Theme Sync -->
   <script>
-    const DRIVE_FOLDERS = {
-      'ww2-alan': {
-        embedId: '19ZgM9p1EAzAq48dJqpR8kd0uMVjAtfgM',
-        name: 'Alan War Collection',
-        subtitle: 'Live photographic repository for Alan’s WWII service album (1939–1945).',
-        badge: '1939 – 1945',
-        theme: 'amber'
-      },
-      'bonniefields-1920s': {
-        embedId: '10uDFMX86iO5AEE3jzLR-8NN845nzqQFr',
-        name: 'Dun and Bonniefields photos',
-        subtitle: 'Live photographic repository for the Bonniefields homestead, farming life, and early machinery.',
-        badge: '1920s Heritage',
-        theme: 'emerald'
-      },
-      'maitland-school': {
-        embedId: '1CRWTGk1xKTUjFm0O2bGT6vSH7ifNv4y7',
-        name: 'Maitland East Chatton and Village',
-        subtitle: 'Live photographic repository for Maitland School, pupils, and East Chatton village archives.',
-        badge: 'School & Village',
-        theme: 'blue'
-      }
-    };
-
-    let activeHall = 'ww2-alan';
-
-    // Audio Controller Logic
     const audio = document.getElementById('alanAudioEl');
     const playBtn = document.getElementById('btnPlayPause');
     const playIcon = document.getElementById('playIcon');
@@ -850,80 +1211,8 @@
       });
     }
 
-    // Hall Switcher
-    function switchHall(hallKey) {
-      if (!DRIVE_FOLDERS[hallKey]) return;
-      activeHall = hallKey;
-      const folder = DRIVE_FOLDERS[hallKey];
-
-      const alanMediaSection = document.getElementById('alanMediaSection');
-      if (alanMediaSection) {
-        alanMediaSection.style.display = (hallKey === 'ww2-alan') ? 'block' : 'none';
-      }
-
-      const iframe = document.getElementById('driveFolderIframe');
-      if (iframe) {
-        iframe.src = `https://drive.google.com/embeddedfolderview?id=${folder.embedId}#grid`;
-      }
-
-      const titleElem = document.getElementById('currentHallTitle');
-      const subElem = document.getElementById('currentHallSubtitle');
-
-      if (titleElem) {
-        let icon = '🪖';
-        if (hallKey === 'bonniefields-1920s') icon = '🌾';
-        if (hallKey === 'maitland-school') icon = '🏫';
-        titleElem.innerHTML = `<span>${icon} ${folder.name}</span>`;
-      }
-      if (subElem) subElem.textContent = folder.subtitle;
-
-      const tabWW2 = document.getElementById('tabBtnWW2');
-      const tabBNF = document.getElementById('tabBtnBNF');
-      const tabMTL = document.getElementById('tabBtnMTL');
-
-      [tabWW2, tabBNF, tabMTL].forEach(b => {
-        if (b) {
-          b.className = 'hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-400';
-        }
-      });
-
-      if (hallKey === 'ww2-alan' && tabWW2) tabWW2.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-amber-500 text-slate-950 border-amber-600 shadow-sm';
-      if (hallKey === 'bonniefields-1920s' && tabBNF) tabBNF.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-500 text-slate-950 border-emerald-600 shadow-sm';
-      if (hallKey === 'maitland-school' && tabMTL) tabMTL.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-blue-500 text-white border-blue-600 shadow-sm';
-
-      const cardWW2 = document.getElementById('cardWW2');
-      const cardBNF = document.getElementById('cardBNF');
-      const cardMTL = document.getElementById('cardMTL');
-
-      [cardWW2, cardBNF, cardMTL].forEach(c => {
-        if (c) {
-          c.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden';
-          const indicator = c.querySelector('.border-t span');
-          if (indicator) {
-            indicator.textContent = 'Click to View →';
-            indicator.className = 'text-slate-500 dark:text-slate-400';
-          }
-        }
-      });
-
-      if (hallKey === 'ww2-alan' && cardWW2) {
-        cardWW2.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-amber-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-amber-500/30';
-        const ind = cardWW2.querySelector('.border-t span');
-        if (ind) { ind.textContent = 'Viewing Repository ⬇'; ind.className = 'text-amber-700 dark:text-amber-400'; }
-      }
-      if (hallKey === 'bonniefields-1920s' && cardBNF) {
-        cardBNF.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-emerald-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-emerald-500/30';
-        const ind = cardBNF.querySelector('.border-t span');
-        if (ind) { ind.textContent = 'Viewing Repository ⬇'; ind.className = 'text-emerald-700 dark:text-emerald-400'; }
-      }
-      if (hallKey === 'maitland-school' && cardMTL) {
-        cardMTL.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-blue-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-blue-500/30';
-        const ind = cardMTL.querySelector('.border-t span');
-        if (ind) { ind.textContent = 'Viewing Repository ⬇'; ind.className = 'text-blue-700 dark:text-blue-400'; }
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
+      // Sync Dark Mode with main site
       const savedTheme = localStorage.getItem('bMMC_theme');
       if (savedTheme === 'dark') document.documentElement.classList.add('dark');
       else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
@@ -934,7 +1223,9 @@
         document.getElementById('themeToggleIcon').textContent = isDark ? '☀️' : '🌙';
       });
 
-      switchHall('ww2-alan');
+      // Load gallery items & default view
+      loadGalleryData();
+      switchHall('all');
     });
   </script>
 </body>
