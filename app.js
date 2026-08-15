@@ -1,3 +1,8 @@
+
+Model 12:42 PM
+Here is the complete, updated `app.js` file with full support for URL search parameters (such as `?search=compass`, `?q=...`, and `?tab=...`), automatic URL synchronization while typing, and proper preservation of URL states.
+
+```javascript
 const EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
 const GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=606568772';
 const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
@@ -609,6 +614,15 @@ function browseAllExhibits() {
   only3DActive = false; hotOnlyActive = false; showingFavoritesOnly = false;
   const btn3D = document.getElementById('btn3DOnly'); if (btn3D) btn3D.classList.remove('ring-2', 'ring-purple-300', 'from-purple-700', 'to-indigo-700');
   const btnHot = document.getElementById('btnHotOnly'); if (btnHot) btnHot.classList.remove('ring-2', 'ring-amber-300', 'from-amber-600', 'to-rose-700');
+  
+  // Clear search URL query parameters
+  const url = new URL(window.location);
+  url.searchParams.delete('search');
+  url.searchParams.delete('q');
+  url.searchParams.delete('query');
+  url.searchParams.delete('tab');
+  window.history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : ''));
+
   updateFavoritesBadge(); updateDynamicDropdowns(); filterCatalog(true); scrollToGrid();
 }
 
@@ -681,6 +695,28 @@ function initFuseSearch() {
   }
 }
 
+function checkUrlQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  const searchQuery = params.get('search') || params.get('q') || params.get('query');
+  const tabParam = params.get('tab');
+
+  if (tabParam === 'gramophone') {
+    setTab('gramophone');
+  } else if (tabParam === 'exhibits') {
+    setTab('exhibits');
+  }
+
+  if (searchQuery) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.value = searchQuery;
+      updateDynamicDropdowns();
+      filterCatalog(true);
+      scrollToGrid();
+    }
+  }
+}
+
 async function loadCatalogData() {
   initTheme();
   try {
@@ -732,6 +768,9 @@ async function loadCatalogData() {
 
     initFuseSearch();
     renderCollectionHubs(rawExhibitsRows);
+
+    // Process any incoming URL search query parameters
+    checkUrlQueryParams();
 
   } catch (err) {
     console.error("Failed to load catalog data:", err);
@@ -972,7 +1011,7 @@ function renderActiveFilterPills() {
     const typeVal = document.getElementById('filterType').value;
     const catVal = document.getElementById('filterCategory').value;
     const subCatVal = document.getElementById('filterSubcategory').value;
-    if (searchVal) filters.push({ label: `Search: "${searchVal}"`, clear: () => { document.getElementById('searchInput').value = ''; } });
+    if (searchVal) filters.push({ label: `Search: "${searchVal}"`, clear: () => { document.getElementById('clearSearch').click(); } });
     if (ageVal) filters.push({ label: `Era / Age: ${unescapeHTML(ageVal)}`, clear: () => { document.getElementById('filterAge').value = ''; } });
     if (typeVal) filters.push({ label: `Type: ${unescapeHTML(typeVal)}`, clear: () => { document.getElementById('filterType').value = ''; } });
     if (catVal) filters.push({ label: `Category: ${unescapeHTML(catVal)}`, clear: () => { document.getElementById('filterCategory').value = ''; } });
@@ -985,7 +1024,7 @@ function renderActiveFilterPills() {
     const labelVal = document.getElementById('filterLabel').value;
     const formatVal = document.getElementById('filterFormat').value;
     const yearVal = document.getElementById('filterYear').value;
-    if (searchVal) filters.push({ label: `Search: "${searchVal}"`, clear: () => { document.getElementById('searchInput').value = ''; } });
+    if (searchVal) filters.push({ label: `Search: "${searchVal}"`, clear: () => { document.getElementById('clearSearch').click(); } });
     if (artistVal) filters.push({ label: `Artist: ${unescapeHTML(artistVal)}`, clear: () => { document.getElementById('filterArtist').value = ''; } });
     if (labelVal) filters.push({ label: `Label: ${unescapeHTML(labelVal)}`, clear: () => { document.getElementById('filterLabel').value = ''; } });
     if (formatVal) filters.push({ label: `Format: ${unescapeHTML(formatVal)}`, clear: () => { document.getElementById('filterFormat').value = ''; } });
@@ -1583,7 +1622,7 @@ function renderMuseumStatistics() {
     const interestRows = rawExhibitsRows.filter(r => getVal(r, colIdx.type).toLowerCase().includes('item') && getVal(r, colIdx.type).toLowerCase().includes('interest'));
     const interestCount = interestRows.length;
     const interestPctNum = totalMuseumItems > 0 ? (interestCount / totalMuseumItems * 100) : 0;
-    const interestPctDisplay = interestPctNum > 0 && interestPctNum < 1 ? interestPctDisplay.toFixed(1) : Math.round(interestPctNum);
+    const interestPctDisplay = interestPctNum > 0 && interestPctNum < 1 ? interestPctNum.toFixed(1) : Math.round(interestPctNum);
     const interestCustomImg = TIMELINE_CUSTOM_IMAGES["Items of interest"] || TIMELINE_CUSTOM_IMAGES["Items of Interest"] || TIMELINE_CUSTOM_IMAGES["Itmes of Interest"];
     const firstInterestImgRow = interestRows.find(r => getVal(r, colIdx.img1) !== '');
     const rawInterestUrl = interestCustomImg || (firstInterestImgRow ? getVal(firstInterestImgRow, colIdx.img1) : '');
@@ -1602,7 +1641,7 @@ function renderMuseumStatistics() {
         </div>
       </div>
       <div class="p-2.5 flex-1 flex flex-col justify-between">
-        <h3 class="font-black text-xs line-clamp-1" style="color: ${interestColor};">Items of interest</h3>
+        <h3 class="font-black text-xs line-clamp-1" style="color: ${interestColor};">${interestColor}</h3>
         <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5" style="color: ${interestColor};">Explore →</span>
       </div>
     `;
@@ -1851,7 +1890,7 @@ function openModal(row, originalIndex) {
   const isDark = document.documentElement.classList.contains('dark');
 
   if (currentTab === 'exhibits') {
-    window.history.replaceState(null, '', `#exhibit-${originalIndex}`);
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#exhibit-${originalIndex}`);
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
     const { title, details } = parseTitleAndDetails(rawContent);
     const displayTitle = title || `Exhibit Item Details`;
@@ -1888,7 +1927,7 @@ function openModal(row, originalIndex) {
     } else { counterElem.textContent = ''; }
 
     document.getElementById('btnShareExhibit').onclick = () => {
-      navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`).then(() => showToast('Link copied to clipboard!', '🔗'));
+      navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}${window.location.search}#exhibit-${originalIndex}`).then(() => showToast('Link copied to clipboard!', '🔗'));
     };
 
     modalContent.innerHTML = `
@@ -2008,7 +2047,7 @@ function openModal(row, originalIndex) {
     }
 
   } else {
-    window.history.replaceState(null, '', `#gramophone-${originalIndex}`);
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#gramophone-${originalIndex}`);
     const catalogNum = getVal(row, 0);
     const artist = getVal(row, 1) || 'Unknown Artist';
     const rawTitle = getGramophoneRawTitle(row);
@@ -2035,7 +2074,7 @@ function openModal(row, originalIndex) {
     } else { counterElem.textContent = ''; }
 
     document.getElementById('btnShareExhibit').onclick = () => {
-      navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#gramophone-${originalIndex}`).then(() => showToast('Record link copied to clipboard!', '🔗'));
+      navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}${window.location.search}#gramophone-${originalIndex}`).then(() => showToast('Record link copied to clipboard!', '🔗'));
     };
 
     modalContent.innerHTML = `
@@ -2095,7 +2134,7 @@ function closeModal() {
   stopAudioGuide();
   document.body.classList.remove('overflow-hidden');
   document.getElementById('detailModal').classList.add('hidden');
-  window.history.replaceState(null, '', ' ');
+  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2146,8 +2185,38 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleCollapsibleControls(false); scrollToGrid();
   });
 
-  document.getElementById('searchInput').addEventListener('input', () => filterCatalog(true));
-  document.getElementById('clearSearch').addEventListener('click', () => { document.getElementById('searchInput').value = ''; filterCatalog(true); });
+  // Search Input with URL query synchronization
+  const searchInputElem = document.getElementById('searchInput');
+  if (searchInputElem) {
+    searchInputElem.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      const url = new URL(window.location);
+      if (val) {
+        url.searchParams.set('search', val);
+      } else {
+        url.searchParams.delete('search');
+        url.searchParams.delete('q');
+        url.searchParams.delete('query');
+      }
+      window.history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : ''));
+      filterCatalog(true);
+    });
+  }
+
+  // Clear Search button with URL query cleanup
+  const clearSearchBtn = document.getElementById('clearSearch');
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      document.getElementById('searchInput').value = '';
+      const url = new URL(window.location);
+      url.searchParams.delete('search');
+      url.searchParams.delete('q');
+      url.searchParams.delete('query');
+      window.history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : ''));
+      filterCatalog(true);
+    });
+  }
+
   document.getElementById('closeModal').addEventListener('click', closeModal);
   document.getElementById('detailModal').addEventListener('click', (e) => { if (e.target === document.getElementById('detailModal')) closeModal(); });
   document.getElementById('close3DLightbox').addEventListener('click', close3DLightbox);

@@ -8,6 +8,7 @@
   <!-- Preconnect for Image & Drive CDN -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
+  <link rel="preconnect" href="https://www.dropbox.com" crossorigin>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
@@ -53,6 +54,16 @@
     }
     .dark .time-sky-animated { filter: brightness(0.4) contrast(1.2) saturate(0.85); }
     .time-sky-animated { animation: seasonSkyCycle 60s linear infinite; }
+
+    /* Custom range slider styling */
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 12px;
+      width: 12px;
+      border-radius: 9999px;
+      background: #f59e0b;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -143,7 +154,7 @@
             <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">1939 – 1945</span>
           </div>
           <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-600">Alan War</h2>
-          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Photographs documenting Alan's wartime military service, comrades, uniforms, training camps, and overseas deployments.</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Photographs documenting Alan's wartime military service, comrades, uniforms, training camps, audio recordings, and overseas deployments.</p>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-amber-700 dark:text-amber-400">
           <span>Viewing Repository ⬇</span>
@@ -182,6 +193,159 @@
 
     </section>
 
+    <!-- Alan Starling Audio & Exhibits Section (Active for Alan War) -->
+    <section id="alanMediaSection" class="space-y-4">
+      <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-5 backdrop-blur-md space-y-4">
+        
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg">🎙️</span>
+              <h3 class="text-sm sm:text-base font-black text-amber-900 dark:text-amber-300">Alan Starling WWII Audio Recording & Related Exhibits</h3>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Listen to original wartime tape recordings and explore related catalog exhibits from the collection.</p>
+          </div>
+          <span class="self-start sm:self-auto bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-400/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+            Alan Starling Archive
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          
+          <!-- Native Custom Audio Player (5 Cols) -->
+          <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 border border-amber-500/30 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-1">
+                <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <span>🔊</span> Oral History Recording
+                </span>
+                <span class="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-md border border-amber-300 dark:border-amber-800">
+                  53:11 Recording
+                </span>
+              </div>
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">2001 Starling Alan WWII (June 01)</p>
+            </div>
+
+            <!-- Custom HTML5 Audio Player Card -->
+            <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3 my-1">
+              
+              <!-- Hidden native audio element streaming from Dropbox direct raw URL -->
+              <audio id="alanAudioEl" preload="metadata">
+                <source src="https://www.dropbox.com/scl/fi/folfcmnhvzhgd4xp56wzp/2001-Starling-Alan-WWII-June-01-53.11.mp3?rlkey=hf9uwym9k7n9hmvv2o2rvxl1r&st=59pa6c0f&raw=1" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+
+              <!-- Top Controls Row -->
+              <div class="flex items-center justify-between gap-2">
+                
+                <!-- Play/Pause Button -->
+                <button id="btnPlayPause" type="button" onclick="togglePlay()" class="h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-2 font-black text-xs shadow transition active:scale-95 cursor-pointer">
+                  <span id="playIcon" class="text-sm">▶</span>
+                  <span id="playLabel">Play</span>
+                </button>
+
+                <!-- Speed & Volume Controls -->
+                <div class="flex items-center gap-2">
+                  
+                  <!-- Speed Toggle Button -->
+                  <button id="btnSpeed" type="button" onclick="cycleSpeed()" title="Playback Speed" class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition">
+                    1.0x
+                  </button>
+
+                  <!-- Volume Control -->
+                  <div class="flex items-center gap-1.5 bg-slate-800/80 px-2 py-1 rounded-lg border border-slate-700">
+                    <button id="btnMute" type="button" onclick="toggleMute()" title="Mute/Unmute" class="text-slate-300 hover:text-white text-xs">
+                      <span id="volIcon">🔊</span>
+                    </button>
+                    <input id="volSlider" type="range" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)" class="w-14 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" title="Volume">
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Interactive Timeline Scrubber & Timers -->
+              <div class="space-y-1.5 pt-1">
+                <!-- Clickable Progress Track -->
+                <div id="audioTrack" onclick="seekAudio(event)" class="relative w-full h-3 bg-slate-800 hover:bg-slate-700 rounded-full overflow-hidden cursor-pointer transition">
+                  <div id="audioProgressBar" class="h-full bg-gradient-to-r from-amber-500 to-amber-400 w-0 rounded-full pointer-events-none transition-all duration-75"></div>
+                </div>
+
+                <!-- Timer Indicators -->
+                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 select-none">
+                  <span id="timeCurrent">00:00</span>
+                  <span id="audioStatusText" class="text-[10px] font-sans font-semibold text-amber-400">Click Play to listen</span>
+                  <span id="timeDuration">53:11</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1">
+              <span>Original wartime oral history tape</span>
+              <span class="text-amber-700 dark:text-amber-400 font-bold">Alan Starling</span>
+            </div>
+          </div>
+
+          <!-- Cross-linked Exhibits (7 Cols) -->
+          <div class="lg:col-span-7 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-3.5 border border-amber-500/30 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <span>🏛️</span> Main Museum Catalog Cross-References
+                </span>
+                <a href="https://museum-nz.github.io/BMMC/?search=Alan+Starling" target="_blank" rel="noopener noreferrer" class="text-[10px] font-black text-amber-600 hover:underline">
+                  View All Alan Items →
+                </a>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Click any item below to view its record in the main exhibit catalogue:</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <!-- Item 1: WW2 Medals -->
+              <a href="https://museum-nz.github.io/BMMC/?search=WW2%20MEDALS%20-%20ALAN%20STARLING" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+                <span class="text-sm mt-0.5">🎖️</span>
+                <div class="overflow-hidden">
+                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">WW2 MEDALS - ALAN STARLING</div>
+                  <div class="text-[9px] text-slate-500 dark:text-slate-400">View catalog record ↗</div>
+                </div>
+              </a>
+
+              <!-- Item 2: Capture of Hess Bicycle -->
+              <a href="https://museum-nz.github.io/BMMC/?search=BICYCLE,%20CAPTURE%20OF%20HESS%20(ALAN%20STARLING)" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+                <span class="text-sm mt-0.5">🚲</span>
+                <div class="overflow-hidden">
+                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">BICYCLE, CAPTURE OF HESS</div>
+                  <div class="text-[9px] text-slate-500 dark:text-slate-400">Alan Starling artifact ↗</div>
+                </div>
+              </a>
+
+              <!-- Item 3: Diaries and Tape -->
+              <a href="https://museum-nz.github.io/BMMC/?search=DIARIES%20AND%20TAPE%20FROM%20ALAN%20STARLING%20WWII" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+                <span class="text-sm mt-0.5">📖</span>
+                <div class="overflow-hidden">
+                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">DIARIES & TAPE RECORDING</div>
+                  <div class="text-[9px] text-slate-500 dark:text-slate-400">WWII personal journal ↗</div>
+                </div>
+              </a>
+
+              <!-- Item 4: Navy Uniform Parts -->
+              <a href="https://museum-nz.github.io/BMMC/?search=UNIFORM%20NAVY%20PARTS%20(ALAN%20STARLING)" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+                <span class="text-sm mt-0.5">⚓</span>
+                <div class="overflow-hidden">
+                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">UNIFORM NAVY PARTS</div>
+                  <div class="text-[9px] text-slate-500 dark:text-slate-400">Naval uniform service pieces ↗</div>
+                </div>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
     <!-- Active Live Drive Explorer Section (Always On) -->
     <section class="space-y-4">
       <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-md">
@@ -206,7 +370,7 @@
 
   </main>
 
-  <!-- Script: Tab Switching & Theme Sync -->
+  <!-- Script: Audio Controller, Tab Switching & Theme Sync -->
   <script>
     const DRIVE_FOLDERS = {
       'ww2-alan': {
@@ -234,10 +398,115 @@
 
     let activeHall = 'ww2-alan';
 
+    // --- Audio Controller Logic ---
+    const audio = document.getElementById('alanAudioEl');
+    const playBtn = document.getElementById('btnPlayPause');
+    const playIcon = document.getElementById('playIcon');
+    const playLabel = document.getElementById('playLabel');
+    const statusText = document.getElementById('audioStatusText');
+    const timeCurrent = document.getElementById('timeCurrent');
+    const timeDuration = document.getElementById('timeDuration');
+    const progressBar = document.getElementById('audioProgressBar');
+    const btnSpeed = document.getElementById('btnSpeed');
+    const volIcon = document.getElementById('volIcon');
+
+    const speeds = [1.0, 1.25, 1.5, 0.8];
+    let speedIndex = 0;
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds === Infinity) return '00:00';
+      const totalSecs = Math.floor(seconds);
+      const hrs = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+
+      if (hrs > 0) {
+        return `${hrs}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+      return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function togglePlay() {
+      if (!audio) return;
+      if (audio.paused) {
+        statusText.textContent = 'Buffering...';
+        audio.play().then(() => {
+          playIcon.textContent = '⏸';
+          playLabel.textContent = 'Pause';
+          statusText.textContent = 'Playing';
+        }).catch(err => {
+          statusText.textContent = 'Click to Play';
+        });
+      } else {
+        audio.pause();
+        playIcon.textContent = '▶';
+        playLabel.textContent = 'Play';
+        statusText.textContent = 'Paused';
+      }
+    }
+
+    function seekAudio(e) {
+      if (!audio || !audio.duration) return;
+      const track = document.getElementById('audioTrack');
+      const rect = track.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      audio.currentTime = pct * audio.duration;
+    }
+
+    function cycleSpeed() {
+      if (!audio) return;
+      speedIndex = (speedIndex + 1) % speeds.length;
+      const nextSpeed = speeds[speedIndex];
+      audio.playbackRate = nextSpeed;
+      btnSpeed.textContent = `${nextSpeed}x`;
+    }
+
+    function toggleMute() {
+      if (!audio) return;
+      audio.muted = !audio.muted;
+      volIcon.textContent = audio.muted ? '🔇' : (audio.volume > 0.5 ? '🔊' : '🔉');
+    }
+
+    function setVolume(val) {
+      if (!audio) return;
+      audio.volume = parseFloat(val);
+      audio.muted = false;
+      volIcon.textContent = audio.volume == 0 ? '🔇' : (audio.volume > 0.5 ? '🔊' : '🔉');
+    }
+
+    if (audio) {
+      audio.addEventListener('timeupdate', () => {
+        timeCurrent.textContent = formatTime(audio.currentTime);
+        if (audio.duration) {
+          const pct = (audio.currentTime / audio.duration) * 100;
+          progressBar.style.width = `${pct}%`;
+        }
+      });
+
+      audio.addEventListener('loadedmetadata', () => {
+        timeDuration.textContent = formatTime(audio.duration);
+      });
+
+      audio.addEventListener('ended', () => {
+        playIcon.textContent = '▶';
+        playLabel.textContent = 'Play';
+        statusText.textContent = 'Finished';
+        progressBar.style.width = '0%';
+      });
+    }
+
+    // --- Hall Switcher ---
     function switchHall(hallKey) {
       if (!DRIVE_FOLDERS[hallKey]) return;
       activeHall = hallKey;
       const folder = DRIVE_FOLDERS[hallKey];
+
+      // Show/Hide Alan-specific media section
+      const alanMediaSection = document.getElementById('alanMediaSection');
+      if (alanMediaSection) {
+        alanMediaSection.style.display = (hallKey === 'ww2-alan') ? 'block' : 'none';
+      }
 
       // Update Iframe
       const iframe = document.getElementById('driveFolderIframe');
