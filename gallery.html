@@ -533,7 +533,8 @@
 
   <!-- Script: Photo Gallery, Speech Synthesis, Favorites, Sorting & Tag Filtering -->
   <script>
-    const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1741478537';
+    // &headers=0 ensures Google Sheets outputs every single row (Rows 1, 2, 3, 4, 5...) without consolidating the header block
+    const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
     const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     let rawGalleryItems = [];
@@ -910,7 +911,7 @@
         if (parsed.data && parsed.data.length > 1) {
           
           // Identify Details column index dynamically
-          let detailsColIdx = 9; // Default Column J
+          let detailsColIdx = 9; // Column J
           if (parsed.data[0]) {
             parsed.data[0].forEach((colName, idx) => {
               const lower = String(colName).toLowerCase().trim();
@@ -921,7 +922,7 @@
           }
 
           // Exact extraction from specified rows:
-          // Row 2 -> Dun and Bonniefields (J2)
+          // Row 2 -> Dun and Bonniefields (parsed.data[1], Column J2)
           if (parsed.data[1]) {
             const rawJ2 = parsed.data[1][detailsColIdx] || parsed.data[1][9] || '';
             const linkF2 = parsed.data[1][5] || '';
@@ -933,7 +934,7 @@
             };
           }
 
-          // Row 3 -> Maitland East Chatton and Village (J3)
+          // Row 3 -> Maitland East Chatton and Village (parsed.data[2], Column J3)
           if (parsed.data[2]) {
             const rawJ3 = parsed.data[2][detailsColIdx] || parsed.data[2][9] || '';
             const linkF3 = parsed.data[2][5] || '';
@@ -945,7 +946,7 @@
             };
           }
 
-          // Row 4 -> WWII - Alan (J4)
+          // Row 4 -> WWII - Alan (parsed.data[3], Column J4)
           if (parsed.data[3]) {
             const rawJ4 = parsed.data[3][detailsColIdx] || parsed.data[3][9] || '';
             const linkF4 = parsed.data[3][5] || '';
@@ -957,6 +958,7 @@
             };
           }
 
+          // Photos start from Row 2 or Row 5 (filtering out header metadata rows)
           rawGalleryItems = parsed.data.slice(1).map((row, idx) => {
             const rawImg = row[5] ? String(row[5]).trim() : '';
             const rawDetails = row[detailsColIdx] ? String(row[detailsColIdx]).trim() : (row[9] || row[8] || row[2] || '');
@@ -973,7 +975,7 @@
               date: rawDate,
               details
             };
-          }).filter(item => item.rawImg || item.title !== 'Untitled Photo');
+          }).filter(item => item.rawImg && (item.rawImg.includes('http') || item.rawImg.includes('drive.google')));
 
           populateFilterDropdowns(rawGalleryItems);
           updateHubCounts();
