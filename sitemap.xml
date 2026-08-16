@@ -2,33 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Museum Showcase Home -->
   <url>
-    <loc>https://dvdbaird.github.io/BMMC/</loc>
+    <loc>https://museum-nz.github.io/BMMC/</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Photo Archives & Photographic Gallery Wing -->
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/gallery</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Interactive 2D Photo Map & Origin Geolocation -->
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/2Dmap</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
   
   <!-- Museum Insights & Live Analytics -->
   <url>
-    <loc>https://dvdbaird.github.io/BMMC/#stats</loc>
-    <lastmod>2026-08-13</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/#stats</loc>
+    <lastmod>2026-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Gramophone & Vintage Audio Catalog -->
   <url>
-    <loc>https://dvdbaird.github.io/BMMC/#gramophone</loc>
-    <lastmod>2026-08-13</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/#gramophone</loc>
+    <lastmod>2026-08-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Interactive 2D Origin Map Resource -->
-  <url>
-    <loc>https://dvdbaird.github.io/BMMC/2Dmap</loc>
-    <lastmod>2026-08-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+  
 </urlset>
