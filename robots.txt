@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://museum-nz.github.io/BMMC/sitemap.xml
