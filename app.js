@@ -23,6 +23,7 @@ const TIMELINE_CUSTOM_IMAGES = {
   "WWII": "https://lh3.googleusercontent.com/d/1EoNqpgXzJoT6g8xsl2hPp9CBloibQEB0=s200",
   "Post War": "https://lh3.googleusercontent.com/d/1BLA99VbyIAhyBgcAjOl-VLUHv9Tpy1bE=s200",
   "Modern": "https://lh3.googleusercontent.com/d/1Eez4R63VdHFSWnVNBqaWiBH_2SrhNrnF=s200",
+  "Items of interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200",
   "Itmes of Interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200"
 };
 
@@ -43,7 +44,7 @@ const TIMELINE_ERAS = [
   { key: 'Prehistory', short: 'Prehistory', full: 'Prehistory / BC (Up to 1699)', min: -9999, max: 1699 },
   { key: 'Victorian', short: 'Victorian', full: 'Victorian & Industrial (1700–1913)', min: 1700, max: 1913 },
   { key: 'WWI', short: 'WWI', full: 'World War I (1914–1918)', min: 1914, max: 1918 },
-  { key: 'Interwar', short: 'Interwar', full: 'Interwar / Depression (1919–1938)', min: 1919, max: 1938 },
+  { key: 'Interwar', short: 'Interwar', full: 'Interwar / 1920s–1930s (1919–1938)', min: 1919, max: 1938 },
   { key: 'WWII', short: 'WWII', full: 'World War II (1939–1945)', min: 1939, max: 1945 },
   { key: 'Post War', short: 'Post War', full: 'Post & Cold War (1946–1999)', min: 1946, max: 1999 },
   { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
@@ -52,9 +53,7 @@ const TIMELINE_ERAS = [
 function safeReplaceState(urlStr) {
   try {
     window.history.replaceState(null, '', urlStr);
-  } catch (e) {
-    // Ignore security errors in sandboxed iframes or local file systems
-  }
+  } catch (e) {}
 }
 
 function getEraByYear(yearNum) {
@@ -62,7 +61,7 @@ function getEraByYear(yearNum) {
   return TIMELINE_ERAS.find(e => yearNum >= e.min && yearNum <= e.max) || null;
 }
 
-// Strictly extracts year ONLY from Column Y ("Year")
+// Strictly extracts year from Column Y ("Year")
 function getEraByRow(row) {
   if (!row) return null;
   const yearStr = getVal(row, colIdx.year);
@@ -1388,7 +1387,7 @@ function renderExhibitsGrid() {
         </div>
         <div class="pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
           <span class="text-xs font-extrabold flex items-center gap-1 group-hover:translate-x-1 transition-transform" style="color: ${theme.hex};">
-            Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            View Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </span>
           <div class="flex gap-1.5" onclick="event.stopPropagation()">
             ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm">👓 3D View</button>` : ''}
@@ -1463,7 +1462,7 @@ function renderGramophoneGrid() {
 
       <div class="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between gap-2" onclick="event.stopPropagation()">
         <span class="text-xs font-extrabold text-amber-700 dark:text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-          Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          View Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </span>
         <div class="flex items-center gap-1.5 flex-wrap justify-end">
           ${hasDiscogsRecording ? `<a href="${discogsUrl || '#'}" target="_blank" class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-emerald-600 flex items-center gap-1">🎙️ Discogs Recording</a>` : ''}

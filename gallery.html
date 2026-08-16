@@ -279,14 +279,11 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-6">
     
-    <!-- Dynamic Collection Details Section (Strictly populated from J2, J3, J4) -->
+    <!-- Dynamic Collection Details Section (Only Title & Details from J2, J3, J4) -->
     <section id="hallDetailsSection" class="hidden">
       <div id="hallDetailsCard" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-5 sm:p-7 border-2 shadow-xl backdrop-blur-md relative overflow-hidden transition-all duration-300">
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div class="space-y-2.5 flex-1">
-            <div class="flex items-center gap-2">
-              <span id="hallDetailsBadge" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border shadow-sm"></span>
-            </div>
             <h3 id="hallDetailsTitle" class="text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white"></h3>
             <div id="hallDetailsBody" class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line font-normal"></div>
           </div>
@@ -534,7 +531,7 @@
   <script>
     // &headers=0 ensures Google Sheets outputs every single row without consolidating the header block
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
-    const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+    const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     // Historical Era Definitions (matching index.html structure)
     const TIMELINE_ERAS = [
@@ -1446,11 +1443,10 @@
       if (e.target === document.getElementById('photoModal')) closePhotoModal();
     });
 
-    // Update Collection Specific Details Section (From Rows J2, J3, J4)
+    // Update Collection Specific Details Section (Only Title & Details from Rows J2, J3, J4)
     function updateHallDetailsBanner(hallKey) {
       const section = document.getElementById('hallDetailsSection');
       const card = document.getElementById('hallDetailsCard');
-      const badge = document.getElementById('hallDetailsBadge');
       const title = document.getElementById('hallDetailsTitle');
       const body = document.getElementById('hallDetailsBody');
       const actions = document.getElementById('hallDetailsActions');
@@ -1465,24 +1461,20 @@
       const info = hallDetailsMap[hallKey];
       section.classList.remove('hidden');
 
+      // Accent border color per collection
       if (hallKey === 'ww2-alan') {
         card.style.borderColor = '#f59e0b';
-        badge.className = 'text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-sm';
-        badge.textContent = '🪖 Alan War Archive';
       } else if (hallKey === 'bonniefields-1920s') {
         card.style.borderColor = '#10b981';
-        badge.className = 'text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-sm';
-        badge.textContent = '🌾 Dun & Bonniefields Heritage';
       } else if (hallKey === 'maitland-school') {
         card.style.borderColor = '#3b82f6';
-        badge.className = 'text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800 shadow-sm';
-        badge.textContent = '🏫 Maitland East Chatton Records';
       }
 
-      title.textContent = info.title || 'Collection Details';
-      body.textContent = info.details || 'Archival collection information from the Bonniefields catalog.';
+      // Display Title and clean Details only
+      title.textContent = info.title || '';
+      body.textContent = info.details || '';
 
-      // Action links from Column F
+      // Documentation / external link button from Column F
       actions.innerHTML = '';
       if (info.link && (info.link.startsWith('http://') || info.link.startsWith('https://') || info.link.length > 4)) {
         const fullUrl = info.link.startsWith('http') ? info.link : `https://${info.link}`;
