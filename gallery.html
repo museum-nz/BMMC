@@ -92,7 +92,7 @@
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
 
-  <!-- Header Section -->
+  <!-- Header Section (Matching index.html layout) -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
       
@@ -102,7 +102,7 @@
         <!-- Branding -->
         <div class="flex items-center gap-3">
           <a href="https://museum-nz.github.io/BMMC/" title="Return to Main Museum Showcase" class="group flex items-center gap-2.5">
-            <span class="text-2xl sm:text-3xl transition-transform group-hover:scale-110 drop-shadow">🏛️</span>
+            <span class="text-2xl sm:text-3xl transition-transform group-hover:scale-110 drop-shadow">📷</span>
             <div>
               <div class="flex items-center gap-2">
                 <h1 class="text-lg sm:text-2xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400 bg-clip-text text-transparent tracking-tight">
@@ -115,7 +115,7 @@
           </a>
         </div>
         
-        <!-- Navigation Buttons -->
+        <!-- Action Buttons Bar -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
           
           <a href="https://museum-nz.github.io/BMMC/" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 active:scale-95">
@@ -126,101 +126,152 @@
             <span>ℹ️ Info</span>
           </a>
 
+          <button id="btnSurprise" onclick="surpriseMe()" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-pink-500/20 active:scale-95">
+            <span>✨ Surprise Me!</span>
+          </button>
+
           <!-- Saved Favorites Button -->
-          <button id="btnFavorites" onclick="toggleFavoritesFilter()" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm">
+          <button id="btnFavorites" onclick="toggleFavoritesFilter()" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
             <span id="favHeartIcon">🤍</span>
             <span id="favCountText">Saved (0)</span>
           </button>
 
           <!-- Theme Toggle -->
-          <button id="btnThemeToggle" aria-label="Toggle Theme" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm">
+          <button id="btnThemeToggle" aria-label="Toggle Theme" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
             <span id="themeToggleIcon">☀️</span>
             <span id="themeToggleText" class="hidden sm:inline">Mode</span>
           </button>
+
+          <!-- Collapsible Controls Toggle Button -->
+          <button id="toggleControlsBtn" onclick="toggleCollapsibleControls()" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+            <span class="hidden xs:inline">Controls</span>
+            <span id="toggleChevron" class="transition-transform duration-200 text-slate-400">▼</span>
+          </button>
         </div>
       </div>
 
-      <!-- Navigation Tabs (Filter Collection) -->
-      <div class="mt-3 pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">Collection:</span>
+      <!-- Collapsible Controls Container (Matching index.html) -->
+      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
+        <p id="subheadingText" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+          Historical photographic collections with speech narration, dating tags, and archival notes.
+        </p>
+
+        <!-- Search and Sort Bar -->
+        <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="flex items-center justify-between sm:justify-start gap-3 shrink-0">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="galleryCountText"></p>
+            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+              <label for="gallerySortSelect" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
+              <select id="gallerySortSelect" onchange="filterGalleryCards()" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+                <option value="default" class="dark:bg-slate-900">Default (Date & Title)</option>
+                <option value="date-asc" class="dark:bg-slate-900">Date (Oldest First)</option>
+                <option value="date-desc" class="dark:bg-slate-900">Date (Newest First)</option>
+                <option value="title-asc" class="dark:bg-slate-900">Title (A-Z)</option>
+                <option value="title-desc" class="dark:bg-slate-900">Title (Z-A)</option>
+                <option value="category-asc" class="dark:bg-slate-900">Tag / Category (A-Z)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Active Filter Pills Bar -->
+          <div id="activeFiltersBar" class="hidden flex-wrap items-center gap-1.5 flex-1 min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Active:</span>
+            <div id="activeFiltersContainer" class="flex flex-wrap gap-1 flex-1 min-w-0"></div>
+            <button id="btnClearAllFilters" onclick="resetGalleryFilters()" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
+          </div>
           
-          <!-- All Collections Button -->
-          <button id="tabBtnAll" class="hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-600 text-white border-emerald-700 shadow-sm" onclick="switchHall('all')">
-            <span>🌐 All Collections</span>
-          </button>
-
-          <button id="tabBtnWW2" class="hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-amber-500" onclick="switchHall('ww2-alan')">
-            <span>🪖 Alan War</span>
-          </button>
-
-          <button id="tabBtnBNF" class="hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-emerald-500" onclick="switchHall('bonniefields-1920s')">
-            <span>🌾 Dun & Bonniefields</span>
-          </button>
-
-          <button id="tabBtnMTL" class="hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-blue-500" onclick="switchHall('maitland-school')">
-            <span>🏫 Maitland East Chatton</span>
-          </button>
+          <!-- Search Input with Clear button -->
+          <div class="w-full sm:w-72 relative shrink-0">
+            <input type="text" id="gallerySearchInput" oninput="filterGalleryCards()" placeholder="Search photo title, details, date..." aria-label="Search photos" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <svg class="w-4 h-4 text-emerald-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <button id="clearSearch" onclick="clearSearchInput()" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
+          </div>
         </div>
-      </div>
 
+        <!-- Filter Dropdowns Grid -->
+        <div id="galleryFilterGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
+          <div>
+            <label for="galleryCategoryFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Tag / Category Filter</label>
+            <select id="galleryCategoryFilter" onchange="filterGalleryCards()" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
+              <option value="">All Tags / Categories</option>
+            </select>
+          </div>
+          <div>
+            <label for="galleryDateFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Date / Era Filter</label>
+            <select id="galleryDateFilter" onchange="filterGalleryCards()" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
+              <option value="">All Dates & Eras</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Collection Hubs Filter Tabs Section (Styled like Categories) -->
+        <div id="collectionHubsSection" class="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+            
+            <!-- All Collections -->
+            <button id="tabBtnAll" onclick="switchHall('all')" class="hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-emerald-600 text-white border-emerald-600 shadow-md">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xl">🌐</span>
+                <span id="hubCountAll" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-sm">0</span>
+              </div>
+              <div>
+                <h4 class="text-xs font-black leading-tight">All Collections</h4>
+                <span class="text-[9px] font-bold opacity-80 mt-0.5 block">Explore Entire Archive →</span>
+              </div>
+            </button>
+
+            <!-- Alan War -->
+            <button id="tabBtnWW2" onclick="switchHall('ww2-alan')" class="hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-amber-500/40 hover:border-amber-500 shadow-sm">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xl">🪖</span>
+                <span id="hubCountWW2" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300">0</span>
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-amber-700 dark:text-amber-400 leading-tight">Alan War</h4>
+                <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 block">1939 – 1945 WWII →</span>
+              </div>
+            </button>
+
+            <!-- Dun & Bonniefields -->
+            <button id="tabBtnBNF" onclick="switchHall('bonniefields-1920s')" class="hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-emerald-500/40 hover:border-emerald-500 shadow-sm">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xl">🌾</span>
+                <span id="hubCountBNF" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-300">0</span>
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-emerald-700 dark:text-emerald-400 leading-tight">Dun & Bonniefields</h4>
+                <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 block">1920s Farm Heritage →</span>
+              </div>
+            </button>
+
+            <!-- Maitland East Chatton -->
+            <button id="tabBtnMTL" onclick="switchHall('maitland-school')" class="hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-blue-500/40 hover:border-blue-500 shadow-sm">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xl">🏫</span>
+                <span id="hubCountMTL" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-900 dark:text-blue-300">0</span>
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-blue-700 dark:text-blue-400 leading-tight">Maitland East Chatton</h4>
+                <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 block">School & Village →</span>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
     </div>
   </header>
 
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-6">
     
-    <!-- Three Curated Overview Filter Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-      
-      <!-- WWII - Alan -->
-      <div id="cardWW2" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-amber-500" onclick="switchHall('ww2-alan')">
-        <div class="absolute -right-8 -top-8 w-28 h-28 bg-amber-500/10 rounded-full blur-xl"></div>
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">1939 – 1945</span>
-          </div>
-          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Alan War</h2>
-          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Photographs documenting Alan's wartime military service, comrades, uniforms, training camps, audio recordings, and overseas deployments.</p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
-          <span>Click to Filter Archive →</span>
-        </div>
-      </div>
-
-      <!-- Dun and Bonniefields photos -->
-      <div id="cardBNF" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-emerald-500" onclick="switchHall('bonniefields-1920s')">
-        <div class="absolute -right-8 -top-8 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl"></div>
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">1920s Heritage</span>
-          </div>
-          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Dun & Bonniefields</h2>
-          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">The homestead, farming life, early harvesting & farm machinery, and rural domestic heritage at Bonniefields.</p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
-          <span>Click to Filter Archive →</span>
-        </div>
-      </div>
-
-      <!-- Maitland East Chatton and Village -->
-      <div id="cardMTL" class="collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-blue-500" onclick="switchHall('maitland-school')">
-        <div class="absolute -right-8 -top-8 w-28 h-28 bg-blue-500/10 rounded-full blur-xl"></div>
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800">School & Village</span>
-          </div>
-          <h2 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Maitland East Chatton</h2>
-          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Historical class photos, pupil group portraits, East Chatton village gatherings, and rural schoolhouse celebrations.</p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
-          <span>Click to Filter Archive →</span>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Dynamic Filter Details Section (Populated from Spreadsheet Rows 2, 3, 4) -->
+    <!-- Dynamic Collection Details Section (Populated strictly from J2, J3, J4) -->
     <section id="hallDetailsSection" class="hidden">
       <div id="hallDetailsCard" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-5 sm:p-7 border-2 shadow-xl backdrop-blur-md relative overflow-hidden transition-all duration-300">
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -228,7 +279,7 @@
             <div class="flex items-center gap-2">
               <span id="hallDetailsBadge" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border shadow-sm"></span>
             </div>
-            <h3 id="hallDetailsTitle" class="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white"></h3>
+            <h3 id="hallDetailsTitle" class="text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white"></h3>
             <div id="hallDetailsBody" class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line font-normal"></div>
           </div>
           <div id="hallDetailsActions" class="shrink-0 flex flex-wrap md:flex-col items-start gap-2 pt-2 md:pt-0"></div>
@@ -236,8 +287,8 @@
       </div>
     </section>
 
-    <!-- Alan Starling Audio & Exhibits Section (Visible only on 'All' and 'Alan War') -->
-    <section id="alanMediaSection" class="space-y-4">
+    <!-- Alan Starling WWII Audio Recording & Related Exhibits (Strictly visible only when WWII - Alan is active) -->
+    <section id="alanMediaSection" class="space-y-4 hidden">
       <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-5 backdrop-blur-md space-y-4">
         
         <!-- Section Header -->
@@ -371,68 +422,23 @@
 
     <!-- Photographic Archives Section -->
     <section id="photoGridSection" class="space-y-4">
-      <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-md space-y-4">
-        
-        <!-- Controls Header Row -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xl">📷</span>
-              <h3 id="gallerySectionTitle" class="text-base sm:text-lg font-black text-slate-900 dark:text-white">All Photographic Collections</h3>
-            </div>
-            <p id="galleryCountText" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Historical photographs with detailed descriptions, speech narration, and archival notes.
-            </p>
-          </div>
-
-          <!-- Search, Category & Sort Controls -->
-          <div class="flex flex-wrap items-center gap-2">
-            
-            <!-- Sort Selector Dropdown -->
-            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700">
-              <label for="gallerySortSelect" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
-              <select id="gallerySortSelect" onchange="filterGalleryCards()" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
-                <option value="default">Default (Date & Title)</option>
-                <option value="date-asc">Date (Oldest First)</option>
-                <option value="date-desc">Date (Newest First)</option>
-                <option value="title-asc">Title (A–Z)</option>
-                <option value="title-desc">Title (Z–A)</option>
-                <option value="category-asc">Tag / Category (A–Z)</option>
-              </select>
-            </div>
-
-            <!-- Category Dropdown Filter -->
-            <select id="galleryCategoryFilter" onchange="filterGalleryCards()" class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500">
-              <option value="">All Tags / Categories</option>
-            </select>
-
-            <!-- Search input -->
-            <div class="relative min-w-[200px]">
-              <input type="text" id="gallerySearchInput" oninput="filterGalleryCards()" placeholder="Search photo title, details, date..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-medium"/>
-              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Loading State Indicator -->
-        <div id="galleryLoading" class="py-12 flex flex-col items-center justify-center gap-3">
-          <div class="animate-spin rounded-full h-8 w-8 border-2 border-emerald-500 border-t-transparent"></div>
-          <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Loading photographs from archive...</span>
-        </div>
-
-        <!-- Photos Cards Grid Container (Vertically Optimized) -->
-        <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 hidden"></div>
-
-        <!-- No Results Fallback -->
-        <div id="galleryNoResults" class="hidden text-center py-12 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
-          <span class="text-3xl block mb-1">🔍</span>
-          <p class="text-sm font-bold text-slate-600 dark:text-slate-400">No photographic records match your selected filter.</p>
-          <button onclick="resetGalleryFilters()" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
-        </div>
-
+      
+      <!-- Loading State Indicator -->
+      <div id="galleryLoading" class="py-12 flex flex-col items-center justify-center gap-3">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-emerald-500 border-t-transparent"></div>
+        <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Loading photographs from archive...</span>
       </div>
+
+      <!-- Photos Cards Grid Container -->
+      <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
+
+      <!-- No Results Fallback -->
+      <div id="galleryNoResults" class="hidden text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
+        <span class="text-3xl block mb-2">🔍</span>
+        <p class="text-sm font-bold text-slate-700 dark:text-slate-300">No photographic records match your selected filter.</p>
+        <button onclick="resetGalleryFilters()" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
+      </div>
+
     </section>
 
   </main>
@@ -518,11 +524,11 @@
   <!-- Script: Photo Gallery, Speech Synthesis, Favorites, Sorting & Tag Filtering -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1741478537';
-    const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+    const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     let rawGalleryItems = [];
     let filteredGalleryItems = [];
-    let hallDetailsMap = {}; // Populated from rows 2, 3, 4
+    let hallDetailsMap = {}; // Populated strictly from rows J2, J3, J4
     let currentModalPhotoIdx = -1;
     let activeHall = 'all';
     let showingFavoritesOnly = false;
@@ -536,6 +542,25 @@
       try {
         window.history.replaceState(null, '', urlStr);
       } catch (e) {}
+    }
+
+    // Toggle Collapsible Controls
+    function toggleCollapsibleControls(show) {
+      const controls = document.getElementById('collapsibleControls');
+      const chevron = document.getElementById('toggleChevron');
+      const btn = document.getElementById('toggleControlsBtn');
+      if (!controls) return;
+
+      const shouldShow = show !== undefined ? show : controls.classList.contains('hidden');
+      if (shouldShow) {
+        controls.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        if (btn) btn.classList.add('bg-emerald-50', 'dark:bg-emerald-950/60', 'text-emerald-700', 'dark:text-emerald-300', 'border-emerald-300');
+      } else {
+        controls.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        if (btn) btn.classList.remove('bg-emerald-50', 'dark:bg-emerald-950/60', 'text-emerald-700', 'dark:text-emerald-300', 'border-emerald-300');
+      }
     }
 
     // Toast alert helper
@@ -852,16 +877,6 @@
       speechSynthesis.onvoiceschanged = loadVoices;
     }
 
-    // Helper: Map text from Column C to hall key
-    function getHallKeyFromColC(cText) {
-      if (!cText) return null;
-      const lower = String(cText).toLowerCase().trim();
-      if (lower.includes('ww2') || lower.includes('wwii') || lower.includes('alan')) return 'ww2-alan';
-      if (lower.includes('dun') || lower.includes('bonniefields')) return 'bonniefields-1920s';
-      if (lower.includes('maitland') || lower.includes('chatton') || lower.includes('school')) return 'maitland-school';
-      return null;
-    }
-
     // --- Fetch and Parse Gallery CSV (gid=1741478537) ---
     async function loadGalleryData() {
       const loadingEl = document.getElementById('galleryLoading');
@@ -873,30 +888,42 @@
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
 
         if (parsed.data && parsed.data.length > 1) {
-          // Parse Specific Cells from Rows 2, 3, 4 (Spreadsheet 1-based rows 2, 3, 4 -> parsed.data[1], parsed.data[2], parsed.data[3])
-          // Column C: row[2], Column F: row[5], Column J: row[9]
-          for (let r = 1; r <= 3 && r < parsed.data.length; r++) {
-            const row = parsed.data[r];
-            const colC = row[2] ? String(row[2]).trim() : '';
-            const colF = row[5] ? String(row[5]).trim() : '';
-            const colJ = row[9] ? String(row[9]).trim() : '';
+          
+          // Strict extraction from specific rows:
+          // Row 2 -> Dun and Bonniefields (J2)
+          // Row 3 -> Maitland East Chatton and Village (J3)
+          // Row 4 -> WWII - Alan (J4)
+          if (parsed.data[1]) {
+            const rawJ2 = parsed.data[1][9] || '';
+            const linkF2 = parsed.data[1][5] || '';
+            const { title, details } = parseTitleAndDetails(rawJ2);
+            hallDetailsMap['bonniefields-1920s'] = {
+              title: title || 'Dun & Bonniefields Heritage',
+              details: details || rawJ2,
+              link: linkF2
+            };
+          }
 
-            let hallKey = getHallKeyFromColC(colC);
-            if (!hallKey) {
-              if (r === 1) hallKey = 'ww2-alan';
-              else if (r === 2) hallKey = 'bonniefields-1920s';
-              else if (r === 3) hallKey = 'maitland-school';
-            }
+          if (parsed.data[2]) {
+            const rawJ3 = parsed.data[2][9] || '';
+            const linkF3 = parsed.data[2][5] || '';
+            const { title, details } = parseTitleAndDetails(rawJ3);
+            hallDetailsMap['maitland-school'] = {
+              title: title || 'Maitland East Chatton and Village',
+              details: details || rawJ3,
+              link: linkF3
+            };
+          }
 
-            if (hallKey) {
-              const { title, details } = parseTitleAndDetails(colJ);
-              hallDetailsMap[hallKey] = {
-                filterColC: colC,
-                link: colF,
-                title: title || colC,
-                details: details || colJ
-              };
-            }
+          if (parsed.data[3]) {
+            const rawJ4 = parsed.data[3][9] || '';
+            const linkF4 = parsed.data[3][5] || '';
+            const { title, details } = parseTitleAndDetails(rawJ4);
+            hallDetailsMap['ww2-alan'] = {
+              title: title || 'WWII - Alan War Archive',
+              details: details || rawJ4,
+              link: linkF4
+            };
           }
 
           rawGalleryItems = parsed.data.slice(1).map((row, idx) => {
@@ -917,7 +944,8 @@
             };
           }).filter(item => item.rawImg || item.title !== 'Untitled Photo');
 
-          populateCategoryFilter(rawGalleryItems);
+          populateFilterDropdowns(rawGalleryItems);
+          updateHubCounts();
           filterGalleryCards();
           updateFavoritesBadge();
           checkUrlHashForPhoto();
@@ -930,38 +958,68 @@
       }
     }
 
-    // Populate Category / Tag Dropdown Filter
-    function populateCategoryFilter(items) {
-      const select = document.getElementById('galleryCategoryFilter');
-      if (!select) return;
+    // Populate Category & Date Dropdowns
+    function populateFilterDropdowns(items) {
+      const catSelect = document.getElementById('galleryCategoryFilter');
+      const dateSelect = document.getElementById('galleryDateFilter');
+      
+      const catCounts = {};
+      const dateCounts = {};
 
-      const counts = {};
       items.forEach(i => {
-        const cat = i.category || 'General';
-        counts[cat] = (counts[cat] || 0) + 1;
+        if (i.category) catCounts[i.category] = (catCounts[i.category] || 0) + 1;
+        if (i.date) dateCounts[i.date] = (dateCounts[i.date] || 0) + 1;
       });
 
-      select.innerHTML = '<option value="">All Tags / Categories</option>';
-      Object.keys(counts).sort().forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = `${cat} (${counts[cat]})`;
-        select.appendChild(opt);
-      });
+      if (catSelect) {
+        catSelect.innerHTML = '<option value="">All Tags / Categories</option>';
+        Object.keys(catCounts).sort().forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = `${cat} (${catCounts[cat]})`;
+          catSelect.appendChild(opt);
+        });
+      }
+
+      if (dateSelect) {
+        dateSelect.innerHTML = '<option value="">All Dates & Eras</option>';
+        Object.keys(dateCounts).sort().forEach(dt => {
+          const opt = document.createElement('option');
+          opt.value = dt;
+          opt.textContent = `${dt} (${dateCounts[dt]})`;
+          dateSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function updateHubCounts() {
+      const totalAll = rawGalleryItems.length;
+      const countWW2 = rawGalleryItems.filter(i => matchesHall(i, 'ww2-alan')).length;
+      const countBNF = rawGalleryItems.filter(i => matchesHall(i, 'bonniefields-1920s')).length;
+      const countMTL = rawGalleryItems.filter(i => matchesHall(i, 'maitland-school')).length;
+
+      const elAll = document.getElementById('hubCountAll');
+      const elWW2 = document.getElementById('hubCountWW2');
+      const elBNF = document.getElementById('hubCountBNF');
+      const elMTL = document.getElementById('hubCountMTL');
+
+      if (elAll) elAll.textContent = totalAll;
+      if (elWW2) elWW2.textContent = countWW2;
+      if (elBNF) elBNF.textContent = countBNF;
+      if (elMTL) elMTL.textContent = countMTL;
     }
 
     // Matcher: Matches item against strict collection tags
     function matchesHall(item, hallKey) {
       if (hallKey === 'all') return true;
-
       const catLower = (item.category || '').toLowerCase().trim();
 
       if (hallKey === 'ww2-alan') {
-        return catLower.includes('wwii - alan') || catLower.includes('ww2 - alan') || catLower.includes('wwii') || catLower.includes('alan war');
+        return catLower.includes('wwii - alan') || catLower.includes('ww2 - alan') || catLower.includes('wwii') || catLower.includes('alan war') || catLower.includes('alan');
       } else if (hallKey === 'bonniefields-1920s') {
         return catLower.includes('dun and bonniefields') || catLower.includes('bonniefields') || catLower.includes('dun');
       } else if (hallKey === 'maitland-school') {
-        return catLower.includes('maitland east chatton') || catLower.includes('maitland') || catLower.includes('east chatton');
+        return catLower.includes('maitland east chatton') || catLower.includes('maitland') || catLower.includes('east chatton') || catLower.includes('school');
       }
       return true;
     }
@@ -976,12 +1034,55 @@
       return 99998;
     }
 
+    function renderActiveFilterPills() {
+      const bar = document.getElementById('activeFiltersBar');
+      const container = document.getElementById('activeFiltersContainer');
+      if (!bar || !container) return;
+
+      container.innerHTML = '';
+      const pills = [];
+
+      const searchVal = (document.getElementById('gallerySearchInput')?.value || '').trim();
+      const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
+      const dateVal = document.getElementById('galleryDateFilter')?.value || '';
+
+      if (searchVal) pills.push({ label: `Search: "${searchVal}"`, clear: () => clearSearchInput() });
+      if (activeHall !== 'all') {
+        const names = { 'ww2-alan': '🪖 Alan War', 'bonniefields-1920s': '🌾 Dun & Bonniefields', 'maitland-school': '🏫 Maitland East Chatton' };
+        pills.push({ label: names[activeHall] || activeHall, clear: () => switchHall('all') });
+      }
+      if (catVal) pills.push({ label: `Tag: ${catVal}`, clear: () => { document.getElementById('galleryCategoryFilter').value = ''; filterGalleryCards(); } });
+      if (dateVal) pills.push({ label: `Date: ${dateVal}`, clear: () => { document.getElementById('galleryDateFilter').value = ''; filterGalleryCards(); } });
+      if (showingFavoritesOnly) pills.push({ label: `Saved Photos`, clear: () => { showingFavoritesOnly = false; updateFavoritesBadge(); filterGalleryCards(); } });
+
+      if (pills.length > 0) {
+        bar.classList.remove('hidden');
+        bar.classList.add('flex');
+        pills.forEach(p => {
+          const span = document.createElement('span');
+          span.className = 'inline-flex items-center gap-1 text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full shadow-sm';
+          span.innerHTML = `${p.label} <button class="hover:text-red-500 font-bold ml-0.5">✕</button>`;
+          span.querySelector('button').addEventListener('click', p.clear);
+          container.appendChild(span);
+        });
+      } else {
+        bar.classList.add('hidden');
+        bar.classList.remove('flex');
+      }
+    }
+
     // Filter, Sort and Render Photo Cards
     function filterGalleryCards() {
       const searchVal = (document.getElementById('gallerySearchInput')?.value || '').toLowerCase().trim();
       const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
+      const dateVal = document.getElementById('galleryDateFilter')?.value || '';
       const sortBy = document.getElementById('gallerySortSelect')?.value || 'default';
       const favs = getFavorites();
+
+      const clearBtn = document.getElementById('clearSearch');
+      if (clearBtn) clearBtn.classList.toggle('hidden', !searchVal);
+
+      renderActiveFilterPills();
 
       filteredGalleryItems = rawGalleryItems.filter(item => {
         const matchHall = matchesHall(item, activeHall);
@@ -991,9 +1092,10 @@
                             item.category.toLowerCase().includes(searchVal) ||
                             item.date.toLowerCase().includes(searchVal);
         const matchCat = !catVal || item.category === catVal;
+        const matchDate = !dateVal || item.date === dateVal;
         const matchFav = !showingFavoritesOnly || favs.includes(item.id);
 
-        return matchHall && matchSearch && matchCat && matchFav;
+        return matchHall && matchSearch && matchCat && matchDate && matchFav;
       });
 
       // Apply Sorting: Default sorts by Date (oldest first), then Title A–Z
@@ -1040,7 +1142,7 @@
       grid.innerHTML = '';
 
       if (countText) {
-        countText.textContent = `Displaying ${filteredGalleryItems.length} photographic record${filteredGalleryItems.length === 1 ? '' : 's'}`;
+        countText.textContent = `Showing ${filteredGalleryItems.length} photograph${filteredGalleryItems.length === 1 ? '' : 's'}`;
       }
 
       if (filteredGalleryItems.length === 0) {
@@ -1052,44 +1154,44 @@
       filteredGalleryItems.forEach((item, index) => {
         const isFav = favs.includes(item.id);
         const card = document.createElement('div');
-        card.className = 'bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative';
+        card.className = 'bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl hover:border-emerald-500/60 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group cursor-pointer relative';
 
         card.innerHTML = `
           <div>
-            <div class="h-44 sm:h-48 bg-slate-900 relative overflow-hidden flex items-center justify-center p-1.5">
+            <div class="h-52 bg-slate-900 relative overflow-hidden flex items-center justify-center p-2">
               <img src="${item.thumbUrl}" alt="${item.title}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'"/>
               
-              <div class="absolute top-2 left-2 flex flex-col items-start gap-1 z-10 max-w-[65%]">
+              <div class="absolute top-2.5 left-2.5 flex flex-col items-start gap-1 z-10 max-w-[65%]">
                 ${item.category ? `<span class="bg-slate-900/85 backdrop-blur-sm text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow truncate">${item.category}</span>` : ''}
-                ${item.date ? `<span class="bg-amber-500/90 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-amber-300/40 truncate">📅 ${item.date}</span>` : ''}
+                ${item.date ? `<span class="bg-amber-500/95 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-amber-300/40 truncate">📅 ${item.date}</span>` : ''}
               </div>
 
               <!-- Action buttons on Card Image -->
-              <div class="absolute top-2 right-2 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
-                <button onclick="toggleFavorite(${item.id}, event)" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
+              <div class="absolute top-2.5 right-2.5 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
+                <button onclick="toggleFavorite(${item.id}, event)" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
                   ${isFav ? '❤️' : '🤍'}
                 </button>
-                ${item.details ? `<button data-gallery-speak-id="${item.id}" onclick="speakPhotoDetails(${item.id}, event)" title="Listen to details" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
+                ${item.details ? `<button data-gallery-speak-id="${item.id}" onclick="speakPhotoDetails(${item.id}, event)" title="Listen to details" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
                   🔊
                 </button>` : ''}
               </div>
             </div>
 
-            <!-- Compact Details Section -->
-            <div class="p-2.5 space-y-1">
-              <h4 class="text-xs font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
+            <!-- Details Section -->
+            <div class="p-4 space-y-1.5">
+              <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
                 ${item.title}
               </h4>
-              ${item.details ? `<p class="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal">${item.details}</p>` : ''}
+              ${item.details ? `<p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal">${item.details}</p>` : ''}
             </div>
           </div>
 
-          <!-- Tightened Footer Actions -->
-          <div class="px-2.5 pb-2 pt-1 flex items-center justify-between border-t border-slate-200/60 dark:border-slate-800/60">
-            <span class="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+          <!-- Footer Actions -->
+          <div class="p-4 pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80">
+            <span class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               View Photo ↗
             </span>
-            <a href="${item.fullUrl}" target="_blank" onclick="event.stopPropagation()" title="Open image in new tab" class="text-[10px] font-bold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+            <a href="${item.fullUrl}" target="_blank" onclick="event.stopPropagation()" title="Open full image in new tab" class="text-xs font-bold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
               Full Scale
             </a>
           </div>
@@ -1102,15 +1204,33 @@
       updateSpeechUI();
     }
 
+    function clearSearchInput() {
+      const input = document.getElementById('gallerySearchInput');
+      if (input) input.value = '';
+      filterGalleryCards();
+    }
+
     function resetGalleryFilters() {
       const search = document.getElementById('gallerySearchInput');
       const cat = document.getElementById('galleryCategoryFilter');
+      const date = document.getElementById('galleryDateFilter');
       const sort = document.getElementById('gallerySortSelect');
       if (search) search.value = '';
       if (cat) cat.value = '';
+      if (date) date.value = '';
       if (sort) sort.value = 'default';
       showingFavoritesOnly = false;
       switchHall('all');
+    }
+
+    function surpriseMe() {
+      if (filteredGalleryItems.length === 0 && rawGalleryItems.length > 0) {
+        resetGalleryFilters();
+      }
+      const pool = filteredGalleryItems.length > 0 ? filteredGalleryItems : rawGalleryItems;
+      if (pool.length === 0) return;
+      const randIdx = Math.floor(Math.random() * pool.length);
+      openPhotoModal(randIdx);
     }
 
     // Modal / Lightbox Logic with Deep Link URL Hash & Cross-Links
@@ -1235,7 +1355,7 @@
       if (e.target === document.getElementById('photoModal')) closePhotoModal();
     });
 
-    // Update Hall Specific Details Section (From Rows 2, 3, 4)
+    // Update Hall Specific Details Section (From Rows J2, J3, J4)
     function updateHallDetailsBanner(hallKey) {
       const section = document.getElementById('hallDetailsSection');
       const card = document.getElementById('hallDetailsCard');
@@ -1254,7 +1374,6 @@
       const info = hallDetailsMap[hallKey];
       section.classList.remove('hidden');
 
-      // Theme Colors per collection
       if (hallKey === 'ww2-alan') {
         card.style.borderColor = '#f59e0b';
         badge.className = 'text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-sm';
@@ -1289,19 +1408,11 @@
     function switchHall(hallKey) {
       activeHall = hallKey;
 
-      // Update Section Titles & Alan Audio Visibility
-      const titleElem = document.getElementById('gallerySectionTitle');
       const alanMediaSection = document.getElementById('alanMediaSection');
 
+      // The Alan Starling audio & exhibits section strictly displays on WWII - Alan
       if (alanMediaSection) {
-        alanMediaSection.style.display = (hallKey === 'ww2-alan' || hallKey === 'all') ? 'block' : 'none';
-      }
-
-      if (titleElem) {
-        if (hallKey === 'all') titleElem.textContent = 'All Photographic Collections';
-        else if (hallKey === 'ww2-alan') titleElem.textContent = '🪖 Alan War Collection';
-        else if (hallKey === 'bonniefields-1920s') titleElem.textContent = '🌾 Dun & Bonniefields Collection';
-        else if (hallKey === 'maitland-school') titleElem.textContent = '🏫 Maitland East Chatton Collection';
+        alanMediaSection.style.display = (hallKey === 'ww2-alan') ? 'block' : 'none';
       }
 
       // Update Tab Styles
@@ -1310,50 +1421,27 @@
       const tabBNF = document.getElementById('tabBtnBNF');
       const tabMTL = document.getElementById('tabBtnMTL');
 
-      [tabAll, tabWW2, tabBNF, tabMTL].forEach(b => {
-        if (b) {
-          b.className = 'hall-tab-btn px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-400';
-        }
-      });
+      const resetHubStyle = (btn, borderColor) => {
+        if (!btn) return;
+        btn.className = `hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 ${borderColor} shadow-sm`;
+      };
 
-      if (hallKey === 'all' && tabAll) tabAll.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-600 text-white border-emerald-700 shadow-sm';
-      if (hallKey === 'ww2-alan' && tabWW2) tabWW2.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-amber-500 text-slate-950 border-amber-600 shadow-sm';
-      if (hallKey === 'bonniefields-1920s' && tabBNF) tabBNF.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-emerald-500 text-slate-950 border-emerald-600 shadow-sm';
-      if (hallKey === 'maitland-school' && tabMTL) tabMTL.className = 'hall-tab-btn active px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-1.5 shrink-0 bg-blue-500 text-white border-blue-600 shadow-sm';
+      resetHubStyle(tabAll, 'border-slate-200 dark:border-slate-800');
+      resetHubStyle(tabWW2, 'border-amber-500/40 hover:border-amber-500');
+      resetHubStyle(tabBNF, 'border-emerald-500/40 hover:border-emerald-500');
+      resetHubStyle(tabMTL, 'border-blue-500/40 hover:border-blue-500');
 
-      // Update Overview Card Highlighting
-      const cardWW2 = document.getElementById('cardWW2');
-      const cardBNF = document.getElementById('cardBNF');
-      const cardMTL = document.getElementById('cardMTL');
-
-      [cardWW2, cardBNF, cardMTL].forEach(c => {
-        if (c) {
-          c.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden group hover:border-emerald-500';
-          const ind = c.querySelector('.border-t span');
-          if (ind) {
-            ind.textContent = 'Click to Filter Archive →';
-            ind.className = 'text-slate-500 dark:text-slate-400';
-          }
-        }
-      });
-
-      if (hallKey === 'ww2-alan' && cardWW2) {
-        cardWW2.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-amber-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-amber-500/30';
-        const ind = cardWW2.querySelector('.border-t span');
-        if (ind) { ind.textContent = 'Filtering Archive ⬇'; ind.className = 'text-amber-700 dark:text-amber-400 font-bold'; }
-      }
-      if (hallKey === 'bonniefields-1920s' && cardBNF) {
-        cardBNF.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-emerald-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-emerald-500/30';
-        const ind = cardBNF.querySelector('.border-t span');
-        if (ind) { ind.textContent = 'Filtering Archive ⬇'; ind.className = 'text-emerald-700 dark:text-emerald-400 font-bold'; }
-      }
-      if (hallKey === 'maitland-school' && cardMTL) {
-        cardMTL.className = 'collection-card bg-white/80 dark:bg-slate-900/80 rounded-3xl p-5 border-2 border-blue-500 shadow-lg transition-all duration-300 flex flex-col justify-between backdrop-blur-md cursor-pointer relative overflow-hidden ring-2 ring-blue-500/30';
-        const ind = cardMTL.querySelector('.border-t span');
-        if (ind) { ind.textContent = 'Filtering Archive ⬇'; ind.className = 'text-blue-700 dark:text-blue-400 font-bold'; }
+      if (hallKey === 'all' && tabAll) {
+        tabAll.className = 'hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-emerald-600 text-white border-emerald-600 shadow-md';
+      } else if (hallKey === 'ww2-alan' && tabWW2) {
+        tabWW2.className = 'hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-amber-500 text-slate-950 border-amber-500 shadow-md ring-2 ring-amber-400/40';
+      } else if (hallKey === 'bonniefields-1920s' && tabBNF) {
+        tabBNF.className = 'hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-emerald-500 text-slate-950 border-emerald-500 shadow-md ring-2 ring-emerald-400/40';
+      } else if (hallKey === 'maitland-school' && tabMTL) {
+        tabMTL.className = 'hall-hub-card group relative p-3 rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-400/40';
       }
 
-      // Update and display the specific Details Card from spreadsheet rows 2, 3, 4
+      // Update and display the specific Details Card from spreadsheet rows J2, J3, J4
       updateHallDetailsBanner(hallKey);
 
       filterGalleryCards();
