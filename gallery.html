@@ -196,15 +196,15 @@
         <!-- Filter Dropdowns Grid -->
         <div id="galleryFilterGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
           <div>
-            <label for="galleryCategoryFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Tag / Category Filter</label>
+            <label for="galleryCategoryFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Tag / Category Filter (Main Collections)</label>
             <select id="galleryCategoryFilter" onchange="filterGalleryCards()" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
-              <option value="">All Tags / Categories</option>
+              <option value="">All Main Collections</option>
             </select>
           </div>
           <div>
-            <label for="galleryDateFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Date / Era Filter</label>
+            <label for="galleryDateFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Historical Era / Age Filter</label>
             <select id="galleryDateFilter" onchange="filterGalleryCards()" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
-              <option value="">All Dates & Eras</option>
+              <option value="">All Historical Eras</option>
             </select>
           </div>
         </div>
@@ -306,7 +306,6 @@
               <span class="text-base sm:text-lg">🎙️</span>
               <h3 class="text-sm sm:text-base font-black text-amber-900 dark:text-amber-300">Alan Starling WWII Audio Recording & Related Exhibits</h3>
             </div>
-            <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Listen to original wartime tape recordings and explore related catalog exhibits from the collection.</p>
           </div>
           <span class="self-start sm:self-auto bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-400/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
             Alan Starling Archive
@@ -386,7 +385,7 @@
                   View All Alan Items →
                 </a>
               </div>
-              <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Click any item below to view its record in the main exhibit catalogue:</p>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Explore related catalog exhibits from the collection</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -533,9 +532,19 @@
 
   <!-- Script: Photo Gallery, Speech Synthesis, Favorites, Sorting & Tag Filtering -->
   <script>
-    // &headers=0 ensures Google Sheets outputs every single row (Rows 1, 2, 3, 4, 5...) without consolidating the header block
+    // &headers=0 ensures Google Sheets outputs every single row without consolidating the header block
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
     const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+
+    // Historical Era Definitions (matching index.html structure)
+    const TIMELINE_ERAS = [
+      { key: 'Victorian', short: 'Victorian', full: 'Victorian & Industrial (1700–1913)', min: 1700, max: 1913 },
+      { key: 'WWI', short: 'WWI', full: 'World War I (1914–1918)', min: 1914, max: 1918 },
+      { key: 'Interwar', short: 'Interwar', full: 'Interwar / 1920s–1930s (1919–1938)', min: 1919, max: 1938 },
+      { key: 'WWII', short: 'WWII', full: 'World War II (1939–1945)', min: 1939, max: 1945 },
+      { key: 'Post War', short: 'Post War', full: 'Post & Cold War (1946–1999)', min: 1946, max: 1999 },
+      { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
+    ];
 
     let rawGalleryItems = [];
     let filteredGalleryItems = [];
@@ -617,6 +626,21 @@
       return url;
     }
 
+    // Clean details text (removes #Category tags completely)
+    function cleanDetailsText(rawText) {
+      if (!rawText) return '';
+      let str = String(rawText).trim();
+      
+      // Remove double hash or single hash category patterns
+      str = str.replace(/##[^\n]*/g, '').replace(/#[^\n]*/g, '');
+      
+      // Clean leading dashes, asterisks, hashes
+      return str.split('\n')
+        .map(l => l.replace(/^[#\*\-]+\s*/, '').trim())
+        .filter(Boolean)
+        .join('\n');
+    }
+
     // Parse Title #Details (e.g. from Col J)
     function parseTitleAndDetails(raw, fallbackTitle) {
       if (!raw) return { title: fallbackTitle || '', details: '' };
@@ -626,16 +650,16 @@
       if (str.includes('##')) {
         const parts = str.split('##');
         title = parts[0].replace(/^[#\*\-]+\s*/, '').trim();
-        details = parts.slice(1).join('##').trim();
+        details = cleanDetailsText(parts.slice(1).join('##'));
       } else if (str.includes('#')) {
         const parts = str.split('#');
         title = parts[0].replace(/^[#\*\-]+\s*/, '').trim();
-        details = parts.slice(1).join('#').trim();
+        details = cleanDetailsText(parts.slice(1).join('#'));
       } else {
         const lines = str.split('\n').map(l => l.trim()).filter(Boolean);
         if (lines.length > 1) {
           title = lines[0].replace(/^[#\*\-]+\s*/, '').trim();
-          details = lines.slice(1).join('\n').trim();
+          details = cleanDetailsText(lines.slice(1).join('\n'));
         } else {
           title = str.replace(/^[#\*\-]+\s*/, '').trim();
           details = '';
@@ -646,7 +670,7 @@
       return { title, details };
     }
 
-    // Details Parser: Extracts Title, #Category/Tag, and ## Details
+    // Details Parser: Extracts Title, #Category/Tag, and pure Details without category tags
     function parseGalleryDetails(raw) {
       if (!raw) return { title: 'Untitled Photo', category: '', details: '' };
       let str = String(raw).trim();
@@ -654,7 +678,7 @@
 
       if (str.includes('##')) {
         const parts = str.split('##');
-        details = parts.slice(1).join('##').trim();
+        details = cleanDetailsText(parts.slice(1).join('##'));
         const firstPart = parts[0].trim();
         if (firstPart.includes('#')) {
           const subParts = firstPart.split('#');
@@ -667,11 +691,12 @@
         const parts = str.split('#');
         title = parts[0].trim();
         category = parts.slice(1).join('#').trim();
+        details = '';
       } else {
         const lines = str.split('\n').map(l => l.trim()).filter(Boolean);
         if (lines.length > 1) {
           title = lines[0];
-          details = lines.slice(1).join('\n');
+          details = cleanDetailsText(lines.slice(1).join('\n'));
         } else {
           title = str;
         }
@@ -679,9 +704,17 @@
 
       title = title.replace(/^[#\*\-]+\s*/, '').trim() || 'Untitled Photo';
       category = category.replace(/^[#\*\-]+\s*/, '').trim();
-      details = details.replace(/^[#\*\-]+\s*/, '').trim();
 
       return { title, category, details };
+    }
+
+    // Era Extraction by Date/Year
+    function getEraByDate(dateStr) {
+      if (!dateStr) return null;
+      const match = String(dateStr).match(/-?\d{4}/);
+      if (!match) return null;
+      const year = parseInt(match[0], 10);
+      return TIMELINE_ERAS.find(e => year >= e.min && year <= e.max) || null;
     }
 
     // Favorites Logic
@@ -958,7 +991,7 @@
             };
           }
 
-          // Photos start from Row 2 or Row 5 (filtering out header metadata rows)
+          // Photos start from Row 2 or Row 5 (filtering out non-image metadata rows)
           rawGalleryItems = parsed.data.slice(1).map((row, idx) => {
             const rawImg = row[5] ? String(row[5]).trim() : '';
             const rawDetails = row[detailsColIdx] ? String(row[detailsColIdx]).trim() : (row[9] || row[8] || row[2] || '');
@@ -991,36 +1024,49 @@
       }
     }
 
-    // Populate Category & Date Dropdowns
+    // Populate Category & Age/Era Dropdowns
     function populateFilterDropdowns(items) {
       const catSelect = document.getElementById('galleryCategoryFilter');
       const dateSelect = document.getElementById('galleryDateFilter');
       
       const catCounts = {};
-      const dateCounts = {};
+      const eraCounts = {};
+      TIMELINE_ERAS.forEach(e => eraCounts[e.short] = 0);
 
       items.forEach(i => {
-        if (i.category) catCounts[i.category] = (catCounts[i.category] || 0) + 1;
-        if (i.date) dateCounts[i.date] = (dateCounts[i.date] || 0) + 1;
+        if (i.category) {
+          catCounts[i.category] = (catCounts[i.category] || 0) + 1;
+        }
+        const era = getEraByDate(i.date);
+        if (era) {
+          eraCounts[era.short] = (eraCounts[era.short] || 0) + 1;
+        }
       });
 
+      // Include only main categories (count > 1)
       if (catSelect) {
-        catSelect.innerHTML = '<option value="">All Tags / Categories</option>';
-        Object.keys(catCounts).sort().forEach(cat => {
-          const opt = document.createElement('option');
-          opt.value = cat;
-          opt.textContent = `${cat} (${catCounts[cat]})`;
-          catSelect.appendChild(opt);
-        });
+        catSelect.innerHTML = '<option value="">All Main Collections</option>';
+        Object.keys(catCounts)
+          .filter(cat => catCounts[cat] > 1)
+          .sort((a, b) => catCounts[b] - catCounts[a])
+          .forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = `${cat} (${catCounts[cat]})`;
+            catSelect.appendChild(opt);
+          });
       }
 
+      // Populate appropriate historical timeline eras
       if (dateSelect) {
-        dateSelect.innerHTML = '<option value="">All Dates & Eras</option>';
-        Object.keys(dateCounts).sort().forEach(dt => {
-          const opt = document.createElement('option');
-          opt.value = dt;
-          opt.textContent = `${dt} (${dateCounts[dt]})`;
-          dateSelect.appendChild(opt);
+        dateSelect.innerHTML = '<option value="">All Historical Eras</option>';
+        TIMELINE_ERAS.forEach(e => {
+          if (eraCounts[e.short] > 0) {
+            const opt = document.createElement('option');
+            opt.value = e.short;
+            opt.textContent = `${e.full} (${eraCounts[e.short]})`;
+            dateSelect.appendChild(opt);
+          }
         });
       }
     }
@@ -1077,7 +1123,7 @@
 
       const searchVal = (document.getElementById('gallerySearchInput')?.value || '').trim();
       const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
-      const dateVal = document.getElementById('galleryDateFilter')?.value || '';
+      const eraVal = document.getElementById('galleryDateFilter')?.value || '';
 
       if (searchVal) pills.push({ label: `Search: "${searchVal}"`, clear: () => clearSearchInput() });
       if (activeHall !== 'all') {
@@ -1085,7 +1131,7 @@
         pills.push({ label: names[activeHall] || activeHall, clear: () => switchHall('all') });
       }
       if (catVal) pills.push({ label: `Tag: ${catVal}`, clear: () => { document.getElementById('galleryCategoryFilter').value = ''; filterGalleryCards(); } });
-      if (dateVal) pills.push({ label: `Date: ${dateVal}`, clear: () => { document.getElementById('galleryDateFilter').value = ''; filterGalleryCards(); } });
+      if (eraVal) pills.push({ label: `Era: ${eraVal}`, clear: () => { document.getElementById('galleryDateFilter').value = ''; filterGalleryCards(); } });
       if (showingFavoritesOnly) pills.push({ label: `Saved Photos`, clear: () => { showingFavoritesOnly = false; updateFavoritesBadge(); filterGalleryCards(); } });
 
       if (pills.length > 0) {
@@ -1108,7 +1154,7 @@
     function filterGalleryCards() {
       const searchVal = (document.getElementById('gallerySearchInput')?.value || '').toLowerCase().trim();
       const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
-      const dateVal = document.getElementById('galleryDateFilter')?.value || '';
+      const eraVal = document.getElementById('galleryDateFilter')?.value || '';
       const sortBy = document.getElementById('gallerySortSelect')?.value || 'default';
       const favs = getFavorites();
 
@@ -1125,10 +1171,14 @@
                             item.category.toLowerCase().includes(searchVal) ||
                             item.date.toLowerCase().includes(searchVal);
         const matchCat = !catVal || item.category === catVal;
-        const matchDate = !dateVal || item.date === dateVal;
+        
+        // Match Historical Era
+        const era = getEraByDate(item.date);
+        const matchEra = !eraVal || (era && (era.short === eraVal || era.full === eraVal));
+
         const matchFav = !showingFavoritesOnly || favs.includes(item.id);
 
-        return matchHall && matchSearch && matchCat && matchDate && matchFav;
+        return matchHall && matchSearch && matchCat && matchEra && matchFav;
       });
 
       // Apply Sorting: Default sorts by Date (oldest first), then Title A–Z
@@ -1210,7 +1260,7 @@
               </div>
             </div>
 
-            <!-- Details Section -->
+            <!-- Details Section (Clean description without category tags) -->
             <div class="p-4 space-y-1.5">
               <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
                 ${item.title}
@@ -1219,7 +1269,7 @@
             </div>
           </div>
 
-          <!-- Footer Actions (Updated to "View Details ↗") -->
+          <!-- Footer Actions -->
           <div class="p-4 pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80">
             <span class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               View Details ↗
