@@ -484,6 +484,20 @@ function extractDirect3DUrl(rawUrl) {
   if (!rawUrl) return '';
   let str = unescapeHTML(rawUrl).trim();
   if (!str) return '';
+
+  // 1. If resolved locally (offline mode), ensure it is strictly a 3D model
+  if (window.resolveOfflineMedia) {
+    const local = window.resolveOfflineMedia(str);
+    if (local && (local.startsWith('./media/models/') || local.startsWith('media/models/') || /\.glb|\.gltf/i.test(local))) {
+      return local;
+    }
+    // If it resolved to an image or document, it is NOT a 3D model
+    if (local && (local.includes('/images/') || local.includes('/docs/') || local.includes('/audio/'))) {
+      return '';
+    }
+  }
+
+  // 2. Parse model query parameters
   if (str.includes('#model=')) str = str.split('#model=').pop();
   else if (str.includes('model=')) str = str.split('model=').pop();
   else if (str.includes('url=')) str = str.split('url=').pop();
@@ -492,11 +506,17 @@ function extractDirect3DUrl(rawUrl) {
     if (lastHttp > 0) str = str.substring(lastHttp);
   }
   str = str.trim();
+
+  if (str.startsWith('./media/models/') || str.startsWith('media/models/')) return str;
   if (!str.startsWith('http://') && !str.startsWith('https://')) return '';
+
+  // 3. Strict 3D extension check
   const lower = str.toLowerCase();
   const isGLB = lower.includes('.glb') || lower.includes('.gltf');
-  const isDropbox3D = lower.includes('dropbox.com') || lower.includes('dropboxusercontent.com');
+  const isDropbox3D = (lower.includes('dropbox.com') || lower.includes('dropboxusercontent.com')) && (lower.includes('.glb') || lower.includes('.gltf'));
+  
   if (!isGLB && !isDropbox3D) return '';
+
   if (isDropbox3D) {
     str = str.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
     if (!str.includes('raw=1')) str += (str.includes('?') ? '&raw=1' : '?raw=1');
@@ -506,10 +526,17 @@ function extractDirect3DUrl(rawUrl) {
 
 function get3DUrlForItem(row) {
   if (!row) return '';
+  // Check designated 3D column first
   const colRVal = extractDirect3DUrl(getVal(row, colIdx.d3d));
   if (colRVal) return colRVal;
-  const colVVal = extractDirect3DUrl(getVal(row, colIdx.img2));
-  if (colVVal) return colVVal;
+
+  // Only check img2 if it explicitly contains a 3D model file
+  const colVRaw = getVal(row, colIdx.img2);
+  if (/\.glb|\.gltf|#model=/i.test(colVRaw)) {
+    const colVVal = extractDirect3DUrl(colVRaw);
+    if (colVVal) return colVVal;
+  }
+
   const itemNoColM = unescapeHTML(getVal(row, colIdx.itemNoM)).replace(/^#\s*/, '').trim().toLowerCase();
   if (itemNoColM && catalog3DMap.has(itemNoColM)) return catalog3DMap.get(itemNoColM);
   const itemNoColA = unescapeHTML(getVal(row, colIdx.id)).replace(/^#\s*/, '').trim().toLowerCase();
