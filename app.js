@@ -1,13 +1,14 @@
-// app.js — BMMC Showcase Application Logic (Unified Dual-Mode: Online & Offline)
+// app.js — BMMC Showcase Application Logic (Optimized Dual-Mode: Online & Offline)
 
 // 1. Environment & Data Source Configuration
 const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
                      window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1';
 
-const REMOTE_EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
-const REMOTE_GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=606568772';
-const REMOTE_GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
+// Fast direct export endpoints
+const REMOTE_EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1146027655';
+const REMOTE_GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=606568772';
+const REMOTE_GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1741478537';
 
 const LOCAL_EXHIBITS_CSV_URL = './data/exhibits.csv';
 const LOCAL_GRAMOPHONE_CSV_URL = './data/gramophone.csv';
@@ -229,19 +230,24 @@ function toggleCollapsibleControls(show) {
 
 // Dual-Mode CSV Fetcher with TTL Cache and Local / Remote Fallbacks
 async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
-  // 1. If explicitly running offline/locally, try local file first
   if (IS_LOCAL_ENV) {
     try {
       const localRes = await fetch(localUrl);
       if (localRes.ok) {
         const text = await localRes.text();
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-        if (parsed.data && parsed.data.length > 1) return parsed.data;
+        if (parsed.data && parsed.data.length > 1) {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+            localStorage.setItem(`${cacheKey}_raw`, text);
+            localStorage.setItem(`${cacheKey}_time`, Date.now());
+          } catch (e) {}
+          return parsed.data;
+        }
       }
     } catch (e) {}
   }
 
-  // 2. Check localStorage cache
   try {
     const cached = localStorage.getItem(cacheKey);
     const cacheTime = localStorage.getItem(`${cacheKey}_time`);
@@ -251,7 +257,6 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
     }
   } catch (e) {}
 
-  // 3. Try Remote Google Sheet
   try {
     const res = await fetch(remoteUrl);
     if (res.ok) {
@@ -260,6 +265,7 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
       if (parsed.data && parsed.data.length > 1) {
         try {
           localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+          localStorage.setItem(`${cacheKey}_raw`, text);
           localStorage.setItem(`${cacheKey}_time`, Date.now());
         } catch (e) {}
         return parsed.data;
@@ -267,13 +273,19 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
     }
   } catch (e) {}
 
-  // 4. Fallback to Local CSV
   try {
     const fallbackRes = await fetch(localUrl);
     if (fallbackRes.ok) {
       const text = await fallbackRes.text();
       const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1) return parsed.data;
+      if (parsed.data && parsed.data.length > 1) {
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+          localStorage.setItem(`${cacheKey}_raw`, text);
+          localStorage.setItem(`${cacheKey}_time`, Date.now());
+        } catch (e) {}
+        return parsed.data;
+      }
     }
   } catch (e) {}
 
@@ -490,7 +502,6 @@ function formatGoogleLh3Url(url, size = 's200') {
   url = String(url).trim();
   if (!url) return '';
 
-  // Check offline adapter resolution
   if (window.resolveOfflineMedia) {
     const local = window.resolveOfflineMedia(url);
     if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
@@ -525,7 +536,6 @@ function extractDirect3DUrl(rawUrl) {
   let str = unescapeHTML(rawUrl).trim();
   if (!str) return '';
 
-  // 1. Strict Offline Check: must be in media/models/ or end with .glb/.gltf
   if (window.resolveOfflineMedia) {
     const local = window.resolveOfflineMedia(str);
     if (local && (local.startsWith('./media/models/') || local.startsWith('media/models/') || /\.glb|\.gltf/i.test(local))) {
@@ -536,7 +546,6 @@ function extractDirect3DUrl(rawUrl) {
     }
   }
 
-  // 2. Parse model query parameters
   if (str.includes('#model=')) str = str.split('#model=').pop();
   else if (str.includes('model=')) str = str.split('model=').pop();
   else if (str.includes('url=')) str = str.split('url=').pop();
@@ -549,7 +558,6 @@ function extractDirect3DUrl(rawUrl) {
   if (str.startsWith('./media/models/') || str.startsWith('media/models/')) return str;
   if (!str.startsWith('http://') && !str.startsWith('https://')) return '';
 
-  // 3. Strict 3D extension verification
   const lower = str.toLowerCase();
   const isGLB = lower.includes('.glb') || lower.includes('.gltf');
   const isDropbox3D = (lower.includes('dropbox.com') || lower.includes('dropboxusercontent.com')) && (lower.includes('.glb') || lower.includes('.gltf'));
@@ -820,14 +828,19 @@ function checkUrlQueryParams() {
   }
 }
 
-// 3. Data Loading & Initialization
+// 3. Fast Parallel Data Loading & Initialization
 async function loadCatalogData() {
   const loadingElem = document.getElementById('loading');
   if (loadingElem) loadingElem.classList.remove('hidden');
 
   initTheme();
   try {
-    const exhibitsData = await fetchDualModeCSV(REMOTE_EXHIBITS_CSV_URL, LOCAL_EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
+    // Fetch exhibits and gramophone datasets in parallel
+    const [exhibitsData, gramophoneData] = await Promise.all([
+      fetchDualModeCSV(REMOTE_EXHIBITS_CSV_URL, LOCAL_EXHIBITS_CSV_URL, 'bMMC_cached_exhibits'),
+      fetchDualModeCSV(REMOTE_GRAMOPHONE_CSV_URL, LOCAL_GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone')
+    ]);
+
     if (exhibitsData && exhibitsData.length > 0) {
       exhibitsData[0].forEach((cell, idx) => {
         const c = String(cell).toLowerCase().trim();
@@ -854,13 +867,6 @@ async function loadCatalogData() {
       populateInitialDropdowns();
     }
 
-    renderCollectionHubs(rawExhibitsRows);
-    updateDynamicDropdowns();
-    document.getElementById('gridPrompt')?.classList.remove('hidden');
-    updateFavoritesBadge();
-    checkUrlHashForExhibit();
-
-    const gramophoneData = await fetchDualModeCSV(REMOTE_GRAMOPHONE_CSV_URL, LOCAL_GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
     if (gramophoneData && gramophoneData.length > 0) {
       rawGramophoneRows = gramophoneData.filter(r => {
         const c0 = getVal(r, 0).toLowerCase();
@@ -869,9 +875,15 @@ async function loadCatalogData() {
       });
     }
 
-    initFuseSearch();
     renderCollectionHubs(rawExhibitsRows);
+    updateDynamicDropdowns();
+    document.getElementById('gridPrompt')?.classList.remove('hidden');
+    updateFavoritesBadge();
+    checkUrlHashForExhibit();
     checkUrlQueryParams();
+
+    // Defer Fuse search indexing to keep main thread completely unblocked
+    setTimeout(() => initFuseSearch(), 80);
 
   } catch (err) {
     console.error("Failed to load catalog data:", err);
@@ -928,7 +940,7 @@ function renderCollectionHubs(rows) {
     hubCard.style.borderColor = theme.hex;
     hubCard.innerHTML = `
       <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: ${theme.hex}25;">
-        <img src="${previewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="${catName}" />
+        <img src="${previewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="${catName}" loading="lazy" />
         <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
           <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${theme.hex}; color: ${theme.text};">${count}</span>
           <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${pctDisplay}%</span>
@@ -1559,6 +1571,12 @@ function closeEnlargeModal() {
 
 // 5. Museum Statistics & Charts
 function renderMuseumStatistics() {
+  // Lazy mount the 2D Map iframe on first visit to the Stats tab
+  const mapIframe = document.getElementById('statMapIframe');
+  if (mapIframe && !mapIframe.src && mapIframe.dataset.src) {
+    mapIframe.src = mapIframe.dataset.src;
+  }
+
   if (typeof Chart === 'undefined' || !rawExhibitsRows || rawExhibitsRows.length === 0) return;
   const isDark = document.documentElement.classList.contains('dark');
   const textColor = isDark ? '#cbd5e1' : '#334155';
@@ -1712,7 +1730,7 @@ function renderMuseumStatistics() {
       card.style.borderColor = hexColor;
       card.innerHTML = `
         <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: ${hexColor}25;">
-          <img src="${previewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="${e.short}" />
+          <img src="${previewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="${e.short}" loading="lazy" />
           <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
             <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${hexColor}; color: #ffffff;">${count}</span>
             <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${pctDisplay}%</span>
@@ -1747,7 +1765,7 @@ function renderMuseumStatistics() {
     interestCard.style.borderColor = interestColor;
     interestCard.innerHTML = `
       <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: ${interestColor}25;">
-        <img src="${interestPreviewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="Items of interest" />
+        <img src="${interestPreviewImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onError="this.src='${NO_IMAGE_SVG}'" alt="Items of interest" loading="lazy" />
         <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
           <span class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md" style="background-color: ${interestColor}; color: #ffffff;">${interestCount}</span>
           <span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full shadow-md bg-slate-900/80 text-white backdrop-blur-sm">${interestPctDisplay}%</span>
@@ -2131,7 +2149,7 @@ function openModal(row, originalIndex) {
                 <div class="w-full">
                   <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Second Media (Image 1)' : 'Primary Image'}</p>
                   <a href="${fullImg1 || modalImg1}" target="_blank" title="Click to view full image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
-                    <img src="${modalImg1}" class="w-full ${!img2 ? 'max-h-[520px] min-h-[220px]' : 'h-52 sm:h-56'} object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" />
+                    <img src="${modalImg1}" class="w-full ${!img2 ? 'max-h-[520px] min-h-[220px]' : 'h-52 sm:h-56'} object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
                     <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                   </a>
                 </div>` : ''}
@@ -2140,7 +2158,7 @@ function openModal(row, originalIndex) {
                 <div class="w-full">
                   <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image'}</p>
                   <a href="${fullImg2 || modalImg2}" target="_blank" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
-                    <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" />
+                    <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
                     <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                   </a>
                 </div>` : ''}

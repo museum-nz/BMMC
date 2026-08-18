@@ -262,9 +262,11 @@
                          window.location.hostname === 'localhost' || 
                          window.location.hostname === '127.0.0.1';
 
-    const REMOTE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
+    // Using high-speed direct CSV export endpoint instead of gviz/tq
+    const REMOTE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1146027655';
     const LOCAL_CSV_URL = './data/exhibits.csv';
     const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+    const SVG_NO_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%2364748b%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     const isMobile = window.innerWidth <= 768;
     const initialZoom = isMobile ? 2 : 3;
@@ -330,7 +332,7 @@
       }
 
       const fileId = extractDriveId(clean);
-      if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}=s400`;
+      if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}=s150`;
       return clean;
     }
 
@@ -346,11 +348,12 @@
       if (heatLayer) map.removeLayer(heatLayer);
 
       const heatPoints = [];
+      const markerList = [];
 
       records.forEach(item => {
         heatPoints.push([item.lat, item.lng, 0.9]);
 
-        const customIconHTML = `<div class="single-photo-wrapper"><img src="${item.imgUrl}" ${item.fallbackAttr} loading="eager" alt="Photo" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%2364748b%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E'"/></div>`;
+        const customIconHTML = `<div class="single-photo-wrapper"><img src="${item.imgUrl}" loading="lazy" alt="Photo" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>`;
 
         const photoIcon = L.divIcon({
           html: customIconHTML,
@@ -367,14 +370,16 @@
           <div class="photo-card-large">
             ${item.title ? `<h3>${item.title}</h3>` : ''}
             ${locationYearText ? `<p>${locationYearText}</p>` : ''}
-            <div class="img-container"><img src="${item.imgUrl}" ${item.fallbackAttr} loading="eager" alt="Photo"/></div>
+            <div class="img-container"><img src="${item.imgUrl}" loading="lazy" alt="Photo" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>
           </div>
         `;
 
         const marker = L.marker([item.lat, item.lng], { icon: photoIcon });
         marker.bindPopup(popupHTML, { autoPan: true, keepInView: true, autoClose: true });
-        markers.addLayer(marker);
+        markerList.push(marker);
       });
+
+      markers.addLayers(markerList);
 
       if (typeof L.heatLayer === 'function' && heatPoints.length > 0) {
         heatLayer = L.heatLayer(heatPoints, {
@@ -462,56 +467,8 @@
       renderDataset(filtered);
     }
 
-    async function loadMapData() {
-      let csvText = '';
-
-      if (IS_LOCAL_ENV) {
-        try {
-          const localRes = await fetch(LOCAL_CSV_URL);
-          if (localRes.ok) csvText = await localRes.text();
-        } catch (e) {}
-      }
-
-      if (!csvText) {
-        try {
-          const cached = localStorage.getItem('bMMC_cached_exhibits_raw');
-          const cacheTime = localStorage.getItem('bMMC_cached_exhibits_time');
-          if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
-            csvText = cached;
-          }
-        } catch (e) {}
-      }
-
-      if (!csvText) {
-        try {
-          const res = await fetch(REMOTE_CSV_URL);
-          if (res.ok) {
-            csvText = await res.text();
-            try {
-              localStorage.setItem('bMMC_cached_exhibits_raw', csvText);
-              localStorage.setItem('bMMC_cached_exhibits_time', Date.now());
-            } catch (e) {}
-          }
-        } catch (e) {}
-      }
-
-      if (!csvText) {
-        try {
-          const fallbackRes = await fetch(LOCAL_CSV_URL);
-          if (fallbackRes.ok) csvText = await fallbackRes.text();
-        } catch (e) {}
-      }
-
-      if (!csvText) {
-        document.getElementById('yearRangeText').innerText = 'Data offline';
-        return;
-      }
-
-      const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
-      if (!parsed.data || parsed.data.length < 2) {
-        document.getElementById('yearRangeText').innerText = 'No records found';
-        return;
-      }
+    function parseAndProcessDataset(rows) {
+      if (!rows || rows.length < 2) return;
 
       let titleIdx = 2;
       let imgIdx = 20;
@@ -520,8 +477,8 @@
       let latIdx = 26;
       let lngIdx = 27;
 
-      if (parsed.data[0]) {
-        parsed.data[0].forEach((col, idx) => {
+      if (rows[0]) {
+        rows[0].forEach((col, idx) => {
           const c = String(col).toLowerCase().trim();
           if (c === 'lat' || c.startsWith('lat') || c.includes('latitude')) latIdx = idx;
           if (c === 'lng' || c.startsWith('lng') || c.startsWith('lon') || c.includes('longitude')) lngIdx = idx;
@@ -534,7 +491,7 @@
 
       allPhotoRecords = [];
 
-      parsed.data.slice(1).forEach(row => {
+      rows.slice(1).forEach(row => {
         let latStr = latIdx >= 0 ? row[latIdx] || '' : '';
         let lngStr = lngIdx >= 0 ? row[lngIdx] || '' : '';
         let imgRaw = imgIdx >= 0 ? row[imgIdx] || '' : '';
@@ -577,8 +534,6 @@
         if (cleanTitle.includes('#')) cleanTitle = cleanTitle.split('#')[0];
 
         const imgUrl = formatImgUrl(imgRaw);
-        const fileId = extractDriveId(imgRaw);
-        const fallbackAttr = fileId ? `onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=${fileId}';"` : '';
 
         allPhotoRecords.push({
           lat: lat,
@@ -586,12 +541,84 @@
           title: cleanTitle.trim(),
           location: String(madeRaw).trim(),
           year: String(yearRaw).trim(),
-          imgUrl: imgUrl,
-          fallbackAttr: fallbackAttr
+          imgUrl: imgUrl
         });
       });
 
       initYearSliderUI();
+    }
+
+    async function loadMapData() {
+      // 1. Shared Cache Check from index.html (Instant load without network request)
+      try {
+        const cachedRaw = localStorage.getItem('bMMC_cached_exhibits_raw');
+        const cachedParsed = localStorage.getItem('bMMC_cached_exhibits');
+        const cacheTime = localStorage.getItem('bMMC_cached_exhibits_time');
+
+        if (cachedParsed && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
+          const parsed = JSON.parse(cachedParsed);
+          if (Array.isArray(parsed) && parsed.length > 1) {
+            parseAndProcessDataset(parsed);
+            return;
+          }
+        }
+
+        if (cachedRaw && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
+          const parsed = Papa.parse(cachedRaw, { header: false, skipEmptyLines: true });
+          if (parsed.data && parsed.data.length > 1) {
+            parseAndProcessDataset(parsed.data);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Local File Check
+      if (IS_LOCAL_ENV) {
+        try {
+          const localRes = await fetch(LOCAL_CSV_URL);
+          if (localRes.ok) {
+            const csvText = await localRes.text();
+            const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+            if (parsed.data && parsed.data.length > 1) {
+              parseAndProcessDataset(parsed.data);
+              return;
+            }
+          }
+        } catch (e) {}
+      }
+
+      // 3. Network Fetch from High-Speed Google Sheets Export
+      try {
+        const res = await fetch(REMOTE_CSV_URL);
+        if (res.ok) {
+          const csvText = await res.text();
+          const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+          if (parsed.data && parsed.data.length > 1) {
+            try {
+              localStorage.setItem('bMMC_cached_exhibits_raw', csvText);
+              localStorage.setItem('bMMC_cached_exhibits', JSON.stringify(parsed.data));
+              localStorage.setItem('bMMC_cached_exhibits_time', Date.now());
+            } catch (e) {}
+            parseAndProcessDataset(parsed.data);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 4. Fallback to Local CSV
+      try {
+        const fallbackRes = await fetch(LOCAL_CSV_URL);
+        if (fallbackRes.ok) {
+          const csvText = await fallbackRes.text();
+          const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+          if (parsed.data && parsed.data.length > 1) {
+            parseAndProcessDataset(parsed.data);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      document.getElementById('yearRangeText').innerText = 'Data offline';
     }
 
     loadMapData();

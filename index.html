@@ -7,9 +7,11 @@
 
   <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
-  <link rel="preconnect" href="https://drive.google.com" crossorigin>
+  <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
@@ -17,7 +19,7 @@
   <!-- Umami Tracking (Fails silently offline) -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="dfdc416e-ad5f-4752-9c46-b426a92e30b3"></script>
 
-  <!-- Tailwind CSS Engine (Online CDN by default) -->
+  <!-- Tailwind CSS Engine -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -38,18 +40,16 @@
     };
   </script>
 
-  <!-- Core Libraries (Direct High-Speed CDN) -->
+  <!-- Core Libraries (Deferred & Non-Blocking) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
   <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <!-- Google Font: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -133,7 +133,7 @@
     }
   </style>
 
-  <!-- Main Application Logic -->
+  <!-- Main Application Logic (Deferred) -->
   <script defer src="app.js"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
@@ -464,14 +464,14 @@
         </div>
       </div>
 
-      <!-- Interactive 2D Map -->
+      <!-- Interactive 2D Map (Mounted dynamically via data-src on tab open) -->
       <div id="statMapCard" class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md flex flex-col gap-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <h3 class="text-base sm:text-lg font-black text-blue-300 uppercase tracking-wider flex items-center gap-2"><span>🗺️</span> Map of item origin</h3>
           <button onclick="openEnlargeModal('2Dmap.html', true)" title="Open Map in Full Scale Pop-Up" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-md border border-blue-400/40 transition flex items-center gap-1 active:scale-95">Enlarge ↗</button>
         </div>
         <div class="w-full h-[400px] sm:h-[520px] relative overflow-hidden rounded-2xl bg-slate-900 border border-indigo-500/30 shadow-inner">
-          <iframe src="2Dmap.html" class="w-full h-full border-0 rounded-2xl bg-white" title="Map of item origin" loading="lazy"></iframe>
+          <iframe data-src="2Dmap.html" id="statMapIframe" class="w-full h-full border-0 rounded-2xl bg-white" title="Map of item origin"></iframe>
         </div>
       </div>
 
