@@ -5,50 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Photo Archives — Historical Photographic Galleries</title>
 
-  <!-- Preconnect for Image & Media CDN Performance (Online) -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
   <link rel="preconnect" href="https://www.dropbox.com" crossorigin>
 
-  <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- Dual-Mode Tailwind CSS (Local Vendor with CDN Fallback) -->
-  <script src="vendor/tailwind.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://cdn.tailwindcss.com'; document.head.appendChild(s);"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    if (typeof tailwind !== 'undefined') {
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f0f7ff',
-                100: '#e0effe',
-                500: '#2563eb',
-                600: '#1d4ed8',
-                700: '#1e40af',
-              }
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
             }
           }
         }
-      };
-    }
+      }
+    };
   </script>
 
-  <!-- Dual-Mode Core JavaScript Libraries -->
-  <script src="vendor/papaparse.min.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'; document.head.appendChild(s);"></script>
-
-  <!-- Optional Offline Media Adapter -->
-  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
-
-  <!-- Web Font with Instant System Fallback -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+    body { font-family: 'Inter', sans-serif; }
     .solid-header { background-color: rgba(255, 255, 255, 0.90); }
     .dark .solid-header { background-color: rgba(15, 23, 42, 0.90); }
 
@@ -74,26 +63,15 @@
     }
     .dark .time-sky-animated { filter: brightness(0.4) contrast(1.2) saturate(0.85); }
     .time-sky-animated { animation: seasonSkyCycle 60s linear infinite; }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 12px;
-      width: 12px;
-      border-radius: 9999px;
-      background: #f59e0b;
-      cursor: pointer;
-    }
   </style>
 </head>
 
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
-  <!-- Ambient Sky Background -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
 
-  <!-- Header Section -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -145,13 +123,11 @@
         </div>
       </div>
 
-      <!-- Collapsible Controls Container -->
       <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
         <p id="subheadingText" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
           Historical photographic collections with speech narration, dating tags, and archival notes.
         </p>
 
-        <!-- Search and Sort Bar -->
         <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
           <div class="flex items-center justify-between sm:justify-start gap-3 shrink-0">
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="galleryCountText"></p>
@@ -198,7 +174,6 @@
           </div>
         </div>
 
-        <!-- Collection Hubs Filter Cards -->
         <div id="collectionHubsSection" class="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
             
@@ -217,7 +192,7 @@
 
             <div id="tabBtnWW2" onclick="switchHall('ww2-alan')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-amber-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #d9770625;">
-                <img id="hubImgWW2" src="https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2280%22%3E🪖%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Alan War" />
+                <img src="https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/200x200?text=WW2+Archive';" alt="Alan War" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountWW2" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-amber-500 text-slate-950">0</span>
                 </div>
@@ -230,7 +205,7 @@
 
             <div id="tabBtnBNF" onclick="switchHall('bonniefields-1920s')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #10b98125;">
-                <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2280%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Dun & Bonniefields" />
+                <img src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/200x200?text=Dun+Archive';" alt="Dun & Bonniefields" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountBNF" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-emerald-500 text-slate-950">0</span>
                 </div>
@@ -243,7 +218,7 @@
 
             <div id="tabBtnMTL" onclick="switchHall('maitland-school')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-blue-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #2563eb25;">
-                <img id="hubImgMTL" src="https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2280%22%3E🏫%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Maitland East Chatton" />
+                <img src="https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/200x200?text=Maitland+Archive';" alt="Maitland East Chatton" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountMTL" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-blue-600 text-white">0</span>
                 </div>
@@ -261,7 +236,6 @@
     </div>
   </header>
 
-  <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-6">
     
     <section id="hallDetailsSection" class="hidden">
@@ -276,9 +250,9 @@
       </div>
     </section>
 
-    <!-- Alan Starling WWII Audio Recording & Related Exhibits -->
     <section id="alanMediaSection" class="space-y-4 hidden">
       <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-5 backdrop-blur-md space-y-4">
+        
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
           <div>
             <div class="flex items-center gap-2">
@@ -292,6 +266,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          
           <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 border border-amber-500/30 shadow-sm flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between gap-1 mb-1">
@@ -305,10 +280,8 @@
               <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">2001 Starling Alan WWII (June 01)</p>
             </div>
 
-            <!-- Dual-Mode Audio Player (Local File with Remote Stream Fallback) -->
             <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3 my-1">
               <audio id="alanAudioEl" preload="metadata">
-                <source src="media/audio/folfcmnhvzhgd4xp56wzp.mp3" type="audio/mpeg">
                 <source src="https://www.dropbox.com/scl/fi/folfcmnhvzhgd4xp56wzp/2001-Starling-Alan-WWII-June-01-53.11.mp3?rlkey=hf9uwym9k7n9hmvv2o2rvxl1r&st=59pa6c0f&raw=1" type="audio/mpeg">
                 Your browser does not support the audio element.
               </audio>
@@ -358,7 +331,7 @@
                 <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                   <span>🏛️</span> Main Museum Catalog Cross-References
                 </span>
-                <a href="index.html?search=Alan+Starling" class="text-[10px] font-black text-amber-600 hover:underline">
+                <a href="index.html?search=Alan+Starling" target="_blank" rel="noopener noreferrer" class="text-[10px] font-black text-amber-600 hover:underline">
                   View All Alan Items →
                 </a>
               </div>
@@ -366,7 +339,7 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <a href="index.html?search=WW2%20MEDALS%20-%20ALAN%20STARLING" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+              <a href="index.html?search=WW2%20MEDALS%20-%20ALAN%20STARLING" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
                 <span class="text-sm mt-0.5">🎖️</span>
                 <div class="overflow-hidden">
                   <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">WW2 MEDALS - ALAN STARLING</div>
@@ -374,7 +347,7 @@
                 </div>
               </a>
 
-              <a href="index.html?search=BICYCLE,%20CAPTURE%20OF%20HESS%20(ALAN%20STARLING)" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+              <a href="index.html?search=BICYCLE,%20CAPTURE%20OF%20HESS%20(ALAN%20STARLING)" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
                 <span class="text-sm mt-0.5">🚲</span>
                 <div class="overflow-hidden">
                   <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">BICYCLE, CAPTURE OF HESS</div>
@@ -382,7 +355,7 @@
                 </div>
               </a>
 
-              <a href="index.html?search=DIARIES%20AND%20TAPE%20FROM%20ALAN%20STARLING%20WWII" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+              <a href="index.html?search=DIARIES%20AND%20TAPE%20FROM%20ALAN%20STARLING%20WWII" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
                 <span class="text-sm mt-0.5">📖</span>
                 <div class="overflow-hidden">
                   <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">DIARIES & TAPE RECORDING</div>
@@ -390,7 +363,7 @@
                 </div>
               </a>
 
-              <a href="index.html?search=UNIFORM%20NAVY%20PARTS%20(ALAN%20STARLING)" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
+              <a href="index.html?search=UNIFORM%20NAVY%20PARTS%20(ALAN%20STARLING)" target="_blank" rel="noopener noreferrer" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
                 <span class="text-sm mt-0.5">⚓</span>
                 <div class="overflow-hidden">
                   <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">UNIFORM NAVY PARTS</div>
@@ -404,7 +377,6 @@
       </div>
     </section>
 
-    <!-- Photographic Archives Section -->
     <section id="photoGridSection" class="space-y-4">
       <div id="galleryLoading" class="py-12 flex flex-col items-center justify-center gap-3">
         <div class="animate-spin rounded-full h-8 w-8 border-2 border-emerald-500 border-t-transparent"></div>
@@ -419,10 +391,8 @@
         <button onclick="resetGalleryFilters()" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
       </div>
     </section>
-
   </main>
 
-  <!-- Photo Lightbox Modal with In-Page Zoom and Full Resolution Option -->
   <div id="photoModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalPhotoTitle">
     <div id="photoModalContainer" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-emerald-500/40 relative flex flex-col">
       
@@ -438,7 +408,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="btnSharePhoto" onclick="shareCurrentPhoto()" title="Copy Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">
+          <button id="btnSharePhoto" onclick="shareCurrentPhoto()" title="Copy Deep Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">
             <span>🔗</span> <span class="hidden sm:inline">Share</span>
           </button>
 
@@ -446,23 +416,17 @@
             <span id="modalFavIcon">🤍</span> <span id="modalFavText">Save</span>
           </button>
 
-          <button onclick="toggleModalPhotoZoom()" title="Toggle Fullscreen Zoom" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-black transition flex items-center gap-1">
-            <span id="btnZoomLabel">🔍 Zoom In</span>
-          </button>
-
-          <a id="modalOpenTabBtn" href="#" target="_blank" class="px-3 py-1 bg-slate-800 hover:bg-black text-white rounded-lg text-xs font-black transition flex items-center gap-1">
+          <a id="modalOpenTabBtn" href="#" target="_blank" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-black transition flex items-center gap-1">
             <span>Full Image ↗</span>
           </a>
-          
           <button onclick="closePhotoModal()" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-bold transition">✕</button>
         </div>
       </div>
 
       <div class="p-4 sm:p-6 space-y-4">
-        <!-- In-Page Clickable Zoom -->
-        <div class="w-full min-h-[260px] max-h-[58vh] bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-800 shadow-inner p-2 cursor-pointer group/modalimg relative transition-all duration-300" onclick="toggleModalPhotoZoom()" title="Click image to toggle zoom">
-          <img id="modalPhotoImage" src="" alt="Full view" class="max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl group-hover/modalimg:scale-105 transition-all duration-300" />
-          <span id="modalZoomBadge" class="absolute bottom-3 right-3 bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-lg shadow border border-slate-700/60 pointer-events-none">Click to Zoom 🔍</span>
+        <div class="w-full min-h-[260px] max-h-[58vh] bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-800 shadow-inner p-2 cursor-pointer group/modalimg relative" onclick="openModalImageFull()" title="Click image to open in full resolution">
+          <img id="modalPhotoImage" src="" alt="Full view" class="max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl group-hover/modalimg:scale-105 transition-transform duration-300" />
+          <span class="absolute bottom-3 right-3 bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-lg shadow border border-slate-700/60 pointer-events-none">Click to Enlarge ↗</span>
         </div>
 
         <div class="space-y-3">
@@ -486,7 +450,7 @@
           <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex items-center gap-3">
               <button id="btnModalGoogleSearch" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">🔍 Google Item</button>
-              <a id="btnModalCatalogSearch" href="#" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🏛️ Search Museum Exhibit</a>
+              <a id="btnModalCatalogSearch" href="#" target="_blank" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🏛️ Search Museum Exhibit</a>
             </div>
             <span class="text-[10px] text-slate-400">Bonniefields Photographic Archive</span>
           </div>
@@ -495,20 +459,14 @@
     </div>
   </div>
 
-  <!-- Toast Notification System -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification</span>
   </div>
 
   <script>
-    const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
-                         window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1';
-
-    const REMOTE_GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
-    const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
-    const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+    // Essential &headers=0 ensures Google Sheets outputs individual rows without header-merging
+    const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
     const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     const TIMELINE_ERAS = [
@@ -524,7 +482,6 @@
     let filteredGalleryItems = [];
     let hallDetailsMap = {};
     let currentModalPhotoIdx = -1;
-    let isModalZoomed = false;
     let activeHall = 'all';
     let showingFavoritesOnly = false;
 
@@ -567,45 +524,30 @@
 
     function formatGoogleLh3Url(url, size = 's500') {
       if (!url) return '';
-      const clean = String(url).trim();
-      if (!clean) return '';
-      
-      if (window.resolveOfflineMedia) {
-        const local = window.resolveOfflineMedia(clean);
-        if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
-      }
-
-      if (clean.startsWith('data:image/') || clean.startsWith('./media/') || clean.startsWith('media/')) return clean;
-
-      if (clean.includes('dropbox.com')) {
-        let dropboxUrl = clean.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
-        if (!dropboxUrl.includes('raw=1')) dropboxUrl += (dropboxUrl.includes('?') ? '&raw=1' : '?raw=1');
-        return dropboxUrl;
-      }
-
-      const match = clean.match(/(?:id=|\/d\/|thumbnail\?id=|googleusercontent\.com\/d\/)([a-zA-Z0-9_-]{15,})/);
-      if (match && match[1]) {
-        const sz = String(size).startsWith('s') ? size : `s${size}`;
-        return `https://lh3.googleusercontent.com/d/${match[1]}=${sz}`;
-      }
-      return clean;
-    }
-
-    function formatDocUrl(url) {
+      url = String(url).trim();
       if (!url) return '';
-      if (window.formatDocUrl) return window.formatDocUrl(url);
-      if (window.resolveOfflineMedia) {
-        const local = window.resolveOfflineMedia(url);
-        if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
-      }
-      return url.startsWith('http') ? url : `https://${url}`;
-    }
+      if (url.startsWith('data:image/')) return url;
 
-    function cleanDetailsText(rawText) {
-      if (!rawText) return '';
-      let str = String(rawText).trim();
-      str = str.replace(/##[^\n]*/g, '').replace(/#[^\n]*/g, '');
-      return str.split('\n').map(l => l.replace(/^[#\*\-]+\s*/, '').trim()).filter(Boolean).join('\n');
+      if (url.includes('dropbox.com')) {
+        let cleanUrl = url.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
+        if (!cleanUrl.includes('raw=1')) cleanUrl += (cleanUrl.includes('?') ? '&raw=1' : '?raw=1');
+        return cleanUrl;
+      }
+
+      const isDrive = url.includes('drive.google.com') || url.includes('lh3.googleusercontent.com') || url.includes('docs.google.com');
+      if (isDrive) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || 
+                      url.match(/id=([a-zA-Z0-9_-]+)/) || 
+                      url.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          const fileId = match[1];
+          const sz = String(size).startsWith('s') ? size : `s${size}`;
+          return `https://lh3.googleusercontent.com/d/${fileId}=${sz}`;
+        }
+      }
+
+      if (!url.startsWith('http://') && !url.startsWith('https://')) return '';
+      return url;
     }
 
     function parseTitleAndDetails(raw, fallbackTitle) {
@@ -613,62 +555,23 @@
       let str = String(raw).trim();
       let title = '', details = '';
 
-      if (str.includes('##')) {
-        const parts = str.split('##');
-        title = parts[0].replace(/^[#\*\-]+\s*/, '').trim();
-        details = cleanDetailsText(parts.slice(1).join('##'));
-      } else if (str.includes('#')) {
-        const parts = str.split('#');
-        title = parts[0].replace(/^[#\*\-]+\s*/, '').trim();
-        details = cleanDetailsText(parts.slice(1).join('#'));
-      } else {
-        const lines = str.split('\n').map(l => l.trim()).filter(Boolean);
-        if (lines.length > 1) {
-          title = lines[0].replace(/^[#\*\-]+\s*/, '').trim();
-          details = cleanDetailsText(lines.slice(1).join('\n'));
-        } else {
-          title = str.replace(/^[#\*\-]+\s*/, '').trim();
-          details = '';
-        }
-      }
-      if (!title) title = fallbackTitle || '';
-      return { title, details };
-    }
-
-    function parseGalleryDetails(raw) {
-      if (!raw) return { title: 'Untitled Photo', category: '', details: '' };
-      let str = String(raw).trim();
-      let title = '', category = '', details = '';
-
-      if (str.includes('##')) {
-        const parts = str.split('##');
-        details = cleanDetailsText(parts.slice(1).join('##'));
-        const firstPart = parts[0].trim();
-        if (firstPart.includes('#')) {
-          const subParts = firstPart.split('#');
-          title = subParts[0].trim();
-          category = subParts.slice(1).join('#').trim();
-        } else {
-          title = firstPart;
-        }
-      } else if (str.includes('#')) {
+      if (str.includes('#')) {
         const parts = str.split('#');
         title = parts[0].trim();
-        category = parts.slice(1).join('#').trim();
-        details = '';
+        details = parts.slice(1).join('#').trim();
       } else {
         const lines = str.split('\n').map(l => l.trim()).filter(Boolean);
         if (lines.length > 1) {
           title = lines[0];
-          details = cleanDetailsText(lines.slice(1).join('\n'));
+          details = lines.slice(1).join('\n');
         } else {
           title = str;
+          details = '';
         }
       }
 
-      title = title.replace(/^[#\*\-]+\s*/, '').trim() || 'Untitled Photo';
-      category = category.replace(/^[#\*\-]+\s*/, '').trim();
-      return { title, category, details };
+      if (!title) title = fallbackTitle || '';
+      return { title, details };
     }
 
     function getEraByDate(dateStr) {
@@ -680,7 +583,11 @@
     }
 
     function getFavorites() {
-      try { return JSON.parse(localStorage.getItem('bMMC_gallery_favorites') || '[]'); } catch (e) { return []; }
+      try {
+        return JSON.parse(localStorage.getItem('bMMC_gallery_favorites') || '[]');
+      } catch (e) {
+        return [];
+      }
     }
 
     function toggleFavorite(itemId, event) {
@@ -753,14 +660,7 @@
 
     function loadVoices() {
       if (!('speechSynthesis' in window)) return;
-      const voices = speechSynthesis.getVoices();
-      availableVoices = voices.filter(v => v.lang.startsWith('en'));
-      const keywords = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'];
-      availableVoices.sort((a, b) => {
-        const aScore = keywords.some(k => a.name.toLowerCase().includes(k)) ? 1 : 0;
-        const bScore = keywords.some(k => b.name.toLowerCase().includes(k)) ? 1 : 0;
-        return bScore - aScore;
-      });
+      availableVoices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
       populateVoiceDropdown();
     }
 
@@ -783,8 +683,7 @@
       availableVoices.forEach(voice => {
         const opt = document.createElement('option');
         opt.value = voice.name;
-        const isNatural = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'].some(k => voice.name.toLowerCase().includes(k));
-        opt.textContent = `${voice.name} ${isNatural ? '✨' : ''}`;
+        opt.textContent = voice.name;
         if (currentVoice && currentVoice.name === voice.name) opt.selected = true;
         select.appendChild(opt);
       });
@@ -805,7 +704,7 @@
         return;
       }
 
-      const item = rawGalleryItems[itemIndex];
+      const item = rawGalleryItems.find(i => i.id === itemIndex);
       if (!item) return;
 
       const narration = (item.details || item.title || '').trim();
@@ -825,6 +724,7 @@
 
         currentSpeechUtterance.onend = () => { currentlySpeakingIndex = null; updateSpeechUI(); };
         currentSpeechUtterance.onerror = () => { currentlySpeakingIndex = null; updateSpeechUI(); };
+
         window.speechSynthesis.speak(currentSpeechUtterance);
         updateSpeechUI();
       }
@@ -862,7 +762,7 @@
       if (modalSpeakBtn && currentModalPhotoIdx !== -1 && filteredGalleryItems[currentModalPhotoIdx]) {
         const currentItem = filteredGalleryItems[currentModalPhotoIdx];
         if (currentlySpeakingIndex === currentItem.id && isSpeaking) {
-          modalSpeakBtn.innerHTML = `<span class="flex items-center gap-1.5"><span class="inline-flex items-center gap-0.5 text-blue-200"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span><span>Stop</span></span>`;
+          modalSpeakBtn.innerHTML = `<span>Stop</span>`;
           modalSpeakBtn.classList.remove('bg-blue-600');
           modalSpeakBtn.classList.add('bg-rose-600');
         } else {
@@ -878,139 +778,76 @@
       speechSynthesis.onvoiceschanged = loadVoices;
     }
 
-    // Dual-Mode CSV Loader for Photo Archive
+    // Precise spreadsheet parser
     async function loadGalleryData() {
       const loadingEl = document.getElementById('galleryLoading');
       const gridEl = document.getElementById('galleryGrid');
 
       try {
         let text = '';
-
-        // 1. Try local data file if running offline
-        if (IS_LOCAL_ENV) {
-          try {
-            const localRes = await fetch(LOCAL_GALLERY_CSV_URL);
-            if (localRes.ok) text = await localRes.text();
-          } catch (e) {}
-        }
-
-        // 2. Try localStorage cache if not yet retrieved
-        if (!text) {
-          try {
-            const cached = localStorage.getItem('bMMC_cached_gallery_raw');
-            const cacheTime = localStorage.getItem('bMMC_cached_gallery_time');
-            if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
-              text = cached;
-            }
-          } catch (e) {}
-        }
-
-        // 3. Try Remote Google Sheet URL
-        if (!text) {
-          try {
-            const res = await fetch(REMOTE_GALLERY_CSV_URL);
-            if (res.ok) {
-              text = await res.text();
-              try {
-                localStorage.setItem('bMMC_cached_gallery_raw', text);
-                localStorage.setItem('bMMC_cached_gallery_time', Date.now());
-              } catch (e) {}
-            }
-          } catch (e) {}
-        }
-
-        // 4. Final Fallback to Local CSV
-        if (!text) {
-          try {
-            const fallbackRes = await fetch(LOCAL_GALLERY_CSV_URL);
-            if (fallbackRes.ok) text = await fallbackRes.text();
-          } catch (e) {}
-        }
+        try {
+          const res = await fetch(GALLERY_CSV_URL);
+          if (res.ok) text = await res.text();
+        } catch (e) {}
 
         if (!text) {
-          console.warn("Could not retrieve gallery CSV data.");
-          return;
+          text = localStorage.getItem('bMMC_cached_gallery_raw') || '';
+        } else {
+          try { localStorage.setItem('bMMC_cached_gallery_raw', text); } catch(e) {}
         }
 
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
 
         if (parsed.data && parsed.data.length > 1) {
-          let detailsColIdx = 9;
-          let ageColIdx = 8;
-          let linkColIdx = 5;
-
-          if (parsed.data[0]) {
-            parsed.data[0].forEach((colName, idx) => {
-              const lower = String(colName).toLowerCase().trim();
-              if (lower === 'age' || lower.startsWith('age') || lower === 'date' || lower.startsWith('date')) ageColIdx = idx;
-              if (lower === 'details' || lower.startsWith('details')) detailsColIdx = idx;
-              if (lower.includes('img') || lower.includes('image') || lower.includes('link') || lower.includes('url')) linkColIdx = idx;
-            });
-          }
-
+          
           // Section Header Row 2: Dun and Bonniefields
           if (parsed.data[1]) {
-            const rawJ2 = parsed.data[1][detailsColIdx] || parsed.data[1][7] || parsed.data[1][6] || '';
-            const linkF2 = parsed.data[1][linkColIdx] || parsed.data[1][5] || '';
-            const { title, details } = parseTitleAndDetails(rawJ2, 'Dun & Bonniefields Heritage');
-            hallDetailsMap['bonniefields-1920s'] = { title: title || 'Dun & Bonniefields Heritage', details: details || rawJ2, link: linkF2 };
+            const rawText = parsed.data[1][7] || parsed.data[1][6] || '';
+            const link = parsed.data[1][5] || '';
+            const { title, details } = parseTitleAndDetails(rawText, 'Dun & Bonniefields Heritage');
+            hallDetailsMap['bonniefields-1920s'] = { title: title || 'Dun & Bonniefields Heritage', details: details || rawText, link: link };
           }
 
           // Section Header Row 3: Maitland East Chatton
           if (parsed.data[2]) {
-            const rawJ3 = parsed.data[2][detailsColIdx] || parsed.data[2][7] || parsed.data[2][6] || '';
-            const linkF3 = parsed.data[2][linkColIdx] || parsed.data[2][5] || '';
-            const { title, details } = parseTitleAndDetails(rawJ3, 'Maitland East Chatton and Village');
-            hallDetailsMap['maitland-school'] = { title: title || 'Maitland East Chatton and Village', details: details || rawJ3, link: linkF3 };
+            const rawText = parsed.data[2][7] || parsed.data[2][6] || '';
+            const link = parsed.data[2][5] || '';
+            const { title, details } = parseTitleAndDetails(rawText, 'Maitland East Chatton and Village');
+            hallDetailsMap['maitland-school'] = { title: title || 'Maitland East Chatton and Village', details: details || rawText, link: link };
           }
 
           // Section Header Row 4: WWII - Alan
           if (parsed.data[3]) {
-            const rawJ4 = parsed.data[3][detailsColIdx] || parsed.data[3][7] || parsed.data[3][6] || '';
-            const linkF4 = parsed.data[3][linkColIdx] || parsed.data[3][5] || '';
-            const { title, details } = parseTitleAndDetails(rawJ4, 'World War 2 as experienced by Alan Starling');
-            hallDetailsMap['ww2-alan'] = { title: title || 'World War 2 as experienced by Alan Starling', details: details || rawJ4, link: linkF4 };
+            const rawText = parsed.data[3][7] || parsed.data[3][6] || '';
+            const link = parsed.data[3][5] || '';
+            const { title, details } = parseTitleAndDetails(rawText, 'World War 2 as experienced by Alan Starling');
+            hallDetailsMap['ww2-alan'] = { title: title || 'World War 2 as experienced by Alan Starling', details: details || rawText, link: link };
           }
 
-          // Photos extraction from Row 5 onwards (or parsed data rows)
-          const startIdx = parsed.data.length > 4 && parsed.data[4][0] ? 4 : 1;
-
-          rawGalleryItems = parsed.data.slice(startIdx).map((row, idx) => {
+          // Photos start strictly at Row 5 (index 4)
+          rawGalleryItems = parsed.data.slice(4).map((row, idx) => {
             const fileId = String(row[0] || '').trim();
-            const rawImg = row[linkColIdx] ? String(row[linkColIdx]).trim() : (row[5] ? String(row[5]).trim() : '');
-            const rawDetails = row[detailsColIdx] ? String(row[detailsColIdx]).trim() : (row[6] || row[9] || '');
-            const rawDate = row[ageColIdx] ? String(row[ageColIdx]).trim() : (row[8] || '');
-            const rawTitle = row[1] ? String(row[1]).trim() : '';
+            let title = String(row[1] || '').trim() || 'Archival Photo';
+            const category = String(row[2] || '').trim();
+            let imgLink = String(row[5] || '').trim();
+            const details = String(row[6] || '').trim();
+            const date = String(row[8] || '').trim();
 
-            let parsedInfo = parseGalleryDetails(rawDetails);
-            let displayTitle = rawTitle || parsedInfo.title;
-            let displayCategory = row[2] ? String(row[2]).trim() : parsedInfo.category;
-
-            let finalImgLink = rawImg;
-            if (!finalImgLink && fileId && /^[a-zA-Z0-9_-]{15,}$/.test(fileId)) {
-              finalImgLink = `https://lh3.googleusercontent.com/d/${fileId}=s600`;
+            if (!imgLink && fileId) {
+              imgLink = `https://lh3.googleusercontent.com/d/${fileId}=s600`;
             }
 
             return {
               id: idx,
               fileId,
-              rawImg: finalImgLink,
-              thumbUrl: formatGoogleLh3Url(finalImgLink, 's400') || NO_IMAGE_SVG,
-              fullUrl: formatGoogleLh3Url(finalImgLink, 's1200') || finalImgLink || NO_IMAGE_SVG,
-              title: displayTitle || 'Archival Photo',
-              category: displayCategory,
-              date: rawDate,
-              details: parsedInfo.details || rawDetails
+              thumbUrl: formatGoogleLh3Url(imgLink, 's400') || NO_IMAGE_SVG,
+              fullUrl: formatGoogleLh3Url(imgLink, 's1200') || imgLink || NO_IMAGE_SVG,
+              title,
+              category,
+              date,
+              details
             };
-          }).filter(item => item.fileId || (item.rawImg && (item.rawImg.includes('http') || item.rawImg.includes('drive.google') || item.rawImg.includes('media/'))));
-
-          // Set collection hub preview images
-          const fWW2 = rawGalleryItems.find(i => matchesHall(i, 'ww2-alan'));
-          const fBNF = rawGalleryItems.find(i => matchesHall(i, 'bonniefields-1920s'));
-          const fMTL = rawGalleryItems.find(i => matchesHall(i, 'maitland-school'));
-          if (fWW2) document.getElementById('hubImgWW2').src = fWW2.thumbUrl;
-          if (fBNF) document.getElementById('hubImgBNF').src = fBNF.thumbUrl;
-          if (fMTL) document.getElementById('hubImgMTL').src = fMTL.thumbUrl;
+          }).filter(item => item.fileId || (item.thumbUrl && item.thumbUrl.includes('http')));
 
           populateFilterDropdowns(rawGalleryItems);
           updateHubCounts();
@@ -1020,7 +857,7 @@
           checkUrlHashForPhoto();
         }
       } catch (err) {
-        console.error('Failed to load gallery data:', err);
+        console.error('Failed to load gallery sheet:', err);
       } finally {
         if (loadingEl) loadingEl.classList.add('hidden');
         if (gridEl) gridEl.classList.remove('hidden');
@@ -1251,9 +1088,9 @@
             <span class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               View Details ↗
             </span>
-            <span class="text-xs font-bold text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">
-              Enlarge ⤢
-            </span>
+            <a href="${item.fullUrl}" target="_blank" onclick="event.stopPropagation()" title="Open full image in new tab" class="text-xs font-bold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+              Full Scale
+            </a>
           </div>
         `;
 
@@ -1294,7 +1131,6 @@
     function openPhotoModal(filteredIndex) {
       if (filteredIndex < 0 || filteredIndex >= filteredGalleryItems.length) return;
       currentModalPhotoIdx = filteredIndex;
-      isModalZoomed = false;
       const item = filteredGalleryItems[filteredIndex];
 
       safeReplaceState(`${window.location.pathname}${window.location.search}#photo-${item.id}`);
@@ -1311,16 +1147,8 @@
       const nextBtn = document.getElementById('btnModalNext');
       const googleBtn = document.getElementById('btnModalGoogleSearch');
       const catalogSearchBtn = document.getElementById('btnModalCatalogSearch');
-      const zoomBadge = document.getElementById('modalZoomBadge');
-      const zoomLabel = document.getElementById('btnZoomLabel');
 
-      if (img) {
-        img.src = item.fullUrl;
-        img.className = "max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl group-hover/modalimg:scale-105 transition-all duration-300";
-      }
-      if (zoomBadge) zoomBadge.textContent = "Click to Zoom 🔍";
-      if (zoomLabel) zoomLabel.textContent = "🔍 Zoom In";
-
+      if (img) img.src = item.fullUrl;
       if (title) title.textContent = item.title;
       if (cat) {
         cat.textContent = item.category || 'General';
@@ -1362,22 +1190,10 @@
       }
     }
 
-    function toggleModalPhotoZoom() {
-      const img = document.getElementById('modalPhotoImage');
-      const zoomBadge = document.getElementById('modalZoomBadge');
-      const zoomLabel = document.getElementById('btnZoomLabel');
-      if (!img) return;
-
-      isModalZoomed = !isModalZoomed;
-      if (isModalZoomed) {
-        img.className = "max-w-full max-h-[82vh] object-contain rounded-lg drop-shadow-2xl scale-110 transition-all duration-300";
-        if (zoomBadge) zoomBadge.textContent = "Click to Reset 🔍";
-        if (zoomLabel) zoomLabel.textContent = "🔍 Zoom Out";
-      } else {
-        img.className = "max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl transition-all duration-300";
-        if (zoomBadge) zoomBadge.textContent = "Click to Zoom 🔍";
-        if (zoomLabel) zoomLabel.textContent = "🔍 Zoom In";
-      }
+    function openModalImageFull() {
+      if (currentModalPhotoIdx === -1 || !filteredGalleryItems[currentModalPhotoIdx]) return;
+      const item = filteredGalleryItems[currentModalPhotoIdx];
+      if (item.fullUrl) window.open(item.fullUrl, '_blank');
     }
 
     function shareCurrentPhoto() {
@@ -1457,13 +1273,13 @@
       body.textContent = info.details || '';
 
       actions.innerHTML = '';
-      if (info.link) {
-        const fullUrl = formatDocUrl(info.link);
+      if (info.link && (info.link.startsWith('http://') || info.link.startsWith('https://') || info.link.length > 4)) {
+        const fullUrl = info.link.startsWith('http') ? info.link : `https://${info.link}`;
         const linkBtn = document.createElement('a');
         linkBtn.href = fullUrl;
         linkBtn.target = '_blank';
         linkBtn.className = 'px-4 py-2 rounded-xl text-xs font-black text-white bg-slate-800 hover:bg-black transition shadow flex items-center gap-1.5';
-        linkBtn.innerHTML = `<span>📄 View Archival Document ↗</span>`;
+        linkBtn.innerHTML = `<span>🔗 Explore Resource / Link ↗</span>`;
         actions.appendChild(linkBtn);
       }
     }
@@ -1511,7 +1327,6 @@
     }
   </script>
 
-  <!-- Audio Player Controller -->
   <script>
     const audio = document.getElementById('alanAudioEl');
     const playBtn = document.getElementById('btnPlayPause');
@@ -1608,7 +1423,7 @@
       if (savedTheme === 'dark') document.documentElement.classList.add('dark');
       else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
 
-      document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
+      document.getElementById('btnThemeToggle').addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('bMMC_theme', isDark ? 'dark' : 'light');
         document.getElementById('themeToggleIcon').textContent = isDark ? '☀️' : '🌙';

@@ -1,18 +1,6 @@
-// app.js — BMMC Showcase Application Logic (Unified Dual-Mode: Online & Offline)
-
-// 1. Environment & Data Source Configuration
-const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
-                     window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1';
-
-const REMOTE_EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
-const REMOTE_GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=606568772';
-const REMOTE_GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
-
-const LOCAL_EXHIBITS_CSV_URL = './data/exhibits.csv';
-const LOCAL_GRAMOPHONE_CSV_URL = './data/gramophone.csv';
-const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
-
+const EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
+const GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=606568772';
+const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
 const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
@@ -62,36 +50,10 @@ const TIMELINE_ERAS = [
   { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
 ];
 
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-let currentTab = 'exhibits';
-let rawExhibitsRows = [];
-let rawGramophoneRows = [];
-let catalog3DMap = new Map();
-let hotItemSet = new Set();
-let currentFilteredRows = [];
-let currentModalIndex = -1;
-let currentlySpeakingIndex = null;
-let only3DActive = false;
-let hotOnlyActive = false;
-let showingFavoritesOnly = false;
-let isGridActive = false;
-let is3DSkyboxLight = false;
-let isPoppyMotionActive = false;
-let currentSpeechUtterance = null;
-let availableVoices = [];
-
-let colIdx = { id: 0, ref: 1, title: 2, notes: 4, itemNoM: 12, age: 13, type: 14, category: 15, subcategory: 16, d3d: 17, doc: 18, web: 19, img1: 20, img2: 21, qty: 22, made: 23, year: 24, hot: 25 };
-let chartStackedInstance = null;
-let chartLocationsInstance = null;
-let chartSubcatCategoryInstance = null;
-let fuseExhibits = null;
-let fuseGramophone = null;
-
-const CHART_PALETTE = ['#C85A32', '#3B7A57', '#B57C1E', '#3182CE', '#708259', '#20807E', '#4A5568', '#D99B43', '#7c3aed', '#db2777'];
-
-// 2. Helper Functions & Dual-Mode Media Resolvers
 function safeReplaceState(urlStr) {
-  try { window.history.replaceState(null, '', urlStr); } catch (e) {}
+  try {
+    window.history.replaceState(null, '', urlStr);
+  } catch (e) {}
 }
 
 function getEraByYear(yearNum) {
@@ -99,6 +61,7 @@ function getEraByYear(yearNum) {
   return TIMELINE_ERAS.find(e => yearNum >= e.min && yearNum <= e.max) || null;
 }
 
+// Strictly extracts year from Column Y ("Year")
 function getEraByRow(row) {
   if (!row) return null;
   const yearStr = getVal(row, colIdx.year);
@@ -147,6 +110,33 @@ function getSolidTint(hex, isDark) {
     return `rgb(${Math.round(255 * 0.96 + r * 0.04)}, ${Math.round(255 * 0.96 + g * 0.04)}, ${Math.round(255 * 0.96 + b * 0.04)})`;
   }
 }
+
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+let currentTab = 'exhibits';
+let rawExhibitsRows = [];
+let rawGramophoneRows = [];
+let catalog3DMap = new Map();
+let hotItemSet = new Set();
+let currentFilteredRows = [];
+let currentModalIndex = -1;
+let currentlySpeakingIndex = null;
+let only3DActive = false;
+let hotOnlyActive = false;
+let showingFavoritesOnly = false;
+let isGridActive = false;
+let is3DSkyboxLight = false;
+let isPoppyMotionActive = false;
+let currentSpeechUtterance = null;
+let availableVoices = [];
+
+let colIdx = { id: 0, ref: 1, title: 2, notes: 4, itemNoM: 12, age: 13, type: 14, category: 15, subcategory: 16, d3d: 17, doc: 18, web: 19, img1: 20, img2: 21, qty: 22, made: 23, year: 24, hot: 25 };
+let chartStackedInstance = null;
+let chartLocationsInstance = null;
+let chartSubcatCategoryInstance = null;
+let fuseExhibits = null;
+let fuseGramophone = null;
+
+const CHART_PALETTE = ['#C85A32', '#3B7A57', '#B57C1E', '#3182CE', '#708259', '#20807E', '#4A5568', '#D99B43', '#7c3aed', '#db2777'];
 
 function escapeHTML(str) {
   if (str == null) return '';
@@ -227,57 +217,34 @@ function toggleCollapsibleControls(show) {
   }
 }
 
-// Dual-Mode CSV Fetcher with TTL Cache and Local / Remote Fallbacks
-async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
-  // 1. If explicitly running offline/locally, try local file first
-  if (IS_LOCAL_ENV) {
-    try {
-      const localRes = await fetch(localUrl);
-      if (localRes.ok) {
-        const text = await localRes.text();
-        const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-        if (parsed.data && parsed.data.length > 1) return parsed.data;
-      }
-    } catch (e) {}
-  }
-
-  // 2. Check localStorage cache
+async function fetchCSVWithCache(url, cacheKey) {
   try {
     const cached = localStorage.getItem(cacheKey);
     const cacheTime = localStorage.getItem(`${cacheKey}_time`);
     if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
       const parsedData = JSON.parse(cached);
-      if (Array.isArray(parsedData) && parsedData.length > 1) return parsedData;
-    }
-  } catch (e) {}
-
-  // 3. Try Remote Google Sheet
-  try {
-    const res = await fetch(remoteUrl);
-    if (res.ok) {
-      const text = await res.text();
-      const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1) {
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
-          localStorage.setItem(`${cacheKey}_time`, Date.now());
-        } catch (e) {}
-        return parsed.data;
+      if (Array.isArray(parsedData) && parsedData.length > 1) {
+        return parsedData;
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn('localStorage read error:', e);
+  }
 
-  // 4. Fallback to Local CSV
-  try {
-    const fallbackRes = await fetch(localUrl);
-    if (fallbackRes.ok) {
-      const text = await fallbackRes.text();
-      const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1) return parsed.data;
+  const res = await fetch(url);
+  const text = await res.text();
+  const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
+
+  if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 1) {
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+      localStorage.setItem(`${cacheKey}_time`, Date.now());
+    } catch (e) {
+      console.warn('localStorage write error:', e);
     }
-  } catch (e) {}
+  }
 
-  return [];
+  return parsed.data;
 }
 
 function parseDiscogsVal(raw) {
@@ -489,14 +456,7 @@ function formatGoogleLh3Url(url, size = 's200') {
   if (!url) return '';
   url = String(url).trim();
   if (!url) return '';
-
-  // Check offline adapter resolution
-  if (window.resolveOfflineMedia) {
-    const local = window.resolveOfflineMedia(url);
-    if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
-  }
-
-  if (url.startsWith('data:image/') || url.startsWith('./media/') || url.startsWith('media/')) return url;
+  if (url.startsWith('data:image/')) return url;
 
   if (url.includes('dropbox.com')) {
     let cleanUrl = url.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
@@ -525,12 +485,13 @@ function extractDirect3DUrl(rawUrl) {
   let str = unescapeHTML(rawUrl).trim();
   if (!str) return '';
 
-  // 1. Strict Offline Check: must be in media/models/ or end with .glb/.gltf
+  // 1. If resolved locally (offline mode), ensure it is strictly a 3D model
   if (window.resolveOfflineMedia) {
     const local = window.resolveOfflineMedia(str);
     if (local && (local.startsWith('./media/models/') || local.startsWith('media/models/') || /\.glb|\.gltf/i.test(local))) {
       return local;
     }
+    // If it resolved to an image or document, it is NOT a 3D model
     if (local && (local.includes('/images/') || local.includes('/docs/') || local.includes('/audio/'))) {
       return '';
     }
@@ -549,7 +510,7 @@ function extractDirect3DUrl(rawUrl) {
   if (str.startsWith('./media/models/') || str.startsWith('media/models/')) return str;
   if (!str.startsWith('http://') && !str.startsWith('https://')) return '';
 
-  // 3. Strict 3D extension verification
+  // 3. Strict 3D extension check
   const lower = str.toLowerCase();
   const isGLB = lower.includes('.glb') || lower.includes('.gltf');
   const isDropbox3D = (lower.includes('dropbox.com') || lower.includes('dropboxusercontent.com')) && (lower.includes('.glb') || lower.includes('.gltf'));
@@ -565,9 +526,11 @@ function extractDirect3DUrl(rawUrl) {
 
 function get3DUrlForItem(row) {
   if (!row) return '';
+  // Check designated 3D column first
   const colRVal = extractDirect3DUrl(getVal(row, colIdx.d3d));
   if (colRVal) return colRVal;
 
+  // Only check img2 if it explicitly contains a 3D model file
   const colVRaw = getVal(row, colIdx.img2);
   if (/\.glb|\.gltf|#model=/i.test(colVRaw)) {
     const colVVal = extractDirect3DUrl(colVRaw);
@@ -598,7 +561,7 @@ function getImagesForItem(row) {
   if (!img1 && row) {
     for (let i = 2; i < row.length; i++) {
       const val = getVal(row, i);
-      if (val && (val.startsWith('http') || val.startsWith('media/') || val.startsWith('./media/')) && (val.includes('drive.google') || val.includes('lh3.google') || val.includes('dropbox') || /\.(jpg|jpeg|png|webp|gif)/i.test(val))) {
+      if (val && val.startsWith('http') && (val.includes('drive.google') || val.includes('lh3.google') || val.includes('dropbox') || /\.(jpg|jpeg|png|webp|gif)/i.test(val))) {
         if (!img1) img1 = val;
         else if (!img2 && val !== img1) { img2 = val; break; }
       }
@@ -612,16 +575,6 @@ function parseTitleAndDetails(rawText) {
   const lines = String(rawText).split('\n').map(l => l.trim()).filter(Boolean);
   if (lines.length === 0) return { title: '', details: '' };
   return { title: lines[0].replace(/^#\s*/, ''), details: lines.slice(1).map(line => line.replace(/^#\s*/, '')).join('\n') };
-}
-
-function formatDocLink(url) {
-  if (!url) return '';
-  if (window.formatDocUrl) return window.formatDocUrl(url);
-  if (window.resolveOfflineMedia) {
-    const local = window.resolveOfflineMedia(url);
-    if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
-  }
-  return url.startsWith('http') ? url : `https://${url}`;
 }
 
 function googleItemSearch(title, category, details) {
@@ -644,8 +597,11 @@ function togglePoppyMotion() {
   const btn = document.getElementById('btnTogglePoppyMotion');
 
   if (skyBg) {
-    if (isPoppyMotionActive) skyBg.classList.add('poppies-animated');
-    else skyBg.classList.remove('poppies-animated');
+    if (isPoppyMotionActive) {
+      skyBg.classList.add('poppies-animated');
+    } else {
+      skyBg.classList.remove('poppies-animated');
+    }
   }
 
   if (btn) {
@@ -690,6 +646,7 @@ function browseAllExhibits() {
   const btn3D = document.getElementById('btn3DOnly'); if (btn3D) btn3D.classList.remove('ring-2', 'ring-purple-300', 'from-purple-700', 'to-indigo-700');
   const btnHot = document.getElementById('btnHotOnly'); if (btnHot) btnHot.classList.remove('ring-2', 'ring-amber-300', 'from-amber-600', 'to-rose-700');
   
+  // Clear search URL query parameters
   try {
     const url = new URL(window.location);
     url.searchParams.delete('search');
@@ -803,8 +760,11 @@ function checkUrlQueryParams() {
     const searchQuery = params.get('search') || params.get('q') || params.get('query');
     const tabParam = params.get('tab');
 
-    if (tabParam === 'gramophone') setTab('gramophone');
-    else if (tabParam === 'exhibits') setTab('exhibits');
+    if (tabParam === 'gramophone') {
+      setTab('gramophone');
+    } else if (tabParam === 'exhibits') {
+      setTab('exhibits');
+    }
 
     if (searchQuery) {
       const searchInput = document.getElementById('searchInput');
@@ -820,14 +780,16 @@ function checkUrlQueryParams() {
   }
 }
 
-// 3. Data Loading & Initialization
 async function loadCatalogData() {
   const loadingElem = document.getElementById('loading');
   if (loadingElem) loadingElem.classList.remove('hidden');
 
   initTheme();
   try {
-    const exhibitsData = await fetchDualModeCSV(REMOTE_EXHIBITS_CSV_URL, LOCAL_EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
+    const exhibitsPromise = fetchCSVWithCache(EXHIBITS_CSV_URL, 'bMMC_cached_exhibits');
+    const gramophonePromise = fetchCSVWithCache(GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
+
+    const exhibitsData = await exhibitsPromise;
     if (exhibitsData && exhibitsData.length > 0) {
       exhibitsData[0].forEach((cell, idx) => {
         const c = String(cell).toLowerCase().trim();
@@ -860,7 +822,7 @@ async function loadCatalogData() {
     updateFavoritesBadge();
     checkUrlHashForExhibit();
 
-    const gramophoneData = await fetchDualModeCSV(REMOTE_GRAMOPHONE_CSV_URL, LOCAL_GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone');
+    const gramophoneData = await gramophonePromise;
     if (gramophoneData && gramophoneData.length > 0) {
       rawGramophoneRows = gramophoneData.filter(r => {
         const c0 = getVal(r, 0).toLowerCase();
@@ -871,6 +833,8 @@ async function loadCatalogData() {
 
     initFuseSearch();
     renderCollectionHubs(rawExhibitsRows);
+
+    // Process URL query parameters (?search=... &tab=...)
     checkUrlQueryParams();
 
   } catch (err) {
@@ -879,9 +843,9 @@ async function loadCatalogData() {
       loadingElem.classList.remove('hidden');
       loadingElem.innerHTML = `
         <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900">
-          <p class="text-rose-600 dark:text-rose-400 font-bold text-base mb-1">Catalog Archive Offline or Missing</p>
-          <p class="text-xs text-slate-500 mb-4">Please check your network connection or verify local CSV files in ./data/.</p>
-          <button onclick="localStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Reload Archive</button>
+          <p class="text-rose-600 dark:text-rose-400 font-bold text-base mb-1">Error loading Google Sheet data</p>
+          <p class="text-xs text-slate-500 mb-4">Please check your connection or retry fetching the catalog archive.</p>
+          <button onclick="localStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Retry Fetching</button>
         </div>
       `;
     }
@@ -1150,7 +1114,6 @@ function renderActiveFilterPills() {
   }
 }
 
-// 4. Grid Filtering & Rendering
 function filterCatalog(forceShowGrid = false) {
   hideLoadingSpinner();
   const searchVal = (document.getElementById('searchInput')?.value || '').trim();
@@ -1455,7 +1418,7 @@ function renderExhibitsGrid() {
           </span>
           <div class="flex gap-1.5" onclick="event.stopPropagation()">
             ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm">👓 3D View</button>` : ''}
-            ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
+            ${ddoc ? `<a href="${ddoc}" target="_blank" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
             ${dweb ? `<a href="${dweb}" target="_blank" title="Website" class="bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 dark:border-blue-800 transition shadow-sm">Web</a>` : ''}
           </div>
         </div>
@@ -1557,7 +1520,6 @@ function closeEnlargeModal() {
   document.body.classList.remove('overflow-hidden');
 }
 
-// 5. Museum Statistics & Charts
 function renderMuseumStatistics() {
   if (typeof Chart === 'undefined' || !rawExhibitsRows || rawExhibitsRows.length === 0) return;
   const isDark = document.documentElement.classList.contains('dark');
@@ -1585,7 +1547,7 @@ function renderMuseumStatistics() {
     const webElem = document.getElementById('statWebLink');
 
     if (docElem) {
-      if (docUrl) { docElem.href = formatDocLink(docUrl); docElem.classList.remove('hidden'); }
+      if (docUrl && (docUrl.startsWith('http') || docUrl.length > 5)) { docElem.href = docUrl.startsWith('http') ? docUrl : `https://${docUrl}`; docElem.classList.remove('hidden'); }
       else { docElem.classList.add('hidden'); }
     }
     if (webElem) {
@@ -1816,10 +1778,10 @@ function renderMuseumStatistics() {
         data: { labels: periodsSorted, datasets: stackedDatasets },
         options: {
           indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: textColor, font: { family: 'Inter, system-ui', size: 11, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } },
+          plugins: { legend: { labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } },
           scales: {
-            x: { stacked: true, grace: '10%', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter, system-ui', size: 10 } } },
-            y: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter, system-ui', size: 10, weight: '600' } } }
+            x: { stacked: true, grace: '10%', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter', size: 10 } } },
+            y: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter', size: 10, weight: '600' } } }
           }
         }
       });
@@ -1834,8 +1796,8 @@ function renderMuseumStatistics() {
         options: {
           responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter, system-ui', size: 10, weight: '600' } } },
-            y: { grace: '12%', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter, system-ui', size: 10 } } }
+            x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter', size: 10, weight: '600' } } },
+            y: { grace: '12%', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter', size: 10 } } }
           }
         }
       });
@@ -1869,7 +1831,7 @@ function renderMuseumStatistics() {
         options: {
           indexAxis: 'y', responsive: true, maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: textColor, font: { family: 'Inter, system-ui', size: 11, weight: '600' } } },
+            legend: { labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } } },
             tooltip: {
               mode: 'index', intersect: false,
               callbacks: {
@@ -1882,8 +1844,8 @@ function renderMuseumStatistics() {
             }
           },
           scales: {
-            x: { stacked: true, grace: '10%', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter, system-ui', size: 10 } } },
-            y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, color: textColor, font: { family: 'Inter, system-ui', size: 10, weight: '600' } } }
+            x: { stacked: true, grace: '10%', grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Inter', size: 10 } } },
+            y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, color: textColor, font: { family: 'Inter', size: 10, weight: '600' } } }
           }
         }
       });
@@ -1995,7 +1957,6 @@ function openModalByFilteredIndex(filteredIndex) {
   openModal(row, originalIndex);
 }
 
-// 6. Detail Modal Manager
 function openModal(row, originalIndex) {
   stopAudioGuide();
   const modalContainer = document.getElementById('modalContainer');
@@ -2102,7 +2063,7 @@ function openModal(row, originalIndex) {
 
             <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
               ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition">👓 Fullscreen 3D View ↗</button>` : ''}
-              ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
+              ${ddoc ? `<a href="${ddoc}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
               ${dweb ? `<a href="${dweb}" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 transition">Web Link ↗</a>` : ''}
             </div>
           </div>
@@ -2170,8 +2131,11 @@ function openModal(row, originalIndex) {
         }
       };
 
-      if (modalViewer.loaded) updateModalDims();
-      else modalViewer.addEventListener('load', updateModalDims, { once: true });
+      if (modalViewer.loaded) {
+        updateModalDims();
+      } else {
+        modalViewer.addEventListener('load', updateModalDims, { once: true });
+      }
     }
 
   } else {
@@ -2278,7 +2242,6 @@ function closeModal() {
   safeReplaceState(`${window.location.pathname}${window.location.search}`);
 }
 
-// 7. Event Listeners & Bootstrapping
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('brandLogoLink')?.addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader')?.addEventListener('click', browseAllExhibits);
@@ -2347,7 +2310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Clear Search button
+  // Clear Search button with URL query cleanup
   const clearSearchBtn = document.getElementById('clearSearch');
   if (clearSearchBtn) {
     clearSearchBtn.addEventListener('click', () => {

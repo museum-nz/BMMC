@@ -5,17 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Photo Map with Dual Year Slider</title>
 
-  <!-- Preconnect for Image & Tile CDN Performance (Online) -->
-  <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
-  <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
-
-  <!-- Dual-Mode Leaflet & Cluster CSS (Local Vendor with CDN Fallback) -->
-  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" onerror="this.onerror=null; this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
-  <link rel="stylesheet" href="vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null; this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';" />
-  <link rel="stylesheet" href="vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null; this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';" />
+  <!-- Leaflet CSS & Plugins -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 
   <style>
-    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #aad3df; }
+    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: #aad3df; }
     #map { width: 100vw; height: 100vh; background: #aad3df; }
 
     .single-photo-wrapper {
@@ -142,21 +138,8 @@
         margin: 0 !important;
         z-index: 1500 !important;
       }
-      .leaflet-popup-content-wrapper {
-        max-width: 78vw !important;
-        border-radius: 12px;
-      }
+      .leaflet-popup-content-wrapper { max-width: 78vw !important; border-radius: 12px; }
       .leaflet-popup-tip-container { display: none !important; }
-      .leaflet-control-container .leaflet-control-attribution {
-        font-size: 9px !important;
-        padding: 2px 6px !important;
-        transform: scale(0.8);
-        transform-origin: bottom right;
-      }
-      .leaflet-control-zoom {
-        transform: scale(0.8);
-        transform-origin: top left;
-      }
     }
 
     .year-slider-header {
@@ -176,6 +159,7 @@
       display: flex;
       align-items: center;
     }
+
     .slider-track-bg {
       position: absolute;
       width: 100%;
@@ -185,6 +169,7 @@
       top: 50%;
       transform: translateY(-50%);
     }
+
     .slider-track-fill {
       position: absolute;
       height: 6px;
@@ -195,6 +180,7 @@
       left: 0%;
       width: 100%;
     }
+
     .dual-slider-track-wrapper input[type="range"] {
       position: absolute;
       width: 100%;
@@ -207,6 +193,7 @@
       appearance: none;
       margin: 0;
     }
+
     .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
       height: 18px;
       width: 18px;
@@ -220,6 +207,7 @@
       transition: transform 0.1s ease;
     }
     .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
     .dual-slider-track-wrapper input[type="range"]::-moz-range-thumb {
       height: 18px;
       width: 18px;
@@ -249,23 +237,13 @@
     </div>
   </div>
 
-  <!-- Dual-Mode JS Libraries (Local Vendor with CDN Fallback) -->
-  <script src="vendor/leaflet/leaflet.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; document.head.appendChild(s);"></script>
-  <script src="vendor/papaparse.min.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js'; document.head.appendChild(s);"></script>
-  <script src="vendor/leaflet/markercluster.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js'; document.head.appendChild(s);"></script>
-  <script src="vendor/leaflet/leaflet-heat.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://unpkg.com/leaflet.heat/dist/leaflet-heat.js'; document.head.appendChild(s);"></script>
-
-  <!-- Optional Offline Media Adapter -->
-  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <script>
-    const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
-                         window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1';
-
-    const REMOTE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
-    const LOCAL_CSV_URL = './data/exhibits.csv';
-    const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&gid=1146027655';
 
     const isMobile = window.innerWidth <= 768;
     const initialZoom = isMobile ? 2 : 3;
@@ -293,8 +271,9 @@
       spiderfyDistanceMultiplier: isMobile ? 2.8 : 2.2,
       maxClusterRadius: isMobile ? 38 : 55,
       iconCreateFunction: function(cluster) {
+        const totalCount = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
+          html: `<div class="cluster-number-badge">${totalCount}</div>`,
           className: 'custom-cluster-number-icon',
           iconSize: [48, 48],
           iconAnchor: [24, 24]
@@ -309,38 +288,25 @@
 
     function extractDriveId(url) {
       if (!url) return '';
-      const match = String(url).trim().match(/(?:id=|\/d\/|thumbnail\?id=|googleusercontent\.com\/d\/)([a-zA-Z0-9_-]{15,})/);
+      const match = String(url).match(/(?:id=|\/d\/|thumbnail\?id=|googleusercontent\.com\/d\/)([a-zA-Z0-9_-]+)/);
       return (match && match[1]) ? match[1] : '';
     }
 
     function formatImgUrl(url) {
       if (!url) return '';
-      const clean = String(url).trim();
-      
-      // Check offline adapter first
-      if (window.resolveOfflineMedia) {
-        const local = window.resolveOfflineMedia(clean);
-        if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
+      const fileId = extractDriveId(url);
+      if (fileId) {
+        return `https://lh3.googleusercontent.com/d/${fileId}=s400`;
       }
-
-      if (clean.startsWith('data:image/') || clean.startsWith('./media/') || clean.startsWith('media/')) return clean;
-
-      if (clean.includes('dropbox.com')) {
-        let dropboxUrl = clean.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
-        if (!dropboxUrl.includes('raw=1')) dropboxUrl += (dropboxUrl.includes('?') ? '&raw=1' : '?raw=1');
-        return dropboxUrl;
-      }
-
-      const fileId = extractDriveId(clean);
-      if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}=s400`;
-      return clean;
+      return String(url).trim();
     }
 
     function parseCoord(val) {
       if (!val) return NaN;
       const clean = String(val).replace(',', '.').replace(/[^0-9.-]/g, '');
       const num = parseFloat(clean);
-      return (isNaN(num) || num === 0) ? NaN : num;
+      if (isNaN(num) || num === 0) return NaN;
+      return num;
     }
 
     function renderDataset(records) {
@@ -352,7 +318,7 @@
       records.forEach(item => {
         heatPoints.push([item.lat, item.lng, 0.9]);
 
-        const customIconHTML = `<div class="single-photo-wrapper"><img src="${item.imgUrl}" ${item.fallbackAttr} loading="eager" alt="Photo" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%2364748b%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E'"/></div>`;
+        const customIconHTML = `<div class="single-photo-wrapper"><img src="${item.imgUrl}" ${item.fallbackAttr} loading="eager" alt="Photo"/></div>`;
 
         const photoIcon = L.divIcon({
           html: customIconHTML,
@@ -374,7 +340,7 @@
         `;
 
         const marker = L.marker([item.lat, item.lng], { icon: photoIcon });
-        marker.bindPopup(popupHTML, { autoPan: true, keepInView: true, autoClose: true });
+        marker.bindPopup(popupHTML, { autoPan: true, keepInView: true });
         markers.addLayer(marker);
       });
 
@@ -466,46 +432,15 @@
 
     async function loadMapData() {
       let csvText = '';
+      try {
+        const res = await fetch(CSV_URL);
+        if (res.ok) csvText = await res.text();
+      } catch (e) {}
 
-      // 1. Try local data file if running offline
-      if (IS_LOCAL_ENV) {
-        try {
-          const localRes = await fetch(LOCAL_CSV_URL);
-          if (localRes.ok) csvText = await localRes.text();
-        } catch (e) {}
-      }
-
-      // 2. Try localStorage cache if not yet retrieved
       if (!csvText) {
-        try {
-          const cached = localStorage.getItem('bMMC_cached_exhibits_raw');
-          const cacheTime = localStorage.getItem('bMMC_cached_exhibits_time');
-          if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
-            csvText = cached;
-          }
-        } catch (e) {}
-      }
-
-      // 3. Try Remote Google Sheet URL
-      if (!csvText) {
-        try {
-          const res = await fetch(REMOTE_CSV_URL);
-          if (res.ok) {
-            csvText = await res.text();
-            try {
-              localStorage.setItem('bMMC_cached_exhibits_raw', csvText);
-              localStorage.setItem('bMMC_cached_exhibits_time', Date.now());
-            } catch (e) {}
-          }
-        } catch (e) {}
-      }
-
-      // 4. Final fallback to local CSV
-      if (!csvText) {
-        try {
-          const fallbackRes = await fetch(LOCAL_CSV_URL);
-          if (fallbackRes.ok) csvText = await fallbackRes.text();
-        } catch (e) {}
+        csvText = localStorage.getItem('bMMC_cached_exhibits_raw') || '';
+      } else {
+        try { localStorage.setItem('bMMC_cached_exhibits_raw', csvText); } catch(e) {}
       }
 
       if (!csvText) {
@@ -527,15 +462,15 @@
       let latIdx = 26;     // Column AA (Lat)
       let lngIdx = 27;     // Column AB (Lng)
 
-      // Dynamic header detection fallback
+      // Header verification fallback
       if (parsed.data[0]) {
         parsed.data[0].forEach((col, idx) => {
           const c = String(col).toLowerCase().trim();
-          if (c === 'lat' || c.startsWith('lat') || c.includes('latitude')) latIdx = idx;
-          if (c === 'lng' || c.startsWith('lng') || c.startsWith('lon') || c.includes('longitude')) lngIdx = idx;
+          if (c === 'lat' || c.startsWith('lat')) latIdx = idx;
+          if (c === 'lng' || c.startsWith('lng') || c.startsWith('lon')) lngIdx = idx;
           if (c === 'img1' || c.includes('1st image') || c.includes('image 1')) imgIdx = idx;
-          if (c === 'title' || c.includes('title') || c === 'content') titleIdx = idx;
-          if (c === 'made' || c.includes('origin') || c.includes('location')) madeIdx = idx;
+          if (c.includes('title')) titleIdx = idx;
+          if (c === 'made' || c.includes('origin')) madeIdx = idx;
           if (c === 'year' || c.includes('date')) yearIdx = idx;
         });
       }
@@ -543,44 +478,29 @@
       allPhotoRecords = [];
 
       parsed.data.slice(1).forEach(row => {
-        let latStr = latIdx >= 0 ? row[latIdx] || '' : '';
-        let lngStr = lngIdx >= 0 ? row[lngIdx] || '' : '';
-        let imgRaw = imgIdx >= 0 ? row[imgIdx] || '' : '';
-        let titleRaw = titleIdx >= 0 ? row[titleIdx] || '' : '';
-        let madeRaw = madeIdx >= 0 ? row[madeIdx] || '' : '';
-        let yearRaw = yearIdx >= 0 ? row[yearIdx] || '' : '';
+        let latStr = row[latIdx] || '';
+        let lngStr = row[lngIdx] || '';
+        let imgRaw = row[imgIdx] || '';
+        let titleRaw = row[titleIdx] || '';
+        let madeRaw = row[madeIdx] || '';
+        let yearRaw = row[yearIdx] || '';
 
-        // Secondary fallback to locate image in row if empty
-        if (!imgRaw || (!imgRaw.includes('http') && !imgRaw.includes('media/'))) {
+        // Secondary fallback to locate image if empty
+        if (!imgRaw || !imgRaw.includes('http')) {
           for (let i = 0; i < row.length; i++) {
             const v = String(row[i] || '').trim();
-            if ((v.startsWith('http') || v.startsWith('media/') || v.startsWith('./media/')) && 
-                (v.includes('drive.google') || v.includes('lh3.google') || v.includes('dropbox') || /\.(jpg|png|jpeg|webp)/i.test(v))) {
+            if (v.startsWith('http') && (v.includes('drive.google') || v.includes('lh3.google') || v.includes('dropbox') || /\.(jpg|png|jpeg|webp)/i.test(v))) {
               imgRaw = v;
               break;
             }
           }
         }
 
-        let lat = parseCoord(latStr);
-        let lng = parseCoord(lngStr);
-
-        // Fallback: Scan row for coordinate pairs
-        if (isNaN(lat) || isNaN(lng)) {
-          row.forEach(cell => {
-            const parts = String(cell).split(/[,;]/);
-            if (parts.length === 2) {
-              const p1 = parseCoord(parts[0]);
-              const p2 = parseCoord(parts[1]);
-              if (!isNaN(p1) && !isNaN(p2) && Math.abs(p1) <= 90 && Math.abs(p2) <= 180) {
-                lat = p1; lng = p2;
-              }
-            }
-          });
-        }
+        const lat = parseCoord(latStr);
+        const lng = parseCoord(lngStr);
 
         if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
-        if (!imgRaw) return;
+        if (!imgRaw || !imgRaw.startsWith('http')) return;
 
         let cleanTitle = String(titleRaw).trim();
         if (cleanTitle.includes('\n')) cleanTitle = cleanTitle.split('\n')[0];
