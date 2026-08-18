@@ -5,50 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Photo Archives — Historical Photographic Galleries</title>
 
-  <!-- Preconnect for Image & Media CDN Performance (Online) -->
+  <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
   <link rel="preconnect" href="https://www.dropbox.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
 
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- Dual-Mode Tailwind CSS (Local Vendor with CDN Fallback) -->
-  <script src="vendor/tailwind.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://cdn.tailwindcss.com'; document.head.appendChild(s);"></script>
+  <!-- Tailwind CSS Engine -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    if (typeof tailwind !== 'undefined') {
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f0f7ff',
-                100: '#e0effe',
-                500: '#2563eb',
-                600: '#1d4ed8',
-                700: '#1e40af',
-              }
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
             }
           }
         }
-      };
-    }
+      }
+    };
   </script>
 
-  <!-- Dual-Mode Core JavaScript Libraries -->
-  <script src="vendor/papaparse.min.js" onerror="this.onerror=null; var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'; document.head.appendChild(s);"></script>
+  <!-- Core PapaParse Library -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-  <!-- Optional Offline Media Adapter -->
+  <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
-  <!-- Web Font with Instant System Fallback -->
+  <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+    body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .solid-header { background-color: rgba(255, 255, 255, 0.90); }
     .dark .solid-header { background-color: rgba(15, 23, 42, 0.90); }
 
@@ -202,7 +201,7 @@
         <div id="collectionHubsSection" class="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
             
-            <div id="tabBtnAll" onclick="switchHall('all')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-600">
+            <div id="tabBtnAll" onclick="switchHall('all')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-600 ring-2 ring-emerald-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #05966925;">
                 <span class="text-3xl drop-shadow group-hover:scale-110 transition-transform duration-300">🌐</span>
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
@@ -305,7 +304,7 @@
               <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">2001 Starling Alan WWII (June 01)</p>
             </div>
 
-            <!-- Dual-Mode Audio Player (Local File with Remote Stream Fallback) -->
+            <!-- Dual-Mode Audio Player -->
             <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3 my-1">
               <audio id="alanAudioEl" preload="metadata">
                 <source src="media/audio/folfcmnhvzhgd4xp56wzp.mp3" type="audio/mpeg">
@@ -422,7 +421,7 @@
 
   </main>
 
-  <!-- Photo Lightbox Modal with In-Page Zoom and Full Resolution Option -->
+  <!-- Photo Lightbox Modal -->
   <div id="photoModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalPhotoTitle">
     <div id="photoModalContainer" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-emerald-500/40 relative flex flex-col">
       
@@ -468,7 +467,7 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between gap-2 flex-wrap">
             <div class="flex items-center gap-2 flex-wrap">
-              <span id="modalPhotoCategory" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 uppercase tracking-wider"></span>
+              <span id="modalPhotoCategory" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm"></span>
               <span id="modalPhotoDate" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800"></span>
             </div>
             
@@ -519,6 +518,26 @@
       { key: 'Post War', short: 'Post War', full: 'Post & Cold War (1946–1999)', min: 1946, max: 1999 },
       { key: 'Modern', short: 'Modern', full: 'Millennium & Modern (2000–Present)', min: 2000, max: 9999 }
     ];
+
+    // Theme Color Palette for Gallery Badges & Cards
+    const GALLERY_THEMES = {
+      'ww2': { hex: '#d97706', bg: '#fef3c7', darkBg: '#78350f35', text: '#b45309', darkText: '#fde68a' },
+      'alan': { hex: '#d97706', bg: '#fef3c7', darkBg: '#78350f35', text: '#b45309', darkText: '#fde68a' },
+      'dun': { hex: '#059669', bg: '#d1fae5', darkBg: '#064e3b35', text: '#047857', darkText: '#a7f3d0' },
+      'bonniefields': { hex: '#059669', bg: '#d1fae5', darkBg: '#064e3b35', text: '#047857', darkText: '#a7f3d0' },
+      'maitland': { hex: '#2563eb', bg: '#dbeafe', darkBg: '#1e3a8a35', text: '#1d4ed8', darkText: '#bfdbfe' },
+      'school': { hex: '#2563eb', bg: '#dbeafe', darkBg: '#1e3a8a35', text: '#1d4ed8', darkText: '#bfdbfe' },
+      'default': { hex: '#7c3aed', bg: '#ede9fe', darkBg: '#4c1d9535', text: '#6d28d9', darkText: '#ddd6fe' }
+    };
+
+    function getGalleryTheme(category) {
+      if (!category) return GALLERY_THEMES.default;
+      const lower = String(category).toLowerCase();
+      if (lower.includes('alan') || lower.includes('wwii') || lower.includes('ww2') || lower.includes('war')) return GALLERY_THEMES.ww2;
+      if (lower.includes('dun') || lower.includes('bonniefields')) return GALLERY_THEMES.dun;
+      if (lower.includes('maitland') || lower.includes('chatton') || lower.includes('school')) return GALLERY_THEMES.maitland;
+      return GALLERY_THEMES.default;
+    }
 
     let rawGalleryItems = [];
     let filteredGalleryItems = [];
@@ -878,153 +897,148 @@
       speechSynthesis.onvoiceschanged = loadVoices;
     }
 
-    // Dual-Mode CSV Loader for Photo Archive
+    // Process Parsed CSV Data
+    function processParsedData(data) {
+      if (!data || data.length < 2) return false;
+
+      let detailsColIdx = 9;
+      let ageColIdx = 8;
+      let linkColIdx = 5;
+
+      if (data[0]) {
+        data[0].forEach((colName, idx) => {
+          const lower = String(colName).toLowerCase().trim();
+          if (lower === 'age' || lower.startsWith('age') || lower === 'date' || lower.startsWith('date')) ageColIdx = idx;
+          if (lower === 'details' || lower.startsWith('details')) detailsColIdx = idx;
+          if (lower.includes('img') || lower.includes('image') || lower.includes('link') || lower.includes('url')) linkColIdx = idx;
+        });
+      }
+
+      if (data[1]) {
+        const rawJ2 = data[1][detailsColIdx] || data[1][7] || data[1][6] || '';
+        const linkF2 = data[1][linkColIdx] || data[1][5] || '';
+        const { title, details } = parseTitleAndDetails(rawJ2, 'Dun & Bonniefields Heritage');
+        hallDetailsMap['bonniefields-1920s'] = { title: title || 'Dun & Bonniefields Heritage', details: details || rawJ2, link: linkF2 };
+      }
+
+      if (data[2]) {
+        const rawJ3 = data[2][detailsColIdx] || data[2][7] || data[2][6] || '';
+        const linkF3 = data[2][linkColIdx] || data[2][5] || '';
+        const { title, details } = parseTitleAndDetails(rawJ3, 'Maitland East Chatton and Village');
+        hallDetailsMap['maitland-school'] = { title: title || 'Maitland East Chatton and Village', details: details || rawJ3, link: linkF3 };
+      }
+
+      if (data[3]) {
+        const rawJ4 = data[3][detailsColIdx] || data[3][7] || data[3][6] || '';
+        const linkF4 = data[3][linkColIdx] || data[3][5] || '';
+        const { title, details } = parseTitleAndDetails(rawJ4, 'World War 2 as experienced by Alan Starling');
+        hallDetailsMap['ww2-alan'] = { title: title || 'World War 2 as experienced by Alan Starling', details: details || rawJ4, link: linkF4 };
+      }
+
+      const startIdx = data.length > 4 && data[4][0] ? 4 : 1;
+
+      rawGalleryItems = data.slice(startIdx).map((row, idx) => {
+        const fileId = String(row[0] || '').trim();
+        const rawImg = row[linkColIdx] ? String(row[linkColIdx]).trim() : (row[5] ? String(row[5]).trim() : '');
+        const rawDetails = row[detailsColIdx] ? String(row[detailsColIdx]).trim() : (row[6] || row[9] || '');
+        const rawDate = row[ageColIdx] ? String(row[ageColIdx]).trim() : (row[8] || '');
+        const rawTitle = row[1] ? String(row[1]).trim() : '';
+
+        let parsedInfo = parseGalleryDetails(rawDetails);
+        let displayTitle = rawTitle || parsedInfo.title;
+        let displayCategory = row[2] ? String(row[2]).trim() : parsedInfo.category;
+
+        let finalImgLink = rawImg;
+        if (!finalImgLink && fileId && /^[a-zA-Z0-9_-]{15,}$/.test(fileId)) {
+          finalImgLink = `https://lh3.googleusercontent.com/d/${fileId}=s600`;
+        }
+
+        return {
+          id: idx,
+          fileId,
+          rawImg: finalImgLink,
+          thumbUrl: formatGoogleLh3Url(finalImgLink, 's400') || NO_IMAGE_SVG,
+          fullUrl: formatGoogleLh3Url(finalImgLink, 's1200') || finalImgLink || NO_IMAGE_SVG,
+          title: displayTitle || 'Archival Photo',
+          category: displayCategory,
+          date: rawDate,
+          details: parsedInfo.details || rawDetails
+        };
+      }).filter(item => item.fileId || (item.rawImg && (item.rawImg.includes('http') || item.rawImg.includes('drive.google') || item.rawImg.includes('media/'))));
+
+      const fWW2 = rawGalleryItems.find(i => matchesHall(i, 'ww2-alan'));
+      const fBNF = rawGalleryItems.find(i => matchesHall(i, 'bonniefields-1920s'));
+      const fMTL = rawGalleryItems.find(i => matchesHall(i, 'maitland-school'));
+      if (fWW2) document.getElementById('hubImgWW2').src = fWW2.thumbUrl;
+      if (fBNF) document.getElementById('hubImgBNF').src = fBNF.thumbUrl;
+      if (fMTL) document.getElementById('hubImgMTL').src = fMTL.thumbUrl;
+
+      populateFilterDropdowns(rawGalleryItems);
+      updateHubCounts();
+      updateHallDetailsBanner(activeHall);
+      filterGalleryCards();
+      updateFavoritesBadge();
+      checkUrlHashForPhoto();
+
+      return rawGalleryItems.length > 0;
+    }
+
+    // High-Speed Stale-While-Revalidate Dual-Mode Loader
     async function loadGalleryData() {
       const loadingEl = document.getElementById('galleryLoading');
       const gridEl = document.getElementById('galleryGrid');
 
+      // 1. FAST PATH: Check & Render Cached Version Immediately
       try {
-        let text = '';
-
-        // 1. Try local data file if running offline
-        if (IS_LOCAL_ENV) {
-          try {
-            const localRes = await fetch(LOCAL_GALLERY_CSV_URL);
-            if (localRes.ok) text = await localRes.text();
-          } catch (e) {}
-        }
-
-        // 2. Try localStorage cache if not yet retrieved
-        if (!text) {
-          try {
-            const cached = localStorage.getItem('bMMC_cached_gallery_raw');
-            const cacheTime = localStorage.getItem('bMMC_cached_gallery_time');
-            if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
-              text = cached;
-            }
-          } catch (e) {}
-        }
-
-        // 3. Try Remote Google Sheet URL
-        if (!text) {
-          try {
-            const res = await fetch(REMOTE_GALLERY_CSV_URL);
-            if (res.ok) {
-              text = await res.text();
-              try {
-                localStorage.setItem('bMMC_cached_gallery_raw', text);
-                localStorage.setItem('bMMC_cached_gallery_time', Date.now());
-              } catch (e) {}
-            }
-          } catch (e) {}
-        }
-
-        // 4. Final Fallback to Local CSV
-        if (!text) {
-          try {
-            const fallbackRes = await fetch(LOCAL_GALLERY_CSV_URL);
-            if (fallbackRes.ok) text = await fallbackRes.text();
-          } catch (e) {}
-        }
-
-        if (!text) {
-          console.warn("Could not retrieve gallery CSV data.");
-          return;
-        }
-
-        const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-
-        if (parsed.data && parsed.data.length > 1) {
-          let detailsColIdx = 9;
-          let ageColIdx = 8;
-          let linkColIdx = 5;
-
-          if (parsed.data[0]) {
-            parsed.data[0].forEach((colName, idx) => {
-              const lower = String(colName).toLowerCase().trim();
-              if (lower === 'age' || lower.startsWith('age') || lower === 'date' || lower.startsWith('date')) ageColIdx = idx;
-              if (lower === 'details' || lower.startsWith('details')) detailsColIdx = idx;
-              if (lower.includes('img') || lower.includes('image') || lower.includes('link') || lower.includes('url')) linkColIdx = idx;
-            });
+        const cached = localStorage.getItem('bMMC_cached_gallery_raw');
+        const cacheTime = localStorage.getItem('bMMC_cached_gallery_time');
+        if (cached) {
+          const parsed = Papa.parse(cached, { header: false, skipEmptyLines: true });
+          if (processParsedData(parsed.data)) {
+            if (loadingEl) loadingEl.classList.add('hidden');
+            if (gridEl) gridEl.classList.remove('hidden');
+            // If cache is fresh, stop here
+            if (cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) return;
           }
-
-          // Section Header Row 2: Dun and Bonniefields
-          if (parsed.data[1]) {
-            const rawJ2 = parsed.data[1][detailsColIdx] || parsed.data[1][7] || parsed.data[1][6] || '';
-            const linkF2 = parsed.data[1][linkColIdx] || parsed.data[1][5] || '';
-            const { title, details } = parseTitleAndDetails(rawJ2, 'Dun & Bonniefields Heritage');
-            hallDetailsMap['bonniefields-1920s'] = { title: title || 'Dun & Bonniefields Heritage', details: details || rawJ2, link: linkF2 };
-          }
-
-          // Section Header Row 3: Maitland East Chatton
-          if (parsed.data[2]) {
-            const rawJ3 = parsed.data[2][detailsColIdx] || parsed.data[2][7] || parsed.data[2][6] || '';
-            const linkF3 = parsed.data[2][linkColIdx] || parsed.data[2][5] || '';
-            const { title, details } = parseTitleAndDetails(rawJ3, 'Maitland East Chatton and Village');
-            hallDetailsMap['maitland-school'] = { title: title || 'Maitland East Chatton and Village', details: details || rawJ3, link: linkF3 };
-          }
-
-          // Section Header Row 4: WWII - Alan
-          if (parsed.data[3]) {
-            const rawJ4 = parsed.data[3][detailsColIdx] || parsed.data[3][7] || parsed.data[3][6] || '';
-            const linkF4 = parsed.data[3][linkColIdx] || parsed.data[3][5] || '';
-            const { title, details } = parseTitleAndDetails(rawJ4, 'World War 2 as experienced by Alan Starling');
-            hallDetailsMap['ww2-alan'] = { title: title || 'World War 2 as experienced by Alan Starling', details: details || rawJ4, link: linkF4 };
-          }
-
-          // Photos extraction from Row 5 onwards (or parsed data rows)
-          const startIdx = parsed.data.length > 4 && parsed.data[4][0] ? 4 : 1;
-
-          rawGalleryItems = parsed.data.slice(startIdx).map((row, idx) => {
-            const fileId = String(row[0] || '').trim();
-            const rawImg = row[linkColIdx] ? String(row[linkColIdx]).trim() : (row[5] ? String(row[5]).trim() : '');
-            const rawDetails = row[detailsColIdx] ? String(row[detailsColIdx]).trim() : (row[6] || row[9] || '');
-            const rawDate = row[ageColIdx] ? String(row[ageColIdx]).trim() : (row[8] || '');
-            const rawTitle = row[1] ? String(row[1]).trim() : '';
-
-            let parsedInfo = parseGalleryDetails(rawDetails);
-            let displayTitle = rawTitle || parsedInfo.title;
-            let displayCategory = row[2] ? String(row[2]).trim() : parsedInfo.category;
-
-            let finalImgLink = rawImg;
-            if (!finalImgLink && fileId && /^[a-zA-Z0-9_-]{15,}$/.test(fileId)) {
-              finalImgLink = `https://lh3.googleusercontent.com/d/${fileId}=s600`;
-            }
-
-            return {
-              id: idx,
-              fileId,
-              rawImg: finalImgLink,
-              thumbUrl: formatGoogleLh3Url(finalImgLink, 's400') || NO_IMAGE_SVG,
-              fullUrl: formatGoogleLh3Url(finalImgLink, 's1200') || finalImgLink || NO_IMAGE_SVG,
-              title: displayTitle || 'Archival Photo',
-              category: displayCategory,
-              date: rawDate,
-              details: parsedInfo.details || rawDetails
-            };
-          }).filter(item => item.fileId || (item.rawImg && (item.rawImg.includes('http') || item.rawImg.includes('drive.google') || item.rawImg.includes('media/'))));
-
-          // Set collection hub preview images
-          const fWW2 = rawGalleryItems.find(i => matchesHall(i, 'ww2-alan'));
-          const fBNF = rawGalleryItems.find(i => matchesHall(i, 'bonniefields-1920s'));
-          const fMTL = rawGalleryItems.find(i => matchesHall(i, 'maitland-school'));
-          if (fWW2) document.getElementById('hubImgWW2').src = fWW2.thumbUrl;
-          if (fBNF) document.getElementById('hubImgBNF').src = fBNF.thumbUrl;
-          if (fMTL) document.getElementById('hubImgMTL').src = fMTL.thumbUrl;
-
-          populateFilterDropdowns(rawGalleryItems);
-          updateHubCounts();
-          updateHallDetailsBanner(activeHall);
-          filterGalleryCards();
-          updateFavoritesBadge();
-          checkUrlHashForPhoto();
         }
-      } catch (err) {
-        console.error('Failed to load gallery data:', err);
-      } finally {
-        if (loadingEl) loadingEl.classList.add('hidden');
-        if (gridEl) gridEl.classList.remove('hidden');
+      } catch (e) {}
+
+      // 2. NETWORK / LOCAL FETCH (Revalidate / Fetch Latest)
+      let text = '';
+      if (IS_LOCAL_ENV) {
+        try {
+          const localRes = await fetch(LOCAL_GALLERY_CSV_URL);
+          if (localRes.ok) text = await localRes.text();
+        } catch (e) {}
       }
+
+      if (!text) {
+        try {
+          const res = await fetch(REMOTE_GALLERY_CSV_URL);
+          if (res.ok) {
+            text = await res.text();
+            try {
+              localStorage.setItem('bMMC_cached_gallery_raw', text);
+              localStorage.setItem('bMMC_cached_gallery_time', Date.now());
+            } catch (e) {}
+          }
+        } catch (e) {}
+      }
+
+      if (!text) {
+        try {
+          const fallbackRes = await fetch(LOCAL_GALLERY_CSV_URL);
+          if (fallbackRes.ok) text = await fallbackRes.text();
+        } catch (e) {}
+      }
+
+      if (text) {
+        const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
+        processParsedData(parsed.data);
+      }
+
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (gridEl) gridEl.classList.remove('hidden');
     }
 
     function populateFilterDropdowns(items) {
@@ -1200,6 +1214,7 @@
       const noResults = document.getElementById('galleryNoResults');
       const countText = document.getElementById('galleryCountText');
       const favs = getFavorites();
+      const isDark = document.documentElement.classList.contains('dark');
 
       if (!grid) return;
       grid.innerHTML = '';
@@ -1216,17 +1231,21 @@
 
       filteredGalleryItems.forEach((item, index) => {
         const isFav = favs.includes(item.id);
+        const theme = getGalleryTheme(item.category);
         const card = document.createElement('div');
-        card.className = 'bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl hover:border-emerald-500/60 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group cursor-pointer relative';
+        card.className = 'rounded-3xl border-2 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group cursor-pointer relative';
+        
+        card.style.borderColor = `${theme.hex}80`;
+        card.style.backgroundColor = isDark ? '#0f172a' : '#ffffff';
 
         card.innerHTML = `
           <div>
-            <div class="h-52 bg-slate-900 relative overflow-hidden flex items-center justify-center p-2">
+            <div class="h-52 relative overflow-hidden flex items-center justify-center p-2" style="background-color: ${theme.hex}18;">
               <img src="${item.thumbUrl}" alt="${item.title}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'"/>
               
               <div class="absolute top-2.5 left-2.5 flex flex-col items-start gap-1 z-10 max-w-[65%]">
-                ${item.category ? `<span class="bg-slate-900/85 backdrop-blur-sm text-emerald-400 border border-emerald-500/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow truncate">${item.category}</span>` : ''}
-                ${item.date ? `<span class="bg-amber-500/95 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-amber-300/40 truncate">📅 ${item.date}</span>` : ''}
+                ${item.category ? `<span class="text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm border truncate" style="background-color: ${theme.hex}22; color: ${theme.hex}; border-color: ${theme.hex}60;">${item.category}</span>` : ''}
+                ${item.date ? `<span class="bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-amber-300/40 truncate">📅 ${item.date}</span>` : ''}
               </div>
 
               <div class="absolute top-2.5 right-2.5 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
@@ -1240,7 +1259,7 @@
             </div>
 
             <div class="p-4 space-y-1.5">
-              <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
+              <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 transition-colors line-clamp-2 leading-tight" style="color: ${isDark ? '#f8fafc' : '#0f172a'};">
                 ${item.title}
               </h4>
               ${item.details ? `<p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal">${item.details}</p>` : ''}
@@ -1248,7 +1267,7 @@
           </div>
 
           <div class="p-4 pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80">
-            <span class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            <span class="text-xs font-extrabold flex items-center gap-1 group-hover:translate-x-1 transition-transform" style="color: ${theme.hex};">
               View Details ↗
             </span>
             <span class="text-xs font-bold text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">
@@ -1296,10 +1315,12 @@
       currentModalPhotoIdx = filteredIndex;
       isModalZoomed = false;
       const item = filteredGalleryItems[filteredIndex];
+      const theme = getGalleryTheme(item.category);
 
       safeReplaceState(`${window.location.pathname}${window.location.search}#photo-${item.id}`);
 
       const modal = document.getElementById('photoModal');
+      const container = document.getElementById('photoModalContainer');
       const img = document.getElementById('modalPhotoImage');
       const title = document.getElementById('modalPhotoTitle');
       const cat = document.getElementById('modalPhotoCategory');
@@ -1314,6 +1335,10 @@
       const zoomBadge = document.getElementById('modalZoomBadge');
       const zoomLabel = document.getElementById('btnZoomLabel');
 
+      if (container) {
+        container.style.borderColor = theme.hex;
+      }
+
       if (img) {
         img.src = item.fullUrl;
         img.className = "max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl group-hover/modalimg:scale-105 transition-all duration-300";
@@ -1324,6 +1349,10 @@
       if (title) title.textContent = item.title;
       if (cat) {
         cat.textContent = item.category || 'General';
+        cat.style.backgroundColor = `${theme.hex}22`;
+        cat.style.color = theme.hex;
+        cat.style.borderColor = `${theme.hex}60`;
+        cat.style.borderWidth = '1px';
         cat.style.display = item.category ? 'inline-block' : 'none';
       }
       if (dateEl) {
@@ -1603,7 +1632,8 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Rock-Solid Initialization Handler
+    function initGalleryPage() {
       const savedTheme = localStorage.getItem('bMMC_theme');
       if (savedTheme === 'dark') document.documentElement.classList.add('dark');
       else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
@@ -1612,10 +1642,17 @@
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('bMMC_theme', isDark ? 'dark' : 'light');
         document.getElementById('themeToggleIcon').textContent = isDark ? '☀️' : '🌙';
+        filterGalleryCards();
       });
 
       loadGalleryData();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGalleryPage);
+    } else {
+      initGalleryPage();
+    }
   </script>
 </body>
 </html>
