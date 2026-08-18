@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Showcase — Museum & Gramophone Archive</title>
 
-  <!-- Preconnect for Image & Media CDN Performance -->
+  <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
 
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 
-  <!-- Umami Tracking Script -->
+  <!-- Umami Tracking (Fails silently offline) -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="dfdc416e-ad5f-4752-9c46-b426a92e30b3"></script>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS Engine (Online CDN by default) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -36,11 +38,14 @@
     };
   </script>
 
-  <!-- Concurrent Non-blocking Libraries CDN -->
-  <script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Core Libraries (Direct High-Speed CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <!-- Offline Media Adapter (Ignored if not present) -->
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +53,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .solid-header { background-color: rgba(255, 255, 255, 0.88); }
     .dark .solid-header { background-color: rgba(15, 23, 42, 0.88); }
     
@@ -71,9 +76,7 @@
       height: 100% !important;
     }
 
-    @keyframes spin3d {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin3d { to { transform: rotate(360deg); } }
     .spinner-3d {
       width: 44px;
       height: 44px;
@@ -85,59 +88,28 @@
 
     /* --- TIME TRAVEL SEASONAL BACKGROUND --- */
     @keyframes seasonSkyCycle {
-      /* Spring */
-      0%, 100% {
-        background: linear-gradient(180deg, #fbcfe8 0%, #fed7aa 45%, #ccfbf1 80%, #a7f3d0 100%);
-      }
-      /* Summer */
-      25% {
-        background: linear-gradient(180deg, #bae6fd 0%, #fef08a 50%, #93c5fd 85%, #60a5fa 100%);
-      }
-      /* Autumn */
-      50% {
-        background: linear-gradient(180deg, #fef08a 0%, #fed7aa 40%, #fca5a5 75%, #f472b6 100%);
-      }
-      /* Winter */
-      75% {
-        background: linear-gradient(180deg, #ddd6fe 0%, #c7d2fe 45%, #bae6fd 75%, #93c5fd 100%);
-      }
+      0%, 100% { background: linear-gradient(180deg, #fbcfe8 0%, #fed7aa 45%, #ccfbf1 80%, #a7f3d0 100%); }
+      25% { background: linear-gradient(180deg, #bae6fd 0%, #fef08a 50%, #93c5fd 85%, #60a5fa 100%); }
+      50% { background: linear-gradient(180deg, #fef08a 0%, #fed7aa 40%, #fca5a5 75%, #f472b6 100%); }
+      75% { background: linear-gradient(180deg, #ddd6fe 0%, #c7d2fe 45%, #bae6fd 75%, #93c5fd 100%); }
     }
 
-    /* Dark mode adjustment for seasonal sky colors */
-    .dark .time-sky-animated {
-      filter: brightness(0.45) contrast(1.15) saturate(0.9);
-    }
+    .dark .time-sky-animated { filter: brightness(0.45) contrast(1.15) saturate(0.9); }
+    .time-sky-animated { animation: seasonSkyCycle 60s linear infinite; }
 
-    .time-sky-animated {
-      animation: seasonSkyCycle 60s linear infinite;
-    }
-
-    /* Celestial Poppy Skyline Arc Motion */
     @keyframes poppyArcDrift {
-      0% {
-        transform: translate(0, 0) rotate(0deg);
-      }
-      25% {
-        transform: translate(-12.5%, -8vh) rotate(-2deg);
-      }
-      50% {
-        transform: translate(-25%, -14vh) rotate(0deg);
-      }
-      75% {
-        transform: translate(-37.5%, -8vh) rotate(2deg);
-      }
-      100% {
-        transform: translate(-50%, 0) rotate(0deg);
-      }
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-12.5%, -8vh) rotate(-2deg); }
+      50% { transform: translate(-25%, -14vh) rotate(0deg); }
+      75% { transform: translate(-37.5%, -8vh) rotate(2deg); }
+      100% { transform: translate(-50%, 0) rotate(0deg); }
     }
 
-    /* Gentle Poppy Flutter */
     @keyframes poppyFlutter {
       0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 3px rgba(220, 38, 38, 0.4)); transform: translateY(0px) rotate(-3deg); }
       50% { opacity: 1.0; filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.7)); transform: translateY(-4px) rotate(4deg); }
     }
 
-    /* OFF BY DEFAULT: Guaranteed hidden on load */
     .poppy-skyline-drift {
       width: 200vw;
       height: 100vh;
@@ -151,7 +123,6 @@
       animation-play-state: paused;
     }
 
-    /* Revealed & animating when Dynamic mode button is clicked */
     .poppies-animated .poppy-skyline-drift {
       display: flex !important;
       animation-play-state: running;
@@ -162,215 +133,139 @@
     }
   </style>
 
-  <!-- Application Logic -->
+  <!-- Main Application Logic -->
   <script defer src="app.js"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
   <!-- Moving Time & Seasons Sky Background with WW1 Silhouette -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
-    
-    <!-- 60-Second Seasonal Gradient Cycle -->
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
 
-    <!-- Skyline Arcing WW1 Poppies Container (Hidden on load) -->
     <div class="poppy-skyline-drift absolute top-0 left-0 z-10 pointer-events-none">
-      
-      <!-- Flutter Child Container -->
       <div class="poppy-flutter w-full h-full flex pointer-events-none">
-        
-        <!-- Tile 1 (80% Density WW1 Poppies across 100% Height) -->
+        <!-- Tile 1 -->
         <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
           <defs>
-            <!-- Remembrance Poppy Vector Symbol -->
             <g id="poppySymbol">
               <path fill="#dc2626" opacity="0.95" d="M 0,-16 C -10,-16 -16,-9 -16,0 C -16,5 -11,9 -7,11 C -11,16 -4,18 0,16 C 4,18 11,16 7,11 C 11,9 16,5 16,0 C 16,-9 10,-16 0,-16 Z"/>
               <path fill="#ef4444" opacity="0.85" d="M -2,-2 C -8,-2 -11,2 -10,8 C -6,11 6,11 10,8 C 11,2 8,-2 -2,-2 Z"/>
               <circle cx="0" cy="0" r="4.5" fill="#09090b"/>
               <circle cx="0" cy="0" r="2" fill="#27272a"/>
             </g>
-            <g id="poppySmall">
-              <use href="#poppySymbol" transform="scale(0.65)" />
-            </g>
-            <g id="poppyLarge">
-              <use href="#poppySymbol" transform="scale(1.25)" />
-            </g>
+            <g id="poppySmall"><use href="#poppySymbol" transform="scale(0.65)" /></g>
+            <g id="poppyLarge"><use href="#poppySymbol" transform="scale(1.25)" /></g>
           </defs>
-
-          <!-- Band 1 (y: 20 - 100) -->
           <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
           <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
           <use href="#poppyLarge" x="620" y="30" opacity="1" />
           <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
-
-          <!-- Band 2 (y: 110 - 190) -->
-          <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
-          <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
-          <use href="#poppySmall" x="720" y="120" opacity="0.75" />
-          <use href="#poppySymbol" x="940" y="180" opacity="0.9" opacity="0.85" />
-
-          <!-- Band 3 (y: 200 - 290) -->
-          <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
-          <use href="#poppySmall" x="310" y="220" opacity="0.8" />
-          <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
-          <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
-
-          <!-- Band 4 (y: 300 - 390) -->
-          <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
-          <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
-          <use href="#poppySmall" x="680" y="320" opacity="0.75" />
-          <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
-
-          <!-- Band 5 (y: 400 - 480 -> Completes 100% Screen Height Coverage) -->
-          <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
-          <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
-          <use href="#poppySmall" x="540" y="470" opacity="0.8" />
-          <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
-          <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
-        </svg>
-
-        <!-- Tile 2 (Seamless Duplicate for Infinite Poppy Arc Loop) -->
-        <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-          <!-- Band 1 (y: 20 - 100) -->
-          <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
-          <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
-          <use href="#poppyLarge" x="620" y="30" opacity="1" />
-          <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
-
-          <!-- Band 2 (y: 110 - 190) -->
           <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
           <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
           <use href="#poppySmall" x="720" y="120" opacity="0.75" />
           <use href="#poppySymbol" x="940" y="180" opacity="0.85" />
-
-          <!-- Band 3 (y: 200 - 290) -->
           <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
           <use href="#poppySmall" x="310" y="220" opacity="0.8" />
           <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
           <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
-
-          <!-- Band 4 (y: 300 - 390) -->
           <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
           <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
           <use href="#poppySmall" x="680" y="320" opacity="0.75" />
           <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
-
-          <!-- Band 5 (y: 400 - 480 -> Completes 100% Screen Height Coverage) -->
           <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
           <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
           <use href="#poppySmall" x="540" y="470" opacity="0.8" />
           <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
           <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
         </svg>
-
+        <!-- Tile 2 -->
+        <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+          <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
+          <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
+          <use href="#poppyLarge" x="620" y="30" opacity="1" />
+          <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
+          <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
+          <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
+          <use href="#poppySmall" x="720" y="120" opacity="0.75" />
+          <use href="#poppySymbol" x="940" y="180" opacity="0.85" />
+          <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
+          <use href="#poppySmall" x="310" y="220" opacity="0.8" />
+          <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
+          <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
+          <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
+          <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
+          <use href="#poppySmall" x="680" y="320" opacity="0.75" />
+          <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
+          <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
+          <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
+          <use href="#poppySmall" x="540" y="470" opacity="0.8" />
+          <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
+          <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
+        </svg>
       </div>
     </div>
 
-    <!-- WW1 Silhouette Remembrance Scene (Horizon Bottom) -->
+    <!-- Horizon Silhouette -->
     <div class="absolute bottom-0 left-0 right-0 w-full leading-none z-20 opacity-85 dark:opacity-95 pointer-events-none">
       <svg class="w-full h-36 sm:h-52 md:h-72 object-cover pointer-events-none" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        
-        <!-- Far Background Battlefield Ridge -->
-        <path d="M0,320 L0,220 L180,210 L340,230 L490,200 L680,225 L840,205 L1020,230 L1200,210 L1200,320 Z" 
-              fill="currentColor" class="text-slate-700/30 dark:text-slate-950/60" />
-
-        <!-- Middle Ground Ridge with Wooden Memorial Crosses & Barren Tree -->
+        <path d="M0,320 L0,220 L180,210 L340,230 L490,200 L680,225 L840,205 L1020,230 L1200,210 L1200,320 Z" fill="currentColor" class="text-slate-700/30 dark:text-slate-950/60" />
         <g fill="currentColor" class="text-slate-800/60 dark:text-slate-950/85">
           <path d="M0,320 L0,235 L120,225 L240,245 L380,215 L520,240 L690,210 L830,235 L1010,215 L1200,225 L1200,320 Z" />
-          
-          <!-- Memorial Crosses -->
           <path d="M178,205 H184 V235 H178 Z M174,213 H188 V217 H174 Z" />
           <path d="M203,212 H209 V237 H203 Z M199,218 H213 V222 H199 Z" />
           <path d="M878,210 H884 V238 H878 Z M874,216 H888 V220 H874 Z" />
-          
-          <!-- Barren Tree Trunk Silhouette -->
           <path d="M1110,230 Q1112,180 1105,140 L1109,140 Q1115,175 1114,230 Z M1108,160 Q1090,145 1075,140 L1076,138 Q1091,143 1109,158 Z M1111,180 Q1130,165 1145,155 L1146,157 Q1131,167 1111,182 Z" />
         </g>
-
-        <!-- Foreground Terrain + Realistic WW1 Marching Soldiers (Rifles Downwards) -->
         <g fill="currentColor" class="text-slate-900/95 dark:text-slate-950">
-          <!-- Foreground Hill Curve -->
           <path d="M0,320 L0,250 L140,235 L310,255 L480,235 L660,250 L840,230 L1030,250 L1200,235 L1200,320 Z" />
-
-          <!-- SOLDIER 1 (Marching Column Leader - Rifle Slung Downwards Over Back) -->
+          <!-- Soldier 1 -->
           <g transform="translate(305, 253)">
-            <!-- Head & Brodie Helmet -->
             <path d="M -12,-63 C -13,-66 -8,-74 1,-74 C 10,-74 15,-66 14,-63 C 18,-62 20,-61 21,-59 C 20,-58 16,-58 13,-58 C 11,-52 8,-50 4,-50 C 0,-50 -4,-51 -6,-58 C -11,-58 -14,-59 -14,-61 C -14,-62 -13,-63 -12,-63 Z" />
-            <!-- Face Profile & Neck -->
             <path d="M 4,-54 C 8,-53 10,-51 11,-48 C 12,-45 9,-43 6,-43 L 7,-38 L -3,-38 L -4,-48 C -2,-52 1,-54 4,-54 Z" />
-            <!-- Backpack / Haversack & Webbing Pack -->
             <path d="M -7,-44 C -16,-43 -18,-24 -15,-18 C -12,-16 -7,-17 -5,-19 L -5,-41 Z" />
-            <!-- Tunic Torso & Belt Pouches -->
             <path d="M -6,-39 C 4,-38 12,-37 11,-24 C 10,-18 5,-17 -2,-17 C -7,-17 -8,-24 -7,-39 Z" />
-            <!-- Slung Lee-Enfield Rifle (Stock Upper Back, Barrel & Muzzle Pointing DOWNWARDS) -->
             <path d="M -6,-48 C -4,-48 -2,-45 -3,-39 L -13,-2 C -15,8 -17,14 -18,17 L -22,16 L -16,-2 L -7,-42 C -8,-46 -8,-48 -6,-48 Z" />
-            <!-- Front Stepping Leg & Boot (Marching Forward) -->
             <path d="M 3,-18 C 7,-10 11,2 14,8 C 16,14 17,21 19,23 L 26,24 C 27,27 22,28 17,28 C 13,28 12,24 11,19 C 9,14 6,5 1,-17 Z" />
-            <!-- Rear Trailing Leg & Boot (Pushing Off Ground) -->
             <path d="M -5,-18 C -7,-10 -11,-2 -15,5 C -17,11 -20,18 -23,22 L -21,25 C -25,27 -29,26 -29,24 C -28,22 -23,17 -19,10 C -15,3 -10,-8 -7,-18 Z" />
           </g>
-
-          <!-- SOLDIER 2 (Middle Marching Infantryman - Rifle Slung Downwards) -->
+          <!-- Soldier 2 -->
           <g transform="translate(365, 247)">
-            <!-- Head & Brodie Helmet -->
             <path d="M -12,-63 C -13,-66 -8,-74 1,-74 C 10,-74 15,-66 14,-63 C 18,-62 20,-61 21,-59 C 20,-58 16,-58 13,-58 C 11,-52 8,-50 4,-50 C 0,-50 -4,-51 -6,-58 C -11,-58 -14,-59 -14,-61 C -14,-62 -13,-63 -12,-63 Z" />
-            <!-- Face Profile & Neck -->
             <path d="M 4,-54 C 8,-53 10,-51 11,-48 C 12,-45 9,-43 6,-43 L 7,-38 L -3,-38 L -4,-48 C -2,-52 1,-54 4,-54 Z" />
-            <!-- Backpack / Haversack & Webbing Pack -->
             <path d="M -7,-44 C -16,-43 -18,-24 -15,-18 C -12,-16 -7,-17 -5,-19 L -5,-41 Z" />
-            <!-- Tunic Torso & Arms -->
             <path d="M -6,-39 C 4,-38 12,-37 11,-24 C 10,-18 5,-17 -2,-17 C -7,-17 -8,-24 -7,-39 Z" />
-            <!-- Slung Rifle Muzzle Pointing DOWNWARDS -->
             <path d="M -6,-48 C -4,-48 -2,-45 -3,-39 L -13,-2 C -15,8 -17,14 -18,17 L -22,16 L -16,-2 L -7,-42 C -8,-46 -8,-48 -6,-48 Z" />
-            <!-- Legs in Marching Stride -->
             <path d="M 3,-18 C 6,-10 9,2 12,8 C 14,14 15,20 17,23 L 24,24 C 25,27 20,28 15,28 C 12,28 10,24 9,19 C 7,14 5,5 1,-17 Z" />
             <path d="M -5,-18 C -7,-10 -11,-2 -14,5 C -16,11 -19,18 -22,22 L -20,25 C -24,27 -28,26 -28,24 C -27,22 -22,17 -18,10 C -14,3 -10,-8 -7,-18 Z" />
           </g>
-
-          <!-- SOLDIER 3 (Rear Marching Infantryman - Rifle Slung Downwards) -->
+          <!-- Soldier 3 -->
           <g transform="translate(425, 240)">
-            <!-- Head & Brodie Helmet -->
             <path d="M -12,-63 C -13,-66 -8,-74 1,-74 C 10,-74 15,-66 14,-63 C 18,-62 20,-61 21,-59 C 20,-58 16,-58 13,-58 C 11,-52 8,-50 4,-50 C 0,-50 -4,-51 -6,-58 C -11,-58 -14,-59 -14,-61 C -14,-62 -13,-63 -12,-63 Z" />
-            <!-- Face Profile & Neck -->
             <path d="M 4,-54 C 8,-53 10,-51 11,-48 C 12,-45 9,-43 6,-43 L 7,-38 L -3,-38 L -4,-48 C -2,-52 1,-54 4,-54 Z" />
-            <!-- Backpack / Haversack & Webbing Pack -->
             <path d="M -7,-44 C -16,-43 -18,-24 -15,-18 C -12,-16 -7,-17 -5,-19 L -5,-41 Z" />
-            <!-- Tunic Torso -->
             <path d="M -6,-39 C 4,-38 12,-37 11,-24 C 10,-18 5,-17 -2,-17 C -7,-17 -8,-24 -7,-39 Z" />
-            <!-- Slung Rifle Muzzle Pointing DOWNWARDS -->
             <path d="M -6,-48 C -4,-48 -2,-45 -3,-39 L -13,-2 C -15,8 -17,14 -18,17 L -22,16 L -16,-2 L -7,-42 C -8,-46 -8,-48 -6,-48 Z" />
-            <!-- Legs in Marching Stride -->
             <path d="M 3,-18 C 7,-10 11,2 14,8 C 16,14 17,21 19,23 L 26,24 C 27,27 22,28 17,28 C 13,28 12,24 11,19 C 9,14 6,5 1,-17 Z" />
             <path d="M -5,-18 C -7,-10 -11,-2 -15,5 C -17,11 -20,18 -23,22 L -21,25 C -25,27 -29,26 -29,24 C -28,22 -23,17 -19,10 C -15,3 -10,-8 -7,-18 Z" />
           </g>
-
-          <!-- SENTRY / MEMORIAL VIGIL SOLDIER (Rest on Arms Reversed - Rifle Pointed Straight Down to Ground) -->
+          <!-- Memorial Vigil Sentry -->
           <g transform="translate(785, 233)">
-            <!-- Bowed Head & Brodie Helmet -->
             <path d="M -14,-62 C -14,-67 -9,-73 0,-73 C 9,-73 15,-67 14,-62 C 18,-61 20,-59 19,-58 C 18,-57 14,-57 10,-57 C 8,-51 4,-48 -1,-48 C -5,-48 -9,-51 -11,-57 C -15,-57 -18,-58 -19,-58 C -19,-59 -18,-61 -14,-62 Z" />
-            <!-- Bowed Neck & Shoulders -->
             <path d="M -10,-50 C -4,-48 4,-48 9,-50 L 12,-40 C 6,-38 -7,-38 -12,-40 Z" />
-            <!-- Greatcoat Torso & Arms Resting Over Rifle Butt -->
             <path d="M -13,-40 C 0,-39 12,-39 14,-40 C 16,-26 15,-10 13,10 L -13,10 C -15,-10 -16,-26 -13,-40 Z" />
-            <!-- Hands Clasping Butt of Inverted Rifle -->
             <path d="M -4,-33 C 0,-35 4,-35 7,-33 C 8,-29 6,-26 2,-26 C -3,-26 -5,-29 -4,-33 Z" />
-            <!-- Rifle Barrel Pointing Directly DOWNWARDS into Ground Between Boots -->
             <path d="M 0,-26 L 3,-26 L 3,25 L 0,25 Z" />
-            <!-- Greatcoat Skirt & Standing Legs/Boots -->
             <path d="M -11,10 L -11,25 L -5,25 L -4,10 Z" />
             <path d="M 5,10 L 6,25 L 12,25 L 11,10 Z" />
           </g>
         </g>
       </svg>
     </div>
-
   </div>
 
   <!-- Header Section -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
-      
-      <!-- Top Header Row -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <a href="#" id="brandLogoLink" class="group flex items-center gap-2.5">
           <span class="text-2xl sm:text-3xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🏛️</span>
@@ -405,9 +300,9 @@
           </button>
 
           <!-- Gallery Wing Link -->
-         <a href="gallery.html" id="btnGalleryWing" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-emerald-900 dark:text-emerald-200 bg-emerald-100 hover:bg-emerald-200/90 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-sm shadow-emerald-500/10 active:scale-95">
-           <span>📷 Gallery Wing</span>
-         </a>
+          <a href="gallery.html" id="btnGalleryWing" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-emerald-900 dark:text-emerald-200 bg-emerald-100 hover:bg-emerald-200/90 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-sm shadow-emerald-500/10 active:scale-95">
+            <span>📷 Gallery Wing</span>
+          </a>
 
           <button id="btnFavorites" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
             <span id="favHeartIcon">🤍</span>
@@ -525,7 +420,7 @@
       </div>
     </div>
     
-    <!-- Initial Prompt (High Transparency Card) -->
+    <!-- Initial Prompt -->
     <div id="gridPrompt" class="text-center py-16 sm:py-20 bg-white/35 dark:bg-slate-950/40 rounded-3xl border border-white/50 dark:border-slate-800/60 shadow-xl backdrop-blur-md hidden">
       <div class="max-w-md mx-auto px-4">
         <div class="w-16 h-16 bg-white/60 dark:bg-slate-900/60 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/60 dark:border-slate-800/80 shadow-inner" id="promptIcon">🔍</div>
@@ -674,7 +569,7 @@
         </div>
       </div>
 
-      <!-- Title Details Section (gid=1146027655, Column C, Row 2 - Content Only) -->
+      <!-- Title Details Section -->
       <div id="statTitleDetailsCard" class="hidden bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm backdrop-blur-sm relative overflow-hidden">
         <div id="statTitleDetailsContent" class="text-slate-700 dark:text-slate-300 leading-relaxed font-normal"></div>
       </div>
