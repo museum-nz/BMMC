@@ -1318,7 +1318,7 @@ function updateAudioUI() {
   if (btnModal) {
     const modalRowIdx = parseInt(btnModal.getAttribute('data-row'), 10);
     if (currentlySpeakingIndex === modalRowIdx && isSpeaking) {
-      btnModal.innerHTML = `<span class="flex items-center gap-1 text-xs font-bold"><span class="inline-flex items-center gap-0.5 text-blue-200"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span><span>Stop</span></span>`;
+      btnModal.innerHTML = `<span class="flex items-center gap-1 text-xs font-bold"><span class="inline-flex items-center gap-0.5 text-blue-200"><span class="eq-bar"></span><span class="eq-bar"></span></span><span>Stop</span></span>`;
       btnModal.onclick = stopAudioGuide;
     } else {
       btnModal.innerHTML = '🔊 Listen';
@@ -1428,7 +1428,7 @@ function renderExhibitsGrid() {
       } else {
         mediaItemsHTML += `
           <div class="card-media-item ${isHidden} w-full h-full items-center justify-center relative group/img" data-slot-idx="${slotNum}">
-            <a href="${s.fullUrl}" target="_blank" onclick="event.stopPropagation()" title="Open full image in new tab" class="w-full h-full flex items-center justify-center">
+            <a href="${s.fullUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="Open full image in new tab" class="w-full h-full flex items-center justify-center">
               <img src="${s.thumbUrl}" class="max-w-full max-h-full object-contain group-hover/img:scale-105 transition-transform duration-300 drop-shadow-md" alt="${displayTitle}" loading="lazy" onError="this.src='${NO_IMAGE_SVG}'" />
             </a>
           </div>`;
@@ -1467,8 +1467,8 @@ function renderExhibitsGrid() {
           </span>
           <div class="flex gap-1.5" onclick="event.stopPropagation()">
             ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm">👓 3D View</button>` : ''}
-            ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
-            ${dweb ? `<a href="${dweb}" target="_blank" title="Website" class="bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 dark:border-blue-800 transition shadow-sm">Web</a>` : ''}
+            ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
+            ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" title="Website" class="bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 dark:border-blue-800 transition shadow-sm">Web</a>` : ''}
           </div>
         </div>
       </div>
@@ -1541,9 +1541,9 @@ function renderGramophoneGrid() {
           View Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </span>
         <div class="flex items-center gap-1.5 flex-wrap justify-end">
-          ${hasDiscogsRecording ? `<a href="${discogsUrl || '#'}" target="_blank" class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-emerald-600 flex items-center gap-1">🎙️ Discogs Recording</a>` : ''}
-          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-sky-700 flex items-center gap-1">📻 Archives 78s Recording</a>` : ''}
-          ${discogsUrl && !hasDiscogsRecording ? `<a href="${discogsUrl}" target="_blank" class="bg-slate-800 hover:bg-black text-white px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">📀 Discogs ↗</a>` : ''}
+          ${hasDiscogsRecording ? `<a href="${discogsUrl || '#'}" target="_blank" rel="noopener noreferrer" class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-emerald-600 flex items-center gap-1">🎙️ Discogs Recording</a>` : ''}
+          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-sky-700 flex items-center gap-1">📻 Archives 78s Recording</a>` : ''}
+          ${discogsUrl && !hasDiscogsRecording ? `<a href="${discogsUrl}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-black text-white px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">📀 Discogs ↗</a>` : ''}
         </div>
       </div>
     `;
@@ -2120,8 +2120,8 @@ function openModal(row, originalIndex) {
 
             <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
               ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition">👓 Fullscreen 3D View ↗</button>` : ''}
-              ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
-              ${dweb ? `<a href="${dweb}" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 transition">Web Link ↗</a>` : ''}
+              ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
+              ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 transition">Web Link ↗</a>` : ''}
             </div>
           </div>
 
@@ -2148,7 +2148,7 @@ function openModal(row, originalIndex) {
               ${img1 ? `
                 <div class="w-full">
                   <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Second Media (Image 1)' : 'Primary Image'}</p>
-                  <a href="${fullImg1 || modalImg1}" target="_blank" title="Click to view full image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
+                  <a href="${fullImg1 || modalImg1}" target="_blank" rel="noopener noreferrer" title="Click to view full image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
                     <img src="${modalImg1}" class="w-full ${!img2 ? 'max-h-[520px] min-h-[220px]' : 'h-52 sm:h-56'} object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
                     <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                   </a>
@@ -2157,7 +2157,7 @@ function openModal(row, originalIndex) {
               ${img2 ? `
                 <div class="w-full">
                   <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image'}</p>
-                  <a href="${fullImg2 || modalImg2}" target="_blank" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
+                  <a href="${fullImg2 || modalImg2}" target="_blank" rel="noopener noreferrer" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
                     <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
                     <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                   </a>
@@ -2270,16 +2270,16 @@ function openModal(row, originalIndex) {
 
         <div class="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
           ${discogsUrl ? `
-            <a href="${discogsUrl}" target="_blank" class="bg-slate-800 hover:bg-black text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-2">
+            <a href="${discogsUrl}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-black text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-2">
               <span>${hasDiscogsRecording ? '📀 Discogs Recording ↗' : '📀 Discogs ↗'}</span>
               ${hasDiscogsRecording ? `<span class="bg-emerald-500 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-full">🎙️ Recording</span>` : ''}
             </a>` : ''}
 
-          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-2"><span>📻 Archives 78s Recording ↗</span></a>` : ''}
+          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-2"><span>📻 Archives 78s Recording ↗</span></a>` : ''}
 
           ${!hasAnyRecording ? `
-            <a href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5"><span>🎵 Search YouTube ↗</span></a>
-            <a href="${archiveUrl}" target="_blank" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5" title="Search the 78 RPM Collection on Internet Archive"><span>📻 Search Archive 78s ↗</span></a>` : ''}
+            <a href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener noreferrer" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5"><span>🎵 Search YouTube ↗</span></a>
+            <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5" title="Search the 78 RPM Collection on Internet Archive"><span>📻 Search Archive 78s ↗</span></a>` : ''}
         </div>`;
     }
   }

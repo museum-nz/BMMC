@@ -5,16 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Photo Archives — Historical Photographic Galleries</title>
 
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.dropboxusercontent.com https://*.dropbox.com;
+    media-src 'self' blob: https://www.dropbox.com https://*.dropbox.com https://*.dropboxusercontent.com;
+    connect-src 'self' https://docs.google.com https://drive.google.com;
+    font-src 'self' https://fonts.gstatic.com;
+  ">
+
   <!-- Preconnect for Image & Media CDN -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
   <link rel="preconnect" href="https://www.dropbox.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- PapaParse for CSV fetching -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- PapaParse for CSV fetching with SRI -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
@@ -41,8 +55,6 @@
   </script>
 
   <!-- Google Font: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -129,12 +141,12 @@
             <span>ℹ️ Info</span>
           </a>
 
-          <button id="btnSurprise" onclick="surpriseMe()" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-pink-500/20 active:scale-95">
+          <button id="btnSurprise" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-pink-500/20 active:scale-95">
             <span>✨ Surprise Me!</span>
           </button>
 
           <!-- Saved Favorites Button -->
-          <button id="btnFavorites" onclick="toggleFavoritesFilter()" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
+          <button id="btnFavorites" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
             <span id="favHeartIcon">🤍</span>
             <span id="favCountText">Saved (0)</span>
           </button>
@@ -146,7 +158,7 @@
           </button>
 
           <!-- Collapsible Controls Toggle Button -->
-          <button id="toggleControlsBtn" onclick="toggleCollapsibleControls()" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
+          <button id="toggleControlsBtn" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
             </svg>
@@ -168,7 +180,7 @@
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="galleryCountText"></p>
             <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
               <label for="gallerySortSelect" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
-              <select id="gallerySortSelect" onchange="filterGalleryCards()" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+              <select id="gallerySortSelect" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
                 <option value="default" class="dark:bg-slate-900">Default (Date & Title)</option>
                 <option value="date-asc" class="dark:bg-slate-900">Date (Oldest First)</option>
                 <option value="date-desc" class="dark:bg-slate-900">Date (Newest First)</option>
@@ -183,16 +195,16 @@
           <div id="activeFiltersBar" class="hidden flex-wrap items-center gap-1.5 flex-1 min-w-0">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Active:</span>
             <div id="activeFiltersContainer" class="flex flex-wrap gap-1 flex-1 min-w-0"></div>
-            <button id="btnClearAllFilters" onclick="resetGalleryFilters()" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
+            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
           </div>
           
           <!-- Search Input with Clear button -->
           <div class="w-full sm:w-72 relative shrink-0">
-            <input type="text" id="gallerySearchInput" oninput="filterGalleryCards()" placeholder="Search photo title, details, date..." aria-label="Search photos" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <input type="text" id="gallerySearchInput" placeholder="Search photo title, details, date..." aria-label="Search photos" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
             <svg class="w-4 h-4 text-emerald-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <button id="clearSearch" onclick="clearSearchInput()" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
+            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
           </div>
         </div>
 
@@ -200,13 +212,13 @@
         <div id="galleryFilterGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
           <div>
             <label for="galleryCategoryFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Tag / Category Filter (Main Collections)</label>
-            <select id="galleryCategoryFilter" onchange="onCategoryFilterDropdownChange()" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
+            <select id="galleryCategoryFilter" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
               <option value="">All Main Collections</option>
             </select>
           </div>
           <div>
             <label for="galleryDateFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Historical Era / Age Filter</label>
-            <select id="galleryDateFilter" onchange="filterGalleryCards()" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
+            <select id="galleryDateFilter" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
               <option value="">All Historical Eras</option>
             </select>
           </div>
@@ -217,7 +229,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
             
             <!-- All Collections -->
-            <div id="tabBtnAll" onclick="switchHall('all')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-600 ring-2 ring-emerald-500/40">
+            <div id="tabBtnAll" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-600 ring-2 ring-emerald-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #05966925;">
                 <span class="text-3xl drop-shadow group-hover:scale-110 transition-transform duration-300">🌐</span>
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
@@ -231,7 +243,7 @@
             </div>
 
             <!-- Alan War -->
-            <div id="tabBtnWW2" onclick="switchHall('ww2-alan')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-amber-500/40">
+            <div id="tabBtnWW2" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-amber-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #d9770625;">
                 <img id="hubImgWW2" src="https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='./media/images/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo.jpg';}else{this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🪖%3C%2Ftext%3E%3C%2Fsvg%3E';}" alt="Alan War" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
@@ -245,7 +257,7 @@
             </div>
 
             <!-- Dun & Bonniefields -->
-            <div id="tabBtnBNF" onclick="switchHall('bonniefields-1920s')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
+            <div id="tabBtnBNF" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #10b98125;">
                 <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='./media/images/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ.jpg';}else{this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';}" alt="Dun & Bonniefields" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
@@ -259,7 +271,7 @@
             </div>
 
             <!-- Maitland East Chatton -->
-            <div id="tabBtnMTL" onclick="switchHall('maitland-school')" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-blue-500/40">
+            <div id="tabBtnMTL" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-blue-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #2563eb25;">
                 <img id="hubImgMTL" src="https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='./media/images/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf.jpg';}else{this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🏫%3C%2Ftext%3E%3C%2Fsvg%3E';}" alt="Maitland East Chatton" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
@@ -336,27 +348,27 @@
               </audio>
 
               <div class="flex items-center justify-between gap-2">
-                <button id="btnPlayPause" type="button" onclick="togglePlay()" class="h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-2 font-black text-xs shadow transition active:scale-95 cursor-pointer">
+                <button id="btnPlayPause" type="button" class="h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-2 font-black text-xs shadow transition active:scale-95 cursor-pointer">
                   <span id="playIcon" class="text-sm">▶</span>
                   <span id="playLabel">Play</span>
                 </button>
 
                 <div class="flex items-center gap-2">
-                  <button id="btnSpeed" type="button" onclick="cycleSpeed()" title="Playback Speed" class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition">
+                  <button id="btnSpeed" type="button" title="Playback Speed" class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition">
                     1.0x
                   </button>
 
                   <div class="flex items-center gap-1.5 bg-slate-800/80 px-2 py-1 rounded-lg border border-slate-700">
-                    <button id="btnMute" type="button" onclick="toggleMute()" title="Mute/Unmute" class="text-slate-300 hover:text-white text-xs">
+                    <button id="btnMute" type="button" title="Mute/Unmute" class="text-slate-300 hover:text-white text-xs">
                       <span id="volIcon">🔊</span>
                     </button>
-                    <input id="volSlider" type="range" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)" class="w-14 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" title="Volume">
+                    <input id="volSlider" type="range" min="0" max="1" step="0.05" value="1" class="w-14 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" title="Volume">
                   </div>
                 </div>
               </div>
 
               <div class="space-y-1.5 pt-1">
-                <div id="audioTrack" onclick="seekAudio(event)" class="relative w-full h-3 bg-slate-800 hover:bg-slate-700 rounded-full overflow-hidden cursor-pointer transition">
+                <div id="audioTrack" class="relative w-full h-3 bg-slate-800 hover:bg-slate-700 rounded-full overflow-hidden cursor-pointer transition">
                   <div id="audioProgressBar" class="h-full bg-gradient-to-r from-amber-500 to-amber-400 w-0 rounded-full pointer-events-none transition-all duration-75"></div>
                 </div>
 
@@ -443,7 +455,7 @@
       <div id="galleryNoResults" class="hidden text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
         <span class="text-3xl block mb-2">🔍</span>
         <p class="text-sm font-bold text-slate-700 dark:text-slate-300">No photographic records match your selected filter.</p>
-        <button onclick="resetGalleryFilters()" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
+        <button id="btnResetNoResults" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
       </div>
 
     </section>
@@ -457,37 +469,37 @@
       <!-- Modal Navigation Bar -->
       <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <button id="btnModalPrev" onclick="navigatePhotoModal(-1)" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1">
+          <button id="btnModalPrev" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1">
             <span>←</span> <span class="hidden sm:inline">Prev</span>
           </button>
           <span id="modalPhotoCounter" class="text-xs font-black text-emerald-600 dark:text-emerald-400 px-1"></span>
-          <button id="btnModalNext" onclick="navigatePhotoModal(1)" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1">
+          <button id="btnModalNext" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1">
             <span class="hidden sm:inline">Next</span> <span>→</span>
           </button>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Share Link Button -->
-          <button id="btnSharePhoto" onclick="shareCurrentPhoto()" title="Copy Deep Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">
+          <button id="btnSharePhoto" title="Copy Deep Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">
             <span>🔗</span> <span class="hidden sm:inline">Share</span>
           </button>
 
           <!-- Favorite Button -->
-          <button id="modalFavBtn" onclick="toggleModalFavorite()" class="px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200">
+          <button id="modalFavBtn" class="px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200">
             <span id="modalFavIcon">🤍</span> <span id="modalFavText">Save</span>
           </button>
 
           <a id="modalOpenTabBtn" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-black transition flex items-center gap-1">
             <span>Full Image ↗</span>
           </a>
-          <button onclick="closePhotoModal()" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-bold transition">✕</button>
+          <button id="btnCloseModal" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-bold transition">✕</button>
         </div>
       </div>
 
       <!-- Modal Body -->
       <div class="p-4 sm:p-6 space-y-4">
         <!-- Clickable Image Container to Enlarge in Full Scale / New Tab -->
-        <div class="w-full min-h-[260px] max-h-[58vh] bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-800 shadow-inner p-2 cursor-pointer group/modalimg relative" onclick="openModalImageFull()" title="Click image to open in full resolution">
+        <div id="modalImageWrapper" class="w-full min-h-[260px] max-h-[58vh] bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-800 shadow-inner p-2 cursor-pointer group/modalimg relative" title="Click image to open in full resolution">
           <img id="modalPhotoImage" src="" alt="Full view" class="max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl group-hover/modalimg:scale-105 transition-transform duration-300" />
           <span class="absolute bottom-3 right-3 bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-lg shadow border border-slate-700/60 pointer-events-none">Click to Enlarge ↗</span>
         </div>
@@ -501,10 +513,10 @@
             
             <!-- Speech Narration Controls -->
             <div class="flex items-center gap-1.5">
-              <button id="btnModalSpeak" onclick="toggleModalSpeech()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-black transition shadow flex items-center gap-1">
+              <button id="btnModalSpeak" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-black transition shadow flex items-center gap-1">
                 <span>🔊 Listen</span>
               </button>
-              <select id="modalVoiceSelect" onchange="onVoiceSelected(this.value)" class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-1 font-medium max-w-[120px] truncate outline-none"></select>
+              <select id="modalVoiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-1 font-medium max-w-[120px] truncate outline-none"></select>
             </div>
           </div>
 
@@ -530,21 +542,19 @@
     <span id="toastMsg">Notification</span>
   </div>
 
-  <!-- Script: Photo Gallery, Speech Synthesis, Favorites, Sorting & Tag Filtering -->
+  <!-- Main Application Script -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
     const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
     const CACHE_KEY_GALLERY = 'bMMC_cached_gallery_raw';
     const CACHE_KEY_TIME = 'bMMC_cached_gallery_time';
-    const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 Hours TTL
+    const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
     const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
-    // Exact collection hub thumbnail images
     const HUB_IMG_WW2 = 'https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200';
     const HUB_IMG_BNF = 'https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200';
     const HUB_IMG_MTL = 'https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200';
 
-    // Historical Era Definitions
     const TIMELINE_ERAS = [
       { key: 'Victorian', short: 'Victorian', full: 'Victorian & Industrial (1700–1913)', min: 1700, max: 1913 },
       { key: 'WWI', short: 'WWI', full: 'World War I (1914–1918)', min: 1914, max: 1918 },
@@ -561,12 +571,11 @@
     let activeHall = 'all';
     let showingFavoritesOnly = false;
 
-    // Speech synthesis state
     let availableVoices = [];
     let currentlySpeakingIndex = null;
     let currentSpeechUtterance = null;
 
-    // --- Security Helper: HTML Entity Escaping (Prevents DOM-based XSS) ---
+    // --- Security Utilities ---
     function escapeHTML(str) {
       if (str === null || str === undefined) return '';
       return String(str)
@@ -577,7 +586,6 @@
         .replace(/'/g, '&#039;');
     }
 
-    // --- Security Helper: URL Sanitization (Rejects javascript:, data:text/html, etc.) ---
     function sanitizeUrl(url) {
       if (!url) return '';
       const clean = String(url).trim();
@@ -590,7 +598,7 @@
       if (!clean.includes(':')) {
         return clean.startsWith('./') ? clean : `https://${clean}`;
       }
-      return '#';
+      return '';
     }
 
     function safeReplaceState(urlStr) {
@@ -599,7 +607,6 @@
       } catch (e) {}
     }
 
-    // Toggle Collapsible Controls
     function toggleCollapsibleControls(show) {
       const controls = document.getElementById('collapsibleControls');
       const chevron = document.getElementById('toggleChevron');
@@ -618,7 +625,6 @@
       }
     }
 
-    // Toast alert helper
     function showToast(msg, icon = '✨') {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toastMsg');
@@ -632,13 +638,11 @@
       }, 2500);
     }
 
-    // Google Drive / Offline Media URL Formatter
     function formatGoogleLh3Url(url, size = 's500') {
       if (!url) return '';
       url = String(url).trim();
       if (!url) return '';
 
-      // Check for offline adapter
       if (window.resolveOfflineMedia) {
         const local = window.resolveOfflineMedia(url);
         if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return sanitizeUrl(local);
@@ -664,7 +668,6 @@
       return sanitizeUrl(url);
     }
 
-    // Clean details text
     function cleanDetailsText(rawText) {
       if (!rawText) return '';
       let str = String(rawText).trim();
@@ -675,7 +678,6 @@
         .join('\n');
     }
 
-    // Parse Title #Details from J2, J3, J4
     function parseTitleAndDetails(raw, fallbackTitle) {
       if (!raw) return { title: fallbackTitle || '', details: '' };
       let str = String(raw).trim();
@@ -704,7 +706,6 @@
       return { title, details };
     }
 
-    // Details Parser: Extracts Title, #Category/Tag, and pure Details from Column J
     function parseGalleryDetails(raw) {
       if (!raw) return { title: 'Untitled Photo', category: '', details: '' };
       let str = String(raw).trim();
@@ -742,7 +743,6 @@
       return { title, category, details };
     }
 
-    // Era Extraction by Date/Year
     function getEraByDate(dateStr) {
       if (!dateStr) return null;
       const match = String(dateStr).match(/-?\d{4}/);
@@ -751,7 +751,6 @@
       return TIMELINE_ERAS.find(e => year >= e.min && year <= e.max) || null;
     }
 
-    // Hall Matching from item.category
     function matchesHall(item, hallKey) {
       if (!hallKey || hallKey === 'all') return true;
       const catLower = (item.category || '').toLowerCase().trim();
@@ -781,7 +780,6 @@
       return 'all';
     }
 
-    // Favorites Logic
     function getFavorites() {
       try {
         return JSON.parse(localStorage.getItem('bMMC_gallery_favorites') || '[]');
@@ -995,13 +993,12 @@
       speechSynthesis.onvoiceschanged = loadVoices;
     }
 
-    // --- Process Parsed CSV Data Matrix ---
     function processParsedData(data) {
       if (!data || data.length < 2) return false;
 
-      let detailsColIdx = 9; // Column J default
-      let ageColIdx = 8;     // Column I default (header 'Age')
-      let linkColIdx = 5;    // Column F default
+      let detailsColIdx = 9;
+      let ageColIdx = 8;
+      let linkColIdx = 5;
 
       if (data[0]) {
         data[0].forEach((colName, idx) => {
@@ -1018,8 +1015,6 @@
         });
       }
 
-      // Exact extraction from specified rows:
-      // Row 2 -> Dun and Bonniefields (data[1], Column J2)
       if (data[1]) {
         const rawJ2 = data[1][detailsColIdx] || data[1][9] || '';
         const linkF2 = data[1][linkColIdx] || data[1][5] || '';
@@ -1031,7 +1026,6 @@
         };
       }
 
-      // Row 3 -> Maitland East Chatton and Village (data[2], Column J3)
       if (data[2]) {
         const rawJ3 = data[2][detailsColIdx] || data[2][9] || '';
         const linkF3 = data[2][linkColIdx] || data[2][5] || '';
@@ -1043,7 +1037,6 @@
         };
       }
 
-      // Row 4 -> WWII - Alan (data[3], Column J4)
       if (data[3]) {
         const rawJ4 = data[3][detailsColIdx] || data[3][9] || '';
         const linkF4 = data[3][linkColIdx] || data[3][5] || '';
@@ -1055,7 +1048,6 @@
         };
       }
 
-      // Photos start from Row 2 or Row 5 (filtering out non-image metadata rows)
       rawGalleryItems = data.slice(1).map((row, idx) => {
         const rawImg = row[linkColIdx] ? String(row[linkColIdx]).trim() : (row[5] ? String(row[5]).trim() : '');
         const rawDetails = row[detailsColIdx] ? String(row[detailsColIdx]).trim() : (row[9] || row[8] || row[2] || '');
@@ -1084,12 +1076,10 @@
       return rawGalleryItems.length > 0;
     }
 
-    // --- High-Speed Stale-While-Revalidate Cached CSV Loader ---
     async function loadGalleryData() {
       const loadingEl = document.getElementById('galleryLoading');
       const gridEl = document.getElementById('galleryGrid');
 
-      // Initialize collection hub images immediately with safe fallbacks
       const imgWW2 = document.getElementById('hubImgWW2');
       const imgBNF = document.getElementById('hubImgBNF');
       const imgMTL = document.getElementById('hubImgMTL');
@@ -1097,20 +1087,15 @@
       if (imgBNF) imgBNF.src = formatGoogleLh3Url(HUB_IMG_BNF, 's200');
       if (imgMTL) imgMTL.src = formatGoogleLh3Url(HUB_IMG_MTL, 's200');
 
-      let renderedFromCache = false;
-
-      // 1. FAST PATH: Check & Render Cached Version Instantly (0ms delay)
       try {
         const cachedRaw = localStorage.getItem(CACHE_KEY_GALLERY);
         const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
         if (cachedRaw) {
           const parsed = Papa.parse(cachedRaw, { header: false, skipEmptyLines: true });
           if (processParsedData(parsed.data)) {
-            renderedFromCache = true;
             if (loadingEl) loadingEl.classList.add('hidden');
             if (gridEl) gridEl.classList.remove('hidden');
 
-            // If the cache is still fresh (< 12 hours), skip the network request entirely
             if (cachedTime && (Date.now() - Number(cachedTime) < CACHE_TTL_MS)) {
               return;
             }
@@ -1120,7 +1105,6 @@
         console.warn('Cache read error:', e);
       }
 
-      // 2. NETWORK FETCH: Fetch live Google Sheet (or revalidate in background)
       try {
         let text = '';
         if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -1145,14 +1129,13 @@
           processParsedData(parsed.data);
         }
       } catch (err) {
-        console.warn('Network fetch error (offline fallback active):', err);
+        console.warn('Network fetch error:', err);
       } finally {
         if (loadingEl) loadingEl.classList.add('hidden');
         if (gridEl) gridEl.classList.remove('hidden');
       }
     }
 
-    // Populate Category & Age/Era Dropdowns (Strictly filters categories with count > 1)
     function populateFilterDropdowns(items) {
       const catSelect = document.getElementById('galleryCategoryFilter');
       const dateSelect = document.getElementById('galleryDateFilter');
@@ -1171,7 +1154,6 @@
         }
       });
 
-      // Filter only categories with more than 1 item
       if (catSelect) {
         catSelect.innerHTML = '<option value="">All Main Collections</option>';
         Object.keys(catCounts)
@@ -1215,7 +1197,6 @@
       if (elMTL) elMTL.textContent = countMTL;
     }
 
-    // Numeric Year Extractor for Date Sorting
     function parseDateForSort(dateStr) {
       if (!dateStr) return 99999;
       const match = String(dateStr).match(/-?\d{4}/);
@@ -1225,7 +1206,6 @@
       return 99998;
     }
 
-    // Render Active Filter Pills (With XSS Patch applied)
     function renderActiveFilterPills() {
       const bar = document.getElementById('activeFiltersBar');
       const container = document.getElementById('activeFiltersContainer');
@@ -1238,16 +1218,16 @@
       const catVal = document.getElementById('galleryCategoryFilter')?.value || '';
       const eraVal = document.getElementById('galleryDateFilter')?.value || '';
 
-      if (searchVal) pills.push({ label: `Search: "${escapeHTML(searchVal)}"`, clear: () => clearSearchInput() });
+      if (searchVal) pills.push({ label: `Search: "${searchVal}"`, clear: () => clearSearchInput() });
       
       if (catVal) {
-        pills.push({ label: `Category: ${escapeHTML(catVal)}`, clear: () => { document.getElementById('galleryCategoryFilter').value = ''; onCategoryFilterDropdownChange(); } });
+        pills.push({ label: `Category: ${catVal}`, clear: () => { document.getElementById('galleryCategoryFilter').value = ''; onCategoryFilterDropdownChange(); } });
       } else if (activeHall !== 'all') {
         const names = { 'ww2-alan': '🪖 Alan War', 'bonniefields-1920s': '🌾 Dun & Bonniefields', 'maitland-school': '🏫 Maitland East Chatton' };
-        pills.push({ label: names[activeHall] || escapeHTML(activeHall), clear: () => switchHall('all') });
+        pills.push({ label: names[activeHall] || activeHall, clear: () => switchHall('all') });
       }
 
-      if (eraVal) pills.push({ label: `Era: ${escapeHTML(eraVal)}`, clear: () => { document.getElementById('galleryDateFilter').value = ''; filterGalleryCards(); } });
+      if (eraVal) pills.push({ label: `Era: ${eraVal}`, clear: () => { document.getElementById('galleryDateFilter').value = ''; filterGalleryCards(); } });
       if (showingFavoritesOnly) pills.push({ label: `Saved Photos`, clear: () => { showingFavoritesOnly = false; updateFavoritesBadge(); filterGalleryCards(); } });
 
       if (pills.length > 0) {
@@ -1256,8 +1236,16 @@
         pills.forEach(p => {
           const span = document.createElement('span');
           span.className = 'inline-flex items-center gap-1 text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full shadow-sm';
-          span.innerHTML = `${p.label} <button class="hover:text-red-500 font-bold ml-0.5" aria-label="Remove filter">✕</button>`;
-          span.querySelector('button').addEventListener('click', p.clear);
+          
+          const labelText = document.createTextNode(p.label + ' ');
+          const btn = document.createElement('button');
+          btn.className = 'hover:text-red-500 font-bold ml-0.5';
+          btn.setAttribute('aria-label', 'Remove filter');
+          btn.textContent = '✕';
+          btn.addEventListener('click', p.clear);
+
+          span.appendChild(labelText);
+          span.appendChild(btn);
           container.appendChild(span);
         });
       } else {
@@ -1266,7 +1254,6 @@
       }
     }
 
-    // Category Dropdown Change Handler
     function onCategoryFilterDropdownChange() {
       const catVal = (document.getElementById('galleryCategoryFilter')?.value || '').trim();
       
@@ -1281,7 +1268,6 @@
       filterGalleryCards();
     }
 
-    // Filter, Sort and Render Photo Cards
     function filterGalleryCards() {
       const searchVal = (document.getElementById('gallerySearchInput')?.value || '').toLowerCase().trim();
       const catVal = (document.getElementById('galleryCategoryFilter')?.value || '').trim();
@@ -1310,13 +1296,11 @@
         
         const era = getEraByDate(item.date);
         const matchEra = !eraVal || (era && (era.short === eraVal || era.full === eraVal));
-
         const matchFav = !showingFavoritesOnly || favs.includes(item.id);
 
         return matchCat && matchSearch && matchEra && matchFav;
       });
 
-      // Apply Sorting
       if (sortBy === 'default' || sortBy === 'date-asc') {
         filteredGalleryItems.sort((a, b) => {
           const da = parseDateForSort(a.date);
@@ -1342,7 +1326,6 @@
       renderGalleryCards();
     }
 
-    // Render Gallery Grid Cards (With Security Patches applied)
     function renderGalleryCards() {
       const grid = document.getElementById('galleryGrid');
       const noResults = document.getElementById('galleryNoResults');
@@ -1371,8 +1354,8 @@
         const safeCategory = escapeHTML(item.category);
         const safeDate = escapeHTML(item.date);
         const safeDetails = escapeHTML(item.details);
-        const safeThumbUrl = sanitizeUrl(item.thumbUrl);
-        const safeFullUrl = sanitizeUrl(item.fullUrl);
+        const safeThumbUrl = sanitizeUrl(item.thumbUrl) || NO_IMAGE_SVG;
+        const safeFullUrl = sanitizeUrl(item.fullUrl) || safeThumbUrl;
 
         card.innerHTML = `
           <div>
@@ -1386,10 +1369,10 @@
 
               <!-- Action buttons on Card Image -->
               <div class="absolute top-2.5 right-2.5 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
-                <button onclick="toggleFavorite(${item.id}, event)" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
+                <button data-fav-id="${item.id}" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="btn-card-fav w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
                   ${isFav ? '❤️' : '🤍'}
                 </button>
-                ${item.details ? `<button data-gallery-speak-id="${item.id}" onclick="speakPhotoDetails(${item.id}, event)" title="Listen to details" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
+                ${item.details ? `<button data-gallery-speak-id="${item.id}" title="Listen to details" class="btn-card-speak w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
                   🔊
                 </button>` : ''}
               </div>
@@ -1415,6 +1398,8 @@
           </div>
         `;
 
+        card.querySelector('.btn-card-fav')?.addEventListener('click', (e) => toggleFavorite(item.id, e));
+        card.querySelector('.btn-card-speak')?.addEventListener('click', (e) => speakPhotoDetails(item.id, e));
         card.addEventListener('click', () => openPhotoModal(index));
         grid.appendChild(card);
       });
@@ -1451,7 +1436,6 @@
       openPhotoModal(randIdx);
     }
 
-    // Modal / Lightbox Logic with Deep Link URL Hash & Safe DOM updates
     function openPhotoModal(filteredIndex) {
       if (filteredIndex < 0 || filteredIndex >= filteredGalleryItems.length) return;
       currentModalPhotoIdx = filteredIndex;
@@ -1472,7 +1456,9 @@
       const googleBtn = document.getElementById('btnModalGoogleSearch');
       const catalogSearchBtn = document.getElementById('btnModalCatalogSearch');
 
-      if (img) img.src = sanitizeUrl(item.fullUrl);
+      const safeFullUrl = sanitizeUrl(item.fullUrl) || NO_IMAGE_SVG;
+
+      if (img) img.src = safeFullUrl;
       if (title) title.textContent = item.title;
       if (cat) {
         cat.textContent = item.category || 'General';
@@ -1489,7 +1475,10 @@
       if (details) {
         details.textContent = item.details || 'No additional descriptive text is recorded for this archival photo.';
       }
-      if (openBtn) openBtn.href = sanitizeUrl(item.fullUrl);
+      if (openBtn) {
+        openBtn.href = safeFullUrl;
+        openBtn.rel = 'noopener noreferrer';
+      }
       if (counter) counter.textContent = `${filteredIndex + 1} of ${filteredGalleryItems.length}`;
 
       if (prevBtn) prevBtn.disabled = filteredIndex === 0;
@@ -1519,8 +1508,9 @@
     function openModalImageFull() {
       if (currentModalPhotoIdx === -1 || !filteredGalleryItems[currentModalPhotoIdx]) return;
       const item = filteredGalleryItems[currentModalPhotoIdx];
-      if (item.fullUrl) {
-        window.open(sanitizeUrl(item.fullUrl), '_blank', 'noopener,noreferrer');
+      const safeUrl = sanitizeUrl(item.fullUrl);
+      if (safeUrl) {
+        window.open(safeUrl, '_blank', 'noopener,noreferrer');
       }
     }
 
@@ -1567,21 +1557,6 @@
       safeReplaceState(`${window.location.pathname}${window.location.search}`);
     }
 
-    // Global Keybindings
-    window.addEventListener('keydown', (e) => {
-      const modal = document.getElementById('photoModal');
-      if (modal && !modal.classList.contains('hidden')) {
-        if (e.key === 'Escape') closePhotoModal();
-        if (e.key === 'ArrowLeft') navigatePhotoModal(-1);
-        if (e.key === 'ArrowRight') navigatePhotoModal(1);
-      }
-    });
-
-    document.getElementById('photoModal')?.addEventListener('click', (e) => {
-      if (e.target === document.getElementById('photoModal')) closePhotoModal();
-    });
-
-    // Update Collection Specific Details Section
     function updateHallDetailsBanner(hallKey) {
       const section = document.getElementById('hallDetailsSection');
       const card = document.getElementById('hallDetailsCard');
@@ -1613,13 +1588,15 @@
       actions.innerHTML = '';
       if (info.link && (info.link.startsWith('http://') || info.link.startsWith('https://') || info.link.startsWith('./') || info.link.length > 4)) {
         const fullUrl = sanitizeUrl(info.link);
-        const linkBtn = document.createElement('a');
-        linkBtn.href = fullUrl;
-        linkBtn.target = '_blank';
-        linkBtn.rel = 'noopener noreferrer';
-        linkBtn.className = 'px-4 py-2 rounded-xl text-xs font-black text-white bg-slate-800 hover:bg-black transition shadow flex items-center gap-1.5';
-        linkBtn.innerHTML = `<span>🔗 Explore Resource / Link ↗</span>`;
-        actions.appendChild(linkBtn);
+        if (fullUrl) {
+          const linkBtn = document.createElement('a');
+          linkBtn.href = fullUrl;
+          linkBtn.target = '_blank';
+          linkBtn.rel = 'noopener noreferrer';
+          linkBtn.className = 'px-4 py-2 rounded-xl text-xs font-black text-white bg-slate-800 hover:bg-black transition shadow flex items-center gap-1.5';
+          linkBtn.innerHTML = `<span>🔗 Explore Resource / Link ↗</span>`;
+          actions.appendChild(linkBtn);
+        }
       }
     }
 
@@ -1666,7 +1643,6 @@
       }
     }
 
-    // Hall / Collection Switcher
     function switchHall(hallKey) {
       activeHall = hallKey;
 
@@ -1679,7 +1655,7 @@
     }
   </script>
 
-  <!-- Script: Alan Audio Player Controller & Theme Sync -->
+  <!-- Audio Player Controller Script -->
   <script>
     const audio = document.getElementById('alanAudioEl');
     const playBtn = document.getElementById('btnPlayPause');
@@ -1690,7 +1666,10 @@
     const timeDuration = document.getElementById('timeDuration');
     const progressBar = document.getElementById('audioProgressBar');
     const btnSpeed = document.getElementById('btnSpeed');
+    const btnMute = document.getElementById('btnMute');
+    const volSlider = document.getElementById('volSlider');
     const volIcon = document.getElementById('volIcon');
+    const audioTrack = document.getElementById('audioTrack');
 
     const speeds = [1.0, 1.25, 1.5, 0.8];
     let speedIndex = 0;
@@ -1716,7 +1695,7 @@
           playIcon.textContent = '⏸';
           playLabel.textContent = 'Pause';
           statusText.textContent = 'Playing';
-        }).catch(err => {
+        }).catch(() => {
           statusText.textContent = 'Click to Play';
         });
       } else {
@@ -1729,8 +1708,7 @@
 
     function seekAudio(e) {
       if (!audio || !audio.duration) return;
-      const track = document.getElementById('audioTrack');
-      const rect = track.getBoundingClientRect();
+      const rect = audioTrack.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const pct = Math.max(0, Math.min(1, clickX / rect.width));
       audio.currentTime = pct * audio.duration;
@@ -1754,7 +1732,7 @@
       if (!audio) return;
       audio.volume = parseFloat(val);
       audio.muted = false;
-      volIcon.textContent = audio.volume == 0 ? '🔇' : (audio.volume > 0.5 ? '🔊' : '🔉');
+      volIcon.textContent = audio.volume === 0 ? '🔇' : (audio.volume > 0.5 ? '🔊' : '🔉');
     }
 
     if (audio) {
@@ -1778,18 +1756,69 @@
       });
     }
 
+    // Attach Event Listeners on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
+      // Theme setup
       const savedTheme = localStorage.getItem('bMMC_theme');
       if (savedTheme === 'dark') document.documentElement.classList.add('dark');
       else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
 
-      document.getElementById('btnThemeToggle').addEventListener('click', () => {
+      document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('bMMC_theme', isDark ? 'dark' : 'light');
         document.getElementById('themeToggleIcon').textContent = isDark ? '☀️' : '🌙';
       });
 
-      // Load gallery items & default view
+      // Controls and Filters
+      document.getElementById('toggleControlsBtn')?.addEventListener('click', () => toggleCollapsibleControls());
+      document.getElementById('btnSurprise')?.addEventListener('click', surpriseMe);
+      document.getElementById('btnFavorites')?.addEventListener('click', toggleFavoritesFilter);
+      document.getElementById('btnClearAllFilters')?.addEventListener('click', resetGalleryFilters);
+      document.getElementById('btnResetNoResults')?.addEventListener('click', resetGalleryFilters);
+      document.getElementById('clearSearch')?.addEventListener('click', clearSearchInput);
+
+      document.getElementById('gallerySearchInput')?.addEventListener('input', filterGalleryCards);
+      document.getElementById('gallerySortSelect')?.addEventListener('change', filterGalleryCards);
+      document.getElementById('galleryCategoryFilter')?.addEventListener('change', onCategoryFilterDropdownChange);
+      document.getElementById('galleryDateFilter')?.addEventListener('change', filterGalleryCards);
+
+      // Hub collection cards
+      document.getElementById('tabBtnAll')?.addEventListener('click', () => switchHall('all'));
+      document.getElementById('tabBtnWW2')?.addEventListener('click', () => switchHall('ww2-alan'));
+      document.getElementById('tabBtnBNF')?.addEventListener('click', () => switchHall('bonniefields-1920s'));
+      document.getElementById('tabBtnMTL')?.addEventListener('click', () => switchHall('maitland-school'));
+
+      // Modal navigation & controls
+      document.getElementById('btnModalPrev')?.addEventListener('click', () => navigatePhotoModal(-1));
+      document.getElementById('btnModalNext')?.addEventListener('click', () => navigatePhotoModal(1));
+      document.getElementById('btnSharePhoto')?.addEventListener('click', shareCurrentPhoto);
+      document.getElementById('modalFavBtn')?.addEventListener('click', toggleModalFavorite);
+      document.getElementById('btnCloseModal')?.addEventListener('click', closePhotoModal);
+      document.getElementById('modalImageWrapper')?.addEventListener('click', openModalImageFull);
+      document.getElementById('btnModalSpeak')?.addEventListener('click', toggleModalSpeech);
+      document.getElementById('modalVoiceSelect')?.addEventListener('change', (e) => onVoiceSelected(e.target.value));
+
+      document.getElementById('photoModal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('photoModal')) closePhotoModal();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('photoModal');
+        if (modal && !modal.classList.contains('hidden')) {
+          if (e.key === 'Escape') closePhotoModal();
+          if (e.key === 'ArrowLeft') navigatePhotoModal(-1);
+          if (e.key === 'ArrowRight') navigatePhotoModal(1);
+        }
+      });
+
+      // Audio controls
+      playBtn?.addEventListener('click', togglePlay);
+      btnSpeed?.addEventListener('click', cycleSpeed);
+      btnMute?.addEventListener('click', toggleMute);
+      volSlider?.addEventListener('input', (e) => setVolume(e.target.value));
+      audioTrack?.addEventListener('click', seekAudio);
+
+      // Load gallery data
       loadGalleryData();
       switchHall('all');
     });

@@ -5,13 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Photo Map with Dual Year Slider</title>
 
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+    style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
+    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.cartocdn.com https://*.dropboxusercontent.com https://*.dropbox.com;
+    connect-src 'self' https://docs.google.com https://*.cartocdn.com;
+    font-src 'self' https://fonts.gstatic.com;
+  ">
+
   <!-- Preconnect for Image & Tile CDN Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-  <!-- Leaflet CSS & Plugins (Direct CDN) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet CSS & Plugins (Secured with SRI) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 
@@ -245,24 +256,49 @@
     <div class="dual-slider-track-wrapper">
       <div class="slider-track-bg"></div>
       <div class="slider-track-fill" id="sliderTrackFill"></div>
-      <input type="range" id="minYearSlider" min="1800" max="2026" value="1800" step="1" oninput="updateYearFilter(event)">
-      <input type="range" id="maxYearSlider" min="1800" max="2026" value="2026" step="1" oninput="updateYearFilter(event)">
+      <input type="range" id="minYearSlider" min="1800" max="2026" value="1800" step="1" aria-label="Minimum Year Filter">
+      <input type="range" id="maxYearSlider" min="1800" max="2026" value="2026" step="1" aria-label="Maximum Year Filter">
     </div>
   </div>
 
-  <!-- Leaflet & PapaParse CDN Libraries -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <!-- Leaflet & PapaParse CDN Libraries with SRI Validation -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <script>
+    // --- Security Utilities ---
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function sanitizeUrl(url) {
+      if (!url) return '';
+      const clean = String(url).trim();
+      if (clean.startsWith('./media/') || clean.startsWith('media/') || clean.startsWith('data:image/')) {
+        return clean;
+      }
+      if (/^https?:\/\//i.test(clean)) {
+        return clean;
+      }
+      if (!clean.includes(':')) {
+        return clean.startsWith('./') ? clean : `https://${clean}`;
+      }
+      return '';
+    }
+
     const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
                          window.location.hostname === 'localhost' || 
                          window.location.hostname === '127.0.0.1';
 
-    // Using high-speed direct CSV export endpoint instead of gviz/tq
     const REMOTE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1146027655';
     const LOCAL_CSV_URL = './data/exhibits.csv';
     const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -281,7 +317,7 @@
     }).setView([-10, 135], initialZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap contributors, © CARTO',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
       maxZoom: 19,
       subdomains: 'abcd',
       noWrap: true
@@ -320,20 +356,22 @@
       
       if (window.resolveOfflineMedia) {
         const local = window.resolveOfflineMedia(clean);
-        if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return local;
+        if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return sanitizeUrl(local);
       }
 
-      if (clean.startsWith('data:image/') || clean.startsWith('./media/') || clean.startsWith('media/')) return clean;
+      if (clean.startsWith('data:image/') || clean.startsWith('./media/') || clean.startsWith('media/')) {
+        return sanitizeUrl(clean);
+      }
 
       if (clean.includes('dropbox.com')) {
         let dropboxUrl = clean.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
         if (!dropboxUrl.includes('raw=1')) dropboxUrl += (dropboxUrl.includes('?') ? '&raw=1' : '?raw=1');
-        return dropboxUrl;
+        return sanitizeUrl(dropboxUrl);
       }
 
       const fileId = extractDriveId(clean);
-      if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}=s150`;
-      return clean;
+      if (fileId) return sanitizeUrl(`https://lh3.googleusercontent.com/d/${fileId}=s150`);
+      return sanitizeUrl(clean);
     }
 
     function parseCoord(val) {
@@ -353,7 +391,12 @@
       records.forEach(item => {
         heatPoints.push([item.lat, item.lng, 0.9]);
 
-        const customIconHTML = `<div class="single-photo-wrapper"><img src="${item.imgUrl}" loading="lazy" alt="Photo" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>`;
+        const safeImgUrl = sanitizeUrl(item.imgUrl) || SVG_NO_IMG;
+        const safeTitle = escapeHTML(item.title);
+        const safeLocation = escapeHTML(item.location);
+        const safeYear = escapeHTML(item.year);
+
+        const customIconHTML = `<div class="single-photo-wrapper"><img src="${safeImgUrl}" loading="lazy" alt="${safeTitle || 'Photo'}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>`;
 
         const photoIcon = L.divIcon({
           html: customIconHTML,
@@ -362,15 +405,15 @@
           iconAnchor: [37.5, 37.5]
         });
 
-        const locationYearText = item.location 
-          ? (item.year ? `📍 ${item.location} &bull; ${item.year}` : `📍 ${item.location}`)
-          : (item.year ? `📅 ${item.year}` : '');
+        const locationYearText = safeLocation 
+          ? (safeYear ? `📍 ${safeLocation} &bull; ${safeYear}` : `📍 ${safeLocation}`)
+          : (safeYear ? `📅 ${safeYear}` : '');
 
         const popupHTML = `
           <div class="photo-card-large">
-            ${item.title ? `<h3>${item.title}</h3>` : ''}
+            ${safeTitle ? `<h3>${safeTitle}</h3>` : ''}
             ${locationYearText ? `<p>${locationYearText}</p>` : ''}
-            <div class="img-container"><img src="${item.imgUrl}" loading="lazy" alt="Photo" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>
+            <div class="img-container"><img src="${safeImgUrl}" loading="lazy" alt="${safeTitle || 'Photo'}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>
           </div>
         `;
 
@@ -456,7 +499,7 @@
       trackFill.style.left = leftPercent + '%';
       trackFill.style.width = (rightPercent - leftPercent) + '%';
 
-      document.getElementById('yearRangeText').innerText = `${minVal} – ${maxVal}`;
+      document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
 
       const filtered = allPhotoRecords.filter(item => {
         const y = parseInt(item.year, 10);
@@ -534,6 +577,7 @@
         if (cleanTitle.includes('#')) cleanTitle = cleanTitle.split('#')[0];
 
         const imgUrl = formatImgUrl(imgRaw);
+        if (!imgUrl) return;
 
         allPhotoRecords.push({
           lat: lat,
@@ -549,7 +593,7 @@
     }
 
     async function loadMapData() {
-      // 1. Shared Cache Check from index.html (Instant load without network request)
+      // 1. Shared Cache Check
       try {
         const cachedRaw = localStorage.getItem('bMMC_cached_exhibits_raw');
         const cachedParsed = localStorage.getItem('bMMC_cached_exhibits');
@@ -570,7 +614,9 @@
             return;
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Cache parsing error:', e);
+      }
 
       // 2. Local File Check
       if (IS_LOCAL_ENV) {
@@ -587,7 +633,7 @@
         } catch (e) {}
       }
 
-      // 3. Network Fetch from High-Speed Google Sheets Export
+      // 3. Network Fetch from Google Sheets Export
       try {
         const res = await fetch(REMOTE_CSV_URL);
         if (res.ok) {
@@ -618,10 +664,15 @@
         }
       } catch (e) {}
 
-      document.getElementById('yearRangeText').innerText = 'Data offline';
+      document.getElementById('yearRangeText').textContent = 'Data offline';
     }
 
-    loadMapData();
+    // Attach non-inline event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
+      document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
+      loadMapData();
+    });
   </script>
 </body>
 </html>
