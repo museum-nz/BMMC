@@ -570,7 +570,6 @@
       } catch (e) {}
     }
 
-    // Bridge click event to parent window (opens modal in-place without refreshing index.html)
     function openItemInIndex(event, exhibitNum, title) {
       saveMapViewState();
       try {
@@ -585,7 +584,6 @@
         }
       } catch (e) {}
 
-      // Fallback if opened standalone
       window.location.href = `index.html#exhibit-${exhibitNum}`;
     }
 
@@ -620,7 +618,7 @@
       worldCopyJump: false
     }).setView(initialCenter, initialZoom);
 
-    // --- Base Layer Definitions (Voyager & Satellite Only) ---
+    // Base Layers
     const layerVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>',
       maxZoom: 19,
@@ -674,6 +672,7 @@
     let heatLayer = null;
     let allPhotoRecords = [];
     let recordMarkerMap = new Map();
+    let pendingExhibitToFocus = null;
     let globalMinYear = 1800;
     let globalMaxYear = 2026;
     let timelinePlayTimer = null;
@@ -847,6 +846,14 @@
 
       updateYearFilter();
       handleInitialDeepLinks();
+
+      // Check if an exhibit was requested before data finished parsing
+      if (pendingExhibitToFocus !== null) {
+        setTimeout(() => {
+          focusExhibitMarker(pendingExhibitToFocus);
+          pendingExhibitToFocus = null;
+        }, 200);
+      }
     }
 
     function updateYearFilter(evt) {
@@ -896,7 +903,6 @@
       saveMapViewState();
     }
 
-    // --- Timeline Play / Pause Engine (Starts at 1830 by Default) ---
     function toggleTimelinePlayback() {
       const playBtn = document.getElementById('btnPlayTimeline');
       const maxSlider = document.getElementById('maxYearSlider');
@@ -930,8 +936,11 @@
       }
     }
 
-    // --- Deep Link & Window PostMessage Bridge ---
     function focusExhibitMarker(exhibitIdOrIndex) {
+      if (recordMarkerMap.size === 0) {
+        pendingExhibitToFocus = exhibitIdOrIndex;
+        return;
+      }
       const marker = recordMarkerMap.get(exhibitIdOrIndex) || recordMarkerMap.get(Number(exhibitIdOrIndex));
       if (marker) {
         markers.zoomToShowLayer(marker, () => {
@@ -960,12 +969,11 @@
         if (!isNaN(lat) && !isNaN(lng)) {
           map.setView([lat, lng], 12);
         } else if (exhibit !== null) {
-          setTimeout(() => focusExhibitMarker(exhibit), 300);
+          focusExhibitMarker(exhibit);
         }
       } catch (e) {}
     }
 
-    // Listen for parent messages from index.html
     window.addEventListener('message', (e) => {
       if (e.data && e.data.type === 'FOCUS_EXHIBIT') {
         focusExhibitMarker(e.data.exhibit);
@@ -974,7 +982,6 @@
       }
     });
 
-    // --- Fit Bounds & Reset Controls ---
     function fitAllMarkers() {
       if (markers && markers.getLayers().length > 0) {
         map.fitBounds(markers.getBounds(), { padding: [50, 50], maxZoom: 12 });
@@ -1103,7 +1110,7 @@
 
         if (cachedParsed && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
           const parsed = JSON.parse(cachedParsed);
-          if (Array.isArray(parsed) && parsed.length > 1) {
+          if (Array.isArray(parsed) && parsed.length > 1 && Array.isArray(parsed[0])) {
             parseAndProcessDataset(parsed);
             return;
           }
@@ -1111,7 +1118,7 @@
 
         if (cachedRaw && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
           const parsed = Papa.parse(cachedRaw, { header: false, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 1) {
+          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
             parseAndProcessDataset(parsed.data);
             return;
           }
@@ -1124,7 +1131,7 @@
           if (localRes.ok) {
             const csvText = await localRes.text();
             const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
-            if (parsed.data && parsed.data.length > 1) {
+            if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
               parseAndProcessDataset(parsed.data);
               return;
             }
@@ -1137,7 +1144,7 @@
         if (res.ok) {
           const csvText = await res.text();
           const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 1) {
+          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
             try {
               localStorage.setItem('bMMC_cached_exhibits_raw', csvText);
               localStorage.setItem('bMMC_cached_exhibits', JSON.stringify(parsed.data));
@@ -1154,7 +1161,7 @@
         if (fallbackRes.ok) {
           const csvText = await fallbackRes.text();
           const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 1) {
+          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
             parseAndProcessDataset(parsed.data);
             return;
           }
@@ -1165,7 +1172,6 @@
       document.getElementById('itemCountBadge').textContent = 'Offline';
     }
 
-    // --- Attach Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
       document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
@@ -1175,7 +1181,6 @@
       document.getElementById('btnResetView')?.addEventListener('click', resetEntireMapView);
       document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
 
-      // Layer switcher dropdown toggle
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
 

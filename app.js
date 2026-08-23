@@ -5,7 +5,6 @@ const IS_LOCAL_ENV = window.location.protocol === 'file:' ||
                      window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1';
 
-// Fast direct export endpoints
 const REMOTE_EXHIBITS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1146027655';
 const REMOTE_GRAMOPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=606568772';
 const REMOTE_GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1741478537';
@@ -711,8 +710,9 @@ window.showExhibitOnMap = function(originalIndex) {
 
   const mapIframe = document.getElementById('statMapIframe');
   if (mapIframe) {
-    if (!mapIframe.src || mapIframe.src === 'about:blank') {
-      mapIframe.src = `2Dmap.html?exhibit=${originalIndex}`;
+    const targetSrc = `2Dmap.html?exhibit=${originalIndex}`;
+    if (!mapIframe.src || mapIframe.src.indexOf('2Dmap.html') === -1) {
+      mapIframe.src = targetSrc;
     } else {
       try {
         mapIframe.contentWindow?.postMessage({
@@ -1619,7 +1619,7 @@ function closeEnlargeModal() {
 // 5. Museum Statistics & Charts
 function renderMuseumStatistics() {
   const mapIframe = document.getElementById('statMapIframe');
-  if (mapIframe && !mapIframe.src && mapIframe.dataset.src) {
+  if (mapIframe && (!mapIframe.src || mapIframe.src === 'about:blank') && mapIframe.dataset.src) {
     mapIframe.src = mapIframe.dataset.src;
   }
 
