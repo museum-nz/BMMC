@@ -374,9 +374,11 @@
       return sanitizeUrl(clean);
     }
 
+    // Strict coordinate parser to avoid interpreting dates, sizes, or text as coordinates
     function parseCoord(val) {
       if (!val) return NaN;
-      const clean = String(val).replace(',', '.').replace(/[^0-9.-]/g, '');
+      const clean = String(val).trim().replace(',', '.');
+      if (!/^-?\d+(\.\d+)?$/.test(clean)) return NaN;
       const num = parseFloat(clean);
       return (isNaN(num) || num === 0) ? NaN : num;
     }
@@ -520,15 +522,16 @@
       let latIdx = 26;
       let lngIdx = 27;
 
+      // Exact/targeted column matching to prevent false column collisions
       if (rows[0]) {
         rows[0].forEach((col, idx) => {
           const c = String(col).toLowerCase().trim();
-          if (c === 'lat' || c.startsWith('lat') || c.includes('latitude')) latIdx = idx;
-          if (c === 'lng' || c.startsWith('lng') || c.startsWith('lon') || c.includes('longitude')) lngIdx = idx;
+          if (c === 'lat' || c === 'latitude' || c === 'lat_deg') latIdx = idx;
+          if (c === 'lng' || c === 'lon' || c === 'long' || c === 'longitude') lngIdx = idx;
           if (c === 'img1' || c.includes('1st image') || c.includes('image 1')) imgIdx = idx;
-          if (c === 'title' || c.includes('title') || c === 'content') titleIdx = idx;
+          if (c === 'title' || c === 'content') titleIdx = idx;
           if (c === 'made' || c.includes('origin') || c.includes('location')) madeIdx = idx;
-          if (c === 'year' || c.includes('date')) yearIdx = idx;
+          if (c === 'year' || c === 'date') yearIdx = idx;
         });
       }
 
@@ -542,6 +545,7 @@
         let madeRaw = madeIdx >= 0 ? row[madeIdx] || '' : '';
         let yearRaw = yearIdx >= 0 ? row[yearIdx] || '' : '';
 
+        // Find primary image if not in designated column
         if (!imgRaw || (!imgRaw.includes('http') && !imgRaw.includes('media/'))) {
           for (let i = 0; i < row.length; i++) {
             const v = String(row[i] || '').trim();
@@ -556,19 +560,20 @@
         let lat = parseCoord(latStr);
         let lng = parseCoord(lngStr);
 
-        if (isNaN(lat) || isNaN(lng)) {
-          row.forEach(cell => {
-            const parts = String(cell).split(/[,;]/);
-            if (parts.length === 2) {
-              const p1 = parseCoord(parts[0]);
-              const p2 = parseCoord(parts[1]);
-              if (!isNaN(p1) && !isNaN(p2) && Math.abs(p1) <= 90 && Math.abs(p2) <= 180) {
-                lat = p1; lng = p2;
-              }
+        // Fallback only if coordinates were combined into a single lat column (e.g. "-33.86, 151.20")
+        if ((isNaN(lat) || isNaN(lng)) && String(latStr).includes(',')) {
+          const parts = String(latStr).split(',');
+          if (parts.length === 2) {
+            const p1 = parseCoord(parts[0]);
+            const p2 = parseCoord(parts[1]);
+            if (!isNaN(p1) && !isNaN(p2)) {
+              lat = p1;
+              lng = p2;
             }
-          });
+          }
         }
 
+        // Validate strictly within world latitude/longitude bounds
         if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
         if (!imgRaw) return;
 
