@@ -81,7 +81,7 @@ let isPoppyMotionActive = false;
 let currentSpeechUtterance = null;
 let availableVoices = [];
 
-let colIdx = { id: 0, ref: 1, title: 2, notes: 4, itemNoM: 12, age: 13, type: 14, category: 15, subcategory: 16, d3d: 17, doc: 18, web: 19, img1: 20, img2: 21, qty: 22, made: 23, year: 24, hot: 25 };
+let colIdx = { id: 0, ref: 1, title: 2, notes: 4, itemNoM: 12, age: 13, type: 14, category: 15, subcategory: 16, d3d: 17, doc: 18, web: 19, img1: 20, img2: 21, qty: 22, made: 23, year: 24, hot: 25, lat: 26, lng: 27 };
 let chartStackedInstance = null;
 let chartLocationsInstance = null;
 let chartSubcatCategoryInstance = null;
@@ -93,6 +93,14 @@ const CHART_PALETTE = ['#C85A32', '#3B7A57', '#B57C1E', '#3182CE', '#708259', '#
 // 2. Helper Functions & Dual-Mode Media Resolvers
 function safeReplaceState(urlStr) {
   try { window.history.replaceState(null, '', urlStr); } catch (e) {}
+}
+
+function parseCoord(val) {
+  if (!val) return NaN;
+  const clean = String(val).trim().replace(',', '.');
+  if (!/^-?\d+(\.\d+)?$/.test(clean)) return NaN;
+  const num = parseFloat(clean);
+  return (isNaN(num) || num === 0) ? NaN : num;
 }
 
 function getEraByYear(yearNum) {
@@ -228,15 +236,32 @@ function toggleCollapsibleControls(show) {
   }
 }
 
-// Dual-Mode CSV Fetcher with TTL Cache and Local / Remote Fallbacks
+// Dual-Mode CSV Fetcher with Cache-Shape Validation and Auto-Recovery
 async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+    if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
+      const parsedData = JSON.parse(cached);
+      if (Array.isArray(parsedData) && parsedData.length > 1 && Array.isArray(parsedData[0])) {
+        return parsedData;
+      } else {
+        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(`${cacheKey}_raw`);
+        localStorage.removeItem(`${cacheKey}_time`);
+      }
+    }
+  } catch (e) {
+    try { localStorage.removeItem(cacheKey); } catch(err) {}
+  }
+
   if (IS_LOCAL_ENV) {
     try {
       const localRes = await fetch(localUrl);
       if (localRes.ok) {
         const text = await localRes.text();
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-        if (parsed.data && parsed.data.length > 1) {
+        if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
           try {
             localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
             localStorage.setItem(`${cacheKey}_raw`, text);
@@ -249,20 +274,11 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
   }
 
   try {
-    const cached = localStorage.getItem(cacheKey);
-    const cacheTime = localStorage.getItem(`${cacheKey}_time`);
-    if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
-      const parsedData = JSON.parse(cached);
-      if (Array.isArray(parsedData) && parsedData.length > 1) return parsedData;
-    }
-  } catch (e) {}
-
-  try {
     const res = await fetch(remoteUrl);
     if (res.ok) {
       const text = await res.text();
       const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1) {
+      if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
         try {
           localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
           localStorage.setItem(`${cacheKey}_raw`, text);
@@ -278,7 +294,7 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
     if (fallbackRes.ok) {
       const text = await fallbackRes.text();
       const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1) {
+      if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
         try {
           localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
           localStorage.setItem(`${cacheKey}_raw`, text);
@@ -541,9 +557,6 @@ function extractDirect3DUrl(rawUrl) {
     if (local && (local.startsWith('./media/models/') || local.startsWith('media/models/') || /\.glb|\.gltf/i.test(local))) {
       return local;
     }
-    if (local && (local.includes('/images/') || local.includes('/docs/') || local.includes('/audio/'))) {
-      return '';
-    }
   }
 
   if (str.includes('#model=')) str = str.split('#model=').pop();
@@ -688,8 +701,36 @@ function update3DSkyboxUI() {
   if (lightboxBtn) lightboxBtn.textContent = labelText;
 }
 
+// --- Bidirectional 2D Map Jump Bridge ---
+window.showExhibitOnMap = function(originalIndex) {
+  closeModal();
+  closeEnlargeModal();
+  close3DLightbox();
+  document.body.classList.remove('overflow-hidden');
+  setTab('stats');
+
+  const mapIframe = document.getElementById('statMapIframe');
+  if (mapIframe) {
+    if (!mapIframe.src || mapIframe.src === 'about:blank') {
+      mapIframe.src = `2Dmap.html?exhibit=${originalIndex}`;
+    } else {
+      try {
+        mapIframe.contentWindow?.postMessage({
+          type: 'FOCUS_EXHIBIT',
+          exhibit: originalIndex
+        }, '*');
+      } catch (e) {}
+    }
+  }
+
+  setTimeout(() => {
+    document.getElementById('statMapCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+};
+
 function browseAllExhibits() {
   hideLoadingSpinner();
+  document.body.classList.remove('overflow-hidden');
   if (currentTab !== 'exhibits') setTab('exhibits');
   ['searchInput', 'filterAge', 'filterType', 'filterCategory', 'filterSubcategory', 'filterArtist', 'filterLabel', 'filterFormat', 'filterYear'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
@@ -703,6 +744,7 @@ function browseAllExhibits() {
     url.searchParams.delete('search');
     url.searchParams.delete('q');
     url.searchParams.delete('query');
+    url.searchParams.delete('item');
     url.searchParams.delete('tab');
     safeReplaceState(url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : ''));
   } catch (e) {}
@@ -714,8 +756,16 @@ function setTab(tabName) {
   currentTab = tabName;
   stopAudioGuide();
   hideLoadingSpinner();
-  if (tabName !== 'stats' && tabName !== 'analytics' && window.location.hash === '#stats') {
-    safeReplaceState(window.location.pathname + window.location.search);
+  document.body.classList.remove('overflow-hidden');
+
+  if (tabName === 'stats' || tabName === 'analytics') {
+    try {
+      const url = new URL(window.location);
+      url.searchParams.delete('search');
+      url.searchParams.delete('item');
+      url.searchParams.delete('q');
+      safeReplaceState(url.pathname + `#${tabName}`);
+    } catch (e) {}
   }
 
   const exhibitsFilterGrid = document.getElementById('exhibitsFilterGrid');
@@ -740,12 +790,6 @@ function setTab(tabName) {
     if (headerTitle) headerTitle.textContent = 'BMMC Showcase';
     if (headerIcon) headerIcon.textContent = '🏛️';
     if (subhead) subhead.textContent = 'Discover historical artifacts, equipment, and memorabilia at the Bonniefields Museum.';
-    const promptIcon = document.getElementById('promptIcon');
-    const promptTitle = document.getElementById('promptTitle');
-    const promptDesc = document.getElementById('promptDesc');
-    if (promptIcon) promptIcon.textContent = '🔍';
-    if (promptTitle) promptTitle.textContent = 'Ready to Explore Exhibits';
-    if (promptDesc) promptDesc.textContent = 'Select a Collection Hub above, search by keyword, or view all items in the BMMC archive.';
   } else if (tabName === 'gramophone') {
     if (statsSection) statsSection.classList.add('hidden');
     if (gridSection) gridSection.classList.remove('hidden');
@@ -755,12 +799,6 @@ function setTab(tabName) {
     if (headerTitle) headerTitle.textContent = 'BMMC Gramophones';
     if (headerIcon) headerIcon.textContent = '🎵';
     if (subhead) subhead.textContent = 'Gramophone Catalog (1916 – 1953): Shellac, vinyl, and early 20th-century audio recordings preserved in the BMMC music collection.';
-    const promptIcon = document.getElementById('promptIcon');
-    const promptTitle = document.getElementById('promptTitle');
-    const promptDesc = document.getElementById('promptDesc');
-    if (promptIcon) promptIcon.textContent = '🎵';
-    if (promptTitle) promptTitle.textContent = 'Explore Vintage Audio Records';
-    if (promptDesc) promptDesc.textContent = 'Search vintage gramophone recordings by artist, title, record label, or release year (1916 - 1953).';
   } else if (tabName === 'stats') {
     if (gridPrompt) gridPrompt.classList.add('hidden');
     if (gridSection) gridSection.classList.add('hidden');
@@ -808,7 +846,7 @@ function initFuseSearch() {
 function checkUrlQueryParams() {
   try {
     const params = new URLSearchParams(window.location.search);
-    const searchQuery = params.get('search') || params.get('q') || params.get('query');
+    const searchQuery = params.get('search') || params.get('q') || params.get('query') || params.get('item');
     const tabParam = params.get('tab');
 
     if (tabParam === 'gramophone') setTab('gramophone');
@@ -835,39 +873,40 @@ async function loadCatalogData() {
 
   initTheme();
   try {
-    // Fetch exhibits and gramophone datasets in parallel
     const [exhibitsData, gramophoneData] = await Promise.all([
       fetchDualModeCSV(REMOTE_EXHIBITS_CSV_URL, LOCAL_EXHIBITS_CSV_URL, 'bMMC_cached_exhibits'),
       fetchDualModeCSV(REMOTE_GRAMOPHONE_CSV_URL, LOCAL_GRAMOPHONE_CSV_URL, 'bMMC_cached_gramophone')
     ]);
 
-    if (exhibitsData && exhibitsData.length > 0) {
+    if (exhibitsData && exhibitsData.length > 0 && Array.isArray(exhibitsData[0])) {
       exhibitsData[0].forEach((cell, idx) => {
-        const c = String(cell).toLowerCase().trim();
-        if (c === 'no' || c === 'id') colIdx.id = idx;
+        const c = String(cell || '').toLowerCase().trim();
+        if (c === 'no' || c === 'id' || c === 'uid' || c === 'item id') colIdx.id = idx;
         if (c === 'ref') colIdx.ref = idx;
-        if (c === 'title' || c === 'content' || c === 'item') colIdx.title = idx;
+        if (c === 'title' || c === 'content' || c === 'name') colIdx.title = idx;
         if (c === 'notes' || c.includes('note')) colIdx.notes = idx;
         if (c === '#' || c === 'item no') colIdx.itemNoM = idx;
         if (c === 'age') colIdx.age = idx;
         if (c === 'type') colIdx.type = idx;
         if (c === 'category') colIdx.category = idx;
         if (c === 'subcategory' || c.includes('sub category')) colIdx.subcategory = idx;
-        if (c === '3d model' || c.includes('3d')) colIdx.d3d = idx;
+        if (c === '3d model' || c === '3d' || c.includes('3d')) colIdx.d3d = idx;
         if (c === 'ddoc' || (c.includes('doc') && !c.includes('banner'))) colIdx.doc = idx;
         if (c === 'dweb' || (c.includes('web') && !c.includes('banner'))) colIdx.web = idx;
         if (c === 'image 1' || c === 'img1' || (c.includes('image') && !c.includes('2'))) colIdx.img1 = idx;
         if (c === 'image 2' || c === 'img2') colIdx.img2 = idx;
         if (c === 'qty' || c === 'quantity' || c.includes('count')) colIdx.qty = idx;
         if (c === 'made' || c === 'origin' || c.includes('location')) colIdx.made = idx;
-        if (c === 'year' || c === 'date') colIdx.year = idx;
+        if (c === 'year' || c === 'date' || c === 'era') colIdx.year = idx;
         if (c === 'hot') colIdx.hot = idx;
+        if (c === 'lat' || c === 'latitude') colIdx.lat = idx;
+        if (c === 'lng' || c === 'lon' || c === 'longitude') colIdx.lng = idx;
       });
       rawExhibitsRows = exhibitsData.slice(1);
       populateInitialDropdowns();
     }
 
-    if (gramophoneData && gramophoneData.length > 0) {
+    if (gramophoneData && gramophoneData.length > 0 && Array.isArray(gramophoneData[0])) {
       rawGramophoneRows = gramophoneData.filter(r => {
         const c0 = getVal(r, 0).toLowerCase();
         const c1 = getVal(r, 1).toLowerCase();
@@ -879,10 +918,9 @@ async function loadCatalogData() {
     updateDynamicDropdowns();
     document.getElementById('gridPrompt')?.classList.remove('hidden');
     updateFavoritesBadge();
-    checkUrlHashForExhibit();
     checkUrlQueryParams();
+    checkUrlHashForExhibit();
 
-    // Defer Fuse search indexing to keep main thread completely unblocked
     setTimeout(() => initFuseSearch(), 80);
 
   } catch (err) {
@@ -903,13 +941,19 @@ async function loadCatalogData() {
 function checkUrlHashForExhibit() {
   const hash = window.location.hash;
   if (hash === '#analytics' || hash === '#admin-stats') setTab('analytics');
-  else if (hash === '#stats') setTab('stats');
+  else if (hash === '#stats' || hash === '#info') setTab('stats');
   else if (hash && hash.startsWith('#exhibit-')) {
     const index = parseInt(hash.replace('#exhibit-', ''), 10);
-    if (!isNaN(index) && rawExhibitsRows[index]) { filterCatalog(true); openModalByOriginalIndex(index); }
+    if (!isNaN(index) && rawExhibitsRows && rawExhibitsRows[index]) {
+      if (currentTab !== 'exhibits') setTab('exhibits');
+      openModalByOriginalIndex(index);
+    }
   } else if (hash && hash.startsWith('#gramophone-')) {
     const index = parseInt(hash.replace('#gramophone-', ''), 10);
-    if (!isNaN(index) && rawGramophoneRows[index]) { setTab('gramophone'); openModalByOriginalIndex(index); }
+    if (!isNaN(index) && rawGramophoneRows && rawGramophoneRows[index]) {
+      setTab('gramophone');
+      openModalByOriginalIndex(index);
+    }
   }
 }
 
@@ -1566,12 +1610,14 @@ function closeEnlargeModal() {
   const body = document.getElementById('enlargeModalBody');
   if (modal) modal.classList.add('hidden');
   if (body) body.innerHTML = '';
-  document.body.classList.remove('overflow-hidden');
+  const detailModal = document.getElementById('detailModal');
+  if (!detailModal || detailModal.classList.contains('hidden')) {
+    document.body.classList.remove('overflow-hidden');
+  }
 }
 
 // 5. Museum Statistics & Charts
 function renderMuseumStatistics() {
-  // Lazy mount the 2D Map iframe on first visit to the Stats tab
   const mapIframe = document.getElementById('statMapIframe');
   if (mapIframe && !mapIframe.src && mapIframe.dataset.src) {
     mapIframe.src = mapIframe.dataset.src;
@@ -1995,16 +2041,36 @@ function open3DLightbox(rawUrl, rawTitle) {
 function close3DLightbox() {
   const modal = document.getElementById('lightbox3DModal');
   if (modal) modal.classList.add('hidden');
+  const detailModal = document.getElementById('detailModal');
+  if (!detailModal || detailModal.classList.contains('hidden')) {
+    document.body.classList.remove('overflow-hidden');
+  }
 }
 
 function openModalByOriginalIndex(origIdx) {
-  const filteredIndex = currentFilteredRows.findIndex(item => item.originalIndex === origIdx);
-  if (filteredIndex !== -1) openModalByFilteredIndex(filteredIndex);
-  else {
-    const rows = currentTab === 'exhibits' ? rawExhibitsRows : rawGramophoneRows;
-    if (rows[origIdx]) openModal(rows[origIdx], origIdx);
+  if (currentTab !== 'exhibits') setTab('exhibits');
+  
+  if (rawExhibitsRows[origIdx]) {
+    isGridActive = true;
+    document.getElementById('gridPrompt')?.classList.add('hidden');
+    document.getElementById('grid')?.classList.remove('hidden');
+    document.getElementById('gridSection')?.classList.remove('hidden');
+    document.getElementById('statsSection')?.classList.add('hidden');
+    document.getElementById('adminAnalyticsSection')?.classList.add('hidden');
+
+    const filteredIndex = currentFilteredRows.findIndex(item => item.originalIndex === origIdx);
+    if (filteredIndex !== -1) {
+      currentModalIndex = filteredIndex;
+      openModal(currentFilteredRows[filteredIndex].row, origIdx);
+    } else {
+      currentModalIndex = 0;
+      openModal(rawExhibitsRows[origIdx], origIdx);
+    }
   }
 }
+
+// Global Export for 2D Map & PostMessage integration
+window.openExhibitModal = openModalByOriginalIndex;
 
 function openModalByFilteredIndex(filteredIndex) {
   if (filteredIndex < 0 || filteredIndex >= currentFilteredRows.length) return;
@@ -2026,7 +2092,7 @@ function openModal(row, originalIndex) {
   const isDark = document.documentElement.classList.contains('dark');
 
   if (currentTab === 'exhibits') {
-    safeReplaceState(`${window.location.pathname}${window.location.search}#exhibit-${originalIndex}`);
+    safeReplaceState(`${window.location.pathname}#exhibit-${originalIndex}`);
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
     const { title, details } = parseTitleAndDetails(rawContent);
     const displayTitle = title || `Exhibit Item Details`;
@@ -2047,6 +2113,22 @@ function openModal(row, originalIndex) {
     const ageBadgeClass = getAgeBadgeStyle(eraDisplay);
     const cleanedDetails = cleanDetailsForModal(details);
     const theme = getCategoryTheme(category || type || subcategory);
+
+    // Robust Coordinate extraction
+    let latRaw = getVal(row, colIdx.lat);
+    let lngRaw = getVal(row, colIdx.lng);
+    let latVal = parseCoord(latRaw);
+    let lngVal = parseCoord(lngRaw);
+
+    if ((isNaN(latVal) || isNaN(lngVal)) && latRaw.includes(',')) {
+      const parts = latRaw.split(',');
+      if (parts.length === 2) {
+        latVal = parseCoord(parts[0]);
+        lngVal = parseCoord(parts[1]);
+      }
+    }
+
+    const hasCoordinates = !isNaN(latVal) && !isNaN(lngVal) && latVal >= -90 && latVal <= 90 && lngVal >= -180 && lngVal <= 180;
 
     const modalImg1 = formatGoogleLh3Url(img1, 's600');
     const modalImg2 = formatGoogleLh3Url(img2, 's600');
@@ -2073,7 +2155,7 @@ function openModal(row, originalIndex) {
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
       shareBtn.onclick = () => {
-        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}${window.location.search}#exhibit-${originalIndex}`).then(() => showToast('Link copied to clipboard!', '🔗'));
+        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`).then(() => showToast('Link copied to clipboard!', '🔗'));
       };
     }
 
@@ -2094,6 +2176,7 @@ function openModal(row, originalIndex) {
               ${category ? createCategoryBadge(category, 'category') : ''}
               ${type ? createCategoryBadge(type, 'type') : ''}
               ${subcategory ? createCategoryBadge(subcategory, 'subcategory') : ''}
+              ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" title="View origin on 2D map" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow transition flex items-center gap-1">📍 Show on Map ↗</button>` : ''}
             </div>
 
             ${cleanedDetails ? `
@@ -2116,6 +2199,7 @@ function openModal(row, originalIndex) {
 
             <div class="flex flex-wrap items-center gap-2.5 pt-2">
               <button id="btnGoogleSearchMain" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">🔍 Google Item</button>
+              ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🗺️ Locate Origin Map</button>` : ''}
             </div>
 
             <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
@@ -2193,7 +2277,7 @@ function openModal(row, originalIndex) {
     }
 
   } else {
-    safeReplaceState(`${window.location.pathname}${window.location.search}#gramophone-${originalIndex}`);
+    safeReplaceState(`${window.location.pathname}#gramophone-${originalIndex}`);
     const catalogNum = getVal(row, 0);
     const artist = getVal(row, 1) || 'Unknown Artist';
     const rawTitle = getGramophoneRawTitle(row);
@@ -2230,7 +2314,7 @@ function openModal(row, originalIndex) {
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
       shareBtn.onclick = () => {
-        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}${window.location.search}#gramophone-${originalIndex}`).then(() => showToast('Record link copied to clipboard!', '🔗'));
+        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#gramophone-${originalIndex}`).then(() => showToast('Record link copied to clipboard!', '🔗'));
       };
     }
 
@@ -2293,7 +2377,7 @@ function closeModal() {
   stopAudioGuide();
   document.body.classList.remove('overflow-hidden');
   document.getElementById('detailModal')?.classList.add('hidden');
-  safeReplaceState(`${window.location.pathname}${window.location.search}`);
+  safeReplaceState(window.location.pathname);
 }
 
 // 7. Event Listeners & Bootstrapping
@@ -2402,6 +2486,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modal && modal.classList.contains('hidden')) return;
     if (e.key === 'ArrowLeft' && currentModalIndex > 0) openModalByFilteredIndex(currentModalIndex - 1);
     if (e.key === 'ArrowRight' && currentModalIndex < currentFilteredRows.length - 1) openModalByFilteredIndex(currentModalIndex + 1);
+  });
+
+  // Listen for hash changes from map clicks / URLs
+  window.addEventListener('hashchange', checkUrlHashForExhibit);
+
+  // Listen for iframe postMessage events (e.g. from 2Dmap.html)
+  window.addEventListener('message', (event) => {
+    if (!event.data) return;
+    if (event.data.type === 'BMMC_OPEN_ITEM' || event.data.action === 'openExhibit') {
+      const exhibitNum = event.data.exhibit !== undefined ? event.data.exhibit : event.data.id;
+      if (typeof closeEnlargeModal === 'function') closeEnlargeModal();
+      if (typeof close3DLightbox === 'function') close3DLightbox();
+      if (exhibitNum !== undefined && exhibitNum !== null) {
+        openModalByOriginalIndex(Number(exhibitNum));
+      }
+    }
   });
 
   loadCatalogData();

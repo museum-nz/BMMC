@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Photo Map with Dual Year Slider</title>
 
-  <!-- Content Security Policy -->
+  <!-- Content Security Policy (Includes Esri Satellite CDN) -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
     style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
-    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.cartocdn.com https://*.dropboxusercontent.com https://*.dropbox.com;
-    connect-src 'self' https://docs.google.com https://*.cartocdn.com;
+    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.cartocdn.com https://*.dropboxusercontent.com https://*.dropbox.com https://server.arcgisonline.com https://*.arcgisonline.com;
+    connect-src 'self' https://docs.google.com https://*.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com;
     font-src 'self' https://fonts.gstatic.com;
   ">
 
   <!-- Preconnect for Image & Tile CDN Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
+  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
@@ -27,9 +28,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 
   <style>
-    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #aad3df; }
+    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #0f172a; }
     #map { width: 100vw; height: 100vh; background: #aad3df; }
 
+    /* --- Custom Markers & Badges --- */
     .single-photo-wrapper {
       width: 75px;
       height: 75px;
@@ -79,11 +81,12 @@
       border-color: #38bdf8;
     }
 
+    /* --- Popups --- */
     .leaflet-popup-content-wrapper {
       padding: 0;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
     }
     .leaflet-popup-content {
       margin: 0 !important;
@@ -97,19 +100,19 @@
     }
     .photo-card-large h3 {
       margin: 0 0 4px 0;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: #0f172a;
     }
     .photo-card-large p {
       margin: 0 0 10px 0;
-      font-size: 13px;
+      font-size: 12px;
       color: #0284c7;
       font-weight: 600;
     }
     .photo-card-large .img-container {
       width: 100%;
-      height: 280px;
+      height: 270px;
       border-radius: 8px;
       background: #f8fafc;
       overflow: hidden;
@@ -121,65 +124,231 @@
       display: block;
     }
 
+    .card-footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    .view-item-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0369a1;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 6px 11px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+    }
+    .view-item-btn:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+      text-decoration: none;
+    }
+
+    /* --- Top Controls Bar --- */
+    .top-controls-bar {
+      position: absolute;
+      top: 15px;
+      left: 60px;
+      right: 15px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .map-search-box {
+      pointer-events: auto;
+      position: relative;
+      width: 280px;
+      max-width: 50vw;
+    }
+    .map-search-box input {
+      width: 100%;
+      padding: 8px 30px 8px 32px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      box-sizing: border-box;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .map-search-box input:focus {
+      border-color: #38bdf8;
+      background: rgba(15, 23, 42, 0.98);
+    }
+    .map-search-box .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .map-search-box .clear-search-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #ffffff;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .top-action-btn {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      transition: all 0.15s ease;
+    }
+    .top-action-btn:hover {
+      background: rgba(30, 41, 59, 0.98);
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+
+    /* --- Google Maps Style Layer Switcher Popup --- */
+    .layer-switcher-container {
+      position: relative;
+      pointer-events: auto;
+    }
+    .layer-dropdown-card {
+      position: absolute;
+      top: 42px;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 10px;
+      display: none;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 1100;
+    }
+    .layer-dropdown-card.show { display: flex; }
+    .layer-option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 6px 8px;
+      color: #f8fafc;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .layer-option-btn:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: #38bdf8;
+    }
+    .layer-option-btn.active {
+      border-color: #0284c7;
+      background: rgba(2, 132, 199, 0.25);
+    }
+    .layer-option-btn span.icon { font-size: 18px; }
+
+    /* --- Bottom Year Slider Bar --- */
     .year-slider-container {
       position: absolute;
       bottom: 20px;
       left: 20px;
       z-index: 1000;
       background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       padding: 12px 18px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.18);
       color: #f8fafc;
-      width: 290px;
+      width: 320px;
       box-sizing: border-box;
     }
 
-    @media (max-width: 768px) {
-      .year-slider-container {
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 15px !important;
-        width: 85vw !important;
-        max-width: 320px !important;
-      }
-      .leaflet-popup {
-        position: fixed !important;
-        bottom: 85px !important;
-        left: 12px !important;
-        top: auto !important;
-        transform: none !important;
-        margin: 0 !important;
-        z-index: 1500 !important;
-      }
-      .leaflet-popup-content-wrapper {
-        max-width: 78vw !important;
-        border-radius: 12px;
-      }
-      .leaflet-popup-tip-container { display: none !important; }
-      .leaflet-control-container .leaflet-control-attribution {
-        font-size: 9px !important;
-        padding: 2px 6px !important;
-        transform: scale(0.8);
-        transform-origin: bottom right;
-      }
-      .leaflet-control-zoom {
-        transform: scale(0.8);
-        transform-origin: top left;
-      }
-    }
-
     .year-slider-header {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
     }
-    .year-slider-header span { color: #38bdf8; font-weight: 700; font-size: 14px; }
+    .timeline-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-timeline-play {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .btn-timeline-play:hover { background: #0369a1; transform: scale(1.08); }
+    .btn-timeline-play.playing { background: #e11d48; }
+
+    .item-counter-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .year-slider-header span.range-text {
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 13px;
+    }
 
     .dual-slider-track-wrapper {
       position: relative;
@@ -242,16 +411,104 @@
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
+
+    @media (max-width: 768px) {
+      .top-controls-bar {
+        left: 50px;
+        right: 10px;
+        top: 10px;
+      }
+      .map-search-box { width: 140px; }
+      .year-slider-container {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 15px !important;
+        width: 90vw !important;
+        max-width: 330px !important;
+      }
+      .leaflet-popup {
+        position: fixed !important;
+        bottom: 95px !important;
+        left: 10px !important;
+        top: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+        z-index: 1500 !important;
+      }
+      .leaflet-popup-content-wrapper {
+        max-width: 84vw !important;
+        border-radius: 12px;
+      }
+      .leaflet-popup-tip-container { display: none !important; }
+      .leaflet-control-container .leaflet-control-attribution {
+        font-size: 8px !important;
+        transform: scale(0.8);
+        transform-origin: bottom right;
+      }
+      .leaflet-control-zoom {
+        transform: scale(0.8);
+        transform-origin: top left;
+      }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Top Search & Google Maps Style Layer Controls -->
+  <div class="top-controls-bar">
+    <div class="map-search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mapSearchInput" placeholder="Search map items..." aria-label="Search map artifacts">
+      <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
+    </div>
+
+    <!-- Google Maps Style Layers Switcher Button -->
+    <div class="layer-switcher-container">
+      <button id="btnLayersToggle" class="top-action-btn" title="Change Map Type">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>Layers</span>
+      </button>
+
+      <div id="layerDropdownCard" class="layer-dropdown-card">
+        <button id="btnLayerVoyager" class="layer-option-btn active" title="Default Map View">
+          <span class="icon">🗺️</span>
+          <span>Default</span>
+        </button>
+        <button id="btnLayerSatellite" class="layer-option-btn" title="Satellite Imagery">
+          <span class="icon">🛰️</span>
+          <span>Satellite</span>
+        </button>
+      </div>
+    </div>
+
+    <button id="btnFitBounds" class="top-action-btn" title="Fit all visible items in view">
+      <span>🧭</span> <span class="hidden-xs">Fit All</span>
+    </button>
+
+    <button id="btnResetView" class="top-action-btn" title="Reset map position & timeline">
+      <span>↺</span> <span class="hidden-xs">Reset</span>
+    </button>
+
+    <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
+      <span id="fullscreenIcon">⛶</span>
+    </button>
+  </div>
+
   <div id="map"></div>
 
+  <!-- Bottom Timeline & Year Slider Panel -->
   <div class="year-slider-container">
     <div class="year-slider-header">
-      <div>Year Range</div>
-      <span id="yearRangeText">Loading...</span>
+      <div class="timeline-title-group">
+        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play Timeline Time-Lapse" aria-label="Play timeline">▶</button>
+        <span>Timeline</span>
+        <span id="itemCountBadge" class="item-counter-badge">Loading...</span>
+      </div>
+      <span id="yearRangeText" class="range-text">Loading...</span>
     </div>
     <div class="dual-slider-track-wrapper">
       <div class="slider-track-bg"></div>
@@ -261,7 +518,7 @@
     </div>
   </div>
 
-  <!-- Leaflet & PapaParse CDN Libraries with SRI Validation -->
+  <!-- Leaflet & PapaParse CDN Libraries -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
@@ -283,16 +540,53 @@
     function sanitizeUrl(url) {
       if (!url) return '';
       const clean = String(url).trim();
-      if (clean.startsWith('./media/') || clean.startsWith('media/') || clean.startsWith('data:image/')) {
-        return clean;
-      }
-      if (/^https?:\/\//i.test(clean)) {
-        return clean;
-      }
-      if (!clean.includes(':')) {
-        return clean.startsWith('./') ? clean : `https://${clean}`;
-      }
+      if (clean.startsWith('./media/') || clean.startsWith('media/')) return clean;
+      if (clean.startsWith('data:image/svg+xml') || clean.startsWith('data:image/png') || clean.startsWith('data:image/jpeg') || clean.startsWith('data:image/webp')) return clean;
+      if (/^https?:\/\//i.test(clean)) return clean;
+      if (!clean.includes(':')) return clean.startsWith('./') ? clean : `https://${clean}`;
       return '';
+    }
+
+    // --- State Persistence: Remember Map Position & Zoom Level ---
+    let savedState = null;
+    try {
+      const rawState = sessionStorage.getItem('bMMC_map_view_state');
+      if (rawState) savedState = JSON.parse(rawState);
+    } catch (e) {}
+
+    function saveMapViewState() {
+      try {
+        if (!map) return;
+        const center = map.getCenter();
+        const state = {
+          lat: center.lat,
+          lng: center.lng,
+          zoom: map.getZoom(),
+          minYear: document.getElementById('minYearSlider')?.value,
+          maxYear: document.getElementById('maxYearSlider')?.value,
+          search: document.getElementById('mapSearchInput')?.value || ''
+        };
+        sessionStorage.setItem('bMMC_map_view_state', JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    // Bridge click event to parent window (opens modal in-place without refreshing index.html)
+    function openItemInIndex(event, exhibitNum, title) {
+      saveMapViewState();
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'BMMC_OPEN_ITEM',
+            exhibit: exhibitNum,
+            title: title
+          }, '*');
+          if (event) event.preventDefault();
+          return;
+        }
+      } catch (e) {}
+
+      // Fallback if opened standalone
+      window.location.href = `index.html#exhibit-${exhibitNum}`;
     }
 
     const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
@@ -305,8 +599,18 @@
     const SVG_NO_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%2364748b%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     const isMobile = window.innerWidth <= 768;
-    const initialZoom = isMobile ? 2 : 3;
+    const defaultZoom = isMobile ? 2 : 3;
+    const defaultCenter = [-10, 135];
     const worldBounds = [[-89, -180], [89, 180]];
+    const TIMELINE_DEFAULT_START_YEAR = 1830;
+
+    const initialCenter = (savedState && !isNaN(savedState.lat) && !isNaN(savedState.lng))
+      ? [savedState.lat, savedState.lng]
+      : defaultCenter;
+
+    const initialZoom = (savedState && !isNaN(savedState.zoom))
+      ? savedState.zoom
+      : defaultZoom;
 
     const map = L.map('map', {
       closePopupOnClick: true,
@@ -314,14 +618,42 @@
       maxBoundsViscosity: 1.0,
       minZoom: 2,
       worldCopyJump: false
-    }).setView([-10, 135], initialZoom);
+    }).setView(initialCenter, initialZoom);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
+    // --- Base Layer Definitions (Voyager & Satellite Only) ---
+    const layerVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>',
       maxZoom: 19,
       subdomains: 'abcd',
       noWrap: true
     }).addTo(map);
+
+    const layerSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      maxZoom: 18,
+      noWrap: true
+    });
+
+    function setBasemap(type) {
+      const btnVoyager = document.getElementById('btnLayerVoyager');
+      const btnSatellite = document.getElementById('btnLayerSatellite');
+
+      if (type === 'satellite') {
+        map.removeLayer(layerVoyager);
+        layerSatellite.addTo(map);
+        btnSatellite?.classList.add('active');
+        btnVoyager?.classList.remove('active');
+      } else {
+        map.removeLayer(layerSatellite);
+        layerVoyager.addTo(map);
+        btnVoyager?.classList.add('active');
+        btnSatellite?.classList.remove('active');
+      }
+      document.getElementById('layerDropdownCard')?.classList.remove('show');
+    }
+
+    map.on('moveend', saveMapViewState);
+    map.on('zoomend', saveMapViewState);
 
     let markers = L.markerClusterGroup({
       spiderfyOnMaxZoom: true,
@@ -341,8 +673,10 @@
 
     let heatLayer = null;
     let allPhotoRecords = [];
+    let recordMarkerMap = new Map();
     let globalMinYear = 1800;
     let globalMaxYear = 2026;
+    let timelinePlayTimer = null;
 
     function extractDriveId(url) {
       if (!url) return '';
@@ -374,7 +708,6 @@
       return sanitizeUrl(clean);
     }
 
-    // Strict coordinate parser to avoid interpreting dates, sizes, or text as coordinates
     function parseCoord(val) {
       if (!val) return NaN;
       const clean = String(val).trim().replace(',', '.');
@@ -386,6 +719,7 @@
     function renderDataset(records) {
       markers.clearLayers();
       if (heatLayer) map.removeLayer(heatLayer);
+      recordMarkerMap.clear();
 
       const heatPoints = [];
       const markerList = [];
@@ -411,17 +745,30 @@
           ? (safeYear ? `📍 ${safeLocation} &bull; ${safeYear}` : `📍 ${safeLocation}`)
           : (safeYear ? `📅 ${safeYear}` : '');
 
+        const exhibitNum = (item.index !== undefined && item.index !== null) ? item.index : 0;
+        const itemHref = `index.html#exhibit-${exhibitNum}`;
+
         const popupHTML = `
           <div class="photo-card-large">
             ${safeTitle ? `<h3>${safeTitle}</h3>` : ''}
             ${locationYearText ? `<p>${locationYearText}</p>` : ''}
-            <div class="img-container"><img src="${safeImgUrl}" loading="lazy" alt="${safeTitle || 'Photo'}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>
+            <div class="img-container">
+              <img src="${safeImgUrl}" loading="lazy" alt="${safeTitle || 'Photo'}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/>
+            </div>
+            <div class="card-footer">
+              <a href="${itemHref}" target="_top" class="view-item-btn" onclick="openItemInIndex(event, ${exhibitNum}, '${safeTitle.replace(/'/g, "\\'")}')">
+                <span>🔍</span> View Item Details ↗
+              </a>
+            </div>
           </div>
         `;
 
         const marker = L.marker([item.lat, item.lng], { icon: photoIcon });
         marker.bindPopup(popupHTML, { autoPan: true, keepInView: true, autoClose: true });
         markerList.push(marker);
+
+        recordMarkerMap.set(item.index, marker);
+        if (item.id) recordMarkerMap.set(item.id, marker);
       });
 
       markers.addLayers(markerList);
@@ -444,6 +791,11 @@
       }
 
       map.addLayer(markers);
+
+      const countBadge = document.getElementById('itemCountBadge');
+      if (countBadge) {
+        countBadge.textContent = `${records.length} item${records.length === 1 ? '' : 's'}`;
+      }
     }
 
     function initYearSliderUI() {
@@ -464,19 +816,44 @@
 
       minSlider.min = globalMinYear;
       minSlider.max = globalMaxYear;
-      minSlider.value = globalMinYear;
 
       maxSlider.min = globalMinYear;
       maxSlider.max = globalMaxYear;
-      maxSlider.value = globalMaxYear;
+
+      let restoredMin = globalMinYear;
+      let restoredMax = globalMaxYear;
+
+      if (savedState) {
+        const sMin = parseInt(savedState.minYear, 10);
+        const sMax = parseInt(savedState.maxYear, 10);
+        if (!isNaN(sMin) && sMin >= globalMinYear && sMin <= globalMaxYear) restoredMin = sMin;
+        if (!isNaN(sMax) && sMax >= globalMinYear && sMax <= globalMaxYear) restoredMax = sMax;
+        if (restoredMin > restoredMax) {
+          restoredMin = globalMinYear;
+          restoredMax = globalMaxYear;
+        }
+      }
+
+      minSlider.value = restoredMin;
+      maxSlider.value = restoredMax;
+
+      if (savedState && savedState.search) {
+        const searchInput = document.getElementById('mapSearchInput');
+        if (searchInput) {
+          searchInput.value = savedState.search;
+          document.getElementById('clearMapSearch').style.display = 'flex';
+        }
+      }
 
       updateYearFilter();
+      handleInitialDeepLinks();
     }
 
     function updateYearFilter(evt) {
       const minSlider = document.getElementById('minYearSlider');
       const maxSlider = document.getElementById('maxYearSlider');
       const trackFill = document.getElementById('sliderTrackFill');
+      const searchVal = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
 
       let minVal = parseInt(minSlider.value, 10);
       let maxVal = parseInt(maxSlider.value, 10);
@@ -505,16 +882,133 @@
 
       const filtered = allPhotoRecords.filter(item => {
         const y = parseInt(item.year, 10);
-        if (isNaN(y)) return true;
-        return y >= minVal && y <= maxVal;
+        const matchesYear = isNaN(y) || (y >= minVal && y <= maxVal);
+        if (!matchesYear) return false;
+
+        if (searchVal) {
+          const hay = `${item.title} ${item.location} ${item.year}`.toLowerCase();
+          return hay.includes(searchVal);
+        }
+        return true;
       });
 
       renderDataset(filtered);
+      saveMapViewState();
+    }
+
+    // --- Timeline Play / Pause Engine (Starts at 1830 by Default) ---
+    function toggleTimelinePlayback() {
+      const playBtn = document.getElementById('btnPlayTimeline');
+      const maxSlider = document.getElementById('maxYearSlider');
+
+      if (timelinePlayTimer) {
+        clearInterval(timelinePlayTimer);
+        timelinePlayTimer = null;
+        playBtn.textContent = '▶';
+        playBtn.classList.remove('playing');
+        playBtn.title = 'Play Timeline Time-Lapse';
+      } else {
+        playBtn.textContent = '⏸';
+        playBtn.classList.add('playing');
+        playBtn.title = 'Pause Timeline';
+
+        let startYear = Math.max(TIMELINE_DEFAULT_START_YEAR, globalMinYear);
+        if (parseInt(maxSlider.value, 10) >= globalMaxYear || parseInt(maxSlider.value, 10) <= startYear) {
+          maxSlider.value = startYear;
+          updateYearFilter();
+        }
+
+        timelinePlayTimer = setInterval(() => {
+          let curr = parseInt(maxSlider.value, 10);
+          if (curr >= globalMaxYear) {
+            toggleTimelinePlayback();
+          } else {
+            maxSlider.value = Math.min(globalMaxYear, curr + 2);
+            updateYearFilter();
+          }
+        }, 350);
+      }
+    }
+
+    // --- Deep Link & Window PostMessage Bridge ---
+    function focusExhibitMarker(exhibitIdOrIndex) {
+      const marker = recordMarkerMap.get(exhibitIdOrIndex) || recordMarkerMap.get(Number(exhibitIdOrIndex));
+      if (marker) {
+        markers.zoomToShowLayer(marker, () => {
+          marker.openPopup();
+        });
+      }
+    }
+
+    function handleInitialDeepLinks() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const exhibit = params.get('exhibit') || params.get('id');
+        const search = params.get('search');
+        const lat = parseFloat(params.get('lat'));
+        const lng = parseFloat(params.get('lng'));
+
+        if (search) {
+          const searchInput = document.getElementById('mapSearchInput');
+          if (searchInput) {
+            searchInput.value = search;
+            document.getElementById('clearMapSearch').style.display = 'flex';
+            updateYearFilter();
+          }
+        }
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+          map.setView([lat, lng], 12);
+        } else if (exhibit !== null) {
+          setTimeout(() => focusExhibitMarker(exhibit), 300);
+        }
+      } catch (e) {}
+    }
+
+    // Listen for parent messages from index.html
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'FOCUS_EXHIBIT') {
+        focusExhibitMarker(e.data.exhibit);
+      } else if (e.data && e.data.type === 'FOCUS_COORDS' && !isNaN(e.data.lat) && !isNaN(e.data.lng)) {
+        map.setView([e.data.lat, e.data.lng], e.data.zoom || 11);
+      }
+    });
+
+    // --- Fit Bounds & Reset Controls ---
+    function fitAllMarkers() {
+      if (markers && markers.getLayers().length > 0) {
+        map.fitBounds(markers.getBounds(), { padding: [50, 50], maxZoom: 12 });
+      } else {
+        map.setView(defaultCenter, defaultZoom);
+      }
+    }
+
+    function resetEntireMapView() {
+      try { sessionStorage.removeItem('bMMC_map_view_state'); } catch (e) {}
+      document.getElementById('minYearSlider').value = globalMinYear;
+      document.getElementById('maxYearSlider').value = globalMaxYear;
+      const searchInput = document.getElementById('mapSearchInput');
+      if (searchInput) searchInput.value = '';
+      document.getElementById('clearMapSearch').style.display = 'none';
+      if (timelinePlayTimer) toggleTimelinePlayback();
+      map.setView(defaultCenter, defaultZoom);
+      updateYearFilter();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fullscreenIcon').textContent = '🗗';
+      } else {
+        document.exitFullscreen().catch(() => {});
+        document.getElementById('fullscreenIcon').textContent = '⛶';
+      }
     }
 
     function parseAndProcessDataset(rows) {
       if (!rows || rows.length < 2) return;
 
+      let idIdx = 0;
       let titleIdx = 2;
       let imgIdx = 20;
       let madeIdx = 23;
@@ -522,10 +1016,10 @@
       let latIdx = 26;
       let lngIdx = 27;
 
-      // Exact/targeted column matching to prevent false column collisions
       if (rows[0]) {
         rows[0].forEach((col, idx) => {
           const c = String(col).toLowerCase().trim();
+          if (c === 'id' || c === 'uid' || c === 'item id' || c === 'item_id' || c === 'no' || c === 'item' || c === 'item #') idIdx = idx;
           if (c === 'lat' || c === 'latitude' || c === 'lat_deg') latIdx = idx;
           if (c === 'lng' || c === 'lon' || c === 'long' || c === 'longitude') lngIdx = idx;
           if (c === 'img1' || c.includes('1st image') || c.includes('image 1')) imgIdx = idx;
@@ -537,7 +1031,8 @@
 
       allPhotoRecords = [];
 
-      rows.slice(1).forEach(row => {
+      rows.slice(1).forEach((row, rIdx) => {
+        let idRaw = idIdx >= 0 ? row[idIdx] || '' : '';
         let latStr = latIdx >= 0 ? row[latIdx] || '' : '';
         let lngStr = lngIdx >= 0 ? row[lngIdx] || '' : '';
         let imgRaw = imgIdx >= 0 ? row[imgIdx] || '' : '';
@@ -545,7 +1040,6 @@
         let madeRaw = madeIdx >= 0 ? row[madeIdx] || '' : '';
         let yearRaw = yearIdx >= 0 ? row[yearIdx] || '' : '';
 
-        // Find primary image if not in designated column
         if (!imgRaw || (!imgRaw.includes('http') && !imgRaw.includes('media/'))) {
           for (let i = 0; i < row.length; i++) {
             const v = String(row[i] || '').trim();
@@ -560,7 +1054,6 @@
         let lat = parseCoord(latStr);
         let lng = parseCoord(lngStr);
 
-        // Fallback only if coordinates were combined into a single lat column (e.g. "-33.86, 151.20")
         if ((isNaN(lat) || isNaN(lng)) && String(latStr).includes(',')) {
           const parts = String(latStr).split(',');
           if (parts.length === 2) {
@@ -573,7 +1066,6 @@
           }
         }
 
-        // Validate strictly within world latitude/longitude bounds
         if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
         if (!imgRaw) return;
 
@@ -584,7 +1076,13 @@
         const imgUrl = formatImgUrl(imgRaw);
         if (!imgUrl) return;
 
+        let numId = parseInt(idRaw, 10);
+        let exhibitIndex = !isNaN(numId) ? (numId - 2) : rIdx;
+        if (exhibitIndex < 0) exhibitIndex = rIdx;
+
         allPhotoRecords.push({
+          id: String(idRaw).trim(),
+          index: exhibitIndex,
           lat: lat,
           lng: lng,
           title: cleanTitle.trim(),
@@ -598,7 +1096,6 @@
     }
 
     async function loadMapData() {
-      // 1. Shared Cache Check
       try {
         const cachedRaw = localStorage.getItem('bMMC_cached_exhibits_raw');
         const cachedParsed = localStorage.getItem('bMMC_cached_exhibits');
@@ -619,11 +1116,8 @@
             return;
           }
         }
-      } catch (e) {
-        console.warn('Cache parsing error:', e);
-      }
+      } catch (e) {}
 
-      // 2. Local File Check
       if (IS_LOCAL_ENV) {
         try {
           const localRes = await fetch(LOCAL_CSV_URL);
@@ -638,7 +1132,6 @@
         } catch (e) {}
       }
 
-      // 3. Network Fetch from Google Sheets Export
       try {
         const res = await fetch(REMOTE_CSV_URL);
         if (res.ok) {
@@ -656,7 +1149,6 @@
         }
       } catch (e) {}
 
-      // 4. Fallback to Local CSV
       try {
         const fallbackRes = await fetch(LOCAL_CSV_URL);
         if (fallbackRes.ok) {
@@ -670,12 +1162,77 @@
       } catch (e) {}
 
       document.getElementById('yearRangeText').textContent = 'Data offline';
+      document.getElementById('itemCountBadge').textContent = 'Offline';
     }
 
-    // Attach non-inline event listeners
+    // --- Attach Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
       document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
+
+      document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
+      document.getElementById('btnFitBounds')?.addEventListener('click', fitAllMarkers);
+      document.getElementById('btnResetView')?.addEventListener('click', resetEntireMapView);
+      document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
+
+      // Layer switcher dropdown toggle
+      const btnLayersToggle = document.getElementById('btnLayersToggle');
+      const layerDropdownCard = document.getElementById('layerDropdownCard');
+
+      btnLayersToggle?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        layerDropdownCard?.classList.toggle('show');
+      });
+
+      document.getElementById('btnLayerVoyager')?.addEventListener('click', () => setBasemap('voyager'));
+      document.getElementById('btnLayerSatellite')?.addEventListener('click', () => setBasemap('satellite'));
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.layer-switcher-container')) {
+          layerDropdownCard?.classList.remove('show');
+        }
+      });
+
+      const searchInput = document.getElementById('mapSearchInput');
+      const clearSearchBtn = document.getElementById('clearMapSearch');
+
+      searchInput?.addEventListener('input', (e) => {
+        clearSearchBtn.style.display = e.target.value ? 'flex' : 'none';
+        updateYearFilter();
+      });
+
+      clearSearchBtn?.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        updateYearFilter();
+        searchInput.focus();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') {
+          if (e.key === 'Escape') {
+            e.target.blur();
+            map.closePopup();
+          }
+          return;
+        }
+
+        if (e.key === ' ') {
+          e.preventDefault();
+          toggleTimelinePlayback();
+        } else if (e.key === 'Escape') {
+          map.closePopup();
+        } else if (e.key === 'ArrowRight') {
+          const maxSlider = document.getElementById('maxYearSlider');
+          maxSlider.value = Math.min(globalMaxYear, parseInt(maxSlider.value, 10) + (e.shiftKey ? 5 : 1));
+          updateYearFilter();
+        } else if (e.key === 'ArrowLeft') {
+          const maxSlider = document.getElementById('maxYearSlider');
+          maxSlider.value = Math.max(globalMinYear, parseInt(maxSlider.value, 10) - (e.shiftKey ? 5 : 1));
+          updateYearFilter();
+        }
+      });
+
       loadMapData();
     });
   </script>
