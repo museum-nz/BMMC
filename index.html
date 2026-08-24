@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Showcase — Museum & Gramophone Archive</title>
 
+  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
@@ -147,7 +162,6 @@
         margin: 0 !important;
         padding: 0 !important;
       }
-      /* Completely remove entire DOM tree from layout calculation */
       #timeSkyBackground, header, main, #detailModal, #enlargeModal, #lightbox3DModal, #compareModal, #floatingCompareBar, #toast, #floatingJumpBtn {
         display: none !important;
       }
@@ -296,64 +310,79 @@
     </div>
   </div>
 
-  <!-- Header Section -->
+  <!-- Header Section (Clean 1-Line Desktop Navigation) -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <a href="#" id="brandLogoLink" class="group flex items-center gap-2.5">
-          <span class="text-2xl sm:text-3xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🏛️</span>
-          <div>
-            <h1 class="text-lg sm:text-2xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent tracking-tight" id="headerTitleText">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
+      <div class="flex items-center justify-between gap-2">
+        
+        <!-- Brand Link -->
+        <a href="#" id="brandLogoLink" class="group flex items-center gap-2 shrink-0">
+          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🏛️</span>
+          <div class="leading-none">
+            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap" id="headerTitleText">
               BMMC Showcase
             </h1>
-            <p class="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">Bonniefields Museum Catalog</p>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Bonniefields Museum Catalog</p>
           </div>
         </a>
         
-        <!-- Action Buttons Bar -->
-        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <button id="btnBrowseAllHeader" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 active:scale-95">
-            <span>🌐 Browse All</span>
+        <!-- Action Buttons & Navigation Cluster (Single-Line Fit) -->
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
+          
+          <!-- Primary Actions -->
+          <button id="btnBrowseAllHeader" title="Browse All Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>🌐</span> <span class="hidden sm:inline">Browse</span>
           </button>
 
-          <button id="btnStatsHeader" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-emerald-500/20 active:scale-95">
-            <span>ℹ️ Info</span>
+          <button id="btnStatsHeader" title="Museum Insights & Stats" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>ℹ️</span> <span class="hidden sm:inline">Info</span>
           </button>
 
-          <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-purple-500/20 active:scale-95">
-            <span>👓 3D Only</span>
+          <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>👓</span> <span class="hidden md:inline">3D</span>
           </button>
 
-          <button id="btnHotOnly" title="Filter to Hot Items Only" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-amber-500/20 active:scale-95">
-            <span>🔥 Hot</span>
+          <button id="btnHotOnly" title="Filter to Hot Items Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>🔥</span> <span class="hidden md:inline">Hot</span>
           </button>
 
-          <button id="btnSurprise" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-md shadow-pink-500/20 active:scale-95">
-            <span>✨ Surprise Me!</span>
+          <button id="btnSurprise" title="Surprise Me (Random Item)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>✨</span> <span class="hidden lg:inline">Surprise</span>
           </button>
 
           <!-- Gallery Wing Link -->
-          <a href="gallery.html" id="btnGalleryWing" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold text-emerald-900 dark:text-emerald-200 bg-emerald-100 hover:bg-emerald-200/90 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-sm shadow-emerald-500/10 active:scale-95">
-            <span>📷 Gallery Wing</span>
+          <a href="gallery.html" id="btnGalleryWing" title="Visual Photo Gallery" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-emerald-900 dark:text-emerald-200 bg-emerald-100 hover:bg-emerald-200/90 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>📷</span> <span class="hidden lg:inline">Gallery</span>
           </a>
 
-          <button id="btnFavorites" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
-            <span id="favHeartIcon">🤍</span>
-            <span id="favCountText">Saved (0)</span>
-          </button>
+          <!-- Restoration & Care Guide Link -->
+          <a href="restoration-guide.html" id="btnCareGuide" title="Restoration & Artifact Care Guide" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-amber-900 dark:text-amber-200 bg-amber-100 hover:bg-amber-200/90 dark:bg-amber-950/80 dark:hover:bg-amber-900 border border-amber-300 dark:border-amber-800 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>🛠️</span> <span class="hidden lg:inline">Care</span>
+          </a>
 
-          <button id="btnThemeToggle" aria-label="Toggle Mode" class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
-            <span id="themeToggleIcon">☀️</span>
-            <span id="themeToggleText" class="hidden sm:inline">Mode</span>
-          </button>
+          <!-- Utility Pill Cluster: [ 🤍 Saved | ☀️/🌙 Mode | 🌪️ Filter ] -->
+          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
+            <!-- Favorites -->
+            <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+              <span id="favHeartIcon">🤍</span>
+              <span id="favCountText" class="text-[10px] sm:text-[11px]">0</span>
+            </button>
 
-          <button id="toggleControlsBtn" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl transition shadow-sm backdrop-blur-sm">
-            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-            </svg>
-            <span class="hidden xs:inline">Controls</span>
-            <span id="toggleChevron" class="transition-transform duration-200 text-slate-400">▼</span>
-          </button>
+            <!-- Theme Toggle -->
+            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+              <span id="themeToggleIcon">☀️</span>
+              <span id="themeToggleText" class="sr-only">Mode</span>
+            </button>
+
+            <!-- Filter Controls Toggle (Filter Funnel Icon) -->
+            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+              <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              </svg>
+              <span id="toggleChevron" class="text-[8px] text-slate-400">▼</span>
+            </button>
+          </div>
+
         </div>
       </div>
 
@@ -367,7 +396,7 @@
           <div class="flex items-center justify-between sm:justify-start gap-2 sm:gap-3 shrink-0 flex-wrap">
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount"></p>
             
-            <!-- Phase 2: Catalog View Switcher Buttons -->
+            <!-- Catalog View Switcher Buttons -->
             <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60" role="group" aria-label="View Switcher">
               <button id="btnViewGrid" title="Card Grid View" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm">
                 <span>🔲</span> <span class="hidden md:inline">Grid</span>
@@ -407,7 +436,7 @@
             </svg>
             <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
             
-            <!-- Phase 2: Live Suggestion Overlay Box -->
+            <!-- Live Suggestion Overlay Box -->
             <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden text-xs"></div>
           </div>
         </div>
@@ -482,7 +511,7 @@
       </div>
     </div>
 
-    <!-- Hidden Site Analytics Dashboard Section (Accessible via #analytics) -->
+    <!-- Live Website Analytics Dashboard Section (Accessible via #analytics) -->
     <div id="adminAnalyticsSection" class="hidden space-y-4">
       <div class="flex items-center justify-between bg-white/90 dark:bg-slate-900/90 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex items-center gap-2">
@@ -504,7 +533,7 @@
       <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
     </div>
 
-    <!-- Stats Dashboard Section -->
+    <!-- Museum Insights / Stats Dashboard Section -->
     <div id="statsSection" class="hidden space-y-6">
       <!-- Top Intro Card -->
       <div id="statIntroCard" class="hidden bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md">
@@ -516,7 +545,7 @@
         </div>
       </div>
 
-      <!-- Interactive 2D Map (Mounted dynamically via data-src on tab open) -->
+      <!-- Interactive 2D Map -->
       <div id="statMapCard" class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md flex flex-col gap-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <h3 class="text-base sm:text-lg font-black text-blue-300 uppercase tracking-wider flex items-center gap-2"><span>🗺️</span> Map of item origin</h3>
@@ -571,18 +600,19 @@
           </div>
         </div>
 
-        <!-- Highlighted Links & Background Motion Controls -->
+        <!-- Highlighted Links & Guides Card -->
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/50 transition">
           <div class="w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 absolute top-0 left-0"></div>
           <div>
             <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Highlighted Links & Controls</span>
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Highlighted Links & Guides</span>
               <span class="p-1.5 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 rounded-xl text-base border border-emerald-100 dark:border-emerald-900/60">🔗</span>
             </div>
-            <div class="flex flex-wrap items-center gap-2 min-h-[32px]">
-              <a id="statDocLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Documentation ↗</a>
-              <a id="statWebLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">🌐 Web Info ↗</a>
-              <button id="btnTogglePoppyMotion" onclick="togglePoppyMotion()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1 active:scale-95">🌺 Dynamic</button>
+            <div class="flex flex-wrap items-center gap-1.5 min-h-[32px]">
+              <a id="statDocLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Doc ↗</a>
+              <a id="statWebLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">🌐 Web ↗</a>
+              <a href="restoration-guide.html" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-amber-500 shadow-sm transition flex items-center gap-1">🛠️ Care ↗</a>
+              <button id="btnTogglePoppyMotion" onclick="togglePoppyMotion()" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1 active:scale-95">🌺 Dynamic</button>
             </div>
           </div>
         </div>
@@ -635,7 +665,7 @@
     <span>⬇️ View Archive</span>
   </button>
 
-  <!-- Phase 3: Floating Compare Bar (Bottom Pill) -->
+  <!-- Floating Compare Bar (Bottom Pill) -->
   <div id="floatingCompareBar" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white dark:bg-slate-800/95 dark:text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-xl flex items-center gap-3 hidden transition-all duration-300 transform translate-y-4">
     <div class="flex items-center gap-2">
       <span class="text-base">⚖️</span>
@@ -717,7 +747,7 @@
     </div>
   </div>
 
-  <!-- Phase 3: Side-by-Side Artifact Compare Modal (Z-Index: 85) -->
+  <!-- Side-by-Side Artifact Compare Modal (Z-Index: 85) -->
   <div id="compareModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-[85] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/40 relative flex flex-col overflow-hidden">
       <!-- Header -->
@@ -736,7 +766,7 @@
       </div>
 
       <!-- Body (Scrollable comparison columns) -->
-      <div id="compareModalBody" class="w-full flex-1 overflow-y-auto p-4 sm:p-6"></div>
+      <div id="compareModalBody" class="w-full flex-1 overflow-y-auto p-4 sm:px-6"></div>
     </div>
   </div>
 

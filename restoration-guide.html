@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+  <title>Artifact Care & Restoration Guide — BMMC Showcase</title>
+
+  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+
+  <!-- Tailwind CSS Engine -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Font: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .solid-header { background-color: rgba(255, 255, 255, 0.88); }
+    .dark .solid-header { background-color: rgba(15, 23, 42, 0.88); }
+
+    /* Time Sky Background matching index.html */
+    @keyframes seasonSkyCycle {
+      0%, 100% { background: linear-gradient(180deg, #fbcfe8 0%, #fed7aa 45%, #ccfbf1 80%, #a7f3d0 100%); }
+      25% { background: linear-gradient(180deg, #bae6fd 0%, #fef08a 50%, #93c5fd 85%, #60a5fa 100%); }
+      50% { background: linear-gradient(180deg, #fef08a 0%, #fed7aa 40%, #fca5a5 75%, #f472b6 100%); }
+      75% { background: linear-gradient(180deg, #ddd6fe 0%, #c7d2fe 45%, #bae6fd 75%, #93c5fd 100%); }
+    }
+    .dark .time-sky-animated { filter: brightness(0.45) contrast(1.15) saturate(0.9); }
+    .time-sky-animated { animation: seasonSkyCycle 60s linear infinite; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+
+  <!-- Ambient Sky Background -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
+    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
+  </div>
+
+  <!-- Header Section (1-Line Desktop Navigation matching index.html) -->
+  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
+      <div class="flex items-center justify-between gap-2">
+        
+        <!-- Brand Link -->
+        <a href="index.html" class="group flex items-center gap-2 shrink-0">
+          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow">🏛️</span>
+          <div class="leading-none">
+            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+              BMMC Showcase
+            </h1>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Conservation & Care Guide</p>
+          </div>
+        </a>
+        
+        <!-- Action Buttons & Navigation Cluster (Single-Line Fit) -->
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
+          
+          <a href="index.html" title="Back to Museum Catalog" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>🌐</span> <span class="hidden sm:inline">Catalog</span>
+          </a>
+
+          <a href="index.html#stats" title="Museum Insights & Analytics" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>ℹ️</span> <span class="hidden sm:inline">Info</span>
+          </a>
+
+          <a href="gallery.html" title="Visual Photo Gallery" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-emerald-900 dark:text-emerald-200 bg-emerald-100 hover:bg-emerald-200/90 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+            <span>📷</span> <span class="hidden lg:inline">Gallery</span>
+          </a>
+
+          <!-- Utility Pill Cluster: [ ☀️/🌙 Mode ] -->
+          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm shrink-0">
+            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+              <span id="themeToggleIcon">☀️</span>
+              <span id="themeToggleText" class="sr-only">Mode</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-8">
+    
+    <!-- Top Hero Banner Card -->
+    <div class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md">
+      <div class="absolute -right-10 -top-10 w-52 h-52 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-10 -bottom-10 w-52 h-52 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 max-w-4xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">
+          <span>🛠️ Curator & Collector Field Manual</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-3">
+          Artifact Care, Cleaning & Surface Restoration
+        </h2>
+        <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
+          Time-tested workshop techniques, safe chemical recipes, and preventative maintenance strategies for metals, fine hardwoods, leather, and heritage finishes.
+        </p>
+
+        <!-- Quick Jump Links Bar -->
+        <div class="mt-6 flex flex-wrap items-center gap-2 pt-4 border-t border-indigo-800/60">
+          <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider mr-2">Jump to:</span>
+          <a href="#workshop-safety" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">⚠️ Safety & Patina</a>
+          <a href="#metal-care" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">🪙 Metals (Silver, Brass, Iron)</a>
+          <a href="#wood-care" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">🪵 Hardwood & Finishes</a>
+          <a href="#other-materials" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">📜 Leather, Pewter & Ironware</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. CRITICAL SAFETY & CONSERVATION PRINCIPLES -->
+    <section id="workshop-safety" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Workshop Safety Card -->
+      <div class="bg-white/90 dark:bg-slate-900/90 border border-rose-200 dark:border-rose-900/50 rounded-3xl p-6 shadow-sm backdrop-blur-sm relative overflow-hidden flex flex-col justify-between">
+        <div class="w-full h-1 bg-gradient-to-r from-rose-500 to-amber-500 absolute top-0 left-0"></div>
+        <div>
+          <div class="flex items-center gap-2.5 mb-3">
+            <span class="p-2 bg-rose-50 dark:bg-rose-950/80 text-rose-600 rounded-xl text-lg border border-rose-200 dark:border-rose-900/60">⚠️</span>
+            <div>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">Workshop Safety & Fire Prevention</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Essential PPE and chemical precautions</p>
+            </div>
+          </div>
+          <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
+            <li class="flex items-start gap-2">
+              <span class="text-rose-500 font-bold">•</span>
+              <span><strong>Ventilation & PPE:</strong> Always work in well-ventilated areas when using Mineral Turpentine, Kerosene, or Methylated Spirits. Use chemical-resistant nitrile gloves and eye protection.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-500 font-bold">•</span>
+              <span><strong>Spontaneous Combustion Hazard:</strong> Rags saturated with oils, turpentine, or solvents can spontaneously ignite as they dry. Seal used rags in an airtight, water-filled metal container before disposal.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-500 font-bold">•</span>
+              <span><strong>Wax Heating Rule:</strong> Never heat beeswax or turpentine over an open flame. Always use an electric hotplate on the lowest setting or an electric double boiler.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Antique Valuation & Patina Card -->
+      <div class="bg-white/90 dark:bg-slate-900/90 border border-amber-200 dark:border-amber-900/50 rounded-3xl p-6 shadow-sm backdrop-blur-sm relative overflow-hidden flex flex-col justify-between">
+        <div class="w-full h-1 bg-gradient-to-r from-amber-500 to-yellow-500 absolute top-0 left-0"></div>
+        <div>
+          <div class="flex items-center gap-2.5 mb-3">
+            <span class="p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-xl text-lg border border-amber-200 dark:border-amber-900/60">🔍</span>
+            <div>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">The Golden Rule: Preserve Historic Patina</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Distinguishing harmful oxidation from valuable patina</p>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
+            Before applying acidic baths or metal polishes, assess whether the item is a rare collectible. Original aged patina on historical bronze, brass, coin silver, and antique iron accounts for a major portion of its historical significance and monetary value.
+          </p>
+          <div class="p-3 bg-amber-50/80 dark:bg-amber-950/40 rounded-xl border border-amber-200/80 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 font-medium">
+            <strong>Museum Advice:</strong> Clean away loose grit and corrosive surface salts, but avoid stripping metal back to raw, bright factory finish unless required for functional restoration.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 2. METAL CLEANING & RESTORATION (PLACED BEFORE WOOD) -->
+    <section id="metal-care" class="space-y-6">
+      
+      <!-- Section Header -->
+      <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🪙</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Metal Cleaning & Preservation</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Gentle electrochemical dips, natural formulas, and rust conversion</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metal Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Silver Card -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/40 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-slate-400 to-indigo-400 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>✨</span> Silver (Electrochemical Dip)
+              </h3>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Non-Abrasive</span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+              Cleans deep tarnish through ionic transfer in seconds without rubbing away microscopic silver layers.
+            </p>
+
+            <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">Solution Formula:</span>
+                1 rounded dessertspoon of <strong>Washing Soda Crystals</strong> (e.g. Greenwoods) per <strong>1 Litre of hot water</strong>.
+              </div>
+
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">Method:</span>
+                Line a plastic or aluminium basin with aluminium foil. Submerge the item, ensuring it maintains direct contact with the aluminium. Light tarnish clears in seconds. For stubborn crevices, gently agitate with a soft paintbrush. Rinse in clean water and buff dry.
+              </div>
+
+              <div class="p-3 bg-rose-50/70 dark:bg-rose-950/40 rounded-2xl border border-rose-200/60 dark:border-rose-900/40 text-rose-800 dark:text-rose-300 font-medium">
+                ⚠️ <strong>Never submerge:</strong> Jewelry with mounted pearls, coral, turquoise, opals, glued parts, or wooden/bone cutlery handles.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brass & Copper Card -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group hover:border-amber-500/40 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🎺</span> Brass & Copper
+              </h3>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-300">Natural Acid</span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+              Removes green verdigris, grease, and heavy atmospheric oxidation using kitchen-grade pantry solutions.
+            </p>
+
+            <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">1. Surface Tarnish (Rubbing Paste):</span>
+                Mix <strong>2 tbsp fine salt</strong> and <strong>2 tbsp white vinegar</strong> into a paste. Apply using a soft cotton cloth, rub gently along the contour, rinse thoroughly, and dry immediately.
+              </div>
+
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">2. Heavy Encrustation (Simmer Method):</span>
+                Immerse tarnished solid copper or brass into a pot of water with the salt & vinegar mixture. Bring to a gentle boil until grime releases. Let cool, wash with warm soapy water, rinse, and buff to a warm luster.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Iron & Rust Card -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between relative overflow-hidden group hover:border-slate-500/40 transition">
+          <div class="w-full h-1 bg-gradient-to-r from-slate-600 to-zinc-900 absolute top-0 left-0"></div>
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🔩</span> Iron & Rust Derusting
+              </h3>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">De-Oxidation</span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+              Gentle citric conversion bath for heritage iron tools, machine castings, fittings, and brackets.
+            </p>
+
+            <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">Mild Citric Bath:</span>
+                Dissolve <strong>1 tbsp Citric Acid crystals per 10 L of water</strong>. Soak items until rust is loosened. Remove heavy scale with a soft wire brush first.
+              </div>
+
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">Rinse & Immediate Protection:</span>
+                Wash down with clean water, dry immediately with a clean towel or heat gun to prevent flash rust. Coat decorative iron with <strong>Liberon Iron Paste</strong> or <strong>CRC Zinc Rust Protection</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. WOOD CARE & WORKSHOP RESTORATION -->
+    <section id="wood-care" class="space-y-6">
+      
+      <!-- Section Header -->
+      <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🪵</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Hardwood Furniture & Cabinet Care</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Environmental defenses, homemade archival wax, and spot repairs</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threat Factors & Cleaning Protocol -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Environmental Deterioration -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+          <h3 class="text-base font-black text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <span>🌡️</span> Environmental Threats to Avoid
+          </h3>
+          <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
+            <li><strong>Thermal & Humidity Shock:</strong> Hot, dry air causes shrinkage, joint failure, and cracking. Cold, damp air causes swelling, binding drawers, and warping.</li>
+            <li><strong>Direct UV Sunlight:</strong> Bleaches natural timber pigmentation, dries wood grain, and degrades French polish and lacquer.</li>
+            <li><strong>Mould & Rot Fungi:</strong> Fungi thrive in still, damp environments. Ensure continuous gentle air circulation.</li>
+            <li><strong>House Borer (Common in NZ):</strong> Common wood-boring beetle causing flight holes and structural powdering.</li>
+          </ul>
+        </div>
+
+        <!-- Routine Maintenance & Dos/Don'ts -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+          <h3 class="text-base font-black text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <span>🧽</span> Routine Maintenance & Strict DO NOTs
+          </h3>
+          <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
+            <li><strong>Dusting:</strong> Dust regularly with a lightly dampened cloth, followed immediately by buffing with a soft dry cloth. Dust unfinished wood with a completely dry cloth only.</li>
+            <li><strong>Wax Application:</strong> Buff with hard wood paste wax or microcrystalline wax (Museum wax) once yearly (quarterly for dining tables). Buff horizontally, then vertically.</li>
+            <li>🚫 <strong>NEVER USE RED OIL POLISH:</strong> Polishing oils attract atmospheric dust, oxidise, harden into a sticky film, and irreversibly blacken the wood grain.</li>
+            <li>🚫 <strong>Avoid Unnecessary Chemical Stripping:</strong> Harsh stripping destroys natural patina and original stain depths.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- DIY Archival Wood Wax Recipe Card -->
+      <div class="bg-gradient-to-r from-amber-950 via-slate-950 to-stone-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-amber-600/30 relative overflow-hidden backdrop-blur-md">
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
+            <span>🐝 Non-Perishable Archival Formula</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-black text-white mb-2">Homemade Hardwood Wax Paste</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+            A resilient, inert paste that forms a crystal-clear, mould-resistant protective shell over all wood types.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <div class="bg-white/10 p-3 rounded-2xl border border-white/10">
+              <span class="text-amber-400 font-extrabold text-xs uppercase block">Base</span>
+              <span class="text-sm font-bold">1 kg Refined Beeswax</span>
+            </div>
+            <div class="bg-white/10 p-3 rounded-2xl border border-white/10">
+              <span class="text-amber-400 font-extrabold text-xs uppercase block">Solvent</span>
+              <span class="text-sm font-bold">500 ml Mineral Turpentine</span>
+            </div>
+            <div class="bg-white/10 p-3 rounded-2xl border border-white/10">
+              <span class="text-amber-400 font-extrabold text-xs uppercase block">Hardener</span>
+              <span class="text-sm font-bold">2 tbsp Carnauba Wax</span>
+            </div>
+          </div>
+
+          <div class="bg-amber-950/60 border border-amber-500/40 p-3.5 rounded-2xl text-xs text-amber-200">
+            <strong>Preparation:</strong> Gently heat ingredients together on an <strong>electric hotplate</strong> on the lowest setting (no open flames!) until thoroughly melted and uniform (soft butter consistency). Pour into clean glass jars to cool and seal.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick DIY Wood Repairs Table -->
+      <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+        <h3 class="text-base font-black text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <span>🩺</span> Quick Wood Defect Repair Matrix
+        </h3>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-slate-700/80 text-slate-400 uppercase text-[10px] tracking-wider">
+                <th class="py-3 px-3">Condition / Issue</th>
+                <th class="py-3 px-3">Underlying Cause</th>
+                <th class="py-3 px-3">Workshop Remedy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-300">
+              <tr>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">White Spots / Rings</td>
+                <td class="py-3.5 px-3">Moisture trapped in varnish layer</td>
+                <td class="py-3.5 px-3">Gently polish with <code>0000</code> steel wool lubricated with a mix of mineral turpentine & oil (cooking or baby oil). If spot persists, moisture penetrated bare wood and localized refinishing is required.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Blushing / White Haze</td>
+                <td class="py-3.5 px-3">Trapped humidity in lacquer/varnish</td>
+                <td class="py-3.5 px-3">Lightly rub the entire surface with <code>0000</code> steel wool and mineral turpentine. Wipe clean, let dry, and apply a fresh coat of hard wax.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Dents (Softwoods / Pine)</td>
+                <td class="py-3.5 px-3">Crushed wood fibers</td>
+                <td class="py-3.5 px-3">Place a damp cotton cloth over the dent and hover a hot clothes iron over it to produce steam. The steam swells compressed fibers back into place. <em>Never allow the iron to touch dry wood.</em></td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Crazing / Fine Cracks</td>
+                <td class="py-3.5 px-3">Aged, embrittled spirit varnish</td>
+                <td class="py-3.5 px-3">Re-dissolve and level the surface by carefully brushing methylated spirits/alcohol over the crack until it softens. Let cure and re-wax.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Chips & Deep Scratches</td>
+                <td class="py-3.5 px-3">Physical impact</td>
+                <td class="py-3.5 px-3">Fill void using a color-matched wax or shellac burn-in stick, level flush with a razor blade, and buff.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Heavy Wax / Dirt Grime</td>
+                <td class="py-3.5 px-3">Accumulated grime & mould</td>
+                <td class="py-3.5 px-3">Wipe with pure mineral turpentine on a lint-free cloth. Cuts through grime and mould build-up without dissolving the underlying shellac or varnish.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Wood Borer / Woodworm Eradication -->
+      <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+        <h3 class="text-base font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+          <span>🪲</span> House Borer & Woodworm Eradication (NZ Protocol)
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+          House borer flight holes indicate active larvae feeding inside timber cores.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+            <h4 class="font-extrabold text-blue-600 dark:text-blue-400 mb-1">Small Objects: Thermal Freeze Cycle</h4>
+            <p class="text-slate-600 dark:text-slate-300">Seal small carvings, wooden boxes, or frames inside an airtight plastic bag and place into a domestic deep freezer for <strong>7 to 10 days</strong>. Kills larvae and eggs without chemicals.</p>
+          </div>
+
+          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+            <h4 class="font-extrabold text-blue-600 dark:text-blue-400 mb-1">Large Furniture: Kerosene Syringe Injection</h4>
+            <p class="text-slate-600 dark:text-slate-300">Using a fine medical syringe, inject mineral kerosene directly into fresh flight holes. Kerosene penetrates the tunnels and kills larvae while leaving an odour barrier that deters future re-infestation.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 4. SPECIALIST HISTORIC MATERIALS -->
+    <section id="other-materials" class="space-y-6">
+      
+      <!-- Section Header -->
+      <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">📜</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Specialist Materials: Leather, Pewter & Ironware</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Preserving organic desk inlays, soft alloys, and distinguishing cookware from decorative cast iron</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Leather Care Card -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="p-1.5 bg-amber-50 dark:bg-amber-950 text-amber-600 rounded-xl text-base">🛋️</span>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">Antique Leather</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <strong>Desk tops & Chair upholstery:</strong> Dust with a dry microfibre cloth. Treat twice yearly with high-grade leather dressing containing lanolin and beeswax. Never use silicone sprays or dish detergents, which strip natural tanning oils and cause "red rot" powdering.
+          </p>
+        </div>
+
+        <!-- Pewter & Lead Card -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="p-1.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 rounded-xl text-base">🫖</span>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">Pewter & Soft Alloys</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <strong>Avoid acidic dips:</strong> Pewter contains tin and lead. <strong>Never</strong> use vinegar, lemon juice, or harsh abrasives on pewter as they cause permanent etching. Wash with warm water and mild soap, then polish gently with a paste of whiting powder and methylated spirits.
+          </p>
+        </div>
+
+        <!-- Cast Iron Cookware vs Decorative -->
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="p-1.5 bg-rose-50 dark:bg-rose-950 text-rose-600 rounded-xl text-base">🍳</span>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">Cookware vs Decorative Iron</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <strong>Vital Distinction:</strong> Chemical rust preventatives (Liberon paste, CRC zinc sprays) are for <em>ornamental</em> iron only. Historical cast iron cookware must be derusted via vinegar/electrolysis and seasoned exclusively with food-grade polymerized oils (flaxseed or grapeseed).
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="solid-header border-t border-slate-200/80 dark:border-slate-800/80 py-6 mt-12 transition-colors relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+      <p>© Bonniefields Museum Collection (BMMC) — Conservation Archive</p>
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="hover:text-blue-600 dark:hover:text-blue-400 font-bold transition">Catalog Index</a>
+        <a href="gallery.html" class="hover:text-blue-600 dark:hover:text-blue-400 font-bold transition">Gallery Wing</a>
+        <a href="#mainHeader" class="hover:text-blue-600 dark:hover:text-blue-400 font-bold transition">Back to Top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Theme Synchronization Script -->
+  <script>
+    const themeToggleBtn = document.getElementById('btnThemeToggle');
+    const themeIcon = document.getElementById('themeToggleIcon');
+
+    function updateThemeUI(isDark) {
+      if (themeIcon) {
+        themeIcon.textContent = isDark ? '☀️' : '🌙';
+      }
+    }
+
+    // Initialize icon based on current state
+    updateThemeUI(document.documentElement.classList.contains('dark'));
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const isCurrentlyDark = document.documentElement.classList.contains('dark');
+        const nextDark = !isCurrentlyDark;
+        if (nextDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('theme', nextDark ? 'dark' : 'light');
+        localStorage.setItem('bMMC_theme', nextDark ? 'dark' : 'light');
+        updateThemeUI(nextDark);
+      });
+    }
+
+    // Live Cross-Tab Synchronization
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme' || e.key === 'bMMC_theme') {
+        const isDark = (e.newValue === 'dark');
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        updateThemeUI(isDark);
+      }
+    });
+  </script>
+</body>
+</html>
