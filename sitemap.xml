@@ -1,43 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Main Museum Showcase Home -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- 1. Main Museum Showcase & Exhibits Catalog -->
   <url>
-    <loc>https://museum-nz.github.io/BMMC/</loc>
-    <lastmod>2026-08-13</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/index.html</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Photo Archives & Photographic Gallery Wing -->
+  <!-- 2. Photo Archives & Historical Photographic Gallery Wing -->
   <url>
-    <loc>https://museum-nz.github.io/BMMC/gallery</loc>
-    <lastmod>2026-08-17</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/gallery.html</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
+    <priority>0.9</priority>
   </url>
 
-  <!-- Interactive 2D Photo Map & Origin Geolocation -->
+  <!-- 3. Artifact Care, Conservation & Restoration Guide -->
   <url>
-    <loc>https://museum-nz.github.io/BMMC/2Dmap</loc>
-    <lastmod>2026-08-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  
-  <!-- Museum Insights & Live Analytics -->
-  <url>
-    <loc>https://museum-nz.github.io/BMMC/#stats</loc>
-    <lastmod>2026-08-17</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/restoration-guide.html</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Gramophone & Vintage Audio Catalog -->
+  <!-- 4. Interactive 2D Geographic Origin Map -->
   <url>
-    <loc>https://museum-nz.github.io/BMMC/#gramophone</loc>
-    <lastmod>2026-08-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://museum-nz.github.io/BMMC/2Dmap.html</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
-  
+
 </urlset>
