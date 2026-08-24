@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Photo Map with Dual Year Slider</title>
 
-  <!-- Content Security Policy (Includes Esri Satellite CDN) -->
+  <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-  <!-- Leaflet CSS & Plugins (Secured with SRI) -->
+  <!-- Leaflet CSS & Plugins -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -454,7 +454,7 @@
 </head>
 <body>
 
-  <!-- Top Search & Google Maps Style Layer Controls -->
+  <!-- Top Search & Layer Controls -->
   <div class="top-controls-bar">
     <div class="map-search-box">
       <span class="search-icon">🔍</span>
@@ -462,10 +462,10 @@
       <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
     </div>
 
-    <!-- Google Maps Style Layers Switcher Button -->
+    <!-- Layer Switcher Button -->
     <div class="layer-switcher-container">
       <button id="btnLayersToggle" class="top-action-btn" title="Change Map Type">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
           <polyline points="2 17 12 22 22 17"></polyline>
           <polyline points="2 12 12 17 22 12"></polyline>
@@ -767,7 +767,12 @@
         markerList.push(marker);
 
         recordMarkerMap.set(item.index, marker);
-        if (item.id) recordMarkerMap.set(item.id, marker);
+        recordMarkerMap.set(String(item.index), marker);
+        recordMarkerMap.set(Number(item.index), marker);
+        if (item.id) {
+          recordMarkerMap.set(item.id, marker);
+          recordMarkerMap.set(String(item.id), marker);
+        }
       });
 
       markers.addLayers(markerList);
@@ -854,6 +859,12 @@
           pendingExhibitToFocus = null;
         }, 200);
       }
+
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'MAP_READY' }, '*');
+        }
+      } catch (e) {}
     }
 
     function updateYearFilter(evt) {
@@ -937,15 +948,37 @@
     }
 
     function focusExhibitMarker(exhibitIdOrIndex) {
-      if (recordMarkerMap.size === 0) {
+      if (allPhotoRecords.length === 0) {
         pendingExhibitToFocus = exhibitIdOrIndex;
         return;
       }
-      const marker = recordMarkerMap.get(exhibitIdOrIndex) || recordMarkerMap.get(Number(exhibitIdOrIndex));
+
+      // Check if target exhibit year is outside current timeline slider range
+      const record = allPhotoRecords.find(r => r.index === Number(exhibitIdOrIndex) || String(r.id) === String(exhibitIdOrIndex) || String(r.index) === String(exhibitIdOrIndex));
+      if (record && record.year) {
+        const yr = parseInt(record.year, 10);
+        if (!isNaN(yr)) {
+          const minSlider = document.getElementById('minYearSlider');
+          const maxSlider = document.getElementById('maxYearSlider');
+          if (minSlider && maxSlider) {
+            let changed = false;
+            if (yr < parseInt(minSlider.value, 10)) { minSlider.value = Math.max(globalMinYear, yr); changed = true; }
+            if (yr > parseInt(maxSlider.value, 10)) { maxSlider.value = Math.min(globalMaxYear, yr); changed = true; }
+            if (changed) updateYearFilter();
+          }
+        }
+      }
+
+      let marker = recordMarkerMap.get(exhibitIdOrIndex) || 
+                   recordMarkerMap.get(Number(exhibitIdOrIndex)) || 
+                   recordMarkerMap.get(String(exhibitIdOrIndex));
+
       if (marker) {
         markers.zoomToShowLayer(marker, () => {
           marker.openPopup();
         });
+      } else {
+        pendingExhibitToFocus = exhibitIdOrIndex;
       }
     }
 
@@ -968,7 +1001,7 @@
 
         if (!isNaN(lat) && !isNaN(lng)) {
           map.setView([lat, lng], 12);
-        } else if (exhibit !== null) {
+        } else if (exhibit !== null && exhibit !== undefined) {
           focusExhibitMarker(exhibit);
         }
       } catch (e) {}
@@ -1083,13 +1116,9 @@
         const imgUrl = formatImgUrl(imgRaw);
         if (!imgUrl) return;
 
-        let numId = parseInt(idRaw, 10);
-        let exhibitIndex = !isNaN(numId) ? (numId - 2) : rIdx;
-        if (exhibitIndex < 0) exhibitIndex = rIdx;
-
         allPhotoRecords.push({
           id: String(idRaw).trim(),
-          index: exhibitIndex,
+          index: rIdx,
           lat: lat,
           lng: lng,
           title: cleanTitle.trim(),

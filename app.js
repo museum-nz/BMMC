@@ -13,7 +13,7 @@ const LOCAL_EXHIBITS_CSV_URL = './data/exhibits.csv';
 const LOCAL_GRAMOPHONE_CSV_URL = './data/gramophone.csv';
 const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
 
-const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
 
@@ -35,8 +35,7 @@ const TIMELINE_CUSTOM_IMAGES = {
   "WWII": "https://lh3.googleusercontent.com/d/1EoNqpgXzJoT6g8xsl2hPp9CBloibQEB0=s200",
   "Post War": "https://lh3.googleusercontent.com/d/1BLA99VbyIAhyBgcAjOl-VLUHv9Tpy1bE=s200",
   "Modern": "https://lh3.googleusercontent.com/d/1Eez4R63VdHFSWnVNBqaWiBH_2SrhNrnF=s200",
-  "Items of interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200",
-  "Itmes of Interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200"
+  "Items of interest": "https://lh3.googleusercontent.com/d/1mNQ9DZlCobUg1C25JwRlJj_hUxCrWDXf=s200"
 };
 
 const CATEGORY_PALETTE = {
@@ -64,6 +63,12 @@ const TIMELINE_ERAS = [
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 let currentTab = 'exhibits';
+let catalogViewMode = localStorage.getItem('bMMC_view_mode') || 'grid';
+let tableSortCol = null;
+let tableSortDir = 'asc';
+let compareItemIndices = new Set();
+let restoredSessionFilters = {};
+
 let rawExhibitsRows = [];
 let rawGramophoneRows = [];
 let catalog3DMap = new Map();
@@ -88,6 +93,209 @@ let fuseExhibits = null;
 let fuseGramophone = null;
 
 const CHART_PALETTE = ['#C85A32', '#3B7A57', '#B57C1E', '#3182CE', '#708259', '#20807E', '#4A5568', '#D99B43', '#7c3aed', '#db2777'];
+
+// --- Audio Narration Guide Controller ---
+function stopAudioGuide() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  currentlySpeakingIndex = null;
+  currentSpeechUtterance = null;
+  updateAudioUI();
+}
+
+function speakAudioGuide(rowIndex, event) {
+  if (event) event.stopPropagation();
+
+  if (currentlySpeakingIndex === rowIndex && window.speechSynthesis && window.speechSynthesis.speaking) {
+    stopAudioGuide();
+    return;
+  }
+
+  const row = rawExhibitsRows[rowIndex];
+  if (!row) return;
+
+  const notes = getVal(row, colIdx.notes);
+  const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+  const { title, details } = parseTitleAndDetails(rawContent);
+  const textToSpeak = notes ? notes.replace(/^#\s*/, '') : (details || title);
+
+  if (!textToSpeak) {
+    showToast('No museum notes available to read', 'ℹ️');
+    return;
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    currentlySpeakingIndex = rowIndex;
+    currentSpeechUtterance = new SpeechSynthesisUtterance(unescapeHTML(textToSpeak));
+    const chosenVoice = getSelectedVoice();
+    if (chosenVoice) currentSpeechUtterance.voice = chosenVoice;
+    currentSpeechUtterance.rate = 0.94;
+    currentSpeechUtterance.pitch = 1.0;
+
+    currentSpeechUtterance.onend = () => {
+      currentlySpeakingIndex = null;
+      updateAudioUI();
+    };
+    currentSpeechUtterance.onerror = () => {
+      currentlySpeakingIndex = null;
+      updateAudioUI();
+    };
+
+    window.speechSynthesis.speak(currentSpeechUtterance);
+    updateAudioUI();
+  }
+}
+
+function updateAudioUI() {
+  const isSpeaking = window.speechSynthesis && window.speechSynthesis.speaking;
+
+  document.querySelectorAll('[data-grid-audio-idx]').forEach(btn => {
+    const idx = parseInt(btn.getAttribute('data-grid-audio-idx'), 10);
+    if (currentlySpeakingIndex === idx && isSpeaking) {
+      btn.classList.add('bg-blue-600', 'text-white', 'animate-pulse');
+      btn.classList.remove('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600', 'dark:text-blue-400');
+      btn.innerHTML = '🔊';
+    } else {
+      btn.classList.remove('bg-blue-600', 'text-white', 'animate-pulse');
+      btn.classList.add('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600', 'dark:text-blue-400');
+      btn.innerHTML = '🔊';
+    }
+  });
+
+  const modalBtn = document.getElementById('btnAudioGuide');
+  if (modalBtn) {
+    const origIdx = parseInt(modalBtn.getAttribute('data-row'), 10);
+    if (currentlySpeakingIndex === origIdx && isSpeaking) {
+      modalBtn.textContent = '⏹ Stop';
+      modalBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+      modalBtn.classList.add('bg-rose-600', 'hover:bg-rose-500');
+    } else {
+      modalBtn.textContent = '🔊 Listen';
+      modalBtn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
+      modalBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+    }
+  }
+}
+
+// --- Card Multi-Slot Image Switcher ---
+function switchCardImage(rowIndex, dir, event) {
+  if (event) event.stopPropagation();
+  const box = document.getElementById(`card-media-box-${rowIndex}`);
+  const badge = document.getElementById(`card-badge-${rowIndex}`);
+  if (!box) return;
+
+  const total = parseInt(box.dataset.totalSlots, 10) || 1;
+  let curr = parseInt(box.dataset.currentSlot, 10) || 1;
+
+  curr = curr + dir;
+  if (curr < 1) curr = total;
+  if (curr > total) curr = 1;
+  box.dataset.currentSlot = curr;
+
+  const items = box.querySelectorAll('.card-media-item');
+  items.forEach(el => {
+    const slotIdx = parseInt(el.getAttribute('data-slot-idx'), 10);
+    if (slotIdx === curr) {
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    } else {
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+  });
+
+  if (badge) badge.textContent = `${curr} / ${total}`;
+}
+
+// --- Empty Filter State Component ---
+function renderEmptyState(container) {
+  if (!container) return;
+  container.innerHTML = `
+    <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
+      <span class="text-3xl mb-2 block">🔍</span>
+      <p class="text-slate-700 dark:text-slate-300 font-bold text-sm">No exhibits match your current filter selections.</p>
+      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Reset Filters & Show All Exhibits</button>
+    </div>
+  `;
+}
+
+// --- Session State Preservation Engine ---
+function saveCatalogSessionState() {
+  try {
+    const state = {
+      currentTab,
+      catalogViewMode,
+      tableSortCol,
+      tableSortDir,
+      only3DActive,
+      hotOnlyActive,
+      showingFavoritesOnly,
+      isGridActive,
+      compareItems: [...compareItemIndices],
+      search: document.getElementById('searchInput')?.value || '',
+      age: document.getElementById('filterAge')?.value || restoredSessionFilters.filterAge || '',
+      type: document.getElementById('filterType')?.value || restoredSessionFilters.filterType || '',
+      category: document.getElementById('filterCategory')?.value || restoredSessionFilters.filterCategory || '',
+      subcategory: document.getElementById('filterSubcategory')?.value || restoredSessionFilters.filterSubcategory || '',
+      artist: document.getElementById('filterArtist')?.value || restoredSessionFilters.filterArtist || '',
+      label: document.getElementById('filterLabel')?.value || restoredSessionFilters.filterLabel || '',
+      format: document.getElementById('filterFormat')?.value || restoredSessionFilters.filterFormat || '',
+      year: document.getElementById('filterYear')?.value || restoredSessionFilters.filterYear || '',
+      sortBy: document.getElementById('sortBy')?.value || 'default'
+    };
+    sessionStorage.setItem('bMMC_catalog_session', JSON.stringify(state));
+  } catch (e) {}
+}
+
+function restoreCatalogSessionState() {
+  try {
+    const raw = sessionStorage.getItem('bMMC_catalog_session');
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+
+    const hasExplicitHash = window.location.hash && (
+      window.location.hash.startsWith('#exhibit-') || 
+      window.location.hash.startsWith('#gramophone-') || 
+      window.location.hash === '#stats' || 
+      window.location.hash === '#info' || 
+      window.location.hash === '#analytics'
+    );
+
+    if (state.catalogViewMode) catalogViewMode = state.catalogViewMode;
+    if (state.tableSortCol) tableSortCol = state.tableSortCol;
+    if (state.tableSortDir) tableSortDir = state.tableSortDir;
+    if (Array.isArray(state.compareItems)) compareItemIndices = new Set(state.compareItems);
+    if (typeof state.only3DActive === 'boolean') only3DActive = state.only3DActive;
+    if (typeof state.hotOnlyActive === 'boolean') hotOnlyActive = state.hotOnlyActive;
+    if (typeof state.showingFavoritesOnly === 'boolean') showingFavoritesOnly = state.showingFavoritesOnly;
+    if (typeof state.isGridActive === 'boolean') isGridActive = state.isGridActive;
+
+    restoredSessionFilters = {
+      filterAge: state.age || '',
+      filterType: state.type || '',
+      filterCategory: state.category || '',
+      filterSubcategory: state.subcategory || '',
+      filterArtist: state.artist || '',
+      filterLabel: state.label || '',
+      filterFormat: state.format || '',
+      filterYear: state.year || ''
+    };
+
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
+    setVal('searchInput', state.search || '');
+    setVal('sortBy', state.sortBy || 'default');
+
+    if (!hasExplicitHash && state.currentTab) {
+      currentTab = state.currentTab;
+    }
+    updateCompareUI();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 // 2. Helper Functions & Dual-Mode Media Resolvers
 function safeReplaceState(urlStr) {
@@ -150,9 +358,9 @@ function getSolidTint(hex, isDark) {
   let g = parseInt(c.substring(2, 4), 16);
   let b = parseInt(c.substring(4, 6), 16);
   if (isDark) {
-    return `rgb(${Math.round(15 * 0.96 + r * 0.04)}, ${Math.round(23 * 0.96 + g * 0.04)}, ${Math.round(42 * 0.96 + b * 0.04)})`;
+    return `rgb(${Math.round(15 * 0.94 + r * 0.06)}, ${Math.round(23 * 0.94 + g * 0.06)}, ${Math.round(42 * 0.94 + b * 0.06)})`;
   } else {
-    return `rgb(${Math.round(255 * 0.96 + r * 0.04)}, ${Math.round(255 * 0.96 + g * 0.04)}, ${Math.round(255 * 0.96 + b * 0.04)})`;
+    return `rgb(${Math.round(255 * 0.94 + r * 0.06)}, ${Math.round(255 * 0.94 + g * 0.06)}, ${Math.round(255 * 0.94 + b * 0.06)})`;
   }
 }
 
@@ -177,6 +385,13 @@ function getVal(row, colIndex) {
   if (!row || !Array.isArray(row)) return '';
   const raw = colIndex < row.length && row[colIndex] != null ? String(row[colIndex]).trim() : '';
   return escapeHTML(raw);
+}
+
+function getItemNumberForSort(row, originalIndex) {
+  const raw = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || getVal(row, colIdx.ref);
+  const clean = unescapeHTML(raw).replace(/^#\s*/, '').trim();
+  const num = parseInt(clean.replace(/[^\d]/g, ''), 10);
+  return isNaN(num) ? (originalIndex + 1) : num;
 }
 
 function cleanDetailsForModal(rawDetails) {
@@ -235,7 +450,7 @@ function toggleCollapsibleControls(show) {
   }
 }
 
-// Dual-Mode CSV Fetcher with Cache-Shape Validation and Auto-Recovery
+// Dual-Mode CSV Fetcher
 async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
   try {
     const cached = localStorage.getItem(cacheKey);
@@ -244,10 +459,6 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
       const parsedData = JSON.parse(cached);
       if (Array.isArray(parsedData) && parsedData.length > 1 && Array.isArray(parsedData[0])) {
         return parsedData;
-      } else {
-        localStorage.removeItem(cacheKey);
-        localStorage.removeItem(`${cacheKey}_raw`);
-        localStorage.removeItem(`${cacheKey}_time`);
       }
     }
   } catch (e) {
@@ -294,11 +505,6 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
       const text = await fallbackRes.text();
       const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
       if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
-          localStorage.setItem(`${cacheKey}_raw`, text);
-          localStorage.setItem(`${cacheKey}_time`, Date.now());
-        } catch (e) {}
         return parsed.data;
       }
     }
@@ -491,6 +697,7 @@ function toggleFavorite(rowIndex, event) {
   else { favs = favs.filter(i => i !== rowIndex); showToast('Removed from saved items', '🤍'); }
   localStorage.setItem(key, JSON.stringify(favs));
   updateFavoritesBadge();
+  saveCatalogSessionState();
   if (isGridActive) filterCatalog(true);
 }
 
@@ -509,6 +716,164 @@ function updateFavoritesBadge() {
       btnFav.classList.remove('bg-rose-600', 'text-white', 'border-rose-600');
       btnFav.classList.add('bg-white/80', 'text-slate-700', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-200');
     }
+  }
+}
+
+// --- Side-by-Side Comparison UI Handlers ---
+function toggleCompareItem(originalIndex, event) {
+  if (event) event.stopPropagation();
+  if (compareItemIndices.has(originalIndex)) {
+    compareItemIndices.delete(originalIndex);
+    showToast('Removed from comparison', '⚖️');
+  } else {
+    if (compareItemIndices.size >= 4) {
+      showToast('Maximum 4 items can be compared at once', '⚠️');
+      return;
+    }
+    compareItemIndices.add(originalIndex);
+    showToast('Added to comparison tray', '⚖️');
+  }
+  updateCompareUI();
+  saveCatalogSessionState();
+  if (isGridActive) filterCatalog(true);
+}
+
+function clearCompareItems() {
+  compareItemIndices.clear();
+  updateCompareUI();
+  closeCompareModal();
+  saveCatalogSessionState();
+  if (isGridActive) filterCatalog(true);
+  showToast('Comparison tray cleared', '🗑️');
+}
+
+function updateCompareUI() {
+  const bar = document.getElementById('floatingCompareBar');
+  const countText = document.getElementById('compareCountText');
+  const count = compareItemIndices.size;
+
+  if (bar) {
+    if (count > 0) {
+      bar.classList.remove('hidden', 'translate-y-4');
+      bar.classList.add('flex', 'translate-y-0');
+      if (countText) countText.textContent = `${count} Item${count > 1 ? 's' : ''} Selected`;
+    } else {
+      bar.classList.add('hidden', 'translate-y-4');
+      bar.classList.remove('flex', 'translate-y-0');
+    }
+  }
+}
+
+function openCompareModal() {
+  const modal = document.getElementById('compareModal');
+  const body = document.getElementById('compareModalBody');
+  if (!modal || !body) return;
+
+  if (compareItemIndices.size === 0) {
+    showToast('Select artifacts using ⚖️ Compare first', 'ℹ️');
+    return;
+  }
+
+  const items = Array.from(compareItemIndices).map(idx => ({
+    originalIndex: idx,
+    row: rawExhibitsRows[idx]
+  })).filter(i => i.row);
+
+  const colsCount = items.length;
+  let gridColsClass = 'grid-cols-1';
+  if (colsCount === 2) gridColsClass = 'grid-cols-1 md:grid-cols-2';
+  else if (colsCount === 3) gridColsClass = 'grid-cols-1 md:grid-cols-3';
+  else if (colsCount >= 4) gridColsClass = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
+  let html = `
+    <div class="grid ${gridColsClass} gap-4 sm:gap-6 items-stretch">
+      ${items.map(({ originalIndex, row }) => {
+        const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+        const { title, details } = parseTitleAndDetails(rawContent);
+        const displayTitle = title || `Exhibit #${originalIndex + 1}`;
+        const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
+        const era = getEraByRow(row);
+        const eraDisplay = era ? era.short : getVal(row, colIdx.age);
+        const category = getVal(row, colIdx.category);
+        const type = getVal(row, colIdx.type);
+        const made = getVal(row, colIdx.made);
+        const year = getVal(row, colIdx.year);
+        const notes = getVal(row, colIdx.notes);
+        const d3d = get3DUrlForItem(row);
+        const { img1 } = getImagesForItem(row);
+        const thumbImg = formatGoogleLh3Url(img1, 's600') || NO_IMAGE_SVG;
+        const theme = getCategoryTheme(category || type);
+
+        return `
+          <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-5 border-2 flex flex-col justify-between shadow-md relative" style="border-color: ${theme.hex}80;">
+            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold">✕</button>
+            
+            <div class="space-y-3.5">
+              <div class="h-48 rounded-2xl overflow-hidden bg-slate-950 p-2 flex items-center justify-center relative">
+                <img src="${thumbImg}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" />
+                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow">👓 3D Model</button>` : ''}
+              </div>
+
+              <div>
+                <span class="text-[10px] font-mono font-bold text-slate-400 block">REF ${escapeHTML(itemNo)}</span>
+                <h4 class="text-base font-black text-slate-900 dark:text-white leading-tight mt-0.5">${escapeHTML(displayTitle)}</h4>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Era / Period</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(eraDisplay || '—')}</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Date</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(year || '—')}</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Category</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(category || '—')}</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Origin</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(made || '—')}</span>
+                </div>
+              </div>
+
+              ${notes ? `
+                <div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 p-3 rounded-xl text-amber-900 dark:text-amber-300">
+                  <span class="text-[9px] font-black uppercase block text-amber-600 dark:text-amber-400 mb-0.5">Curator Notes</span>
+                  <p class="line-clamp-3">${escapeHTML(notes.replace(/^#\s*/, ''))}</p>
+                </div>
+              ` : ''}
+
+              ${details ? `
+                <div class="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                  ${escapeHTML(cleanDetailsForModal(details))}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
+              <button onclick="closeCompareModal(); window.openModalByOriginalIndex(${originalIndex});" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2 rounded-xl transition shadow">
+                Full Details ↗
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  body.innerHTML = html;
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeCompareModal() {
+  const modal = document.getElementById('compareModal');
+  if (modal) modal.classList.add('hidden');
+  const detailModal = document.getElementById('detailModal');
+  if (!detailModal || detailModal.classList.contains('hidden')) {
+    document.body.classList.remove('overflow-hidden');
   }
 }
 
@@ -700,19 +1065,369 @@ function update3DSkyboxUI() {
   if (lightboxBtn) lightboxBtn.textContent = labelText;
 }
 
+// --- Printable Display Placard Generator ---
+function printMuseumPlacard(row, originalIndex) {
+  const placard = document.getElementById('printablePlacard');
+  if (!placard || !row) return;
+
+  const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+  const { title, details } = parseTitleAndDetails(rawContent);
+  const cleanTitle = title || `Exhibit Item ${originalIndex + 1}`;
+  const notes = getVal(row, colIdx.notes);
+  const age = getVal(row, colIdx.age);
+  const era = getEraByRow(row);
+  const eraDisplay = era ? era.short : age;
+  const category = getVal(row, colIdx.category);
+  const subcategory = getVal(row, colIdx.subcategory);
+  const type = getVal(row, colIdx.type);
+  const made = getVal(row, colIdx.made);
+  const year = getVal(row, colIdx.year);
+  const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
+  const { img1 } = getImagesForItem(row);
+  const fullImg = formatGoogleLh3Url(img1, 's800');
+
+  const currentUrl = `${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`;
+  const originalDocTitle = document.title;
+  const cleanItemRef = String(itemNo).replace(/[^a-zA-Z0-9_-]/g, '');
+  const cleanFileNameTitle = cleanTitle.replace(/[^a-zA-Z0-9\s_-]/g, '').trim().substring(0, 40);
+  document.title = `BMMC Placard - ${cleanItemRef || 'Item'} - ${cleanFileNameTitle}`;
+
+  placard.innerHTML = `
+    <div style="border: 3px double #0f172a; padding: 18px 22px; max-width: 650px; margin: 0 auto; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box;">
+      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h4 style="margin: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; font-weight: 800;">Bonniefields Museum Collection</h4>
+          <h1 style="margin: 3px 0 0 0; font-size: 18px; font-weight: 900; color: #0f172a; line-height: 1.2;">${cleanTitle}</h1>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 11px; font-weight: 800; background: #0f172a; color: #ffffff; padding: 2px 7px; border-radius: 4px;">Ref ${itemNo}</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 14px; margin-bottom: 12px;">
+        ${fullImg ? `<div style="width: 170px; height: 130px; flex-shrink: 0; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-radius: 6px; overflow: hidden;"><img src="${fullImg}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>` : ''}
+        <div style="flex: 1; font-size: 10.5px; line-height: 1.5; color: #334155;">
+          ${eraDisplay ? `<p style="margin: 0 0 3px 0;"><strong>Historical Era:</strong> ${eraDisplay}</p>` : ''}
+          ${year ? `<p style="margin: 0 0 3px 0;"><strong>Date / Period:</strong> ${year}</p>` : ''}
+          ${made ? `<p style="margin: 0 0 3px 0;"><strong>Origin / Location:</strong> ${made}</p>` : ''}
+          ${category ? `<p style="margin: 0 0 3px 0;"><strong>Category:</strong> ${category} ${subcategory ? `&bull; ${subcategory}` : ''}</p>` : ''}
+          ${type ? `<p style="margin: 0 0 3px 0;"><strong>Type:</strong> ${type}</p>` : ''}
+        </div>
+      </div>
+
+      ${notes ? `
+        <div style="background: #f8fafc; border-left: 3px solid #0284c7; padding: 8px 12px; margin-bottom: 10px;">
+          <h5 style="margin: 0 0 3px 0; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; color: #0284c7; font-weight: 800;">Curator's Notes</h5>
+          <p style="margin: 0; font-size: 10.5px; color: #1e293b; line-height: 1.45; white-space: pre-line;">${notes.replace(/^#\s*/, '')}</p>
+        </div>
+      ` : ''}
+
+      ${details ? `
+        <div style="margin-bottom: 12px;">
+          <p style="margin: 0; font-size: 10.5px; color: #475569; line-height: 1.45; white-space: pre-line;">${cleanDetailsForModal(details)}</p>
+        </div>
+      ` : ''}
+
+      <div style="border-top: 1px dashed #94a3b8; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 8.5px; color: #64748b;">
+        <span>BMMC Catalog &bull; Archive Reference System</span>
+        <span>${currentUrl}</span>
+      </div>
+    </div>
+  `;
+
+  const cleanupAfterPrint = () => {
+    document.title = originalDocTitle;
+    window.removeEventListener('afterprint', cleanupAfterPrint);
+  };
+  window.addEventListener('afterprint', cleanupAfterPrint);
+
+  setTimeout(() => {
+    window.print();
+    setTimeout(cleanupAfterPrint, 2000);
+  }, 100);
+}
+
+// --- Related Exhibits Finder ---
+function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
+  if (!rawExhibitsRows || rawExhibitsRows.length === 0) return [];
+  const currentCat = getVal(currentRow, colIdx.category).toLowerCase();
+  const currentEra = getEraByRow(currentRow);
+  const currentEraKey = currentEra ? currentEra.short : '';
+
+  const candidates = rawExhibitsRows
+    .map((r, idx) => ({ row: r, originalIndex: idx }))
+    .filter(item => item.originalIndex !== currentOriginalIndex);
+
+  candidates.forEach(item => {
+    let score = 0;
+    const cat = getVal(item.row, colIdx.category).toLowerCase();
+    const era = getEraByRow(item.row);
+    const eraKey = era ? era.short : '';
+
+    if (currentCat && cat && (cat === currentCat || cat.includes(currentCat))) score += 3;
+    if (currentEraKey && eraKey && eraKey === currentEraKey) score += 2;
+    item.score = score;
+  });
+
+  return candidates
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+// --- View Switcher State Handler ---
+function setCatalogViewMode(mode) {
+  catalogViewMode = mode;
+  try { localStorage.setItem('bMMC_view_mode', mode); } catch (e) {}
+  saveCatalogSessionState();
+  updateViewSwitcherUI();
+  if (isGridActive) filterCatalog(true);
+}
+
+function updateViewSwitcherUI() {
+  const btnGrid = document.getElementById('btnViewGrid');
+  const btnTable = document.getElementById('btnViewTable');
+  const btnPhotos = document.getElementById('btnViewPhotos');
+
+  [btnGrid, btnTable, btnPhotos].forEach(b => {
+    if (b) {
+      b.classList.remove('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+      b.classList.add('text-slate-600', 'dark:text-slate-400');
+    }
+  });
+
+  const activeBtn = catalogViewMode === 'table' ? btnTable : (catalogViewMode === 'photos' ? btnPhotos : btnGrid);
+  if (activeBtn) {
+    activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+    activeBtn.classList.add('bg-white', 'dark:bg-slate-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+  }
+}
+
+// --- Interactive Column Sorter for Table View ---
+window.sortTableByColumn = function(colName) {
+  if (tableSortCol === colName) {
+    tableSortDir = (tableSortDir === 'asc') ? 'desc' : 'asc';
+  } else {
+    tableSortCol = colName;
+    tableSortDir = 'asc';
+  }
+  saveCatalogSessionState();
+  filterCatalog(true);
+};
+
+// --- Live Search Auto-Suggest Engine ---
+function handleSearchInputSuggestions(val) {
+  const box = document.getElementById('searchSuggestionsBox');
+  if (!box) return;
+
+  const query = val.trim().toLowerCase();
+  if (query.length < 2 || !rawExhibitsRows || rawExhibitsRows.length === 0) {
+    box.classList.add('hidden');
+    box.innerHTML = '';
+    return;
+  }
+
+  const catMatches = new Set();
+  const eraMatches = new Set();
+  const locMatches = new Set();
+  const itemMatches = [];
+
+  rawExhibitsRows.forEach((row, idx) => {
+    const title = parseTitleAndDetails(getVal(row, colIdx.title) || getVal(row, colIdx.id)).title;
+    const cat = getVal(row, colIdx.category);
+    const subcat = getVal(row, colIdx.subcategory);
+    const era = getEraByRow(row);
+    const loc = getVal(row, colIdx.made);
+
+    if (cat && cat.toLowerCase().includes(query)) catMatches.add(cat);
+    if (subcat && subcat.toLowerCase().includes(query)) catMatches.add(subcat);
+    if (era && (era.short.toLowerCase().includes(query) || era.full.toLowerCase().includes(query))) eraMatches.add(era.short);
+    if (loc && loc.toLowerCase().includes(query)) locMatches.add(loc);
+
+    if (title && title.toLowerCase().includes(query) && itemMatches.length < 3) {
+      itemMatches.push({ title, originalIndex: idx, img: formatGoogleLh3Url(getImagesForItem(row).img1, 's100') });
+    }
+  });
+
+  if (catMatches.size === 0 && eraMatches.size === 0 && locMatches.size === 0 && itemMatches.length === 0) {
+    box.classList.add('hidden');
+    box.innerHTML = '';
+    return;
+  }
+
+  let html = `<div class="p-2 space-y-2">`;
+
+  if (catMatches.size > 0 || eraMatches.size > 0 || locMatches.size > 0) {
+    html += `<div class="flex flex-wrap gap-1 items-center">`;
+    Array.from(catMatches).slice(0, 3).forEach(c => {
+      html += `<button onclick="applyAutoSuggestFilter('category', '${escapeHTML(c)}')" class="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-bold text-[10px] hover:bg-blue-100">Category: ${escapeHTML(c)}</button>`;
+    });
+    Array.from(eraMatches).slice(0, 2).forEach(e => {
+      html += `<button onclick="applyAutoSuggestFilter('age', '${escapeHTML(e)}')" class="px-2 py-0.5 rounded-lg bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-bold text-[10px] hover:bg-purple-100">Era: ${escapeHTML(e)}</button>`;
+    });
+    Array.from(locMatches).slice(0, 2).forEach(l => {
+      html += `<button onclick="applyAutoSuggestSearch('${escapeHTML(l)}')" class="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] hover:bg-emerald-100">📍 ${escapeHTML(l)}</button>`;
+    });
+    html += `</div>`;
+  }
+
+  if (itemMatches.length > 0) {
+    html += `<div class="border-t border-slate-100 dark:border-slate-800 pt-1.5 space-y-1">`;
+    itemMatches.forEach(item => {
+      html += `
+        <div onclick="window.openModalByOriginalIndex(${item.originalIndex}); hideSearchSuggestions();" class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition">
+          <img src="${item.img || NO_IMAGE_SVG}" class="w-8 h-8 rounded-lg object-contain bg-slate-200 dark:bg-slate-950 p-0.5 flex-shrink-0" />
+          <span class="font-bold text-slate-800 dark:text-slate-200 truncate">${escapeHTML(item.title)}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  box.innerHTML = html;
+  box.classList.remove('hidden');
+}
+
+function hideSearchSuggestions() {
+  const box = document.getElementById('searchSuggestionsBox');
+  if (box) {
+    box.classList.add('hidden');
+    box.innerHTML = '';
+  }
+}
+
+window.applyAutoSuggestFilter = function(filterKey, filterVal) {
+  hideSearchSuggestions();
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  if (filterKey === 'category') {
+    const sel = document.getElementById('filterCategory');
+    if (sel) sel.value = filterVal;
+  } else if (filterKey === 'age') {
+    const sel = document.getElementById('filterAge');
+    if (sel) sel.value = filterVal;
+  }
+  updateDynamicDropdowns();
+  filterCatalog(true);
+  scrollToGrid();
+};
+
+window.applyAutoSuggestSearch = function(query) {
+  hideSearchSuggestions();
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = query;
+  updateDynamicDropdowns();
+  filterCatalog(true);
+  scrollToGrid();
+};
+
+// --- Dedicated Clean Hub Category Selector ---
+window.selectHubCategory = function(catName) {
+  clearAllFilters(false);
+  setTab('exhibits');
+
+  const isCollectionsHub = catName.toLowerCase().includes('collection');
+
+  if (isCollectionsHub) {
+    const typeSelect = document.getElementById('filterType');
+    if (typeSelect) {
+      let matched = false;
+      const target = 'collection';
+      for (let opt of typeSelect.options) {
+        const optVal = opt.value.toLowerCase().trim();
+        if (optVal && (optVal === 'collections' || optVal === 'collection' || optVal.includes(target))) {
+          typeSelect.value = opt.value;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        const existingMatch = rawExhibitsRows.find(r => {
+          const t = getVal(r, colIdx.type).toLowerCase();
+          return t.includes('collection');
+        });
+        if (existingMatch) {
+          const bestType = getVal(existingMatch, colIdx.type);
+          const opt = document.createElement('option');
+          opt.value = bestType;
+          opt.textContent = bestType;
+          typeSelect.appendChild(opt);
+          typeSelect.value = bestType;
+        } else {
+          typeSelect.value = catName;
+        }
+      }
+    }
+  } else {
+    const catSelect = document.getElementById('filterCategory');
+    if (catSelect) {
+      let matched = false;
+      const targetStem = catName.toLowerCase().replace(/s$/, '').trim();
+      
+      for (let opt of catSelect.options) {
+        const optVal = opt.value.toLowerCase().trim();
+        const optStem = optVal.replace(/s$/, '');
+        if (optVal && (optVal === catName.toLowerCase().trim() || optStem === targetStem || optVal.includes(targetStem))) {
+          catSelect.value = opt.value;
+          matched = true;
+          break;
+        }
+      }
+
+      if (!matched) {
+        const existingMatch = rawExhibitsRows.find(r => {
+          const c = getVal(r, colIdx.category).toLowerCase();
+          return c === catName.toLowerCase() || c.replace(/s$/, '') === targetStem || c.includes(targetStem);
+        });
+        if (existingMatch) {
+          const bestCat = getVal(existingMatch, colIdx.category);
+          const opt = document.createElement('option');
+          opt.value = bestCat;
+          opt.textContent = bestCat;
+          catSelect.appendChild(opt);
+          catSelect.value = bestCat;
+        }
+      }
+    }
+  }
+
+  updateDynamicDropdowns();
+  filterCatalog(true);
+  scrollToGrid();
+};
+
+window.selectGramophoneHub = function() {
+  clearAllFilters(false);
+  setTab('gramophone');
+  updateDynamicDropdowns();
+  filterCatalog(true);
+  scrollToGrid();
+};
+
 // --- Bidirectional 2D Map Jump Bridge ---
 window.showExhibitOnMap = function(originalIndex) {
   closeModal();
   closeEnlargeModal();
   close3DLightbox();
+  closeCompareModal();
   document.body.classList.remove('overflow-hidden');
-  setTab('stats');
 
+  const targetSrc = `2Dmap.html?exhibit=${originalIndex}`;
   const mapIframe = document.getElementById('statMapIframe');
+
   if (mapIframe) {
-    const targetSrc = `2Dmap.html?exhibit=${originalIndex}`;
-    if (!mapIframe.src || mapIframe.src.indexOf('2Dmap.html') === -1) {
+    const currentSrc = mapIframe.getAttribute('src') || mapIframe.src || '';
+    if (!currentSrc || currentSrc === 'about:blank' || !currentSrc.includes(`exhibit=${originalIndex}`)) {
       mapIframe.src = targetSrc;
+      mapIframe.onload = function() {
+        try {
+          mapIframe.contentWindow?.postMessage({
+            type: 'FOCUS_EXHIBIT',
+            exhibit: originalIndex
+          }, '*');
+        } catch (e) {}
+      };
     } else {
       try {
         mapIframe.contentWindow?.postMessage({
@@ -723,19 +1438,20 @@ window.showExhibitOnMap = function(originalIndex) {
     }
   }
 
+  setTab('stats');
+
   setTimeout(() => {
     document.getElementById('statMapCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 200);
+  }, 250);
 };
 
-function browseAllExhibits() {
-  hideLoadingSpinner();
-  document.body.classList.remove('overflow-hidden');
-  if (currentTab !== 'exhibits') setTab('exhibits');
+function clearAllFilters(shouldScroll = true) {
   ['searchInput', 'filterAge', 'filterType', 'filterCategory', 'filterSubcategory', 'filterArtist', 'filterLabel', 'filterFormat', 'filterYear'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   only3DActive = false; hotOnlyActive = false; showingFavoritesOnly = false;
+  tableSortCol = null;
+  restoredSessionFilters = {};
   const btn3D = document.getElementById('btn3DOnly'); if (btn3D) btn3D.classList.remove('ring-2', 'ring-purple-300', 'from-purple-700', 'to-indigo-700');
   const btnHot = document.getElementById('btnHotOnly'); if (btnHot) btnHot.classList.remove('ring-2', 'ring-amber-300', 'from-amber-600', 'to-rose-700');
   
@@ -749,7 +1465,17 @@ function browseAllExhibits() {
     safeReplaceState(url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : ''));
   } catch (e) {}
 
-  updateFavoritesBadge(); updateDynamicDropdowns(); filterCatalog(true); scrollToGrid();
+  updateFavoritesBadge();
+}
+
+function browseAllExhibits() {
+  hideLoadingSpinner();
+  document.body.classList.remove('overflow-hidden');
+  if (currentTab !== 'exhibits') setTab('exhibits');
+  clearAllFilters(false);
+  updateDynamicDropdowns();
+  filterCatalog(true);
+  scrollToGrid();
 }
 
 function setTab(tabName) {
@@ -757,20 +1483,12 @@ function setTab(tabName) {
   stopAudioGuide();
   hideLoadingSpinner();
   document.body.classList.remove('overflow-hidden');
-
-  if (tabName === 'stats' || tabName === 'analytics') {
-    try {
-      const url = new URL(window.location);
-      url.searchParams.delete('search');
-      url.searchParams.delete('item');
-      url.searchParams.delete('q');
-      safeReplaceState(url.pathname + `#${tabName}`);
-    } catch (e) {}
-  }
+  saveCatalogSessionState();
 
   const exhibitsFilterGrid = document.getElementById('exhibitsFilterGrid');
   const gramophoneFilterGrid = document.getElementById('gramophoneFilterGrid');
   const searchSortBar = document.getElementById('searchSortBar');
+  const collectionHubsSection = document.getElementById('collectionHubsSection');
   const gridPrompt = document.getElementById('gridPrompt');
   const gridSection = document.getElementById('gridSection');
   const statsSection = document.getElementById('statsSection');
@@ -787,28 +1505,34 @@ function setTab(tabName) {
     if (exhibitsFilterGrid) exhibitsFilterGrid.classList.remove('hidden');
     if (gramophoneFilterGrid) gramophoneFilterGrid.classList.add('hidden');
     if (searchSortBar) searchSortBar.classList.remove('hidden');
+    if (collectionHubsSection) collectionHubsSection.classList.remove('hidden');
     if (headerTitle) headerTitle.textContent = 'BMMC Showcase';
     if (headerIcon) headerIcon.textContent = '🏛️';
     if (subhead) subhead.textContent = 'Discover historical artifacts, equipment, and memorabilia at the Bonniefields Museum.';
+    safeReplaceState(window.location.pathname);
   } else if (tabName === 'gramophone') {
     if (statsSection) statsSection.classList.add('hidden');
     if (gridSection) gridSection.classList.remove('hidden');
     if (gramophoneFilterGrid) gramophoneFilterGrid.classList.remove('hidden');
     if (exhibitsFilterGrid) exhibitsFilterGrid.classList.add('hidden');
     if (searchSortBar) searchSortBar.classList.remove('hidden');
+    if (collectionHubsSection) collectionHubsSection.classList.remove('hidden');
     if (headerTitle) headerTitle.textContent = 'BMMC Gramophones';
     if (headerIcon) headerIcon.textContent = '🎵';
     if (subhead) subhead.textContent = 'Gramophone Catalog (1916 – 1953): Shellac, vinyl, and early 20th-century audio recordings preserved in the BMMC music collection.';
+    safeReplaceState(window.location.pathname + '#gramophone');
   } else if (tabName === 'stats') {
     if (gridPrompt) gridPrompt.classList.add('hidden');
     if (gridSection) gridSection.classList.add('hidden');
     if (exhibitsFilterGrid) exhibitsFilterGrid.classList.add('hidden');
     if (gramophoneFilterGrid) gramophoneFilterGrid.classList.add('hidden');
     if (searchSortBar) searchSortBar.classList.add('hidden');
+    if (collectionHubsSection) collectionHubsSection.classList.add('hidden');
     if (statsSection) statsSection.classList.remove('hidden');
     if (headerTitle) headerTitle.textContent = 'Museum Insights Live';
     if (headerIcon) headerIcon.textContent = 'ℹ️';
     if (subhead) subhead.textContent = 'Explore live analytics, origin distribution, and chronological evolution from the Bonniefields Museum catalog.';
+    safeReplaceState(window.location.pathname + '#stats');
     renderMuseumStatistics();
   } else if (tabName === 'analytics') {
     if (gridPrompt) gridPrompt.classList.add('hidden');
@@ -817,13 +1541,19 @@ function setTab(tabName) {
     if (exhibitsFilterGrid) exhibitsFilterGrid.classList.add('hidden');
     if (gramophoneFilterGrid) gramophoneFilterGrid.classList.add('hidden');
     if (searchSortBar) searchSortBar.classList.add('hidden');
+    if (collectionHubsSection) collectionHubsSection.classList.add('hidden');
     if (adminAnalyticsSection) adminAnalyticsSection.classList.remove('hidden');
     if (headerTitle) headerTitle.textContent = 'Site Traffic Dashboard';
     if (headerIcon) headerIcon.textContent = '📊';
     if (subhead) subhead.textContent = 'Live visitor statistics, pageviews, and visitor interactions tracked by Umami.';
+    safeReplaceState(window.location.pathname + '#analytics');
   }
+
   updateFavoritesBadge();
-  if (tabName !== 'stats' && tabName !== 'analytics') { updateDynamicDropdowns(); filterCatalog(true); }
+  if (tabName !== 'stats' && tabName !== 'analytics') {
+    updateDynamicDropdowns();
+    filterCatalog(true);
+  }
 }
 
 function initFuseSearch() {
@@ -872,6 +1602,9 @@ async function loadCatalogData() {
   if (loadingElem) loadingElem.classList.remove('hidden');
 
   initTheme();
+  const hadRestoredState = restoreCatalogSessionState();
+  updateViewSwitcherUI();
+
   try {
     const [exhibitsData, gramophoneData] = await Promise.all([
       fetchDualModeCSV(REMOTE_EXHIBITS_CSV_URL, LOCAL_EXHIBITS_CSV_URL, 'bMMC_cached_exhibits'),
@@ -916,10 +1649,23 @@ async function loadCatalogData() {
 
     renderCollectionHubs(rawExhibitsRows);
     updateDynamicDropdowns();
-    document.getElementById('gridPrompt')?.classList.remove('hidden');
+    
+    // Check explicit hash navigation on load
+    const hash = window.location.hash;
+    if (hash === '#stats' || hash === '#info') {
+      setTab('stats');
+    } else if (hash === '#analytics' || hash === '#admin-stats') {
+      setTab('analytics');
+    } else if (hash && (hash.startsWith('#exhibit-') || hash.startsWith('#gramophone-'))) {
+      checkUrlHashForExhibit();
+    } else if (hadRestoredState && isGridActive) {
+      filterCatalog(true);
+    } else {
+      document.getElementById('gridPrompt')?.classList.remove('hidden');
+    }
+
     updateFavoritesBadge();
     checkUrlQueryParams();
-    checkUrlHashForExhibit();
 
     setTimeout(() => initFuseSearch(), 80);
 
@@ -931,7 +1677,7 @@ async function loadCatalogData() {
         <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900">
           <p class="text-rose-600 dark:text-rose-400 font-bold text-base mb-1">Catalog Archive Offline or Missing</p>
           <p class="text-xs text-slate-500 mb-4">Please check your network connection or verify local CSV files in ./data/.</p>
-          <button onclick="localStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Reload Archive</button>
+          <button onclick="localStorage.clear(); sessionStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Reload Archive</button>
         </div>
       `;
     }
@@ -966,7 +1712,11 @@ function renderCollectionHubs(rows) {
 
   MAIN_HUB_CATEGORIES.forEach(catName => {
     const baseName = catName.toLowerCase().replace(/s$/, '');
-    const matchingRows = rows.filter(r => getVal(r, colIdx.category).toLowerCase().includes(baseName) || getVal(r, colIdx.type).toLowerCase().includes(baseName));
+    const matchingRows = rows.filter(r => {
+      const c = getVal(r, colIdx.category).toLowerCase();
+      const t = getVal(r, colIdx.type).toLowerCase();
+      return c.includes(baseName) || t.includes(baseName);
+    });
     const count = matchingRows.length;
     if (count === 0) return;
 
@@ -996,25 +1746,7 @@ function renderCollectionHubs(rows) {
       </div>
     `;
 
-    hubCard.addEventListener('click', () => {
-      setTab('exhibits');
-      const catSelect = document.getElementById('filterCategory');
-      const typeSelect = document.getElementById('filterType');
-      if (catSelect) catSelect.value = '';
-      if (typeSelect) typeSelect.value = '';
-      let matched = false;
-      if (typeSelect) {
-        for (let opt of typeSelect.options) {
-          if (opt.value.toLowerCase().includes(baseName)) { typeSelect.value = opt.value; matched = true; break; }
-        }
-      }
-      if (!matched && catSelect) {
-        for (let opt of catSelect.options) {
-          if (opt.value.toLowerCase().includes(baseName)) { catSelect.value = opt.value; matched = true; break; }
-        }
-      }
-      updateDynamicDropdowns(); filterCatalog(true); scrollToGrid();
-    });
+    hubCard.addEventListener('click', () => window.selectHubCategory(catName));
     hubsGrid.appendChild(hubCard);
   });
 
@@ -1039,7 +1771,7 @@ function renderCollectionHubs(rows) {
       <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5" style="color: ${gramTheme.hex};">1916–1953 →</span>
     </div>
   `;
-  gramophoneHubCard.addEventListener('click', () => { setTab('gramophone'); scrollToGrid(); });
+  gramophoneHubCard.addEventListener('click', () => window.selectGramophoneHub());
   hubsGrid.appendChild(gramophoneHubCard);
   document.getElementById('collectionHubsSection')?.classList.remove('hidden');
 }
@@ -1049,7 +1781,11 @@ function populateInitialDropdowns() {
   document.getElementById('btnClearAllFilters')?.addEventListener('click', browseAllExhibits);
   ['filterAge', 'filterType', 'filterCategory', 'filterSubcategory', 'filterArtist', 'filterLabel', 'filterFormat', 'filterYear'].forEach(id => {
     const elem = document.getElementById(id);
-    if (elem) elem.addEventListener('change', () => { updateDynamicDropdowns(); filterCatalog(true); scrollToGrid(); });
+    if (elem) elem.addEventListener('change', () => { 
+      updateDynamicDropdowns(); 
+      filterCatalog(true); 
+      scrollToGrid(); 
+    });
   });
 }
 
@@ -1058,10 +1794,10 @@ function updateDynamicDropdowns() {
   const favs = getFavorites();
 
   if (currentTab === 'exhibits') {
-    const ageVal = document.getElementById('filterAge')?.value || '';
-    const typeVal = document.getElementById('filterType')?.value || '';
-    const catVal = document.getElementById('filterCategory')?.value || '';
-    const subCatVal = document.getElementById('filterSubcategory')?.value || '';
+    const ageVal = document.getElementById('filterAge')?.value || restoredSessionFilters.filterAge || '';
+    const typeVal = document.getElementById('filterType')?.value || restoredSessionFilters.filterType || '';
+    const catVal = document.getElementById('filterCategory')?.value || restoredSessionFilters.filterCategory || '';
+    const subCatVal = document.getElementById('filterSubcategory')?.value || restoredSessionFilters.filterSubcategory || '';
 
     let matchedOriginalIndices = null;
     if (searchVal && fuseExhibits) {
@@ -1073,12 +1809,13 @@ function updateDynamicDropdowns() {
         const searchMatch = !searchVal || (matchedOriginalIndices ? matchedOriginalIndices.has(originalIndex) : row.join(' ').toLowerCase().includes(searchVal.toLowerCase()));
         const rowEra = getEraByRow(row);
         const ageMatch = excludeField === 'age' || !ageVal || (rowEra && (rowEra.short === ageVal || rowEra.full === ageVal)) || getVal(row, colIdx.year) === ageVal;
-        const typeMatch = excludeField === 'type' || !typeVal || getVal(row, colIdx.type).toLowerCase().includes(typeVal.toLowerCase());
+        const typeMatch = excludeField === 'type' || !typeVal || getVal(row, colIdx.type).toLowerCase().includes(typeVal.toLowerCase()) || (typeVal.toLowerCase().includes('collection') && getVal(row, colIdx.type).toLowerCase().includes('collection'));
         const catMatch = excludeField === 'category' || !catVal || getVal(row, colIdx.category).toLowerCase().includes(catVal.toLowerCase());
         const subCatMatch = excludeField === 'subcategory' || !subCatVal || getVal(row, colIdx.subcategory) === subCatVal;
         const match3D = !only3DActive || Boolean(get3DUrlForItem(row));
         const matchHot = !hotOnlyActive || isItemHot(row);
         const matchFav = !showingFavoritesOnly || favs.includes(originalIndex);
+
         return searchMatch && ageMatch && typeMatch && catMatch && subCatMatch && match3D && matchHot && matchFav;
       });
     }
@@ -1092,13 +1829,16 @@ function updateDynamicDropdowns() {
         const era = getEraByRow(r);
         if (era) eraCounts[era.short] = (eraCounts[era.short] || 0) + 1;
       });
-      const currAge = ageSelect.value;
+      const currAge = ageSelect.value || restoredSessionFilters.filterAge || '';
       ageSelect.innerHTML = '<option value="">All Eras / Ages</option>';
       TIMELINE_ERAS.forEach(e => {
         const opt = document.createElement('option');
         opt.value = e.short;
         opt.textContent = `${e.full} - (${eraCounts[e.short] || 0})`;
-        if (e.short === currAge || e.full === currAge) opt.selected = true;
+        if (e.short === currAge || e.full === currAge) {
+          opt.selected = true;
+          delete restoredSessionFilters.filterAge;
+        }
         ageSelect.appendChild(opt);
       });
     }
@@ -1108,10 +1848,10 @@ function updateDynamicDropdowns() {
     updateSelectOptions('filterSubcategory', getExhibitRowsExcluding('subcategory').map(r => getVal(r, colIdx.subcategory)));
 
   } else if (currentTab === 'gramophone') {
-    const artistVal = document.getElementById('filterArtist')?.value || '';
-    const labelVal = document.getElementById('filterLabel')?.value || '';
-    const formatVal = document.getElementById('filterFormat')?.value || '';
-    const yearVal = document.getElementById('filterYear')?.value || '';
+    const artistVal = document.getElementById('filterArtist')?.value || restoredSessionFilters.filterArtist || '';
+    const labelVal = document.getElementById('filterLabel')?.value || restoredSessionFilters.filterLabel || '';
+    const formatVal = document.getElementById('filterFormat')?.value || restoredSessionFilters.filterFormat || '';
+    const yearVal = document.getElementById('filterYear')?.value || restoredSessionFilters.filterYear || '';
 
     let matchedOriginalIndices = null;
     if (searchVal && fuseGramophone) {
@@ -1140,7 +1880,7 @@ function updateDynamicDropdowns() {
 function updateSelectOptions(elementId, values) {
   const select = document.getElementById(elementId);
   if (!select) return;
-  const currentSelection = select.value;
+  const currentSelection = select.value || restoredSessionFilters[elementId] || '';
   const counts = {};
   values.filter(Boolean).forEach(val => { counts[val] = (counts[val] || 0) + 1; });
   let uniqueValues = Object.keys(counts).sort().filter(val => {
@@ -1152,7 +1892,10 @@ function updateSelectOptions(elementId, values) {
     const opt = document.createElement('option');
     opt.value = val;
     opt.textContent = `${unescapeHTML(val)} - (${counts[val] || 0})`;
-    if (val === currentSelection) opt.selected = true;
+    if (currentSelection && (val === currentSelection || val.toLowerCase().trim() === currentSelection.toLowerCase().trim())) {
+      opt.selected = true;
+      delete restoredSessionFilters[elementId];
+    }
     select.appendChild(opt);
   });
 }
@@ -1171,6 +1914,7 @@ function renderActiveFilterPills() {
     const typeVal = document.getElementById('filterType')?.value || '';
     const catVal = document.getElementById('filterCategory')?.value || '';
     const subCatVal = document.getElementById('filterSubcategory')?.value || '';
+    
     if (searchVal) filters.push({ label: `Search: "${searchVal}"`, clear: () => { document.getElementById('clearSearch').click(); } });
     if (ageVal) filters.push({ label: `Era / Age: ${unescapeHTML(ageVal)}`, clear: () => { document.getElementById('filterAge').value = ''; } });
     if (typeVal) filters.push({ label: `Type: ${unescapeHTML(typeVal)}`, clear: () => { document.getElementById('filterType').value = ''; } });
@@ -1206,9 +1950,11 @@ function renderActiveFilterPills() {
   }
 }
 
-// 4. Grid Filtering & Rendering
+// 4. Grid Filtering & Multi-View Rendering
 function filterCatalog(forceShowGrid = false) {
   hideLoadingSpinner();
+  saveCatalogSessionState();
+
   const searchVal = (document.getElementById('searchInput')?.value || '').trim();
   const sortBy = document.getElementById('sortBy')?.value || 'default';
   const favs = getFavorites();
@@ -1245,26 +1991,58 @@ function filterCatalog(forceShowGrid = false) {
       const searchMatch = !searchVal || (matchedOriginalIndices ? matchedOriginalIndices.has(originalIndex) : row.join(' ').toLowerCase().includes(searchVal.toLowerCase()));
       const rowEra = getEraByRow(row);
       const ageMatch = !ageVal || (rowEra && (rowEra.short === ageVal || rowEra.full === ageVal)) || getVal(row, colIdx.year) === ageVal;
-      const typeMatch = !typeVal || getVal(row, colIdx.type).toLowerCase().includes(typeVal.toLowerCase());
+      const typeMatch = !typeVal || getVal(row, colIdx.type).toLowerCase().includes(typeVal.toLowerCase()) || (typeVal.toLowerCase().includes('collection') && getVal(row, colIdx.type).toLowerCase().includes('collection'));
       const catMatch = !catVal || getVal(row, colIdx.category).toLowerCase().includes(catVal.toLowerCase());
       const subCatMatch = !subCatVal || getVal(row, colIdx.subcategory) === subCatVal;
       const match3D = !only3DActive || Boolean(get3DUrlForItem(row));
       const matchHot = !hotOnlyActive || isItemHot(row);
       const matchFav = !showingFavoritesOnly || favs.includes(originalIndex);
+
       return searchMatch && ageMatch && typeMatch && catMatch && subCatMatch && match3D && matchHot && matchFav;
     });
 
-    if (sortBy === 'title-asc') {
-      currentFilteredRows.sort((a, b) => parseTitleAndDetails(getVal(a.row, colIdx.title) || getVal(a.row, colIdx.id)).title.localeCompare(parseTitleAndDetails(getVal(b.row, colIdx.title) || getVal(b.row, colIdx.id)).title));
-    } else if (sortBy === 'title-desc') {
-      currentFilteredRows.sort((a, b) => parseTitleAndDetails(getVal(b.row, colIdx.title) || getVal(b.row, colIdx.id)).title.localeCompare(parseTitleAndDetails(getVal(a.row, colIdx.title) || getVal(a.row, colIdx.id)).title));
-    } else if (sortBy === 'age-oldest') {
-      currentFilteredRows.sort((a, b) => getVal(a.row, colIdx.year).localeCompare(getVal(b.row, colIdx.year)));
-    } else if (sortBy === 'age-newest') {
-      currentFilteredRows.sort((a, b) => getVal(b.row, colIdx.year).localeCompare(getVal(a.row, colIdx.year)));
+    if (catalogViewMode === 'table' && tableSortCol) {
+      currentFilteredRows.sort((a, b) => {
+        let valA = '', valB = '';
+        if (tableSortCol === 'ref') {
+          valA = getItemNumberForSort(a.row, a.originalIndex);
+          valB = getItemNumberForSort(b.row, b.originalIndex);
+          return tableSortDir === 'asc' ? valA - valB : valB - valA;
+        } else if (tableSortCol === 'title') {
+          valA = parseTitleAndDetails(getVal(a.row, colIdx.title) || '').title.toLowerCase();
+          valB = parseTitleAndDetails(getVal(b.row, colIdx.title) || '').title.toLowerCase();
+        } else if (tableSortCol === 'era') {
+          valA = (getEraByRow(a.row)?.short || getVal(a.row, colIdx.age) || '').toLowerCase();
+          valB = (getEraByRow(b.row)?.short || getVal(b.row, colIdx.age) || '').toLowerCase();
+        } else if (tableSortCol === 'date') {
+          valA = parseYearForSort(getVal(a.row, colIdx.year));
+          valB = parseYearForSort(getVal(b.row, colIdx.year));
+          return tableSortDir === 'asc' ? valA - valB : valB - valA;
+        } else if (tableSortCol === 'category') {
+          valA = (getVal(a.row, colIdx.category) || '').toLowerCase();
+          valB = (getVal(b.row, colIdx.category) || '').toLowerCase();
+        } else if (tableSortCol === 'type') {
+          valA = (getVal(a.row, colIdx.type) || '').toLowerCase();
+          valB = (getVal(b.row, colIdx.type) || '').toLowerCase();
+        } else if (tableSortCol === 'origin') {
+          valA = (getVal(a.row, colIdx.made) || '').toLowerCase();
+          valB = (getVal(b.row, colIdx.made) || '').toLowerCase();
+        }
+        return tableSortDir === 'asc' ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+      });
+    } else {
+      if (sortBy === 'title-asc') {
+        currentFilteredRows.sort((a, b) => parseTitleAndDetails(getVal(a.row, colIdx.title) || getVal(a.row, colIdx.id)).title.localeCompare(parseTitleAndDetails(getVal(b.row, colIdx.title) || getVal(b.row, colIdx.id)).title));
+      } else if (sortBy === 'title-desc') {
+        currentFilteredRows.sort((a, b) => parseTitleAndDetails(getVal(b.row, colIdx.title) || getVal(b.row, colIdx.id)).title.localeCompare(parseTitleAndDetails(getVal(a.row, colIdx.title) || getVal(a.row, colIdx.id)).title));
+      } else if (sortBy === 'age-oldest') {
+        currentFilteredRows.sort((a, b) => getVal(a.row, colIdx.year).localeCompare(getVal(b.row, colIdx.year)));
+      } else if (sortBy === 'age-newest') {
+        currentFilteredRows.sort((a, b) => getVal(b.row, colIdx.year).localeCompare(getVal(a.row, colIdx.year)));
+      }
     }
 
-    renderExhibitsGrid();
+    renderExhibitsMultiView();
 
   } else if (currentTab === 'gramophone') {
     const artistVal = document.getElementById('filterArtist')?.value || '';
@@ -1314,83 +2092,17 @@ function filterCatalog(forceShowGrid = false) {
   }
 }
 
-function speakAudioGuide(originalIndex, event) {
-  if (event) event.stopPropagation();
-  if (currentlySpeakingIndex === originalIndex && window.speechSynthesis && window.speechSynthesis.speaking) {
-    stopAudioGuide(); return;
-  }
-  const row = rawExhibitsRows[originalIndex];
-  if (!row) return;
-  const notes = getVal(row, colIdx.notes);
-  if (!notes || notes.trim() === '') { showToast('No Museum Notes available for audio narration', 'ℹ️'); return; }
-
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    currentlySpeakingIndex = originalIndex;
-    currentSpeechUtterance = new SpeechSynthesisUtterance(`Museum Note: ${notes.replace(/^#\s*/, '')}`);
-    const chosenVoice = getSelectedVoice();
-    if (chosenVoice) currentSpeechUtterance.voice = chosenVoice;
-    currentSpeechUtterance.rate = 0.92; currentSpeechUtterance.pitch = 1.0;
-    currentSpeechUtterance.onend = () => { currentlySpeakingIndex = null; updateAudioUI(); };
-    currentSpeechUtterance.onerror = () => { currentlySpeakingIndex = null; updateAudioUI(); };
-    window.speechSynthesis.speak(currentSpeechUtterance);
-    updateAudioUI();
+function renderExhibitsMultiView() {
+  if (catalogViewMode === 'table') {
+    renderExhibitsTableView();
+  } else if (catalogViewMode === 'photos') {
+    renderExhibitsPhotoWallView();
+  } else {
+    renderExhibitsGrid();
   }
 }
 
-function stopAudioGuide() {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  currentlySpeakingIndex = null; updateAudioUI();
-}
-
-function updateAudioUI() {
-  const isSpeaking = window.speechSynthesis && window.speechSynthesis.speaking;
-  document.querySelectorAll('[data-grid-audio-idx]').forEach(btn => {
-    const idx = parseInt(btn.getAttribute('data-grid-audio-idx'), 10);
-    if (currentlySpeakingIndex === idx && isSpeaking) {
-      btn.classList.add('animate-pulse', 'bg-blue-600', 'text-white', 'ring-2', 'ring-blue-400');
-      btn.classList.remove('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600', 'dark:text-blue-400');
-      btn.innerHTML = `<span class="flex items-center gap-1 text-[11px] px-1 font-bold">🔊 <span class="eq-bar"></span><span class="eq-bar"></span></span>`;
-    } else {
-      btn.classList.remove('animate-pulse', 'bg-blue-600', 'text-white', 'ring-2', 'ring-blue-400');
-      btn.classList.add('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600', 'dark:text-blue-400');
-      btn.innerHTML = '🔊';
-    }
-  });
-
-  const btnModal = document.getElementById('btnAudioGuide');
-  if (btnModal) {
-    const modalRowIdx = parseInt(btnModal.getAttribute('data-row'), 10);
-    if (currentlySpeakingIndex === modalRowIdx && isSpeaking) {
-      btnModal.innerHTML = `<span class="flex items-center gap-1 text-xs font-bold"><span class="inline-flex items-center gap-0.5 text-blue-200"><span class="eq-bar"></span><span class="eq-bar"></span></span><span>Stop</span></span>`;
-      btnModal.onclick = stopAudioGuide;
-    } else {
-      btnModal.innerHTML = '🔊 Listen';
-      btnModal.onclick = () => speakAudioGuide(modalRowIdx);
-    }
-  }
-}
-
-function switchCardImage(originalIndex, dir, event) {
-  if (event) event.stopPropagation();
-  const cardThumb = document.getElementById(`card-media-box-${originalIndex}`);
-  const badgeElem = document.getElementById(`card-badge-${originalIndex}`);
-  if (!cardThumb) return;
-
-  const totalSlots = parseInt(cardThumb.getAttribute('data-total-slots') || '1', 10);
-  let currentSlot = parseInt(cardThumb.getAttribute('data-current-slot') || '1', 10) + dir;
-  if (currentSlot > totalSlots) currentSlot = 1;
-  if (currentSlot < 1) currentSlot = totalSlots;
-
-  cardThumb.setAttribute('data-current-slot', String(currentSlot));
-  cardThumb.querySelectorAll('.card-media-item').forEach(item => {
-    const slotIdx = parseInt(item.getAttribute('data-slot-idx'), 10);
-    item.classList.toggle('hidden', slotIdx !== currentSlot);
-    item.classList.toggle('flex', slotIdx === currentSlot);
-  });
-  if (badgeElem) badgeElem.textContent = `${currentSlot} / ${totalSlots}`;
-}
-
+// 4a. Standard Rich Card Grid
 function renderExhibitsGrid() {
   const grid = document.getElementById('grid');
   const itemCount = document.getElementById('itemCount');
@@ -1403,12 +2115,7 @@ function renderExhibitsGrid() {
   if (itemCount) itemCount.textContent = `Showing ${currentFilteredRows.length} exhibit${currentFilteredRows.length === 1 ? '' : 's'}`;
 
   if (currentFilteredRows.length === 0) {
-    grid.innerHTML = `
-      <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
-        <span class="text-3xl mb-2 block">🔍</span>
-        <p class="text-slate-600 dark:text-slate-300 font-bold text-sm">No exhibit results match your selected filters.</p>
-        <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Reset search and filters</button>
-      </div>`;
+    renderEmptyState(grid);
     return;
   }
 
@@ -1451,6 +2158,7 @@ function renderExhibitsGrid() {
 
     const totalSlots = slots.length;
     const isFav = favs.includes(originalIndex);
+    const isCompared = compareItemIndices.has(originalIndex);
     const ageBadgeClass = getAgeBadgeStyle(eraDisplay);
     const theme = getCategoryTheme(category || type || subcategory);
 
@@ -1483,9 +2191,10 @@ function renderExhibitsGrid() {
       <div id="card-media-box-${originalIndex}" data-total-slots="${totalSlots}" data-current-slot="1" class="h-56 relative overflow-hidden flex items-center justify-center p-2 group/cardimg" style="background-color: ${theme.hex}18;">
         ${mediaItemsHTML}
         <div class="absolute top-3 right-3 flex items-center gap-1.5 z-10" onclick="event.stopPropagation()">
-          ${isHot ? `<span title="Hot Item" class="w-8 h-8 rounded-full bg-amber-500/90 text-white backdrop-blur-md transition shadow-md flex items-center justify-center text-xs font-bold pointer-events-none">🔥</span>` : ''}
-          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">${isFav ? '❤️' : '🤍'}</button>
-          ${notes ? `<button data-grid-audio-idx="${originalIndex}" onclick="speakAudioGuide(${originalIndex}, event)" aria-label="Listen to notes" title="Listen to Museum Notes" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">🔊</button>` : ''}
+          ${isHot ? `<span title="Hot Item" class="w-8 h-8 rounded-full bg-amber-500/90 text-white backdrop-blur-md transition shadow-md flex items-center justify-center text-[17px] leading-none font-bold pointer-events-none">🔥</span>` : ''}
+          <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from comparison' : 'Compare artifact'}" class="w-8 h-8 rounded-full ${isCompared ? 'bg-indigo-600 text-white ring-2 ring-indigo-400' : 'bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200'} backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none font-bold">⚖️</button>
+          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none">${isFav ? '❤️' : '🤍'}</button>
+          ${notes ? `<button data-grid-audio-idx="${originalIndex}" onclick="speakAudioGuide(${originalIndex}, event)" aria-label="Listen to notes" title="Listen to Museum Notes" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none font-bold">🔊</button>` : ''}
         </div>
         ${totalSlots > 1 ? `
           <button onclick="switchCardImage(${originalIndex}, -1, event)" title="Previous Media" aria-label="Previous Media" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/75 hover:bg-slate-900 text-white text-xs font-black rounded-full w-7 h-7 flex items-center justify-center backdrop-blur-md shadow-md transition hover:scale-110 z-10">❮</button>
@@ -1510,7 +2219,7 @@ function renderExhibitsGrid() {
             View Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </span>
           <div class="flex gap-1.5" onclick="event.stopPropagation()">
-            ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm">👓 3D View</button>` : ''}
+            ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm">👓 3D View</button>` : ''}
             ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
             ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" title="Website" class="bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 dark:border-blue-800 transition shadow-sm">Web</a>` : ''}
           </div>
@@ -1518,12 +2227,160 @@ function renderExhibitsGrid() {
       </div>
     `;
 
-    card.addEventListener('click', () => openModalByFilteredIndex(arrayIndex));
+    card.addEventListener('click', () => window.openModalByFilteredIndex(arrayIndex));
     grid.appendChild(card);
   }
   updateAudioUI();
 }
 
+// 4b. Single-Line Compact Table View
+function renderExhibitsTableView() {
+  const grid = document.getElementById('grid');
+  const itemCount = document.getElementById('itemCount');
+  const favs = getFavorites();
+  if (!grid) return;
+
+  grid.className = 'w-full overflow-x-auto';
+  grid.innerHTML = '';
+  if (itemCount) itemCount.textContent = `Showing ${currentFilteredRows.length} exhibit${currentFilteredRows.length === 1 ? '' : 's'}`;
+
+  if (currentFilteredRows.length === 0) {
+    renderEmptyState(grid);
+    return;
+  }
+
+  const getSortIndicator = (colName) => {
+    if (tableSortCol !== colName) return '<span class="text-slate-400 opacity-40 ml-1">▲▼</span>';
+    return tableSortDir === 'asc' ? '<span class="text-blue-600 dark:text-blue-400 ml-1">▲</span>' : '<span class="text-blue-600 dark:text-blue-400 ml-1">▼</span>';
+  };
+
+  let tableHTML = `
+    <div class="bg-white/90 dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden backdrop-blur-sm">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead class="bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-[10px] uppercase font-black tracking-wider text-slate-600 dark:text-slate-300 select-none">
+          <tr>
+            <th class="py-1.5 px-2.5 w-12 text-center">Media</th>
+            <th onclick="window.sortTableByColumn('ref')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">REF / #${getSortIndicator('ref')}</th>
+            <th onclick="window.sortTableByColumn('title')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">Title ${getSortIndicator('title')}</th>
+            <th onclick="window.sortTableByColumn('era')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">Era ${getSortIndicator('era')}</th>
+            <th onclick="window.sortTableByColumn('date')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">Date ${getSortIndicator('date')}</th>
+            <th onclick="window.sortTableByColumn('category')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">Category ${getSortIndicator('category')}</th>
+            <th onclick="window.sortTableByColumn('type')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">Type ${getSortIndicator('type')}</th>
+            <th onclick="window.sortTableByColumn('origin')" class="py-1.5 px-2.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">Origin ${getSortIndicator('origin')}</th>
+            <th class="py-1.5 px-2.5 text-right w-20">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold text-slate-700 dark:text-slate-300 text-xs">
+  `;
+
+  currentFilteredRows.forEach(({ row, originalIndex }, arrayIndex) => {
+    const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+    const { title } = parseTitleAndDetails(rawContent);
+    const displayTitle = title || `Exhibit Item #${originalIndex + 1}`;
+    const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
+    const era = getEraByRow(row);
+    const eraDisplay = era ? era.short : getVal(row, colIdx.age);
+    const category = getVal(row, colIdx.category);
+    const type = getVal(row, colIdx.type);
+    const made = getVal(row, colIdx.made);
+    const year = getVal(row, colIdx.year);
+    const isFav = favs.includes(originalIndex);
+    const isCompared = compareItemIndices.has(originalIndex);
+    const d3d = get3DUrlForItem(row);
+    const { img1 } = getImagesForItem(row);
+    const thumbImg = formatGoogleLh3Url(img1, 's100') || NO_IMAGE_SVG;
+
+    tableHTML += `
+      <tr onclick="window.openModalByFilteredIndex(${arrayIndex})" class="hover:bg-blue-50/50 dark:hover:bg-blue-950/30 cursor-pointer transition whitespace-nowrap">
+        <td class="py-1.5 px-2.5 text-center">
+          <div class="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto">
+            <img src="${thumbImg}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" loading="lazy" />
+          </div>
+        </td>
+        <td class="py-1.5 px-2.5 font-mono text-[11px] text-slate-500">${escapeHTML(itemNo)}</td>
+        <td class="py-1.5 px-2.5 font-extrabold text-slate-900 dark:text-white max-w-xs truncate">${escapeHTML(displayTitle)}</td>
+        <td class="py-1.5 px-2.5">${eraDisplay ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${getAgeBadgeStyle(eraDisplay)}">${escapeHTML(eraDisplay)}</span>` : '—'}</td>
+        <td class="py-1.5 px-2.5">${escapeHTML(year || '—')}</td>
+        <td class="py-1.5 px-2.5">${escapeHTML(category || 'General')}</td>
+        <td class="py-1.5 px-2.5 text-slate-500">${escapeHTML(type || '—')}</td>
+        <td class="py-1.5 px-2.5">${escapeHTML(made || '—')}</td>
+        <td class="py-1.5 px-2.5 text-right" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-end gap-1.5">
+            <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from compare' : 'Compare'}" class="p-1 rounded-md text-[16px] leading-none font-bold ${isCompared ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}">⚖️</button>
+            ${d3d ? `<span class="text-purple-600 dark:text-purple-400 font-bold text-xs" title="3D Model Available">👓</span>` : ''}
+            <button onclick="toggleFavorite(${originalIndex}, event)" class="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-[16px] leading-none">${isFav ? '❤️' : '🤍'}</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  tableHTML += `</tbody></table></div>`;
+  grid.innerHTML = tableHTML;
+}
+
+// 4c. Photo Wall View (Category Tinted & Daylight Adaptive)
+function renderExhibitsPhotoWallView() {
+  const grid = document.getElementById('grid');
+  const itemCount = document.getElementById('itemCount');
+  const favs = getFavorites();
+  const isDark = document.documentElement.classList.contains('dark');
+  if (!grid) return;
+
+  grid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3';
+  grid.innerHTML = '';
+  if (itemCount) itemCount.textContent = `Showing ${currentFilteredRows.length} exhibit${currentFilteredRows.length === 1 ? '' : 's'}`;
+
+  if (currentFilteredRows.length === 0) {
+    renderEmptyState(grid);
+    return;
+  }
+
+  currentFilteredRows.forEach(({ row, originalIndex }, arrayIndex) => {
+    const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+    const { title } = parseTitleAndDetails(rawContent);
+    const displayTitle = title || `Exhibit Item #${originalIndex + 1}`;
+    const category = getVal(row, colIdx.category);
+    const type = getVal(row, colIdx.type);
+    const subcategory = getVal(row, colIdx.subcategory);
+    const { img1 } = getImagesForItem(row);
+    const thumbImg = formatGoogleLh3Url(img1, 's500') || NO_IMAGE_SVG;
+    const isFav = favs.includes(originalIndex);
+    const isCompared = compareItemIndices.has(originalIndex);
+    const d3d = get3DUrlForItem(row);
+    const theme = getCategoryTheme(category || type || subcategory);
+
+    const card = document.createElement('div');
+    card.className = 'relative h-48 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer group flex items-center justify-center p-2 transition-all duration-300 transform hover:-translate-y-1';
+    card.style.border = `2px solid ${theme.hex}80`;
+    card.style.backgroundColor = getSolidTint(theme.hex, isDark);
+    
+    card.innerHTML = `
+      ${d3d ? `
+        <div class="w-full h-full flex items-center justify-center pointer-events-none">
+          <model-viewer src="${d3d}" loading="lazy" auto-rotate rotation-per-second="20deg" interaction-prompt="none" shadow-intensity="0.4" style="width: 100%; height: 100%; display: block; --poster-color: transparent;" class="w-full h-full"></model-viewer>
+        </div>
+      ` : `
+        <img src="${thumbImg}" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" alt="${escapeHTML(displayTitle)}" loading="lazy" />
+      `}
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2.5 flex flex-col justify-between">
+        <div class="flex justify-between items-center" onclick="event.stopPropagation()">
+          ${d3d ? `<span class="bg-purple-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">3D Model</span>` : `<span></span>`}
+          <div class="flex items-center gap-1.5">
+            <button onclick="window.toggleCompareItem(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center ${isCompared ? 'bg-indigo-600 text-white' : 'bg-slate-900/80 text-white'} text-[15px] leading-none shadow">⚖️</button>
+            <button onclick="toggleFavorite(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center bg-slate-900/80 text-[15px] leading-none shadow">${isFav ? '❤️' : '🤍'}</button>
+          </div>
+        </div>
+        <p class="text-[11px] font-bold text-white line-clamp-2 leading-tight drop-shadow">${escapeHTML(displayTitle)}</p>
+      </div>
+    `;
+
+    card.addEventListener('click', () => window.openModalByFilteredIndex(arrayIndex));
+    grid.appendChild(card);
+  });
+}
+
+// 4d. Gramophone Grid View
 function renderGramophoneGrid() {
   const grid = document.getElementById('grid');
   const itemCount = document.getElementById('itemCount');
@@ -1556,7 +2413,7 @@ function renderGramophoneGrid() {
     const released = getVal(row, 6);
     const discogsUrl = getDiscogsUrl(row);
     const hasDiscogsRecording = checkIfHasRecording(row);
-    const hasArchiveRecording = getVal(row, 11).toLowerCase().includes('yes');
+    const hasArchiveRecording = (getVal(row, 11) || '').toLowerCase().includes('yes');
     const isFav = favs.includes(originalIndex);
     const catalogNum = getVal(row, 0);
     const archiveUrl = buildArchiveSearchUrl(rawTitle, catalogNum);
@@ -1574,7 +2431,7 @@ function renderGramophoneGrid() {
             ${label ? `<span class="text-[10px] font-bold bg-amber-100/80 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 px-2.5 py-0.5 rounded-lg border border-amber-300/80 dark:border-amber-800/80">${label}</span>` : ''}
             ${format ? `<span class="text-[10px] font-bold bg-slate-200/60 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-lg">${format}</span>` : ''}
           </div>
-          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-xs transition">${isFav ? '❤️' : '🤍'}</button>
+          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-[17px] leading-none transition">${isFav ? '❤️' : '🤍'}</button>
         </div>
         <p class="text-xs font-black text-amber-700 dark:text-amber-400 mb-1 tracking-wide uppercase">${artist}</p>
         <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight">${formattedTitleHTML}</h3>
@@ -1591,7 +2448,7 @@ function renderGramophoneGrid() {
         </div>
       </div>
     `;
-    card.addEventListener('click', () => openModalByFilteredIndex(arrayIndex));
+    card.addEventListener('click', () => window.openModalByFilteredIndex(arrayIndex));
     grid.appendChild(card);
   });
 }
@@ -1619,8 +2476,11 @@ function closeEnlargeModal() {
 // 5. Museum Statistics & Charts
 function renderMuseumStatistics() {
   const mapIframe = document.getElementById('statMapIframe');
-  if (mapIframe && (!mapIframe.src || mapIframe.src === 'about:blank') && mapIframe.dataset.src) {
-    mapIframe.src = mapIframe.dataset.src;
+  if (mapIframe) {
+    const currentSrc = mapIframe.getAttribute('src') || mapIframe.src || '';
+    if ((!currentSrc || currentSrc === 'about:blank') && mapIframe.dataset.src) {
+      mapIframe.src = mapIframe.dataset.src;
+    }
   }
 
   if (typeof Chart === 'undefined' || !rawExhibitsRows || rawExhibitsRows.length === 0) return;
@@ -1669,7 +2529,6 @@ function renderMuseumStatistics() {
         }
 
         postHashText = postHashText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
-
         const firstBreak = postHashText.indexOf('\n');
         let firstLine = '';
         let bodyText = '';
@@ -1854,9 +2713,6 @@ function renderMuseumStatistics() {
     const postPct = 100 - prePct;
     if (preElem) preElem.innerHTML = `Pre 1950: <span class="text-purple-600 dark:text-purple-400 font-black">${prePct}% (${colPreCount})</span>`;
     if (postElem) postElem.innerHTML = `Post 1950: <span class="text-pink-600 dark:text-pink-400 font-black">${postPct}% (${colPostCount})</span>`;
-  } else {
-    if (preElem) preElem.innerHTML = 'Pre 1950: <span class="text-purple-600 dark:text-purple-400 font-black">62%</span>';
-    if (postElem) postElem.innerHTML = 'Post 1950: <span class="text-pink-600 dark:text-pink-400 font-black">38%</span>';
   }
 
   if (chartStackedInstance) chartStackedInstance.destroy();
@@ -2069,15 +2925,24 @@ function openModalByOriginalIndex(origIdx) {
   }
 }
 
-// Global Export for 2D Map & PostMessage integration
-window.openExhibitModal = openModalByOriginalIndex;
-
 function openModalByFilteredIndex(filteredIndex) {
   if (filteredIndex < 0 || filteredIndex >= currentFilteredRows.length) return;
   currentModalIndex = filteredIndex;
   const { row, originalIndex } = currentFilteredRows[filteredIndex];
   openModal(row, originalIndex);
 }
+
+// Global Window Exports
+window.openModalByOriginalIndex = openModalByOriginalIndex;
+window.openModalByFilteredIndex = openModalByFilteredIndex;
+window.openExhibitModal = openModalByOriginalIndex;
+window.printMuseumPlacard = printMuseumPlacard;
+window.toggleCompareItem = toggleCompareItem;
+window.open3DLightbox = open3DLightbox;
+window.browseAllExhibits = browseAllExhibits;
+window.switchCardImage = switchCardImage;
+window.speakAudioGuide = speakAudioGuide;
+window.stopAudioGuide = stopAudioGuide;
 
 // 6. Detail Modal Manager
 function openModal(row, originalIndex) {
@@ -2089,6 +2954,7 @@ function openModal(row, originalIndex) {
   const nextBtn = document.getElementById('modalNextBtn');
   const favs = getFavorites();
   const isFav = favs.includes(originalIndex);
+  const isCompared = compareItemIndices.has(originalIndex);
   const isDark = document.documentElement.classList.contains('dark');
 
   if (currentTab === 'exhibits') {
@@ -2114,7 +2980,6 @@ function openModal(row, originalIndex) {
     const cleanedDetails = cleanDetailsForModal(details);
     const theme = getCategoryTheme(category || type || subcategory);
 
-    // Robust Coordinate extraction
     let latRaw = getVal(row, colIdx.lat);
     let lngRaw = getVal(row, colIdx.lng);
     let latVal = parseCoord(latRaw);
@@ -2134,6 +2999,31 @@ function openModal(row, originalIndex) {
     const modalImg2 = formatGoogleLh3Url(img2, 's600');
     const fullImg1 = formatGoogleLh3Url(img1, 's1000');
     const fullImg2 = formatGoogleLh3Url(img2, 's1000');
+
+    const relatedExhibits = getRelatedExhibits(row, originalIndex, 4);
+    const relatedHTML = relatedExhibits.length > 0 ? `
+      <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800">
+        <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+          <span>🏛️ Related Artifacts (${category || eraDisplay})</span>
+          <span class="text-[10px] font-normal text-slate-400">Swipe or Click to explore</span>
+        </h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          ${relatedExhibits.map(rel => {
+            const relTitle = parseTitleAndDetails(getVal(rel.row, colIdx.title) || getVal(rel.row, colIdx.id)).title;
+            const relImg = formatGoogleLh3Url(getImagesForItem(rel.row).img1, 's200') || NO_IMAGE_SVG;
+            return `
+              <div onclick="window.openModalByOriginalIndex(${rel.originalIndex})" class="bg-slate-50 dark:bg-slate-900/90 rounded-xl p-2 border border-slate-200 dark:border-slate-800 hover:border-blue-500 cursor-pointer transition flex flex-col group/rel shadow-sm">
+                <div class="h-20 w-full rounded-lg overflow-hidden bg-slate-200/80 dark:bg-slate-950 flex items-center justify-center mb-1.5">
+                  <img src="${relImg}" class="max-w-full max-h-full object-contain group-hover/rel:scale-105 transition-transform duration-200" onError="this.src='${NO_IMAGE_SVG}'" alt="${escapeHTML(relTitle)}" />
+                </div>
+                <p class="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1 leading-tight">${escapeHTML(relTitle)}</p>
+                <span class="text-[9px] text-blue-600 dark:text-blue-400 font-extrabold mt-0.5">Explore →</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    ` : '';
 
     if (modalContainer) {
       modalContainer.style.borderColor = theme.hex; modalContainer.style.borderWidth = '3px';
@@ -2167,6 +3057,7 @@ function openModal(row, originalIndex) {
               <h2 id="modalTitle" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">${displayTitle}</h2>
               <div class="flex items-center gap-2 shrink-0">
                 ${isHot ? `<span title="Hot Item" class="text-base sm:text-lg px-2 py-0.5 bg-amber-500/20 rounded-full border border-amber-400/40 leading-none flex items-center justify-center">🔥</span>` : ''}
+                <button onclick="window.toggleCompareItem(${originalIndex})" class="px-3 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 ${isCompared ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">⚖️ ${isCompared ? 'Comparing' : 'Compare'}</button>
                 <button onclick="toggleFavorite(${originalIndex}, event)" class="px-3.5 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 ${isFav ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">${isFav ? '❤️ Saved' : '🤍 Save'}</button>
               </div>
             </div>
@@ -2200,10 +3091,11 @@ function openModal(row, originalIndex) {
             <div class="flex flex-wrap items-center gap-2.5 pt-2">
               <button id="btnGoogleSearchMain" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">🔍 Google Item</button>
               ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🗺️ Locate Origin Map</button>` : ''}
+              <button onclick="window.printMuseumPlacard(rawExhibitsRows[${originalIndex}], ${originalIndex})" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">🖨️ Print Display Placard</button>
             </div>
 
             <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-              ${d3d ? `<button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition">👓 Fullscreen 3D View ↗</button>` : ''}
+              ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition">👓 Fullscreen 3D View ↗</button>` : ''}
               ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
               ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 transition">Web Link ↗</a>` : ''}
             </div>
@@ -2216,10 +3108,10 @@ function openModal(row, originalIndex) {
                   <p class="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest">Interactive 3D Model</p>
                   <div class="flex items-center gap-2">
                     <button id="btnToggleModalSkybox" onclick="toggleModal3DSkybox(event)" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-300 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md transition border border-slate-300 dark:border-slate-700">${is3DSkyboxLight ? '🌙 Dark Sky' : '☀️ Light Sky'}</button>
-                    <button onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="text-[10px] font-bold text-purple-600 dark:text-purple-300 hover:underline">Expand Fullscreen ⤢</button>
+                    <button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="text-[10px] font-bold text-purple-600 dark:text-purple-300 hover:underline">Expand Fullscreen ⤢</button>
                   </div>
                 </div>
-                <div id="modal3DContainer" class="w-full h-64 sm:h-72 ${is3DSkyboxLight ? 'bg-slate-100' : 'bg-slate-900'} rounded-2xl overflow-hidden shadow-inner border border-indigo-500/30 relative cursor-pointer transition-colors duration-300" onclick="open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')">
+                <div id="modal3DContainer" class="w-full h-64 sm:h-72 ${is3DSkyboxLight ? 'bg-slate-100' : 'bg-slate-900'} rounded-2xl overflow-hidden shadow-inner border border-indigo-500/30 relative cursor-pointer transition-colors duration-300" onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')">
                   <model-viewer id="modal3DViewer" src="${d3d}" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" style="width: 100%; height: 100%; display: block; --poster-color: transparent;" class="w-full h-full"></model-viewer>
                   <span id="modal3DScaleBadge" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 text-white backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
@@ -2243,12 +3135,14 @@ function openModal(row, originalIndex) {
                   <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image'}</p>
                   <a href="${fullImg2 || modalImg2}" target="_blank" rel="noopener noreferrer" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
                     <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
-                    <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
+                    <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                   </a>
                 </div>` : ''}
             </div>
           </div>
-        </div>`;
+        </div>
+        ${relatedHTML}
+      `;
     }
 
     const btnMain = document.getElementById('btnGoogleSearchMain');
@@ -2288,7 +3182,7 @@ function openModal(row, originalIndex) {
     const colMDetails = getVal(row, 12);
     const discogsUrl = getDiscogsUrl(row);
     const hasDiscogsRecording = checkIfHasRecording(row);
-    const hasArchiveRecording = getVal(row, 11).toLowerCase().includes('yes');
+    const hasArchiveRecording = (getVal(row, 11) || '').toLowerCase().includes('yes');
     const hasAnyRecording = hasDiscogsRecording || hasArchiveRecording;
     const archiveUrl = buildArchiveSearchUrl(rawTitle, catalogNum);
     const ytQuery = encodeURIComponent(`${unescapeHTML(artist)} ${unescapeHTML(rawTitle)}`.replace(/^[AB][\s\.:-]+/gi, '').trim()).replace(/%20/g, '+');
@@ -2380,12 +3274,12 @@ function closeModal() {
   safeReplaceState(window.location.pathname);
 }
 
-// 7. Event Listeners & Bootstrapping
+// 7. Event Listeners, View Switcher & Touch Navigation
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('brandLogoLink')?.addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader')?.addEventListener('click', browseAllExhibits);
   document.getElementById('btnBrowseAllPrompt')?.addEventListener('click', browseAllExhibits);
-  document.getElementById('btnStatsHeader')?.addEventListener('click', () => { setTab('stats'); window.location.hash = '#stats'; });
+  document.getElementById('btnStatsHeader')?.addEventListener('click', () => setTab('stats'));
   document.getElementById('btnSurprise')?.addEventListener('click', () => {
     const rows = (currentTab === 'gramophone') ? rawGramophoneRows : rawExhibitsRows;
     if (!rows || rows.length === 0) return;
@@ -2403,11 +3297,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleControlsBtn = document.getElementById('toggleControlsBtn');
   if (toggleControlsBtn) toggleControlsBtn.addEventListener('click', () => toggleCollapsibleControls());
 
+  document.getElementById('btnViewGrid')?.addEventListener('click', () => setCatalogViewMode('grid'));
+  document.getElementById('btnViewTable')?.addEventListener('click', () => setCatalogViewMode('table'));
+  document.getElementById('btnViewPhotos')?.addEventListener('click', () => setCatalogViewMode('photos'));
+
+  document.getElementById('btnOpenCompareModal')?.addEventListener('click', openCompareModal);
+  document.getElementById('btnClearCompare')?.addEventListener('click', clearCompareItems);
+  document.getElementById('btnClearCompareInModal')?.addEventListener('click', clearCompareItems);
+  document.getElementById('btnCloseCompareModal')?.addEventListener('click', closeCompareModal);
+  document.getElementById('compareModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('compareModal')) closeCompareModal();
+  });
+
   document.getElementById('btn3DOnly')?.addEventListener('click', () => {
     if (currentTab !== 'exhibits') setTab('exhibits');
     only3DActive = !only3DActive;
     document.getElementById('btn3DOnly')?.classList.toggle('ring-2', only3DActive);
-    if (only3DActive) showToast('Showing 3D Models Only', '👓');
+    if (only3DActive) showToast(only3DActive ? 'Showing 3D Models Only' : '3D Filter Cleared', '👓');
+    saveCatalogSessionState();
     filterCatalog(true);
   });
 
@@ -2415,13 +3322,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTab !== 'exhibits') setTab('exhibits');
     hotOnlyActive = !hotOnlyActive;
     document.getElementById('btnHotOnly')?.classList.toggle('ring-2', hotOnlyActive);
-    if (hotOnlyActive) showToast('Showing Hot Items Only', '🔥');
+    if (hotOnlyActive) showToast(hotOnlyActive ? 'Showing Hot Items Only' : 'Hot Filter Cleared', '🔥');
+    saveCatalogSessionState();
     filterCatalog(true);
   });
 
   document.getElementById('btnFavorites')?.addEventListener('click', () => {
     showingFavoritesOnly = !showingFavoritesOnly;
     updateFavoritesBadge();
+    saveCatalogSessionState();
     filterCatalog(true);
   });
 
@@ -2429,15 +3338,15 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleCollapsibleControls(false); scrollToGrid();
   });
 
-  // Search Input with URL query synchronization
   const searchInputElem = document.getElementById('searchInput');
   if (searchInputElem) {
     searchInputElem.addEventListener('input', (e) => {
-      const val = e.target.value.trim();
+      const val = e.target.value;
+      const cleanVal = val.trim();
       try {
         const url = new URL(window.location);
-        if (val) {
-          url.searchParams.set('search', val);
+        if (cleanVal) {
+          url.searchParams.set('search', cleanVal);
         } else {
           url.searchParams.delete('search');
           url.searchParams.delete('q');
@@ -2445,16 +3354,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         safeReplaceState(url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : ''));
       } catch (err) {}
+
+      handleSearchInputSuggestions(val);
       filterCatalog(true);
+    });
+
+    searchInputElem.addEventListener('focus', (e) => {
+      handleSearchInputSuggestions(e.target.value);
     });
   }
 
-  // Clear Search button
   const clearSearchBtn = document.getElementById('clearSearch');
   if (clearSearchBtn) {
     clearSearchBtn.addEventListener('click', () => {
       const searchInp = document.getElementById('searchInput');
       if (searchInp) searchInp.value = '';
+      hideSearchSuggestions();
       try {
         const url = new URL(window.location);
         url.searchParams.delete('search');
@@ -2466,6 +3381,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#searchInput') && !e.target.closest('#searchSuggestionsBox')) {
+      hideSearchSuggestions();
+    }
+  });
+
   document.getElementById('closeModal')?.addEventListener('click', closeModal);
   document.getElementById('detailModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('detailModal')) closeModal(); });
   document.getElementById('close3DLightbox')?.addEventListener('click', close3DLightbox);
@@ -2474,11 +3395,39 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modalPrevBtn')?.addEventListener('click', () => { if (currentModalIndex > 0) openModalByFilteredIndex(currentModalIndex - 1); });
   document.getElementById('modalNextBtn')?.addEventListener('click', () => { if (currentModalIndex < currentFilteredRows.length - 1) openModalByFilteredIndex(currentModalIndex + 1); });
 
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const modalContainer = document.getElementById('modalContainer');
+
+  modalContainer?.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  modalContainer?.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      if (deltaX < 0) {
+        if (currentModalIndex < currentFilteredRows.length - 1) openModalByFilteredIndex(currentModalIndex + 1);
+      } else {
+        if (currentModalIndex > 0) openModalByFilteredIndex(currentModalIndex - 1);
+      }
+    }
+  }, { passive: true });
+
   window.addEventListener('keydown', (e) => {
     const modal = document.getElementById('detailModal');
     const lightbox = document.getElementById('lightbox3DModal');
     const enlargeModal = document.getElementById('enlargeModal');
+    const compareModal = document.getElementById('compareModal');
+
     if (e.key === 'Escape') {
+      hideSearchSuggestions();
+      if (compareModal && !compareModal.classList.contains('hidden')) { closeCompareModal(); return; }
       if (enlargeModal && !enlargeModal.classList.contains('hidden')) { closeEnlargeModal(); return; }
       if (lightbox && !lightbox.classList.contains('hidden')) { close3DLightbox(); return; }
       if (modal && !modal.classList.contains('hidden')) { closeModal(); return; }
@@ -2488,16 +3437,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'ArrowRight' && currentModalIndex < currentFilteredRows.length - 1) openModalByFilteredIndex(currentModalIndex + 1);
   });
 
-  // Listen for hash changes from map clicks / URLs
   window.addEventListener('hashchange', checkUrlHashForExhibit);
 
-  // Listen for iframe postMessage events (e.g. from 2Dmap.html)
   window.addEventListener('message', (event) => {
     if (!event.data) return;
     if (event.data.type === 'BMMC_OPEN_ITEM' || event.data.action === 'openExhibit') {
       const exhibitNum = event.data.exhibit !== undefined ? event.data.exhibit : event.data.id;
       if (typeof closeEnlargeModal === 'function') closeEnlargeModal();
       if (typeof close3DLightbox === 'function') close3DLightbox();
+      if (typeof closeCompareModal === 'function') closeCompareModal();
       if (exhibitNum !== undefined && exhibitNum !== null) {
         openModalByOriginalIndex(Number(exhibitNum));
       }

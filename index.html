@@ -131,6 +131,38 @@
     .poppies-animated .poppy-flutter {
       animation-play-state: running;
     }
+
+    /* --- STRICT 1-PAGE MUSEUM PLACARD PRINT STYLES --- */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+      html, body {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      /* Completely remove entire DOM tree from layout calculation */
+      #timeSkyBackground, header, main, #detailModal, #enlargeModal, #lightbox3DModal, #compareModal, #floatingCompareBar, #toast, #floatingJumpBtn {
+        display: none !important;
+      }
+      #printablePlacard {
+        display: block !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+    }
   </style>
 
   <!-- Main Application Logic (Deferred) -->
@@ -332,8 +364,23 @@
         </p>
 
         <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
-          <div class="flex items-center justify-between sm:justify-start gap-3 shrink-0">
+          <div class="flex items-center justify-between sm:justify-start gap-2 sm:gap-3 shrink-0 flex-wrap">
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount"></p>
+            
+            <!-- Phase 2: Catalog View Switcher Buttons -->
+            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60" role="group" aria-label="View Switcher">
+              <button id="btnViewGrid" title="Card Grid View" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm">
+                <span>🔲</span> <span class="hidden md:inline">Grid</span>
+              </button>
+              <button id="btnViewTable" title="Compact Table / Ledger View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                <span>📋</span> <span class="hidden md:inline">Table</span>
+              </button>
+              <button id="btnViewPhotos" title="Photo Wall View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                <span>🖼️</span> <span class="hidden md:inline">Photos</span>
+              </button>
+            </div>
+
+            <!-- Sort Dropdown -->
             <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
               <label for="sortBy" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
               <select id="sortBy" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
@@ -352,12 +399,16 @@
             <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
           </div>
           
+          <!-- Search Input with Auto-Suggest Dropdown -->
           <div class="w-full sm:w-72 relative shrink-0">
-            <input type="text" id="searchInput" placeholder="Fuzzy search items, details, artists..." aria-label="Search catalog" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <input type="text" id="searchInput" placeholder="Fuzzy search items, details, artists..." autocomplete="off" aria-label="Search catalog" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
             <svg class="w-4 h-4 text-blue-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
+            
+            <!-- Phase 2: Live Suggestion Overlay Box -->
+            <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden text-xs"></div>
           </div>
         </div>
 
@@ -579,7 +630,26 @@
 
   </main>
 
-  <!-- Toast Notification System -->
+  <!-- Floating Mobile Jump Pill -->
+  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
+    <span>⬇️ View Archive</span>
+  </button>
+
+  <!-- Phase 3: Floating Compare Bar (Bottom Pill) -->
+  <div id="floatingCompareBar" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white dark:bg-slate-800/95 dark:text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-xl flex items-center gap-3 hidden transition-all duration-300 transform translate-y-4">
+    <div class="flex items-center gap-2">
+      <span class="text-base">⚖️</span>
+      <span id="compareCountText" class="text-xs font-black text-blue-400">2 Items Selected</span>
+    </div>
+    <button id="btnOpenCompareModal" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black px-3.5 py-1.5 rounded-xl shadow-md transition active:scale-95">
+      Compare Side-by-Side →
+    </button>
+    <button id="btnClearCompare" title="Clear Selection" class="text-slate-400 hover:text-rose-400 text-xs font-bold px-1 transition">
+      ✕
+    </button>
+  </div>
+
+  <!-- Toast Notification System (Z-Index: 90) -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification message</span>
@@ -596,12 +666,7 @@
     </div>
   </div>
 
-  <!-- Floating Mobile Jump Pill -->
-  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
-    <span>⬇️ View Archive</span>
-  </button>
-
-  <!-- Item Detail Pop-up Modal (Z-Index: 80 - always above other views) -->
+  <!-- Item Detail Pop-up Modal (Z-Index: 80) -->
   <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[80] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
       <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -651,6 +716,32 @@
       </div>
     </div>
   </div>
+
+  <!-- Phase 3: Side-by-Side Artifact Compare Modal (Z-Index: 85) -->
+  <div id="compareModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-[85] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/40 relative flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between z-10 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚖️</span>
+          <div>
+            <h3 id="compareModalTitle" class="text-sm sm:text-base font-black text-slate-900 dark:text-white">Side-by-Side Artifact Comparison</h3>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Compare historical origins, eras, specs, and curator notes</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnClearCompareInModal" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline px-2 py-1">Clear All</button>
+          <button id="btnCloseCompareModal" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+        </div>
+      </div>
+
+      <!-- Body (Scrollable comparison columns) -->
+      <div id="compareModalBody" class="w-full flex-1 overflow-y-auto p-4 sm:p-6"></div>
+    </div>
+  </div>
+
+  <!-- Strict 1-Page Printable Museum Display Placard Container -->
+  <div id="printablePlacard" class="hidden"></div>
 
 </body>
 </html>
