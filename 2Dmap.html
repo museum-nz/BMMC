@@ -673,6 +673,7 @@
     let allPhotoRecords = [];
     let recordMarkerMap = new Map();
     let pendingExhibitToFocus = null;
+    let isMapDataReady = false;
     let globalMinYear = 1800;
     let globalMaxYear = 2026;
     let timelinePlayTimer = null;
@@ -708,11 +709,11 @@
     }
 
     function parseCoord(val) {
-      if (!val) return NaN;
+      if (val === null || val === undefined || val === '') return NaN;
       const clean = String(val).trim().replace(',', '.');
       if (!/^-?\d+(\.\d+)?$/.test(clean)) return NaN;
       const num = parseFloat(clean);
-      return (isNaN(num) || num === 0) ? NaN : num;
+      return isNaN(num) ? NaN : num;
     }
 
     function renderDataset(records) {
@@ -729,7 +730,7 @@
         const safeImgUrl = sanitizeUrl(item.imgUrl) || SVG_NO_IMG;
         const safeTitle = escapeHTML(item.title);
         const safeLocation = escapeHTML(item.location);
-        const safeYear = escapeHTML(item.year);
+        const safeYear = escapeHTML(item.year && item.year !== '0' ? item.year : 'Prehistory');
 
         const customIconHTML = `<div class="single-photo-wrapper"><img src="${safeImgUrl}" loading="lazy" alt="${safeTitle || 'Photo'}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>`;
 
@@ -766,12 +767,18 @@
         marker.bindPopup(popupHTML, { autoPan: true, keepInView: true, autoClose: true });
         markerList.push(marker);
 
+        // Register both 0-based array index and parsed CSV Item #
         recordMarkerMap.set(item.index, marker);
         recordMarkerMap.set(String(item.index), marker);
         recordMarkerMap.set(Number(item.index), marker);
         if (item.id) {
           recordMarkerMap.set(item.id, marker);
           recordMarkerMap.set(String(item.id), marker);
+          const numId = parseInt(String(item.id).replace(/[^\d]/g, ''), 10);
+          if (!isNaN(numId)) {
+            recordMarkerMap.set(numId, marker);
+            recordMarkerMap.set(String(numId), marker);
+          }
         }
       });
 
@@ -849,15 +856,19 @@
         }
       }
 
+      // Mark dataset ready before processing queues and deep links
+      isMapDataReady = true;
+
       updateYearFilter();
       handleInitialDeepLinks();
 
       // Check if an exhibit was requested before data finished parsing
       if (pendingExhibitToFocus !== null) {
+        const target = pendingExhibitToFocus;
+        pendingExhibitToFocus = null;
         setTimeout(() => {
-          focusExhibitMarker(pendingExhibitToFocus);
-          pendingExhibitToFocus = null;
-        }, 200);
+          focusExhibitMarker(target);
+        }, 100);
       }
 
       try {
@@ -900,11 +911,13 @@
 
       const filtered = allPhotoRecords.filter(item => {
         const y = parseInt(item.year, 10);
-        const matchesYear = isNaN(y) || (y >= minVal && y <= maxVal);
+        
+        // Items with Year 0, negative (BC), unparseable, or within selected slider range
+        const matchesYear = isNaN(y) || y <= 0 || (y >= minVal && y <= maxVal);
         if (!matchesYear) return false;
 
         if (searchVal) {
-          const hay = `${item.title} ${item.location} ${item.year}`.toLowerCase();
+          const hay = `${item.title} ${item.location} ${item.year} ${item.id}`.toLowerCase();
           return hay.includes(searchVal);
         }
         return true;
@@ -948,35 +961,56 @@
     }
 
     function focusExhibitMarker(exhibitIdOrIndex) {
-      if (allPhotoRecords.length === 0) {
+      if (!isMapDataReady || allPhotoRecords.length === 0) {
         pendingExhibitToFocus = exhibitIdOrIndex;
         return;
       }
 
-      // Check if target exhibit year is outside current timeline slider range
-      const record = allPhotoRecords.find(r => r.index === Number(exhibitIdOrIndex) || String(r.id) === String(exhibitIdOrIndex) || String(r.index) === String(exhibitIdOrIndex));
+      // 1. Clear any active search input that could filter out this marker
+      const searchInput = document.getElementById('mapSearchInput');
+      if (searchInput && searchInput.value) {
+        searchInput.value = '';
+        const clearBtn = document.getElementById('clearMapSearch');
+        if (clearBtn) clearBtn.style.display = 'none';
+      }
+
+      // 2. Expand year slider bounds if item year is a positive year outside current range
+      const record = allPhotoRecords.find(r => 
+        r.index === Number(exhibitIdOrIndex) || 
+        String(r.id) === String(exhibitIdOrIndex) || 
+        String(r.index) === String(exhibitIdOrIndex) ||
+        (r.id && exhibitIdOrIndex && String(r.id).replace(/[^\d]/g, '') === String(exhibitIdOrIndex).replace(/[^\d]/g, ''))
+      );
+
       if (record && record.year) {
         const yr = parseInt(record.year, 10);
-        if (!isNaN(yr)) {
+        if (!isNaN(yr) && yr > 0) {
           const minSlider = document.getElementById('minYearSlider');
           const maxSlider = document.getElementById('maxYearSlider');
           if (minSlider && maxSlider) {
-            let changed = false;
-            if (yr < parseInt(minSlider.value, 10)) { minSlider.value = Math.max(globalMinYear, yr); changed = true; }
-            if (yr > parseInt(maxSlider.value, 10)) { maxSlider.value = Math.min(globalMaxYear, yr); changed = true; }
-            if (changed) updateYearFilter();
+            if (yr < parseInt(minSlider.value, 10)) minSlider.value = Math.max(globalMinYear, yr);
+            if (yr > parseInt(maxSlider.value, 10)) maxSlider.value = Math.min(globalMaxYear, yr);
           }
         }
       }
 
-      let marker = recordMarkerMap.get(exhibitIdOrIndex) || 
-                   recordMarkerMap.get(Number(exhibitIdOrIndex)) || 
-                   recordMarkerMap.get(String(exhibitIdOrIndex));
+      // 3. Re-render dataset to ensure this marker is active and rendered
+      updateYearFilter();
+
+      // 4. Locate marker by array index, raw ID, or number
+      let marker = recordMarkerMap.get(Number(exhibitIdOrIndex)) || 
+                   recordMarkerMap.get(String(exhibitIdOrIndex)) || 
+                   recordMarkerMap.get(exhibitIdOrIndex);
+
+      if (!marker && record) {
+        marker = recordMarkerMap.get(record.index) || recordMarkerMap.get(record.id);
+      }
 
       if (marker) {
         markers.zoomToShowLayer(marker, () => {
           marker.openPopup();
         });
+        pendingExhibitToFocus = null;
       } else {
         pendingExhibitToFocus = exhibitIdOrIndex;
       }
@@ -1008,9 +1042,10 @@
     }
 
     window.addEventListener('message', (e) => {
-      if (e.data && e.data.type === 'FOCUS_EXHIBIT') {
+      if (!e.data) return;
+      if (e.data.type === 'FOCUS_EXHIBIT') {
         focusExhibitMarker(e.data.exhibit);
-      } else if (e.data && e.data.type === 'FOCUS_COORDS' && !isNaN(e.data.lat) && !isNaN(e.data.lng)) {
+      } else if (e.data.type === 'FOCUS_COORDS' && !isNaN(e.data.lat) && !isNaN(e.data.lng)) {
         map.setView([e.data.lat, e.data.lng], e.data.zoom || 11);
       }
     });
@@ -1048,7 +1083,7 @@
     function parseAndProcessDataset(rows) {
       if (!rows || rows.length < 2) return;
 
-      let idIdx = 0;
+      let idIdx = 12; // Default to Column M (#)
       let titleIdx = 2;
       let imgIdx = 20;
       let madeIdx = 23;
@@ -1059,11 +1094,11 @@
       if (rows[0]) {
         rows[0].forEach((col, idx) => {
           const c = String(col).toLowerCase().trim();
-          if (c === 'id' || c === 'uid' || c === 'item id' || c === 'item_id' || c === 'no' || c === 'item' || c === 'item #') idIdx = idx;
+          if (c === '#' || c === 'id' || c === 'uid' || c === 'item id' || c === 'item_id' || c === 'no' || c === 'item' || c === 'item #') idIdx = idx;
           if (c === 'lat' || c === 'latitude' || c === 'lat_deg') latIdx = idx;
           if (c === 'lng' || c === 'lon' || c === 'long' || c === 'longitude') lngIdx = idx;
-          if (c === 'img1' || c.includes('1st image') || c.includes('image 1')) imgIdx = idx;
-          if (c === 'title' || c === 'content') titleIdx = idx;
+          if (c === 'img1' || c === 'image 1' || (c.includes('image') && !c.includes('2nd') && !c.includes('2'))) imgIdx = idx;
+          if (c === 'title' || c === 'title details' || c === 'content') titleIdx = idx;
           if (c === 'made' || c.includes('origin') || c.includes('location')) madeIdx = idx;
           if (c === 'year' || c === 'date') yearIdx = idx;
         });
@@ -1107,14 +1142,13 @@
         }
 
         if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
-        if (!imgRaw) return;
 
         let cleanTitle = String(titleRaw).trim();
         if (cleanTitle.includes('\n')) cleanTitle = cleanTitle.split('\n')[0];
         if (cleanTitle.includes('#')) cleanTitle = cleanTitle.split('#')[0];
 
-        const imgUrl = formatImgUrl(imgRaw);
-        if (!imgUrl) return;
+        // Gracefully use SVG placeholder if image is not present
+        const imgUrl = (imgRaw ? formatImgUrl(imgRaw) : '') || SVG_NO_IMG;
 
         allPhotoRecords.push({
           id: String(idRaw).trim(),

@@ -69,6 +69,9 @@ let tableSortDir = 'asc';
 let compareItemIndices = new Set();
 let restoredSessionFilters = {};
 
+let isMapIframeReady = false;
+let pendingMapExhibitIndex = null;
+
 let rawExhibitsRows = [];
 let rawGramophoneRows = [];
 let catalog3DMap = new Map();
@@ -1405,7 +1408,7 @@ window.selectGramophoneHub = function() {
   scrollToGrid();
 };
 
-// --- Bidirectional 2D Map Jump Bridge ---
+// --- Bidirectional 2D Map Jump Bridge (Optimized & Non-Reloading) ---
 window.showExhibitOnMap = function(originalIndex) {
   closeModal();
   closeEnlargeModal();
@@ -1413,36 +1416,33 @@ window.showExhibitOnMap = function(originalIndex) {
   closeCompareModal();
   document.body.classList.remove('overflow-hidden');
 
-  const targetSrc = `2Dmap.html?exhibit=${originalIndex}`;
-  const mapIframe = document.getElementById('statMapIframe');
+  setTab('stats');
 
+  const mapIframe = document.getElementById('statMapIframe');
   if (mapIframe) {
-    const currentSrc = mapIframe.getAttribute('src') || mapIframe.src || '';
-    if (!currentSrc || currentSrc === 'about:blank' || !currentSrc.includes(`exhibit=${originalIndex}`)) {
-      mapIframe.src = targetSrc;
-      mapIframe.onload = function() {
-        try {
-          mapIframe.contentWindow?.postMessage({
-            type: 'FOCUS_EXHIBIT',
-            exhibit: originalIndex
-          }, '*');
-        } catch (e) {}
-      };
+    const currentSrc = mapIframe.getAttribute('src') || '';
+
+    // If iframe has not been populated yet, initialize it
+    if (!currentSrc || currentSrc === 'about:blank') {
+      pendingMapExhibitIndex = originalIndex;
+      mapIframe.src = `2Dmap.html?exhibit=${originalIndex}`;
     } else {
-      try {
+      // If already loaded and ready, send message immediately without reloading
+      if (isMapIframeReady) {
         mapIframe.contentWindow?.postMessage({
           type: 'FOCUS_EXHIBIT',
           exhibit: originalIndex
         }, '*');
-      } catch (e) {}
+      } else {
+        // Queue it until MAP_READY arrives from the iframe
+        pendingMapExhibitIndex = originalIndex;
+      }
     }
   }
 
-  setTab('stats');
-
   setTimeout(() => {
     document.getElementById('statMapCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 250);
+  }, 200);
 };
 
 function clearAllFilters(shouldScroll = true) {
@@ -3441,6 +3441,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('message', (event) => {
     if (!event.data) return;
+
+    // Listen for Map Ready Signal from 2Dmap.html
+    if (event.data.type === 'MAP_READY') {
+      isMapIframeReady = true;
+      if (pendingMapExhibitIndex !== null) {
+        const mapIframe = document.getElementById('statMapIframe');
+        mapIframe?.contentWindow?.postMessage({
+          type: 'FOCUS_EXHIBIT',
+          exhibit: pendingMapExhibitIndex
+        }, '*');
+        pendingMapExhibitIndex = null;
+      }
+    }
+
+    // Handle Item Selection from Map Marker Pop-up
     if (event.data.type === 'BMMC_OPEN_ITEM' || event.data.action === 'openExhibit') {
       const exhibitNum = event.data.exhibit !== undefined ? event.data.exhibit : event.data.id;
       if (typeof closeEnlargeModal === 'function') closeEnlargeModal();
