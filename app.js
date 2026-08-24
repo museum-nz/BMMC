@@ -1,4 +1,4 @@
-// app.js — BMMC Showcase Application Logic (Optimized Dual-Mode: Online & Offline)
+// app.js — BMMC Showcase Application Logic (Dual-Mode: Online & Offline with WebAR)
 
 // 1. Environment & Data Source Configuration
 const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
@@ -607,7 +607,7 @@ function getAgeBadgeStyle(ageStr) {
 }
 
 function initTheme() {
-  const savedTheme = localStorage.getItem('bMMC_theme');
+  const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
   const isDark = savedTheme === 'dark';
   if (isDark) document.documentElement.classList.add('dark');
   else document.documentElement.classList.remove('dark');
@@ -814,7 +814,7 @@ function openCompareModal() {
             <div class="space-y-3.5">
               <div class="h-48 rounded-2xl overflow-hidden bg-slate-950 p-2 flex items-center justify-center relative">
                 <img src="${thumbImg}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" />
-                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow">👓 3D Model</button>` : ''}
+                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">📱 3D / AR</button>` : ''}
               </div>
 
               <div>
@@ -2175,7 +2175,7 @@ function renderExhibitsGrid() {
         mediaItemsHTML += `
           <div class="card-media-item ${isHidden} w-full h-full items-center justify-center relative pointer-events-none" data-slot-idx="${slotNum}">
             <model-viewer src="${s.url}" loading="lazy" auto-rotate rotation-per-second="20deg" interaction-prompt="none" shadow-intensity="0.4" style="width: 100%; height: 100%; display: block; --poster-color: transparent;" class="w-full h-full"></model-viewer>
-            <span class="absolute bottom-2.5 left-2.5 bg-purple-600/90 text-white backdrop-blur-md text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-purple-400/40 z-10">3D Interactive</span>
+            <span class="absolute bottom-2.5 left-2.5 bg-purple-600/90 text-white backdrop-blur-md text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-purple-400/40 z-10 flex items-center gap-1"><span>👓</span> 3D / AR</span>
           </div>`;
       } else {
         mediaItemsHTML += `
@@ -2219,7 +2219,7 @@ function renderExhibitsGrid() {
             View Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </span>
           <div class="flex gap-1.5" onclick="event.stopPropagation()">
-            ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm">👓 3D View</button>` : ''}
+            ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D & AR Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm flex items-center gap-1"><span>📱</span> 3D / AR</button>` : ''}
             ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
             ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" title="Website" class="bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 dark:border-blue-800 transition shadow-sm">Web</a>` : ''}
           </div>
@@ -2307,7 +2307,7 @@ function renderExhibitsTableView() {
         <td class="py-1.5 px-2.5 text-right" onclick="event.stopPropagation()">
           <div class="flex items-center justify-end gap-1.5">
             <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from compare' : 'Compare'}" class="p-1 rounded-md text-[16px] leading-none font-bold ${isCompared ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}">⚖️</button>
-            ${d3d ? `<span class="text-purple-600 dark:text-purple-400 font-bold text-xs" title="3D Model Available">👓</span>` : ''}
+            ${d3d ? `<span class="text-purple-600 dark:text-purple-400 font-bold text-xs" title="3D / AR Available">👓</span>` : ''}
             <button onclick="toggleFavorite(${originalIndex}, event)" class="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-[16px] leading-none">${isFav ? '❤️' : '🤍'}</button>
           </div>
         </td>
@@ -2365,7 +2365,7 @@ function renderExhibitsPhotoWallView() {
       `}
       <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2.5 flex flex-col justify-between">
         <div class="flex justify-between items-center" onclick="event.stopPropagation()">
-          ${d3d ? `<span class="bg-purple-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">3D Model</span>` : `<span></span>`}
+          ${d3d ? `<span class="bg-purple-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow flex items-center gap-1"><span>📱</span> 3D / AR</span>` : `<span></span>`}
           <div class="flex items-center gap-1.5">
             <button onclick="window.toggleCompareItem(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center ${isCompared ? 'bg-indigo-600 text-white' : 'bg-slate-900/80 text-white'} text-[15px] leading-none shadow">⚖️</button>
             <button onclick="toggleFavorite(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center bg-slate-900/80 text-[15px] leading-none shadow">${isFav ? '❤️' : '🤍'}</button>
@@ -3095,7 +3095,7 @@ function openModal(row, originalIndex) {
             </div>
 
             <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-              ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition">👓 Fullscreen 3D View ↗</button>` : ''}
+              ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition flex items-center gap-1.5"><span>📱 View in 3D / AR ↗</span></button>` : ''}
               ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
               ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 transition">Web Link ↗</a>` : ''}
             </div>
@@ -3105,14 +3105,34 @@ function openModal(row, originalIndex) {
             ${d3d ? `
               <div class="relative group/model w-full">
                 <div class="flex items-center justify-between mb-2">
-                  <p class="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest">Interactive 3D Model</p>
+                  <p class="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest flex items-center gap-1">
+                    <span>👓</span> Interactive 3D Model & AR
+                  </p>
                   <div class="flex items-center gap-2">
                     <button id="btnToggleModalSkybox" onclick="toggleModal3DSkybox(event)" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-300 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md transition border border-slate-300 dark:border-slate-700">${is3DSkyboxLight ? '🌙 Dark Sky' : '☀️ Light Sky'}</button>
                     <button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="text-[10px] font-bold text-purple-600 dark:text-purple-300 hover:underline">Expand Fullscreen ⤢</button>
                   </div>
                 </div>
-                <div id="modal3DContainer" class="w-full h-64 sm:h-72 ${is3DSkyboxLight ? 'bg-slate-100' : 'bg-slate-900'} rounded-2xl overflow-hidden shadow-inner border border-indigo-500/30 relative cursor-pointer transition-colors duration-300" onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')">
-                  <model-viewer id="modal3DViewer" src="${d3d}" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" style="width: 100%; height: 100%; display: block; --poster-color: transparent;" class="w-full h-full"></model-viewer>
+                <div id="modal3DContainer" class="w-full h-64 sm:h-72 ${is3DSkyboxLight ? 'bg-slate-100' : 'bg-slate-900'} rounded-2xl overflow-hidden shadow-inner border border-indigo-500/30 relative cursor-pointer transition-colors duration-300">
+                  <model-viewer 
+                    id="modal3DViewer" 
+                    src="${d3d}" 
+                    ar 
+                    ar-modes="webxr scene-viewer quick-look" 
+                    ar-scale="auto" 
+                    camera-controls 
+                    auto-rotate 
+                    shadow-intensity="1.2" 
+                    exposure="1.1" 
+                    style="width: 100%; height: 100%; display: block; --poster-color: transparent;" 
+                    class="w-full h-full">
+                    
+                    <button slot="ar-button" class="absolute top-2.5 left-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-lg border border-purple-300/40 flex items-center gap-1.5 active:scale-95 transition-all z-20 cursor-pointer" onclick="event.stopPropagation()">
+                      <span>📱</span>
+                      <span>Place in Room (AR)</span>
+                    </button>
+                  </model-viewer>
+
                   <span id="modal3DScaleBadge" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 text-white backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
                     <span id="modal3DScaleText">Calculating...</span>
@@ -3135,7 +3155,7 @@ function openModal(row, originalIndex) {
                   <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image'}</p>
                   <a href="${fullImg2 || modalImg2}" target="_blank" rel="noopener noreferrer" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
                     <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
-                    <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
+                    <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
                   </a>
                 </div>` : ''}
             </div>
@@ -3290,6 +3310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
     localStorage.setItem('bMMC_theme', isDark ? 'dark' : 'light');
     updateThemeUI(isDark);
   });

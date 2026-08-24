@@ -9,7 +9,7 @@
   <script>
     (function() {
       try {
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
           document.documentElement.classList.add('dark');
@@ -365,7 +365,7 @@
             <!-- Favorites -->
             <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
               <span id="favHeartIcon">🤍</span>
-              <span id="favCountText" class="text-[10px] sm:text-[11px]">0</span>
+              <span id="favCountText" class="text-[10px] sm:text-[11px]">Saved (0)</span>
             </button>
 
             <!-- Theme Toggle -->
@@ -719,7 +719,7 @@
     </div>
   </div>
 
-  <!-- Standalone 3D Lightbox Modal (Z-Index: 85) -->
+  <!-- Standalone 3D & Augmented Reality (AR) Lightbox Modal (Z-Index: 85) -->
   <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[85] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
@@ -738,7 +738,26 @@
           <div class="spinner-3d"></div>
           <span class="text-xs font-bold text-slate-300">Loading 3D Model...</span>
         </div>
-        <model-viewer id="lightboxViewer" camera-controls auto-rotate shadow-intensity="1.2" exposure="1.1" style="width: 100%; height: 100%; display: block;" class="w-full h-full"></model-viewer>
+        
+        <!-- Native AR & 3D Model Viewer -->
+        <model-viewer 
+          id="lightboxViewer" 
+          ar 
+          ar-modes="webxr scene-viewer quick-look" 
+          ar-scale="auto" 
+          camera-controls 
+          auto-rotate 
+          shadow-intensity="1.2" 
+          exposure="1.1" 
+          style="width: 100%; height: 100%; display: block;" 
+          class="w-full h-full">
+          
+          <button slot="ar-button" class="absolute top-4 left-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-black px-4 py-2 rounded-2xl shadow-xl border border-purple-300/40 flex items-center gap-2 active:scale-95 transition-all z-20 cursor-pointer animate-pulse">
+            <span class="text-base">📱</span>
+            <span>Place in Your Room (AR)</span>
+          </button>
+        </model-viewer>
+
         <span id="lightboxScaleBadge" class="absolute bottom-4 right-4 bg-slate-900/85 text-white backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-xl z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-2">
           <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
           <span id="lightboxScaleText">Scale Reference Available</span>
