@@ -10,14 +10,15 @@
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
     style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
-    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.cartocdn.com https://*.dropboxusercontent.com https://*.dropbox.com https://server.arcgisonline.com https://*.arcgisonline.com;
-    connect-src 'self' https://docs.google.com https://*.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com;
+    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.cartocdn.com https://*.dropboxusercontent.com https://*.dropbox.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google.com https://*.googleapis.com https://*.gstatic.com;
+    connect-src 'self' https://docs.google.com https://*.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google.com;
     font-src 'self' https://fonts.gstatic.com;
   ">
 
   <!-- Preconnect for Image & Tile CDN Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
+  <link rel="preconnect" href="https://mt0.google.com" crossorigin>
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -240,7 +241,7 @@
       transform: translateY(-1px);
     }
 
-    /* --- Google Maps Style Layer Switcher Popup --- */
+    /* --- Layer Switcher Popup --- */
     .layer-switcher-container {
       position: relative;
       pointer-events: auto;
@@ -253,7 +254,7 @@
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 14px;
-      padding: 10px;
+      padding: 8px;
       display: none;
       gap: 8px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
@@ -268,11 +269,12 @@
       background: rgba(255,255,255,0.06);
       border: 2px solid transparent;
       border-radius: 10px;
-      padding: 6px 8px;
+      padding: 6px 10px;
       color: #f8fafc;
       font-size: 10px;
       font-weight: 700;
       cursor: pointer;
+      white-space: nowrap;
       transition: all 0.15s ease;
     }
     .layer-option-btn:hover {
@@ -474,13 +476,21 @@
       </button>
 
       <div id="layerDropdownCard" class="layer-dropdown-card">
-        <button id="btnLayerVoyager" class="layer-option-btn active" title="Default Map View">
+        <button id="btnLayerVoyager" class="layer-option-btn active" title="CARTO Voyager (Default View)">
           <span class="icon">🗺️</span>
-          <span>Default</span>
+          <span>Voyager</span>
         </button>
-        <button id="btnLayerSatellite" class="layer-option-btn" title="Satellite Imagery">
+        <button id="btnLayerGoogle" class="layer-option-btn" title="Google Maps (Streets)">
+          <span class="icon">📍</span>
+          <span>Google</span>
+        </button>
+        <button id="btnLayerHybrid" class="layer-option-btn" title="Google Satellite (Hybrid)">
           <span class="icon">🛰️</span>
           <span>Satellite</span>
+        </button>
+        <button id="btnLayerSatellite" class="layer-option-btn" title="Esri Satellite Imagery">
+          <span class="icon">🌍</span>
+          <span>Esri</span>
         </button>
       </div>
     </div>
@@ -526,6 +536,12 @@
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <script>
+    // ==========================================
+    // CARTO API Key (Free at https://carto.com/basemaps/apikey)
+    // Paste your key below to remove the CARTO watermark completely:
+    const CARTO_API_KEY = 'cb1_28sh_1_689e4b671faa6f5947798385'; 
+    // ==========================================
+
     // --- Security Utilities ---
     function escapeHTML(str) {
       if (str === null || str === undefined) return '';
@@ -618,35 +634,61 @@
       worldCopyJump: false
     }).setView(initialCenter, initialZoom);
 
-    // Base Layers
-    const layerVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // --- Base Tile Layers ---
+    const cartoUrl = CARTO_API_KEY 
+      ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    const layerVoyager = L.tileLayer(cartoUrl, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>',
       maxZoom: 19,
       subdomains: 'abcd',
       noWrap: true
-    }).addTo(map);
+    });
 
-    const layerSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    const layerGoogle = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      attribution: '&copy; Google Maps',
+      maxZoom: 20,
+      subdomains: ['0', '1', '2', '3'],
+      noWrap: true
+    });
+
+    const layerHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+      attribution: '&copy; Google Maps',
+      maxZoom: 20,
+      subdomains: ['0', '1', '2', '3'],
+      noWrap: true
+    });
+
+    const layerEsriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar, GIS Community',
       maxZoom: 18,
       noWrap: true
     });
 
-    function setBasemap(type) {
-      const btnVoyager = document.getElementById('btnLayerVoyager');
-      const btnSatellite = document.getElementById('btnLayerSatellite');
+    const baseLayers = {
+      voyager: layerVoyager,
+      google: layerGoogle,
+      hybrid: layerHybrid,
+      satellite: layerEsriSatellite
+    };
 
-      if (type === 'satellite') {
-        map.removeLayer(layerVoyager);
-        layerSatellite.addTo(map);
-        btnSatellite?.classList.add('active');
-        btnVoyager?.classList.remove('active');
-      } else {
-        map.removeLayer(layerSatellite);
-        layerVoyager.addTo(map);
-        btnVoyager?.classList.add('active');
-        btnSatellite?.classList.remove('active');
-      }
+    // Add default layer
+    layerVoyager.addTo(map);
+
+    function setBasemap(type) {
+      if (!baseLayers[type]) return;
+
+      Object.values(baseLayers).forEach(layer => {
+        if (map.hasLayer(layer)) map.removeLayer(layer);
+      });
+
+      baseLayers[type].addTo(map);
+
+      document.querySelectorAll('.layer-option-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id === `btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      });
+
       document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
@@ -767,7 +809,6 @@
         marker.bindPopup(popupHTML, { autoPan: true, keepInView: true, autoClose: true });
         markerList.push(marker);
 
-        // Register both 0-based array index and parsed CSV Item #
         recordMarkerMap.set(item.index, marker);
         recordMarkerMap.set(String(item.index), marker);
         recordMarkerMap.set(Number(item.index), marker);
@@ -856,13 +897,11 @@
         }
       }
 
-      // Mark dataset ready before processing queues and deep links
       isMapDataReady = true;
 
       updateYearFilter();
       handleInitialDeepLinks();
 
-      // Check if an exhibit was requested before data finished parsing
       if (pendingExhibitToFocus !== null) {
         const target = pendingExhibitToFocus;
         pendingExhibitToFocus = null;
@@ -911,8 +950,6 @@
 
       const filtered = allPhotoRecords.filter(item => {
         const y = parseInt(item.year, 10);
-        
-        // Items with Year 0, negative (BC), unparseable, or within selected slider range
         const matchesYear = isNaN(y) || y <= 0 || (y >= minVal && y <= maxVal);
         if (!matchesYear) return false;
 
@@ -966,7 +1003,6 @@
         return;
       }
 
-      // 1. Clear any active search input that could filter out this marker
       const searchInput = document.getElementById('mapSearchInput');
       if (searchInput && searchInput.value) {
         searchInput.value = '';
@@ -974,7 +1010,6 @@
         if (clearBtn) clearBtn.style.display = 'none';
       }
 
-      // 2. Expand year slider bounds if item year is a positive year outside current range
       const record = allPhotoRecords.find(r => 
         r.index === Number(exhibitIdOrIndex) || 
         String(r.id) === String(exhibitIdOrIndex) || 
@@ -994,10 +1029,8 @@
         }
       }
 
-      // 3. Re-render dataset to ensure this marker is active and rendered
       updateYearFilter();
 
-      // 4. Locate marker by array index, raw ID, or number
       let marker = recordMarkerMap.get(Number(exhibitIdOrIndex)) || 
                    recordMarkerMap.get(String(exhibitIdOrIndex)) || 
                    recordMarkerMap.get(exhibitIdOrIndex);
@@ -1083,7 +1116,7 @@
     function parseAndProcessDataset(rows) {
       if (!rows || rows.length < 2) return;
 
-      let idIdx = 12; // Default to Column M (#)
+      let idIdx = 12;
       let titleIdx = 2;
       let imgIdx = 20;
       let madeIdx = 23;
@@ -1147,7 +1180,6 @@
         if (cleanTitle.includes('\n')) cleanTitle = cleanTitle.split('\n')[0];
         if (cleanTitle.includes('#')) cleanTitle = cleanTitle.split('#')[0];
 
-        // Gracefully use SVG placeholder if image is not present
         const imgUrl = (imgRaw ? formatImgUrl(imgRaw) : '') || SVG_NO_IMG;
 
         allPhotoRecords.push({
@@ -1252,7 +1284,10 @@
         layerDropdownCard?.classList.toggle('show');
       });
 
+      // Layer selection buttons
       document.getElementById('btnLayerVoyager')?.addEventListener('click', () => setBasemap('voyager'));
+      document.getElementById('btnLayerGoogle')?.addEventListener('click', () => setBasemap('google'));
+      document.getElementById('btnLayerHybrid')?.addEventListener('click', () => setBasemap('hybrid'));
       document.getElementById('btnLayerSatellite')?.addEventListener('click', () => setBasemap('satellite'));
 
       document.addEventListener('click', (e) => {
