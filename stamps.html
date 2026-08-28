@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+  <title>New Zealand Stamp Archive — StampsNZ Showcase</title>
+
+  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+        if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://docs.google.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>">
+
+  <!-- Tailwind CSS Engine -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#16a34a',
+              600: '#15803d',
+              700: '#166534',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Core External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Core Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Ultra-Compact Dual-Ended Range Slider CSS */
+    .range-slider-container {
+      position: relative;
+      height: 14px;
+      display: flex;
+      align-items: center;
+    }
+    .range-slider-track {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      border-radius: 9999px;
+    }
+    .range-slider-highlight {
+      position: absolute;
+      height: 4px;
+      border-radius: 9999px;
+    }
+    input[type=range].dual-range-input {
+      position: absolute;
+      width: 100%;
+      height: 0;
+      pointer-events: none;
+      appearance: none;
+      background: transparent;
+      outline: none;
+      z-index: 10;
+    }
+    input[type=range].dual-range-input::-webkit-slider-thumb {
+      pointer-events: auto;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 9999px;
+      background: #10b981;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    input[type=range].dual-range-input::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    input[type=range].dual-range-input::-moz-range-thumb {
+      pointer-events: auto;
+      width: 14px;
+      height: 14px;
+      border-radius: 9999px;
+      background: #10b981;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+      cursor: pointer;
+    }
+    #sliderPreMin::-webkit-slider-thumb, #sliderPreMax::-webkit-slider-thumb { background: #f59e0b; }
+    #sliderDecMin::-webkit-slider-thumb, #sliderDecMax::-webkit-slider-thumb { background: #3b82f6; }
+    #sliderUsedMin::-webkit-slider-thumb, #sliderUsedMax::-webkit-slider-thumb { background: #8b5cf6; }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50/40 via-slate-100/40 to-emerald-50/30 dark:from-slate-950/40 dark:via-slate-900/40 dark:to-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+
+  <!-- Ambient Glow Background -->
+  <div id="stampSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
+    <div class="absolute -top-28 -right-28 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 -left-28 w-96 h-96 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header id="mainHeader" class="border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90 dark:bg-slate-900/90 transition-colors">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-1.5">
+      <div class="flex items-center justify-between gap-2">
+        
+        <!-- Brand Link -->
+        <a href="stamps.html" id="brandLogoLink" class="group flex items-center gap-2 shrink-0">
+          <span class="text-xl sm:text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">📮</span>
+          <div class="leading-none">
+            <h1 class="text-sm sm:text-base lg:text-lg font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+              StampsNZ Archive
+            </h1>
+            <p class="text-[7px] sm:text-[8px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">New Zealand Philatelic Catalogue (1855–Present)</p>
+          </div>
+        </a>
+        
+        <!-- Action Cluster -->
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
+          
+          <button onclick="clearAllFilters()" title="Reset All & Browse Catalog" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2.5 py-1 rounded-lg transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span>🌐</span> <span class="hidden sm:inline">All Stamps</span>
+          </button>
+
+          <button onclick="toggleStatsDashboard()" title="Philatelic Insights & Analytics" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 py-1 rounded-lg transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span>📊</span> <span class="hidden sm:inline">Analytics</span>
+          </button>
+
+          <button onclick="surpriseRandomStamp()" title="Surprise Me (Random Stamp)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-2.5 py-1 rounded-lg transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span>✨</span> <span class="hidden lg:inline">Random</span>
+          </button>
+
+          <button onclick="refreshData()" title="Sync Latest Changes from Google Sheets" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 hover:bg-emerald-200 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2.5 py-1 rounded-lg transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span>🔄</span> <span class="hidden lg:inline">Sync</span>
+          </button>
+
+          <!-- Main Museum Link -->
+          <a href="index.html" title="Back to Main Museum Showcase" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 py-1 rounded-lg transition shadow-sm shrink-0">
+            <span>🏛️</span> <span class="hidden lg:inline">Museum</span>
+          </a>
+
+          <!-- Utility Pill Cluster -->
+          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-lg p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700 shrink-0">
+            <button id="btnFavorites" onclick="toggleSavedFilter()" title="Saved Stamps" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-1.5 py-0.5 rounded transition cursor-pointer">
+              <span id="favHeartIcon">🤍</span> <span id="favCountText" class="text-[10px] sm:text-[11px]">Saved (0)</span>
+            </button>
+
+            <button onclick="toggleTheme()" title="Toggle Light/Dark Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-1.5 py-0.5 rounded transition cursor-pointer">
+              <span>☀️</span>
+            </button>
+
+            <button onclick="toggleControlsPanel()" title="Toggle Search & Filters" class="flex items-center gap-0.5 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-1.5 py-0.5 rounded transition cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+              <span id="toggleChevron" class="text-[8px] text-slate-400">▼</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Compact Search & Filter Controls Suite -->
+      <div id="collapsibleControls" class="mt-1.5 flex flex-col gap-1.5 transition-all duration-300">
+        
+        <!-- Row 1: Currency Lens & Live Search -->
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-1.5 pt-1 border-t border-slate-200/60 dark:border-slate-800">
+          
+          <!-- Exact Currency Lens -->
+          <div class="flex items-center bg-slate-100/90 dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shrink-0 text-xs font-extrabold shadow-inner">
+            <button id="lensAll" onclick="setCurrencyLens('ALL')" class="px-2.5 py-0.5 rounded-md transition bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm cursor-pointer">
+              🌐 All Eras
+            </button>
+            <button id="lensPre" onclick="setCurrencyLens('PRE_DECIMAL')" class="px-2.5 py-0.5 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer">
+              🇬🇧 Pre-Decimal (1855–1967)
+            </button>
+            <button id="lensDec" onclick="setCurrencyLens('DECIMAL')" class="px-2.5 py-0.5 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer">
+              🇳🇿 Decimal (1967–Present)
+            </button>
+          </div>
+
+          <!-- Exact Search Input with 🔍 Icon -->
+          <div class="w-full lg:w-96 relative shrink-0">
+            <input type="text" id="searchInput" placeholder="Search Chalon, Pictorials, Health, 1d, 45c, Cat #..." autocomplete="off" class="w-full pl-8 pr-7 py-1 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <span class="absolute left-2.5 top-1 text-emerald-600 text-xs">🔍</span>
+            <button id="clearSearchBtn" onclick="clearSearchInput()" title="Clear Search" class="hidden absolute right-2 top-1 text-slate-400 hover:text-slate-600 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 items-center justify-center cursor-pointer">✕</button>
+          </div>
+        </div>
+
+        <!-- Row 2: View Switcher, Sort & Always-Visible Clear All -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 pt-0.5 border-t border-slate-200/50 dark:border-slate-800/60">
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Exact Dynamic Counter -->
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount">Showing 0 of 0 stamps</p>
+            
+            <!-- View Switcher -->
+            <div class="flex items-center gap-0.5 bg-slate-100/90 dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold">
+              <button id="btnViewGrid" onclick="switchView('grid')" class="px-2 py-0.5 rounded-md transition bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm cursor-pointer">
+                <span>🔲</span> <span>Grid</span>
+              </button>
+              <button id="btnViewTable" onclick="switchView('table')" class="px-2 py-0.5 rounded-md transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+                <span>📋</span> <span>Ledger</span>
+              </button>
+              <button id="btnViewPhotos" onclick="switchView('photos')" class="px-2 py-0.5 rounded-md transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+                <span>🖼️</span> <span>Gallery</span>
+              </button>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/90 px-2 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60 text-xs">
+              <label for="sortBy" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
+              <select id="sortBy" onchange="applyFiltersAndRender()" class="bg-transparent font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+                <option value="year-asc">Year (Oldest First)</option>
+                <option value="year-desc">Year (Newest First)</option>
+                <option value="title-asc">Title / Issue (A–Z)</option>
+                <option value="title-desc">Title / Issue (Z–A)</option>
+                <option value="muh-desc">Mint Unhinged (High–Low)</option>
+                <option value="used-desc">Fine Used (High–Low)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Active Filter Badges & Always-Visible Clear Filter System -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[10px] text-slate-400 font-black uppercase tracking-wider">Active:</span>
+            <div id="activeChipsContainer" class="flex flex-wrap items-center gap-1">
+              <span class="text-[10px] text-slate-400 italic">No filters active (Showing all)</span>
+            </div>
+            <button onclick="clearAllFilters()" class="text-[10px] font-black text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-600 dark:hover:bg-rose-600 transition px-2 py-0.5 bg-rose-50 dark:bg-rose-950/60 rounded-md border border-rose-200 dark:border-rose-900 flex items-center gap-1 shadow-sm cursor-pointer active:scale-95">
+              <span>✕</span> <span>Clear All Filters</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 3: 4 Micro Dual-Ended Range Sliders (Tight Vertical Height) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-1.5 bg-slate-50/70 dark:bg-slate-900/60 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800">
+          
+          <!-- Slider 1: Chronological Milestone Years -->
+          <div class="space-y-0.5 px-1">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="font-extrabold text-slate-700 dark:text-slate-300">📅 Years: <strong id="labelYearRange" class="text-emerald-600 dark:text-emerald-400 font-black">1855 – 2026</strong></span>
+              <button onclick="resetYearSlider()" class="text-[8px] text-slate-400 hover:text-rose-500 font-bold cursor-pointer">Reset</button>
+            </div>
+            <div class="range-slider-container">
+              <div class="range-slider-track bg-slate-200 dark:bg-slate-700"></div>
+              <div id="highlightYear" class="range-slider-highlight bg-emerald-500"></div>
+              <input type="range" id="sliderYearMin" min="1855" max="2026" value="1855" class="dual-range-input" oninput="handleYearSlider(true)">
+              <input type="range" id="sliderYearMax" min="1855" max="2026" value="2026" class="dual-range-input" oninput="handleYearSlider(false)">
+            </div>
+          </div>
+
+          <!-- Slider 2: Pre-Decimal Values (½d to £100) -->
+          <div id="preDecSliderContainer" class="space-y-0.5 px-1">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="font-extrabold text-amber-800 dark:text-amber-300">💰 Pre-Decimal: <strong id="labelPreRange" class="text-amber-600 dark:text-amber-400 font-black">½d – £100</strong></span>
+              <button onclick="resetPreSlider()" class="text-[8px] text-slate-400 hover:text-rose-500 font-bold cursor-pointer">Reset</button>
+            </div>
+            <div class="range-slider-container">
+              <div class="range-slider-track bg-slate-200 dark:bg-slate-700"></div>
+              <div id="highlightPre" class="range-slider-highlight bg-amber-500"></div>
+              <input type="range" id="sliderPreMin" min="0" max="22" value="0" class="dual-range-input" oninput="handlePreSlider(true)">
+              <input type="range" id="sliderPreMax" min="0" max="22" value="22" class="dual-range-input" oninput="handlePreSlider(false)">
+            </div>
+          </div>
+
+          <!-- Slider 3: Decimal Values (1c to $100) -->
+          <div id="decSliderContainer" class="space-y-0.5 px-1">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="font-extrabold text-blue-800 dark:text-blue-300">💵 Decimal: <strong id="labelDecRange" class="text-blue-600 dark:text-blue-400 font-black">1c – $100</strong></span>
+              <button onclick="resetDecSlider()" class="text-[8px] text-slate-400 hover:text-rose-500 font-bold cursor-pointer">Reset</button>
+            </div>
+            <div class="range-slider-container">
+              <div class="range-slider-track bg-slate-200 dark:bg-slate-700"></div>
+              <div id="highlightDec" class="range-slider-highlight bg-blue-500"></div>
+              <input type="range" id="sliderDecMin" min="0" max="29" value="0" class="dual-range-input" oninput="handleDecSlider(true)">
+              <input type="range" id="sliderDecMax" min="0" max="29" value="29" class="dual-range-input" oninput="handleDecSlider(false)">
+            </div>
+          </div>
+
+          <!-- Slider 4: Used Value Range ($0 to $5000+) -->
+          <div class="space-y-0.5 px-1">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="font-extrabold text-purple-800 dark:text-purple-300">🏷️ Fine Used: <strong id="labelUsedRange" class="text-purple-600 dark:text-purple-400 font-black">$0 – $5,000+</strong></span>
+              <button onclick="resetUsedSlider()" class="text-[8px] text-slate-400 hover:text-rose-500 font-bold cursor-pointer">Reset</button>
+            </div>
+            <div class="range-slider-container">
+              <div class="range-slider-track bg-slate-200 dark:bg-slate-700"></div>
+              <div id="highlightUsed" class="range-slider-highlight bg-purple-500"></div>
+              <input type="range" id="sliderUsedMin" min="0" max="18" value="0" class="dual-range-input" oninput="handleUsedSlider(true)">
+              <input type="range" id="sliderUsedMax" min="0" max="18" value="18" class="dual-range-input" oninput="handleUsedSlider(false)">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Row 4: Reordered Category Tabs: 🌐 All (20) [Default], 📮 Core, 🏛️ Depts, 🌿 Thematic -->
+        <div class="space-y-1 pt-0.5 border-t border-slate-200/50 dark:border-slate-800/60">
+          
+          <div class="flex items-center gap-1 text-[11px] font-extrabold" role="tablist">
+            <!-- 1. 🌐 All (20) - Default Active -->
+            <button id="tabCatAll" onclick="switchCategoryGroup('all')" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center gap-1 font-extrabold">
+              <span>🌐 All (20)</span>
+            </button>
+            <!-- 2. 📮 Core -->
+            <button id="tabCatCore" onclick="switchCategoryGroup('core')" class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold">
+              <span>📮 Core</span> <span id="badgeCatCore" class="hidden text-[8px] px-1 py-0.2 bg-emerald-600 text-white rounded-full font-black">0</span>
+            </button>
+            <!-- 3. 🏛️ Depts -->
+            <button id="tabCatDept" onclick="switchCategoryGroup('dept')" class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold">
+              <span>🏛️ Depts</span> <span id="badgeCatDept" class="hidden text-[8px] px-1 py-0.2 bg-emerald-600 text-white rounded-full font-black">0</span>
+            </button>
+            <!-- 4. 🌿 Thematic -->
+            <button id="tabCatThem" onclick="switchCategoryGroup('thematic')" class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold">
+              <span>🌿 Thematic</span> <span id="badgeCatThem" class="hidden text-[8px] px-1 py-0.2 bg-emerald-600 text-white rounded-full font-black">0</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Category Pills Container (Single wrap line) -->
+          <div id="activeCategoryPillsBox" class="flex flex-wrap gap-1 text-xs"></div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-4 flex-1 w-full relative z-10">
+    
+    <div id="loadingScreen" class="py-16 text-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-3 border-emerald-600 border-t-transparent mx-auto mb-3"></div>
+      <p class="text-xs font-bold text-slate-500">Connecting to StampsNZ catalog archive...</p>
+    </div>
+
+    <!-- Philatelic Analytics & Stats Dashboard -->
+    <div id="statsSection" class="hidden space-y-4 mb-6">
+      <div class="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white rounded-2xl p-4 shadow-xl border border-emerald-500/30">
+        <h2 class="text-base sm:text-lg font-black text-white">Postal History & Issue Breakdown</h2>
+        <p class="text-xs text-slate-300 mt-0.5">Chronological analysis of catalogued New Zealand stamps across historical eras and decimal decades.</p>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
+          <div class="w-full h-1 bg-emerald-500 absolute top-0 left-0"></div>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Total Catalogued</span>
+          <div class="text-lg font-black text-emerald-600 dark:text-emerald-400 mt-0.5" id="statTotalCount">0</div>
+        </div>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
+          <div class="w-full h-1 bg-amber-500 absolute top-0 left-0"></div>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Timespan</span>
+          <div class="text-base font-black text-amber-600 dark:text-amber-400 mt-0.5" id="statDateRange">1855 – Present</div>
+        </div>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
+          <div class="w-full h-1 bg-purple-500 absolute top-0 left-0"></div>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Currency Split</span>
+          <div class="text-xs font-black mt-0.5 space-y-0.5">
+            <div id="statPreDecimal">Pre-Dec: <span class="text-purple-600">--</span></div>
+            <div id="statDecimal">Dec: <span class="text-pink-600">--</span></div>
+          </div>
+        </div>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
+          <div class="w-full h-1 bg-blue-500 absolute top-0 left-0"></div>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Active Total</span>
+          <div class="text-base font-black text-blue-600 dark:text-blue-400 mt-0.5" id="statActiveCount">0 Issues</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm">
+          <h3 class="text-xs font-black text-slate-900 dark:text-white mb-1.5">Issues by Historical Era & Decimal Decades</h3>
+          <div class="h-60 w-full relative"><canvas id="chartEra"></canvas></div>
+        </div>
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm">
+          <h3 class="text-xs font-black text-slate-900 dark:text-white mb-1.5">Category Distribution</h3>
+          <div class="h-60 w-full relative"><canvas id="chartCategory"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Grid View (With Favorites Heart Button) -->
+    <div id="gridSection">
+      <div id="stampGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-3.5"></div>
+      <div id="scrollSentinel" class="h-10 w-full flex items-center justify-center"></div>
+    </div>
+
+    <!-- 2. Ledger Table View -->
+    <div id="tableSection" class="hidden overflow-x-auto bg-white/95 dark:bg-slate-900/95 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead class="bg-slate-100 dark:bg-slate-800/80 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+          <tr>
+            <th class="p-2.5">Year</th>
+            <th class="p-2.5">Denom</th>
+            <th class="p-2.5">Title & Subject</th>
+            <th class="p-2.5">Categories</th>
+            <th class="p-2.5">Cat Ref</th>
+            <th class="p-2.5 text-right">Mint Unhinged (MUH)</th>
+            <th class="p-2.5 text-right">Fine Used</th>
+            <th class="p-2.5 text-center">Save</th>
+            <th class="p-2.5 text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody id="stampTableBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+      </table>
+    </div>
+
+    <!-- 3. Photo Wall Gallery View -->
+    <div id="photoSection" class="hidden">
+      <div id="stampPhotoGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="noResults" class="hidden text-center py-16 bg-white/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+      <span class="text-3xl">🔍</span>
+      <h3 class="text-sm font-black text-slate-800 dark:text-slate-200 mt-2">No matching stamps found</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Try broadening your slider ranges or clicking Clear All Filters.</p>
+      <button onclick="clearAllFilters()" class="mt-3 bg-emerald-600 text-white text-xs font-black px-4 py-2 rounded-lg cursor-pointer">Clear All Filters ✕</button>
+    </div>
+
+  </main>
+
+  <!-- Enlarge Lightbox Modal -->
+  <div id="enlargeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[90] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl max-w-5xl w-full h-[88vh] shadow-2xl border-2 border-emerald-500/50 relative flex flex-col overflow-hidden">
+      <div class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10 shrink-0">
+        <h3 id="enlargeModalTitle" class="text-xs sm:text-sm font-extrabold truncate text-slate-900 dark:text-white">High-Resolution Philatelic View</h3>
+        <button onclick="closeEnlargeModal()" class="p-1 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold cursor-pointer">✕</button>
+      </div>
+      <div id="enlargeModalBody" class="w-full flex-1 flex items-center justify-center bg-slate-950 p-4 overflow-auto select-none"></div>
+    </div>
+  </div>
+
+  <!-- Detail Pop-up Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[80] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-emerald-500/40 relative flex flex-col">
+      <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <button onclick="navigateModal(-1)" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold cursor-pointer">← Prev</button>
+          <span id="modalCounter" class="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 px-1.5"></span>
+          <button onclick="navigateModal(1)" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold cursor-pointer">Next →</button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button id="modalFavBtn" onclick="toggleModalFav()" class="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold cursor-pointer">🤍</button>
+          <button onclick="closeModal()" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold cursor-pointer">✕</button>
+        </div>
+      </div>
+      <div id="modalContent" class="p-4 sm:p-6"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <script>
+    // Config: Dual-Mode Google Sheets & Local Fallback
+    const REMOTE_STAMPS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1na-WpYB3GJ8pbazBLVQdCcKiMkfVcDxc3upiUyjHHKQ/export?format=csv&gid=0';
+    const LOCAL_STAMPS_CSV_URL = 'stamps-data.csv';
+    const CACHE_KEY = 'bMMC_cached_stamps';
+    const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+    const PRE_LADDER = [
+      { label: '½d', val: 0.5 }, { label: '1d', val: 1 }, { label: '1½d', val: 1.5 }, { label: '2d', val: 2 },
+      { label: '2½d', val: 2.5 }, { label: '3d', val: 3 }, { label: '4d', val: 4 }, { label: '5d', val: 5 },
+      { label: '6d', val: 6 }, { label: '8d', val: 8 }, { label: '9d', val: 9 }, { label: '1/-', val: 12 },
+      { label: '1/3', val: 15 }, { label: '1/6', val: 18 }, { label: '2/-', val: 24 }, { label: '2/6', val: 30 },
+      { label: '3/-', val: 36 }, { label: '5/-', val: 60 }, { label: '10/-', val: 120 }, { label: '£1', val: 240 },
+      { label: '£5', val: 1200 }, { label: '£20', val: 4800 }, { label: '£100', val: 24000 }
+    ];
+
+    const DEC_LADDER = [
+      { label: '1c', val: 1 }, { label: '2c', val: 2 }, { label: '3c', val: 3 }, { label: '4c', val: 4 },
+      { label: '5c', val: 5 }, { label: '6c', val: 6 }, { label: '7c', val: 7 }, { label: '8c', val: 8 },
+      { label: '10c', val: 10 }, { label: '15c', val: 15 }, { label: '20c', val: 20 }, { label: '25c', val: 25 },
+      { label: '30c', val: 30 }, { label: '40c', val: 40 }, { label: '45c', val: 45 }, { label: '50c', val: 50 },
+      { label: '60c', val: 60 }, { label: '70c', val: 70 }, { label: '80c', val: 80 }, { label: '90c', val: 90 },
+      { label: '$1', val: 100 }, { label: '$1.50', val: 150 }, { label: '$2', val: 200 }, { label: '$3', val: 300 },
+      { label: '$4', val: 400 }, { label: '$5', val: 500 }, { label: '$10', val: 1000 }, { label: '$20', val: 2000 },
+      { label: '$50', val: 5000 }, { label: '$100', val: 10000 }
+    ];
+
+    const USED_LADDER = [
+      { label: '$0', val: 0 },
+      { label: '$0.50', val: 0.5 },
+      { label: '$1', val: 1 },
+      { label: '$2', val: 2 },
+      { label: '$3', val: 3 },
+      { label: '$5', val: 5 },
+      { label: '$10', val: 10 },
+      { label: '$15', val: 15 },
+      { label: '$20', val: 20 },
+      { label: '$30', val: 30 },
+      { label: '$50', val: 50 },
+      { label: '$75', val: 75 },
+      { label: '$100', val: 100 },
+      { label: '$150', val: 150 },
+      { label: '$250', val: 250 },
+      { label: '$500', val: 500 },
+      { label: '$1000', val: 1000 },
+      { label: '$2500', val: 2500 },
+      { label: '$5000+', val: 5000 }
+    ];
+
+    const ERA_DECADE_CHART_ORDER = [
+      'Victorian (1855–1901)',
+      'Edward VII (1901–1910)',
+      'George V (1910–1936)',
+      'George VI (1936–1952)',
+      'QEII Pre-Dec (1953–1966)',
+      '1960s Dec (1967–69)',
+      '1970s Decimal',
+      '1980s Decimal',
+      '1990s Decimal',
+      '2000s Decimal',
+      '2010s Decimal',
+      '2020s Decimal'
+    ];
+
+    const CATEGORY_DEFINITIONS = [
+      { id: 'Definitives', label: 'Definitives', icon: '✉️', group: 'core' },
+      { id: 'Commemoratives', label: 'Commemoratives', icon: '🎖️', group: 'core' },
+      { id: 'KiwiStamps', label: 'KiwiStamps (NVI)', icon: '🥝', group: 'core' },
+      { id: 'Health', label: 'Health Issues', icon: '🏥', group: 'core' },
+      { id: 'Christmas', label: 'Christmas', icon: '🎄', group: 'core' },
+      { id: 'Airmail', label: 'Airmail & Pigeon Post', icon: '✈️', group: 'core' },
+      { id: 'Postal Fiscal (Arms)', label: 'Postal Fiscal (Arms)', icon: '⚖️', group: 'dept' },
+      { id: 'Life Insurance (Lighthouse)', label: 'Life Insurance (Lighthouse)', icon: '💡', group: 'dept' },
+      { id: 'Official', label: 'Official Overprints', icon: '🏢', group: 'dept' },
+      { id: 'Postage Due', label: 'Postage Due', icon: '📮', group: 'dept' },
+      { id: 'Express Delivery', label: 'Express Delivery', icon: '⚡', group: 'dept' },
+      { id: 'Personalised Postage Labels (CALs)', label: 'Personalised CALs', icon: '🏷️', group: 'dept' },
+      { id: 'Frama Stamps', label: 'Frama Stamps', icon: '📠', group: 'dept' },
+      { id: 'Ross Dependency (Antarctic)', label: 'Ross Dependency', icon: '❄️', group: 'dept' },
+      { id: 'Aotearoa', label: 'Aotearoa / Māori Culture', icon: '🌿', group: 'thematic' },
+      { id: 'Matariki', label: 'Matariki', icon: '✨', group: 'thematic' },
+      { id: 'ANZAC', label: 'ANZAC / Military', icon: '🎖️', group: 'thematic' },
+      { id: 'The Royal Family', label: 'The Royal Family', icon: '👑', group: 'thematic' },
+      { id: 'Chinese Lunar Year', label: 'Chinese Lunar Year', icon: '🐉', group: 'thematic' },
+      { id: 'Round Kiwi', label: 'Round Kiwi Die-Cuts', icon: '🥝', group: 'thematic' }
+    ];
+
+    let rawCatalog = [];
+    let filteredCatalog = [];
+    let fuseSearch = null;
+    let currentCurrencyLens = 'ALL';
+    let activeCategories = new Set();
+    let currentCategoryGroupTab = 'all';
+    let showingSavedOnly = false;
+    let currentView = 'grid';
+    let activeModalIndex = -1;
+    let renderedCount = 0;
+    const BATCH_SIZE = 48;
+    let savedStamps = new Set(JSON.parse(localStorage.getItem('saved_stamps') || '[]'));
+    let chartEraInstance = null;
+    let chartCatInstance = null;
+
+    // Compact Category Tab Switcher
+    function switchCategoryGroup(group) {
+      currentCategoryGroupTab = group;
+      ['tabCatAll', 'tabCatCore', 'tabCatDept', 'tabCatThem'].forEach(id => {
+        const btn = document.getElementById(id);
+        const isActive = (id === 'tabCatAll' && group === 'all') ||
+                         (id === 'tabCatCore' && group === 'core') ||
+                         (id === 'tabCatDept' && group === 'dept') ||
+                         (id === 'tabCatThem' && group === 'thematic');
+        btn.className = isActive 
+          ? "px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center gap-1 font-extrabold"
+          : "px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold";
+      });
+      renderCompactCategoryPills();
+    }
+
+    function renderCompactCategoryPills() {
+      const box = document.getElementById('activeCategoryPillsBox');
+      box.innerHTML = '';
+
+      const list = CATEGORY_DEFINITIONS.filter(c => currentCategoryGroupTab === 'all' || c.group === currentCategoryGroupTab);
+
+      list.forEach(cat => {
+        const isAct = activeCategories.has(cat.id);
+        const count = filteredCatalog.filter(s => s.CategoryList.includes(cat.id)).length;
+        const btn = document.createElement('button');
+        btn.className = isAct
+          ? "cat-pill px-2 py-0.5 rounded-md border border-emerald-500 bg-emerald-600 text-white font-extrabold shadow-sm flex items-center gap-1 cursor-pointer transition text-[10px]"
+          : "cat-pill px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 font-bold hover:border-emerald-500 transition flex items-center gap-1 shadow-sm cursor-pointer text-[10px]";
+        btn.innerHTML = `<span>${cat.icon}</span> <span>${cat.label}</span> <span class="text-[8px] px-1 py-0.2 ${isAct ? 'bg-emerald-800 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'} rounded-full font-bold">${count}</span>`;
+        btn.onclick = () => toggleCategoryFilter(cat.id);
+        box.appendChild(btn);
+      });
+
+      updateCategoryGroupBadges();
+    }
+
+    function updateCategoryGroupBadges() {
+      const coreCount = CATEGORY_DEFINITIONS.filter(c => c.group === 'core' && activeCategories.has(c.id)).length;
+      const deptCount = CATEGORY_DEFINITIONS.filter(c => c.group === 'dept' && activeCategories.has(c.id)).length;
+      const themCount = CATEGORY_DEFINITIONS.filter(c => c.group === 'thematic' && activeCategories.has(c.id)).length;
+
+      updateBadgeUI('badgeCatCore', coreCount);
+      updateBadgeUI('badgeCatDept', deptCount);
+      updateBadgeUI('badgeCatThem', themCount);
+    }
+
+    function updateBadgeUI(elId, count) {
+      const b = document.getElementById(elId);
+      if (!b) return;
+      b.innerText = count;
+      b.classList.toggle('hidden', count === 0);
+    }
+
+    // Slider Controls
+    function handleYearSlider(isMin) {
+      let minVal = parseInt(document.getElementById('sliderYearMin').value) || 1855;
+      let maxVal = parseInt(document.getElementById('sliderYearMax').value) || 2026;
+      if (minVal > maxVal) {
+        if (isMin) document.getElementById('sliderYearMin').value = maxVal;
+        else document.getElementById('sliderYearMax').value = minVal;
+        minVal = parseInt(document.getElementById('sliderYearMin').value);
+        maxVal = parseInt(document.getElementById('sliderYearMax').value);
+      }
+      const pMin = ((minVal - 1855) / (2026 - 1855)) * 100;
+      const pMax = ((maxVal - 1855) / (2026 - 1855)) * 100;
+      const hl = document.getElementById('highlightYear');
+      hl.style.left = `${pMin}%`;
+      hl.style.width = `${pMax - pMin}%`;
+      document.getElementById('labelYearRange').innerText = `${minVal} – ${maxVal}`;
+      applyFiltersAndRender();
+    }
+
+    function resetYearSlider() {
+      document.getElementById('sliderYearMin').value = 1855;
+      document.getElementById('sliderYearMax').value = 2026;
+      handleYearSlider(true);
+    }
+
+    function handlePreSlider(isMin) {
+      let minIdx = parseInt(document.getElementById('sliderPreMin').value) || 0;
+      let maxIdx = parseInt(document.getElementById('sliderPreMax').value) || 22;
+      if (minIdx > maxIdx) {
+        if (isMin) document.getElementById('sliderPreMin').value = maxIdx;
+        else document.getElementById('sliderPreMax').value = minIdx;
+        minIdx = parseInt(document.getElementById('sliderPreMin').value);
+        maxIdx = parseInt(document.getElementById('sliderPreMax').value);
+      }
+      const pMin = (minIdx / 22) * 100;
+      const pMax = (maxIdx / 22) * 100;
+      const hl = document.getElementById('highlightPre');
+      hl.style.left = `${pMin}%`;
+      hl.style.width = `${pMax - pMin}%`;
+      document.getElementById('labelPreRange').innerText = `${PRE_LADDER[minIdx].label} – ${PRE_LADDER[maxIdx].label}`;
+      applyFiltersAndRender();
+    }
+
+    function resetPreSlider() {
+      document.getElementById('sliderPreMin').value = 0;
+      document.getElementById('sliderPreMax').value = 22;
+      handlePreSlider(true);
+    }
+
+    function handleDecSlider(isMin) {
+      let minIdx = parseInt(document.getElementById('sliderDecMin').value) || 0;
+      let maxIdx = parseInt(document.getElementById('sliderDecMax').value) || 29;
+      if (minIdx > maxIdx) {
+        if (isMin) document.getElementById('sliderDecMin').value = maxIdx;
+        else document.getElementById('sliderDecMax').value = minIdx;
+        minIdx = parseInt(document.getElementById('sliderDecMin').value);
+        maxIdx = parseInt(document.getElementById('sliderDecMax').value);
+      }
+      const pMin = (minIdx / 29) * 100;
+      const pMax = (maxIdx / 29) * 100;
+      const hl = document.getElementById('highlightDec');
+      hl.style.left = `${pMin}%`;
+      hl.style.width = `${pMax - pMin}%`;
+      document.getElementById('labelDecRange').innerText = `${DEC_LADDER[minIdx].label} – ${DEC_LADDER[maxIdx].label}`;
+      applyFiltersAndRender();
+    }
+
+    function resetDecSlider() {
+      document.getElementById('sliderDecMin').value = 0;
+      document.getElementById('sliderDecMax').value = 29;
+      handleDecSlider(true);
+    }
+
+    function handleUsedSlider(isMin) {
+      let minIdx = parseInt(document.getElementById('sliderUsedMin').value) || 0;
+      let maxIdx = parseInt(document.getElementById('sliderUsedMax').value) || 18;
+      if (minIdx > maxIdx) {
+        if (isMin) document.getElementById('sliderUsedMin').value = maxIdx;
+        else document.getElementById('sliderUsedMax').value = minIdx;
+        minIdx = parseInt(document.getElementById('sliderUsedMin').value);
+        maxIdx = parseInt(document.getElementById('sliderUsedMax').value);
+      }
+      const pMin = (minIdx / 18) * 100;
+      const pMax = (maxIdx / 18) * 100;
+      const hl = document.getElementById('highlightUsed');
+      hl.style.left = `${pMin}%`;
+      hl.style.width = `${pMax - pMin}%`;
+      document.getElementById('labelUsedRange').innerText = `${USED_LADDER[minIdx].label} – ${USED_LADDER[maxIdx].label}`;
+      applyFiltersAndRender();
+    }
+
+    function resetUsedSlider() {
+      document.getElementById('sliderUsedMin').value = 0;
+      document.getElementById('sliderUsedMax').value = 18;
+      handleUsedSlider(true);
+    }
+
+    resetYearSlider();
+    resetPreSlider();
+    resetDecSlider();
+    resetUsedSlider();
+    switchCategoryGroup('all');
+
+    // Dual-Mode Loader (Google Sheets Remote + 24h Cache + Local Fallback)
+    async function loadCatalog() {
+      const loadingScreen = document.getElementById('loadingScreen');
+      loadingScreen.classList.remove('hidden');
+
+      // 1. Check local cache
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        const cacheTime = localStorage.getItem(`${CACHE_KEY}_time`);
+        if (cached && cacheTime && (Date.now() - Number(cacheTime) < CACHE_TTL_MS)) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            processCatalogData(parsed);
+            loadingScreen.classList.add('hidden');
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch remote Google Sheets CSV
+      try {
+        const res = await fetch(REMOTE_STAMPS_CSV_URL);
+        if (res.ok) {
+          const csvText = await res.text();
+          const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+          if (parsed.data && parsed.data.length > 0) {
+            try {
+              localStorage.setItem(CACHE_KEY, JSON.stringify(parsed.data));
+              localStorage.setItem(`${CACHE_KEY}_time`, Date.now());
+            } catch (e) {}
+            processCatalogData(parsed.data);
+            loadingScreen.classList.add('hidden');
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not fetch remote Google Sheets, trying local fallback...", e);
+      }
+
+      // 3. Local fallback
+      Papa.parse(LOCAL_STAMPS_CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(res) {
+          loadingScreen.classList.add('hidden');
+          processCatalogData(res.data || []);
+        },
+        error: function() {
+          loadingScreen.innerHTML = `
+            <div class="bg-rose-50 dark:bg-rose-950/40 rounded-2xl border border-rose-200 dark:border-rose-800 p-6 max-w-lg mx-auto">
+              <span class="text-3xl">⚠️</span>
+              <h3 class="text-base font-bold text-rose-800 dark:text-rose-200 mt-2">Could not connect to Stamps archive</h3>
+              <p class="text-xs text-rose-600 dark:text-rose-400 mt-1">Please verify your internet connection or Google Sheets sharing permissions.</p>
+              <button onclick="refreshData()" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer">Retry Sync 🔄</button>
+            </div>
+          `;
+        }
+      });
+    }
+
+    function refreshData() {
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(`${CACHE_KEY}_time`);
+      showToast('Syncing latest updates from Google Sheets...', '🔄');
+      loadCatalog();
+    }
+
+    function processCatalogData(data) {
+      rawCatalog = (data || [])
+        .filter(s => {
+          if (!s.Title || s.Title.trim() === '') return false;
+          const catRef = (s.Cat_Number || '').toLowerCase().trim();
+          if (catRef === 'cat.' || catRef === 'cat' || catRef === 'no.') return false;
+          const muh = (s.Mint_Unhinged_Price || '').toLowerCase();
+          const fu = (s.Fine_Used_Price || '').toLowerCase();
+          if (muh.includes('mint') || fu.includes('used') || muh.includes('unhinged')) return false;
+          if (s.Title.toLowerCase().includes('first day cover') || s.Title.toLowerCase().includes('fdc')) return false;
+          return true;
+        })
+        .map((s, idx) => {
+          const yr = parseInt(s.Year) || 1900;
+          const isPre = (yr > 0 && yr < 1967) || (s.Currency_Type && s.Currency_Type.toLowerCase().includes('pre'));
+          let cats = (s.Categories || '').split('|').map(c => c.trim()).filter(Boolean);
+          if (!cats.length) cats.push(isPre ? 'Definitives' : 'Commemoratives');
+
+          const usedValNum = parseFloat((s.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0;
+
+          return {
+            ...s,
+            internalId: s.ID || `NZ-STAMP-${idx}`,
+            Year: yr,
+            Era: s.Era || (isPre ? 'Pre-Decimal' : 'Decimal Currency'),
+            Currency_Type: isPre ? 'Pre-Decimal' : 'Decimal',
+            Pence_Value: parseFloat(s.Pence_Value) || 0,
+            Cent_Value: parseFloat(s.Cent_Value) || 0,
+            Used_Price_Num: usedValNum,
+            CategoryList: cats,
+            Categories: cats.join('|'),
+            Mint_Unhinged_Price: s.Mint_Unhinged_Price && !s.Mint_Unhinged_Price.toLowerCase().includes('mint') ? s.Mint_Unhinged_Price : '—',
+            Fine_Used_Price: s.Fine_Used_Price && !s.Fine_Used_Price.toLowerCase().includes('used') ? s.Fine_Used_Price : '—',
+            Image_URL: s.Image_URL || '',
+            Description: s.Description || 'Authentic New Zealand postal release from the StampsNZ catalogue.'
+          };
+        });
+
+      fuseSearch = new Fuse(rawCatalog, {
+        keys: ['Title', 'Subject', 'Cat_Number', 'Year', 'Denomination', 'Categories', 'Era'],
+        threshold: 0.35
+      });
+
+      clearAllFilters();
+      initObserver();
+      updateCharts();
+    }
+
+    function applyFiltersAndRender() {
+      const q = document.getElementById('searchInput').value.trim();
+      const sortMode = document.getElementById('sortBy').value;
+
+      const yrMin = parseInt(document.getElementById('sliderYearMin').value) || 1855;
+      const yrMax = parseInt(document.getElementById('sliderYearMax').value) || 2026;
+
+      const preMin = PRE_LADDER[parseInt(document.getElementById('sliderPreMin').value) || 0].val;
+      const preMax = PRE_LADDER[parseInt(document.getElementById('sliderPreMax').value) || 22].val;
+
+      const decMin = DEC_LADDER[parseInt(document.getElementById('sliderDecMin').value) || 0].val;
+      const decMax = DEC_LADDER[parseInt(document.getElementById('sliderDecMax').value) || 29].val;
+
+      const usedMinIdx = parseInt(document.getElementById('sliderUsedMin').value) || 0;
+      const usedMaxIdx = parseInt(document.getElementById('sliderUsedMax').value) || 18;
+      const usedMin = USED_LADDER[usedMinIdx].val;
+      const usedMax = USED_LADDER[usedMaxIdx].val;
+
+      let results = rawCatalog.filter(s => {
+        if (currentCurrencyLens === 'PRE_DECIMAL' && s.Currency_Type !== 'Pre-Decimal') return false;
+        if (currentCurrencyLens === 'DECIMAL' && s.Currency_Type !== 'Decimal') return false;
+
+        // Year Slider
+        if (s.Year < yrMin || s.Year > yrMax) return false;
+
+        // Pre-Decimal Face Value Slider
+        if (s.Currency_Type === 'Pre-Decimal' && s.Pence_Value > 0) {
+          if (s.Pence_Value < preMin || s.Pence_Value > preMax) return false;
+        }
+
+        // Decimal Face Value Slider
+        if (s.Currency_Type === 'Decimal' && s.Cent_Value > 0) {
+          if (s.Cent_Value < decMin || s.Cent_Value > decMax) return false;
+        }
+
+        // Used Value Range Slider
+        if (usedMinIdx > 0 || usedMaxIdx < 18) {
+          if (s.Used_Price_Num < usedMin || (usedMaxIdx < 18 && s.Used_Price_Num > usedMax)) return false;
+        }
+
+        // Category Multi-Select
+        if (activeCategories.size > 0) {
+          if (![...activeCategories].some(c => s.CategoryList.includes(c))) return false;
+        }
+
+        if (showingSavedOnly && !savedStamps.has(s.internalId)) return false;
+
+        return true;
+      });
+
+      if (q && fuseSearch) {
+        const matches = fuseSearch.search(q).map(r => r.item);
+        results = results.filter(s => matches.includes(s));
+      }
+
+      results.sort((a, b) => {
+        if (sortMode === 'year-asc') return (a.Year || 0) - (b.Year || 0);
+        if (sortMode === 'year-desc') return (b.Year || 0) - (a.Year || 0);
+        if (sortMode === 'title-asc') return a.Title.localeCompare(b.Title);
+        if (sortMode === 'title-desc') return b.Title.localeCompare(a.Title);
+        if (sortMode === 'muh-desc') {
+          return (parseFloat((b.Mint_Unhinged_Price || '').replace(/[^0-9.]/g, '')) || 0) - (parseFloat((a.Mint_Unhinged_Price || '').replace(/[^0-9.]/g, '')) || 0);
+        }
+        if (sortMode === 'used-desc') {
+          return (parseFloat((b.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0) - (parseFloat((a.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0);
+        }
+        return 0;
+      });
+
+      filteredCatalog = results;
+      document.getElementById('itemCount').innerText = `Showing ${filteredCatalog.length} of ${rawCatalog.length} stamps`;
+      document.getElementById('statActiveCount').innerText = `${filteredCatalog.length} Issues`;
+      document.getElementById('noResults').classList.toggle('hidden', filteredCatalog.length > 0);
+
+      renderCompactCategoryPills();
+      renderActiveChips();
+      resetAndRenderCurrentView();
+      updateCharts();
+    }
+
+    function initObserver() {
+      const sentinel = document.getElementById('scrollSentinel');
+      if (!sentinel) return;
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && renderedCount < filteredCatalog.length && currentView === 'grid') {
+          appendNextBatch();
+        }
+      }, { rootMargin: '350px' });
+      observer.observe(sentinel);
+    }
+
+    function resetAndRenderCurrentView() {
+      renderedCount = 0;
+      if (currentView === 'grid') {
+        document.getElementById('stampGrid').innerHTML = '';
+        appendNextBatch();
+      } else if (currentView === 'table') renderTable();
+      else if (currentView === 'photos') renderPhotos();
+    }
+
+    // 1. Grid View
+    function appendNextBatch() {
+      const grid = document.getElementById('stampGrid');
+      const batch = filteredCatalog.slice(renderedCount, renderedCount + BATCH_SIZE);
+      if (!batch.length) return;
+
+      const frag = document.createDocumentFragment();
+      batch.forEach((s, idx) => {
+        const itemIdx = renderedCount + idx;
+        const isFav = savedStamps.has(s.internalId);
+        const card = document.createElement('article');
+        card.className = "bg-white/90 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow hover:shadow-lg transition flex flex-col overflow-hidden group";
+        card.innerHTML = `
+          <div class="relative bg-slate-100 dark:bg-slate-950 p-2.5 flex items-center justify-center min-h-[140px] border-b border-slate-100 dark:border-slate-800 cursor-pointer" onclick="openEnlargeModal('${s.Image_URL || 'placeholder.png'}', '${s.Title.replace(/'/g, "\\'")}')">
+            <span class="absolute top-1.5 left-1.5 bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded shadow">${s.Year || 'NZ'}</span>
+            ${s.Denomination ? `<span class="absolute top-1.5 right-1.5 bg-amber-600 text-white text-[9px] font-bold px-1.5 py-0.2 rounded">${s.Denomination}</span>` : ''}
+            <img src="${s.Image_URL || 'placeholder.png'}" loading="lazy" alt="${s.Title}" class="max-h-28 object-contain rounded drop-shadow hover:scale-105 transition" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>'"/>
+            <span class="absolute bottom-1 right-1.5 text-[8px] font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition">🔍 Enlarge</span>
+          </div>
+          <div class="p-2.5 flex-1 flex flex-col justify-between space-y-1.5">
+            <div>
+              <div class="text-[8px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-0.5 truncate">${s.Era}</div>
+              <h3 class="text-xs font-black text-slate-900 dark:text-white leading-tight cursor-pointer hover:text-emerald-600 transition line-clamp-2" onclick="openModalByIndex(${itemIdx})">${s.Title}</h3>
+              ${s.Cat_Number ? `<p class="text-[9px] font-bold text-slate-400 mt-0.5">Cat: <span class="font-mono text-slate-600 dark:text-slate-300">${s.Cat_Number}</span></p>` : ''}
+            </div>
+            <div class="grid grid-cols-2 gap-1 bg-slate-50 dark:bg-slate-800/60 p-1 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
+              <div><span class="block text-[7px] text-slate-400 font-bold uppercase">MUH</span><span class="text-[10px] font-black text-slate-900 dark:text-white truncate block">${s.Mint_Unhinged_Price}</span></div>
+              <div><span class="block text-[7px] text-slate-400 font-bold uppercase">Used</span><span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 truncate block">${s.Fine_Used_Price}</span></div>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
+              <button onclick="openModalByIndex(${itemIdx})" class="font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer text-[11px]">Specs →</button>
+              <button onclick="toggleFavorite('${s.internalId}', event)" class="p-0.5 text-slate-400 hover:text-rose-500 transition cursor-pointer text-xs" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
+            </div>
+          </div>
+        `;
+        frag.appendChild(card);
+      });
+      grid.appendChild(frag);
+      renderedCount += batch.length;
+    }
+
+    // 2. Ledger Table View
+    function renderTable() {
+      const tbody = document.getElementById('stampTableBody');
+      tbody.innerHTML = filteredCatalog.map((s, idx) => {
+        const isFav = savedStamps.has(s.internalId);
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+            <td class="p-2 font-black text-emerald-600 dark:text-emerald-400">${s.Year || '—'}</td>
+            <td class="p-2 font-black text-amber-600 dark:text-amber-400">${s.Denomination || '—'}</td>
+            <td class="p-2 font-bold text-slate-900 dark:text-white">
+              <span class="cursor-pointer hover:underline" onclick="openModalByIndex(${idx})">${s.Title}</span>
+            </td>
+            <td class="p-2 text-[11px] text-slate-500 dark:text-slate-400">${(s.Categories || '').replace(/\|/g, ', ')}</td>
+            <td class="p-2 font-mono text-[11px] text-slate-600 dark:text-slate-300">${s.Cat_Number || '—'}</td>
+            <td class="p-2 text-right font-black text-slate-900 dark:text-white">${s.Mint_Unhinged_Price}</td>
+            <td class="p-2 text-right font-black text-emerald-600 dark:text-emerald-400">${s.Fine_Used_Price}</td>
+            <td class="p-2 text-center">
+              <button onclick="toggleFavorite('${s.internalId}', event)" class="p-0.5 text-slate-400 hover:text-rose-500 transition cursor-pointer text-xs" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
+            </td>
+            <td class="p-2 text-center">
+              <button onclick="openModalByIndex(${idx})" class="text-xs bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 px-2 py-0.5 rounded-md font-bold transition cursor-pointer">View</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 3. Gallery / Photo Wall View
+    function renderPhotos() {
+      const pGrid = document.getElementById('stampPhotoGrid');
+      pGrid.innerHTML = filteredCatalog.map((s, idx) => {
+        const isFav = savedStamps.has(s.internalId);
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-2 flex flex-col items-center justify-between aspect-square shadow hover:shadow-lg hover:scale-105 transition cursor-pointer relative group overflow-hidden" onclick="openEnlargeModal('${s.Image_URL || 'placeholder.png'}', '${s.Title.replace(/'/g, "\\'")}')">
+            <div class="w-full flex items-center justify-between z-10">
+              <span class="bg-emerald-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded shadow-sm">${s.Year || 'NZ'}</span>
+              <div class="flex items-center gap-1">
+                ${s.Denomination ? `<span class="bg-amber-600 text-white text-[8px] font-bold px-1.5 py-0.2 rounded shadow-sm">${s.Denomination}</span>` : ''}
+                <button onclick="toggleFavorite('${s.internalId}', event)" class="p-0.5 text-xs hover:scale-125 transition cursor-pointer" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
+              </div>
+            </div>
+            <img src="${s.Image_URL || 'placeholder.png'}" loading="lazy" alt="${s.Title}" class="max-h-20 max-w-full object-contain drop-shadow my-auto" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>'"/>
+            <div class="w-full text-center">
+              <span class="text-[9px] font-bold text-slate-800 dark:text-slate-200 truncate block">${s.Title}</span>
+            </div>
+            <span class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[11px] font-bold transition">🔍 Enlarge</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openModalByIndex(idx) {
+      activeModalIndex = idx;
+      const s = filteredCatalog[idx];
+      if (!s) return;
+
+      document.getElementById('modalCounter').innerText = `${idx + 1} of ${filteredCatalog.length}`;
+      document.getElementById('modalFavBtn').innerText = savedStamps.has(s.internalId) ? '❤️' : '🤍';
+
+      document.getElementById('modalContent').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+          <div class="bg-slate-100 dark:bg-slate-950 p-4 rounded-xl flex flex-col items-center justify-center min-h-[220px] border border-slate-200 dark:border-slate-800 group relative">
+            <img src="${s.Image_URL || 'placeholder.png'}" alt="${s.Title}" class="max-h-56 object-contain rounded-lg drop-shadow-2xl cursor-zoom-in" onclick="openEnlargeModal('${s.Image_URL}', '${s.Title.replace(/'/g, "\\'")}')"/>
+            <button onclick="openEnlargeModal('${s.Image_URL}', '${s.Title.replace(/'/g, "\\'")}')" class="mt-2 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🔍 Click to Enlarge High-Res ↗</button>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <span class="inline-block bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider mb-1">${s.Era}</span>
+              <h2 class="text-lg font-black text-slate-900 dark:text-white leading-tight">${s.Title}</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${s.Description}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5 text-xs font-medium bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Year of Issue</span><span class="font-black text-slate-900 dark:text-white">${s.Year || 'Unknown'}</span></div>
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Face Value / Denom</span><span class="font-black text-amber-600 dark:text-amber-400">${s.Denomination || '—'}</span></div>
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Catalogue Ref</span><span class="font-mono font-bold text-slate-700 dark:text-slate-300">${s.Cat_Number || '—'}</span></div>
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Categories</span><span class="font-bold text-slate-700 dark:text-slate-300">${(s.Categories || '').replace(/\|/g, ', ')}</span></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg shadow-sm">
+                <span class="block text-[9px] font-extrabold uppercase text-slate-400">Mint Unhinged (MUH)</span>
+                <span class="text-sm font-black text-slate-900 dark:text-white">${s.Mint_Unhinged_Price}</span>
+              </div>
+              <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg shadow-sm">
+                <span class="block text-[9px] font-extrabold uppercase text-slate-400">Fine Used</span>
+                <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">${s.Fine_Used_Price}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              ${s.Source_Page ? `<a href="${s.Source_Page}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">View on StampsNZ.com ↗</a>` : '<span></span>'}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function navigateModal(dir) {
+      let n = activeModalIndex + dir;
+      if (n < 0) n = filteredCatalog.length - 1;
+      if (n >= filteredCatalog.length) n = 0;
+      openModalByIndex(n);
+    }
+
+    function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
+
+    function openEnlargeModal(imgUrl, title) {
+      document.getElementById('enlargeModalTitle').innerText = title || 'High-Resolution Stamp View';
+      document.getElementById('enlargeModalBody').innerHTML = `
+        <img src="${imgUrl}" alt="${title}" class="max-h-full max-w-full object-contain rounded-xl drop-shadow-2xl"/>
+      `;
+      document.getElementById('enlargeModal').classList.remove('hidden');
+    }
+
+    function closeEnlargeModal() {
+      document.getElementById('enlargeModal').classList.add('hidden');
+    }
+
+    function toggleCategoryFilter(id) {
+      if (activeCategories.has(id)) activeCategories.delete(id);
+      else activeCategories.add(id);
+      applyFiltersAndRender();
+    }
+
+    function setCurrencyLens(mode) {
+      currentCurrencyLens = mode;
+      document.getElementById('lensAll').className = mode === 'ALL' ? "px-2.5 py-0.5 rounded-md bg-white dark:bg-slate-700 text-emerald-600 shadow-sm" : "px-2.5 py-0.5 text-slate-600 dark:text-slate-300";
+      document.getElementById('lensPre').className = mode === 'PRE_DECIMAL' ? "px-2.5 py-0.5 rounded-md bg-white dark:bg-slate-700 text-amber-600 shadow-sm" : "px-2.5 py-0.5 text-slate-600 dark:text-slate-300";
+      document.getElementById('lensDec').className = mode === 'DECIMAL' ? "px-2.5 py-0.5 rounded-md bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "px-2.5 py-0.5 text-slate-600 dark:text-slate-300";
+      document.getElementById('preDecSliderContainer').style.display = mode === 'DECIMAL' ? 'none' : 'block';
+      document.getElementById('decSliderContainer').style.display = mode === 'PRE_DECIMAL' ? 'none' : 'block';
+      applyFiltersAndRender();
+    }
+
+    function switchView(view) {
+      currentView = view;
+      document.getElementById('gridSection').classList.toggle('hidden', view !== 'grid');
+      document.getElementById('tableSection').classList.toggle('hidden', view !== 'table');
+      document.getElementById('photoSection').classList.toggle('hidden', view !== 'photos');
+
+      ['btnViewGrid', 'btnViewTable', 'btnViewPhotos'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        const isActive = (btnId === 'btnViewGrid' && view === 'grid') ||
+                         (btnId === 'btnViewTable' && view === 'table') ||
+                         (btnId === 'btnViewPhotos' && view === 'photos');
+        btn.className = isActive
+          ? "px-2 py-0.5 rounded-md font-bold bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm cursor-pointer"
+          : "px-2 py-0.5 rounded-md font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer";
+      });
+
+      resetAndRenderCurrentView();
+    }
+
+    function renderActiveChips() {
+      const box = document.getElementById('activeChipsContainer');
+      box.innerHTML = '';
+      let hasFilters = false;
+
+      if (currentCurrencyLens !== 'ALL') {
+        hasFilters = true;
+        box.innerHTML += `<span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200 rounded text-[10px] font-bold">${currentCurrencyLens === 'PRE_DECIMAL' ? 'Pre-Decimal' : 'Decimal'}</span>`;
+      }
+      activeCategories.forEach(c => {
+        hasFilters = true;
+        box.innerHTML += `<span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200 rounded text-[10px] font-bold flex items-center gap-1">${c} <button onclick="toggleCategoryFilter('${c}')" class="hover:text-rose-600 font-black cursor-pointer">✕</button></span>`;
+      });
+      if (showingSavedOnly) {
+        hasFilters = true;
+        box.innerHTML += `<span class="px-1.5 py-0.2 bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-200 rounded text-[10px] font-bold">🤍 Saved Only</span>`;
+      }
+      if (!hasFilters) {
+        box.innerHTML = `<span class="text-[10px] text-slate-400 italic">No filters active (Showing all)</span>`;
+      }
+    }
+
+    function clearAllFilters() {
+      currentCurrencyLens = 'ALL';
+      activeCategories.clear();
+      showingSavedOnly = false;
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      document.getElementById('sortBy').value = 'year-asc';
+
+      resetYearSlider();
+      resetPreSlider();
+      resetDecSlider();
+      resetUsedSlider();
+      setCurrencyLens('ALL');
+      switchCategoryGroup('all');
+      switchView('grid');
+      showToast('All filters cleared & reset', '🌐');
+    }
+
+    function surpriseRandomStamp() {
+      if (!rawCatalog.length) return;
+      const rnd = Math.floor(Math.random() * rawCatalog.length);
+      filteredCatalog = [rawCatalog[rnd]];
+      applyFiltersAndRender();
+      openModalByIndex(0);
+    }
+
+    function toggleFavorite(id, e) {
+      if (e) e.stopPropagation();
+      if (savedStamps.has(id)) {
+        savedStamps.delete(id);
+        showToast('Removed from Saved Stamps', '🤍');
+      } else {
+        savedStamps.add(id);
+        showToast('Saved to your collection!', '❤️');
+      }
+      localStorage.setItem('saved_stamps', JSON.stringify([...savedStamps]));
+      document.getElementById('favCountText').innerText = `Saved (${savedStamps.size})`;
+      applyFiltersAndRender();
+    }
+
+    function toggleModalFav() {
+      const s = filteredCatalog[activeModalIndex];
+      if (!s) return;
+      toggleFavorite(s.internalId);
+      document.getElementById('modalFavBtn').innerText = savedStamps.has(s.internalId) ? '❤️' : '🤍';
+    }
+
+    function toggleSavedFilter() {
+      showingSavedOnly = !showingSavedOnly;
+      applyFiltersAndRender();
+      showToast(showingSavedOnly ? 'Showing Saved Stamps Only' : 'Showing All Stamps', '🤍');
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateCharts();
+    }
+
+    function toggleControlsPanel() {
+      const panel = document.getElementById('collapsibleControls');
+      const chev = document.getElementById('toggleChevron');
+      panel.classList.toggle('hidden');
+      if (chev) chev.innerText = panel.classList.contains('hidden') ? '▲' : '▼';
+    }
+
+    function toggleStatsDashboard() {
+      const stats = document.getElementById('statsSection');
+      stats.classList.toggle('hidden');
+      if (!stats.classList.contains('hidden')) {
+        updateCharts();
+        stats.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Chronological Era + Decimal Decades Graph Engine
+    function updateCharts() {
+      if (typeof Chart === 'undefined' || !rawCatalog.length) return;
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#cbd5e1' : '#475569';
+      const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+      document.getElementById('statTotalCount').innerText = rawCatalog.length;
+      const preDec = rawCatalog.filter(s => s.Currency_Type === 'Pre-Decimal').length;
+      const dec = rawCatalog.length - preDec;
+      document.getElementById('statPreDecimal').innerHTML = `Pre-Decimal: <span class="text-purple-600">${preDec}</span>`;
+      document.getElementById('statDecimal').innerHTML = `Decimal: <span class="text-pink-600">${dec}</span>`;
+
+      const eraMap = {};
+      ERA_DECADE_CHART_ORDER.forEach(k => eraMap[k] = 0);
+
+      filteredCatalog.forEach(s => {
+        const yr = s.Year;
+        if (yr < 1967) {
+          if (yr <= 1901) eraMap['Victorian (1855–1901)']++;
+          else if (yr <= 1910) eraMap['Edward VII (1901–1910)']++;
+          else if (yr <= 1936) eraMap['George V (1910–1936)']++;
+          else if (yr <= 1952) eraMap['George VI (1936–1952)']++;
+          else eraMap['QEII Pre-Dec (1953–1966)']++;
+        } else {
+          if (yr < 1970) eraMap['1960s Dec (1967–69)']++;
+          else if (yr < 1980) eraMap['1970s Decimal']++;
+          else if (yr < 1990) eraMap['1980s Decimal']++;
+          else if (yr < 2000) eraMap['1990s Decimal']++;
+          else if (yr < 2010) eraMap['2000s Decimal']++;
+          else if (yr < 2020) eraMap['2010s Decimal']++;
+          else eraMap['2020s Decimal']++;
+        }
+      });
+
+      const ctxEra = document.getElementById('chartEra');
+      if (ctxEra) {
+        if (chartEraInstance) chartEraInstance.destroy();
+        chartEraInstance = new Chart(ctxEra.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: Object.keys(eraMap),
+            datasets: [{
+              label: 'Catalogued Issues',
+              data: Object.values(eraMap),
+              backgroundColor: '#10b981',
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: textColor, font: { size: 9, weight: 'bold' } }, grid: { display: false } },
+              y: { ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor } }
+            }
+          }
+        });
+      }
+
+      const catMap = {};
+      filteredCatalog.forEach(s => {
+        s.CategoryList.forEach(c => { catMap[c] = (catMap[c] || 0) + 1; });
+      });
+      const topCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+      const ctxCat = document.getElementById('chartCategory');
+      if (ctxCat) {
+        if (chartCatInstance) chartCatInstance.destroy();
+        chartCatInstance = new Chart(ctxCat.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: topCats.map(x => x[0]),
+            datasets: [{
+              data: topCats.map(x => x[1]),
+              backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4'],
+              borderWidth: 2,
+              borderColor: isDark ? '#0f172a' : '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: { color: textColor, font: { size: 10, weight: 'bold' }, padding: 8 }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function showToast(msg, icon = '✨') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3'), 2400);
+    }
+
+    let searchTimer;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      document.getElementById('clearSearchBtn').classList.toggle('hidden', !e.target.value);
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFiltersAndRender, 150);
+    });
+
+    function clearSearchInput() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      applyFiltersAndRender();
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeEnlargeModal();
+      }
+      if (!document.getElementById('detailModal').classList.contains('hidden')) {
+        if (e.key === 'ArrowLeft') navigateModal(-1);
+        if (e.key === 'ArrowRight') navigateModal(1);
+      }
+    });
+
+    // Run Initial Loader
+    loadCatalog();
+  </script>
+</body>
+</html>
