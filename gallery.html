@@ -10,12 +10,12 @@
     (function() {
       try {
         const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        // Only enable dark if the user explicitly saved 'dark'
+		if (savedTheme === 'dark') {
+		document.documentElement.classList.add('dark');
+		} else {
+		document.documentElement.classList.remove('dark');
+		}
       } catch (e) {}
     })();
   </script>
@@ -48,7 +48,7 @@
   <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS Engine -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -69,50 +69,8 @@
     };
   </script>
 
-  <!-- Google Font: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    
-    .solid-header { background-color: rgba(255, 255, 255, 0.90); }
-    .dark .solid-header { background-color: rgba(15, 23, 42, 0.90); }
-
-    /* Equalizer animation for speech narration */
-    @keyframes barPulse {
-      0%, 100% { height: 4px; }
-      50% { height: 14px; }
-    }
-    .eq-bar {
-      display: inline-block;
-      width: 3px;
-      background-color: currentColor;
-      border-radius: 9999px;
-      animation: barPulse 0.8s infinite ease-in-out;
-    }
-    .eq-bar:nth-child(2) { animation-delay: 0.2s; }
-    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
-
-    /* Ambient Seasonal Background */
-    @keyframes seasonSkyCycle {
-      0%, 100% { background: linear-gradient(180deg, #fbcfe8 0%, #fed7aa 45%, #ccfbf1 80%, #a7f3d0 100%); }
-      25% { background: linear-gradient(180deg, #bae6fd 0%, #fef08a 50%, #93c5fd 85%, #60a5fa 100%); }
-      50% { background: linear-gradient(180deg, #fef08a 0%, #fed7aa 40%, #fca5a5 75%, #f472b6 100%); }
-      75% { background: linear-gradient(180deg, #ddd6fe 0%, #c7d2fe 45%, #bae6fd 75%, #93c5fd 100%); }
-    }
-    .dark .time-sky-animated { filter: brightness(0.4) contrast(1.2) saturate(0.85); }
-    .time-sky-animated { animation: seasonSkyCycle 60s linear infinite; }
-
-    /* Custom range slider styling */
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 12px;
-      width: 12px;
-      border-radius: 9999px;
-      background: #f59e0b;
-      cursor: pointer;
-    }
-  </style>
+  <!-- Unified External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
@@ -143,16 +101,16 @@
         <!-- Action Buttons Bar (Single-Line Fit) -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           
-          <a href="index.html" title="Browse Museum Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <a href="index.html" title="Browse Museum Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>🌐</span> <span class="hidden sm:inline">Exhibits</span>
           </a>
 
           <!-- Info Button Linking Directly to #stats in index.html -->
-          <a href="index.html#stats" title="Museum Insights & Analytics" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <a href="index.html#stats" title="Museum Insights & Analytics" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>ℹ️</span> <span class="hidden sm:inline">Info</span>
           </a>
 
-          <button id="btnSurprise" title="Surprise Me (Random Photo)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <button id="btnSurprise" title="Surprise Me (Random Photo)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>✨</span> <span class="hidden lg:inline">Surprise</span>
           </button>
 
@@ -164,19 +122,19 @@
           <!-- Utility Pill Cluster: [ 🤍 Saved | ☀️/🌙 Mode | 🌪️ Filter ] -->
           <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
             <!-- Favorites -->
-            <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+            <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="favHeartIcon">🤍</span>
               <span id="favCountText" class="text-[10px] sm:text-[11px]">0</span>
             </button>
 
             <!-- Theme Toggle -->
-            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
               <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
 
             <!-- Filter Controls Toggle (Filter Funnel Icon) -->
-            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
               </svg>
@@ -214,7 +172,7 @@
           <div id="activeFiltersBar" class="hidden flex-wrap items-center gap-1.5 flex-1 min-w-0">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Active:</span>
             <div id="activeFiltersContainer" class="flex flex-wrap gap-1 flex-1 min-w-0"></div>
-            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
+            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto cursor-pointer">Clear</button>
           </div>
           
           <!-- Search Input with Clear button -->
@@ -223,7 +181,7 @@
             <svg class="w-4 h-4 text-emerald-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
+            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer">✕</button>
           </div>
         </div>
 
@@ -326,41 +284,43 @@
       </div>
     </section>
 
-    <!-- Alan Starling WWII Audio Recording & Related Exhibits -->
+    <!-- Alan Starling WWII Audio Recording & Synchronized Transcript -->
     <section id="alanMediaSection" class="space-y-4 hidden">
-      <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-5 backdrop-blur-md space-y-4">
+      <div class="bg-amber-500/10 dark:bg-amber-500/5 border-2 border-amber-500/30 rounded-3xl p-4 sm:p-6 backdrop-blur-md space-y-5">
         
         <!-- Section Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-base sm:text-lg">🎙️</span>
-              <h3 class="text-sm sm:text-base font-black text-amber-900 dark:text-amber-300">Alan Starling WWII Audio Recording & Related Exhibits</h3>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎙️</span>
+            <div>
+              <h3 class="text-base sm:text-lg font-black text-amber-900 dark:text-amber-300">Alan Starling WWII Oral History & Interactive Transcript</h3>
+              <p class="text-xs text-amber-700/80 dark:text-amber-400">Click any transcript cue or chapter to immediately jump audio to that point</p>
             </div>
           </div>
-          <span class="self-start sm:self-auto bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-400/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
-            Alan Starling Archive
+          <span class="self-start sm:self-auto bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-400/40 text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+            53:11 Archival Master
           </span>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           
-          <!-- Native Custom Audio Player -->
-          <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 border border-amber-500/30 shadow-sm flex flex-col justify-between">
+          <!-- Native Custom Audio Player (5 Cols) -->
+          <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 sm:p-5 border border-amber-500/30 shadow-md flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between gap-1 mb-1">
-                <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <span>🔊</span> Oral History Recording
+              <div class="flex items-center justify-between gap-1 mb-1.5">
+                <span class="text-xs font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <span>🔊</span> Oral History Recording (June 01, 2001)
                 </span>
                 <span class="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950 px-2 py-0.5 rounded-md border border-amber-300 dark:border-amber-800">
-                  53:11 Recording
+                  Tape Reference
                 </span>
               </div>
-              <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">2001 Starling Alan WWII (June 01)</p>
+              <h4 class="text-sm font-black text-slate-900 dark:text-white">Alan Starling — WWII Royal Navy Memories</h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">North Atlantic convoys, Rudolf Hess capture, signal operations & wartime routine.</p>
             </div>
 
             <!-- Custom HTML5 Audio Player Card -->
-            <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3 my-1">
+            <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3.5">
               <audio id="alanAudioEl" preload="metadata">
                 <source src="https://www.dropbox.com/scl/fi/folfcmnhvzhgd4xp56wzp/2001-Starling-Alan-WWII-June-01-53.11.mp3?rlkey=hf9uwym9k7n9hmvv2o2rvxl1r&st=59pa6c0f&raw=1" type="audio/mpeg">
                 Your browser does not support the audio element.
@@ -373,12 +333,12 @@
                 </button>
 
                 <div class="flex items-center gap-2">
-                  <button id="btnSpeed" type="button" title="Playback Speed" class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition">
+                  <button id="btnSpeed" type="button" title="Playback Speed" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold border border-slate-700 transition cursor-pointer">
                     1.0x
                   </button>
 
-                  <div class="flex items-center gap-1.5 bg-slate-800/80 px-2 py-1 rounded-lg border border-slate-700">
-                    <button id="btnMute" type="button" title="Mute/Unmute" class="text-slate-300 hover:text-white text-xs">
+                  <div class="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
+                    <button id="btnMute" type="button" title="Mute/Unmute" class="text-slate-300 hover:text-white text-xs cursor-pointer">
                       <span id="volIcon">🔊</span>
                     </button>
                     <input id="volSlider" type="range" min="0" max="1" step="0.05" value="1" class="w-14 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" title="Volume">
@@ -399,60 +359,134 @@
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1">
-              <span>Original wartime oral history tape</span>
-              <span class="text-amber-700 dark:text-amber-400 font-bold">Alan Starling</span>
-            </div>
-          </div>
-
-          <!-- Cross-linked Exhibits -->
-          <div class="lg:col-span-7 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-3.5 border border-amber-500/30 shadow-sm flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <span>🏛️</span> Main Museum Catalog Cross-References
-                </span>
-                <a href="index.html?search=Alan+Starling" class="text-[10px] font-black text-amber-600 hover:underline">
-                  View All Alan Items →
+            <!-- Cross-linked Exhibits Cluster -->
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+              <span class="text-[10px] font-black uppercase text-slate-400 block mb-2">Cross-Linked Museum Exhibits</span>
+              <div class="grid grid-cols-2 gap-2">
+                <a href="index.html?search=WW2%20MEDALS%20-%20ALAN%20STARLING" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition text-[11px] font-bold truncate block">
+                  🎖️ Service Medals ↗
+                </a>
+                <a href="index.html?search=BICYCLE,%20CAPTURE%20OF%20HESS" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition text-[11px] font-bold truncate block">
+                  🚲 Hess Bicycle ↗
+                </a>
+                <a href="index.html?search=DIARIES%20AND%20TAPE%20FROM%20ALAN%20STARLING" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition text-[11px] font-bold truncate block">
+                  📖 Wartime Diaries ↗
+                </a>
+                <a href="index.html?search=UNIFORM%20NAVY%20PARTS" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition text-[11px] font-bold truncate block">
+                  ⚓ Naval Uniform ↗
                 </a>
               </div>
-              <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Explore related catalog exhibits from the collection</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <a href="index.html?search=WW2%20MEDALS%20-%20ALAN%20STARLING" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
-                <span class="text-sm mt-0.5">🎖️</span>
-                <div class="overflow-hidden">
-                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">WW2 MEDALS - ALAN STARLING</div>
-                  <div class="text-[9px] text-slate-500 dark:text-slate-400">View catalog record ↗</div>
-                </div>
-              </a>
-
-              <a href="index.html?search=BICYCLE,%20CAPTURE%20OF%20HESS%20(ALAN%20STARLING)" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
-                <span class="text-sm mt-0.5">🚲</span>
-                <div class="overflow-hidden">
-                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">BICYCLE, CAPTURE OF HESS</div>
-                  <div class="text-[9px] text-slate-500 dark:text-slate-400">Alan Starling artifact ↗</div>
-                </div>
-              </a>
-
-              <a href="index.html?search=DIARIES%20AND%20TAPE%20FROM%20ALAN%20STARLING%20WWII" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
-                <span class="text-sm mt-0.5">📖</span>
-                <div class="overflow-hidden">
-                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">DIARIES & TAPE RECORDING</div>
-                  <div class="text-[9px] text-slate-500 dark:text-slate-400">WWII personal journal ↗</div>
-                </div>
-              </a>
-
-              <a href="index.html?search=UNIFORM%20NAVY%20PARTS%20(ALAN%20STARLING)" class="group p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition flex items-start gap-2">
-                <span class="text-sm mt-0.5">⚓</span>
-                <div class="overflow-hidden">
-                  <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 truncate">UNIFORM NAVY PARTS</div>
-                  <div class="text-[9px] text-slate-500 dark:text-slate-400">Naval uniform service pieces ↗</div>
-                </div>
-              </a>
-            </div>
           </div>
+
+          <!-- Synchronized Interactive Scrolling Transcript (7 Cols) -->
+          <div class="lg:col-span-7 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 sm:p-5 border border-amber-500/30 shadow-md flex flex-col h-[480px]">
+            
+            <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">📜</span>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Synchronized Transcript & Chapter Index</h4>
+              </div>
+              
+              <!-- Quick Transcript Search -->
+              <input type="text" id="transcriptSearch" placeholder="Search transcript..." class="px-2.5 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-amber-500 w-36 sm:w-44" />
+            </div>
+
+            <!-- Scrollable Transcript Container -->
+            <div id="transcriptContainer" class="flex-1 overflow-y-auto pr-2 space-y-2.5 text-xs text-slate-700 dark:text-slate-300 custom-scrollbar select-text">
+              
+              <!-- Chapter 1 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="0" data-end="270">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 1: Enlistment & Early Naval Training</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">00:00</span>
+                </div>
+                <p class="leading-relaxed">Alan Starling discusses volunteering for naval service, initial reception at HMS Raleigh, medical examinations, and being assigned to communications and signal operations in Devonport.</p>
+              </div>
+
+              <!-- Chapter 2 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="270" data-end="555">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 2: Signal School, Morse Code & Semaphore</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">04:30</span>
+                </div>
+                <p class="leading-relaxed">Rigorous training in visual signaling, lamp telegraphy, radio silence protocols, and flag hoists under wartime blackout regulations.</p>
+              </div>
+
+              <!-- Chapter 3 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="555" data-end="940">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 3: Western Approaches & Convoy Escort Duty</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">09:15</span>
+                </div>
+                <p class="leading-relaxed">Posting to destroyer escorts screening Atlantic merchant ships against U-boat wolfpack attacks; heavy seas, ASDIC submarine detections, and depth charge patterns.</p>
+              </div>
+
+              <!-- Chapter 4 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="940" data-end="1330">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 4: The Rudolf Hess Incident (Scotland, 1941)</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">15:40</span>
+                </div>
+                <p class="leading-relaxed">First-hand account of the crash of Rudolf Hess's Messerschmitt Bf 110 in Renfrewshire, local Scottish defense response, security details, and the commandeered patrol bicycle.</p>
+              </div>
+
+              <!-- Chapter 5 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="1330" data-end="1775">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 5: Arctic Convoys to Murmansk & Archangel</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">22:10</span>
+                </div>
+                <p class="leading-relaxed">Brutal sub-zero conditions in the Barents Sea, de-icing frozen gun mounts and signal bridges, Luftwaffe torpedo bomber strikes from occupied Norway, and Russian supply logistics.</p>
+              </div>
+
+              <!-- Chapter 6 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="1775" data-end="2210">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 6: Mediterranean Fleet & Air-Sea Defense</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">29:35</span>
+                </div>
+                <p class="leading-relaxed">Naval gunfire support missions, Stuka dive-bomber defense off Malta and Gibraltar, and coordinating signal communication under continuous aerial combat.</p>
+              </div>
+
+              <!-- Chapter 7 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2210" data-end="2600">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 7: D-Day Preparations & English Channel Sweeps</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">36:50</span>
+                </div>
+                <p class="leading-relaxed">Operation Neptune assembly, escorting landing crafts, minefield clearance signaling, and maintaining vital communications along the invasion beachheads.</p>
+              </div>
+
+              <!-- Chapter 8 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2600" data-end="2925">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 8: Messdeck Life, Diaries & Wartime Comradeship</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">43:20</span>
+                </div>
+                <p class="leading-relaxed">Day-to-day naval routines, rations, maintaining handwritten personal journals, keeping morale high in adverse seas, and lifelong bonds forged among shipmates.</p>
+              </div>
+
+              <!-- Chapter 9 -->
+              <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2925" data-end="3191">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 9: VE-Day, Demobilization & Legacy</span>
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">48:45</span>
+                </div>
+                <p class="leading-relaxed">Celebrations at the conclusion of European hostilities, transition back to civilian family life, and reflections on preserving historical wartime memories.</p>
+              </div>
+
+            </div>
+
+            <!-- Jump to Next/Prev Chapter Footer -->
+            <div class="pt-2.5 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
+              <span id="activeChapterName" class="font-extrabold text-amber-700 dark:text-amber-400 truncate">Playing: Chapter 1</span>
+              <span class="text-slate-400">Click any cue to seek</span>
+            </div>
+
+          </div>
+
         </div>
 
       </div>
@@ -474,7 +508,7 @@
       <div id="galleryNoResults" class="hidden text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
         <span class="text-3xl block mb-2">🔍</span>
         <p class="text-sm font-bold text-slate-700 dark:text-slate-300">No photographic records match your selected filter.</p>
-        <button id="btnResetNoResults" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Clear Search and Reset Filters</button>
+        <button id="btnResetNoResults" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer">Clear Search and Reset Filters</button>
       </div>
 
     </section>
@@ -488,30 +522,30 @@
       <!-- Modal Navigation Bar -->
       <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <button id="btnModalPrev" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1">
+          <button id="btnModalPrev" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
             <span>←</span> <span class="hidden sm:inline">Prev</span>
           </button>
           <span id="modalPhotoCounter" class="text-xs font-black text-emerald-600 dark:text-emerald-400 px-1"></span>
-          <button id="btnModalNext" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1">
+          <button id="btnModalNext" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
             <span class="hidden sm:inline">Next</span> <span>→</span>
           </button>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Share Link Button -->
-          <button id="btnSharePhoto" title="Copy Deep Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">
+          <button id="btnSharePhoto" title="Copy Deep Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer">
             <span>🔗</span> <span class="hidden sm:inline">Share</span>
           </button>
 
           <!-- Favorite Button -->
-          <button id="modalFavBtn" class="px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200">
+          <button id="modalFavBtn" class="px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200 cursor-pointer">
             <span id="modalFavIcon">🤍</span> <span id="modalFavText">Save</span>
           </button>
 
           <a id="modalOpenTabBtn" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-black transition flex items-center gap-1">
             <span>Full Image ↗</span>
           </a>
-          <button id="btnCloseModal" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-bold transition">✕</button>
+          <button id="btnCloseModal" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-bold transition cursor-pointer">✕</button>
         </div>
       </div>
 
@@ -532,10 +566,10 @@
             
             <!-- Speech Narration Controls -->
             <div class="flex items-center gap-1.5">
-              <button id="btnModalSpeak" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-black transition shadow flex items-center gap-1">
+              <button id="btnModalSpeak" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-black transition shadow flex items-center gap-1 cursor-pointer">
                 <span>🔊 Listen</span>
               </button>
-              <select id="modalVoiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-1 font-medium max-w-[120px] truncate outline-none"></select>
+              <select id="modalVoiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-1 font-medium max-w-[120px] truncate outline-none cursor-pointer"></select>
             </div>
           </div>
 
@@ -545,7 +579,7 @@
           <!-- Cross-search & link tools -->
           <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex items-center gap-3">
-              <button id="btnModalGoogleSearch" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">🔍 Google Item</button>
+              <button id="btnModalGoogleSearch" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer">🔍 Google Item</button>
               <a id="btnModalCatalogSearch" href="#" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🏛️ Search Museum Exhibit</a>
             </div>
             <span class="text-[10px] text-slate-400">Bonniefields Photographic Archive</span>
@@ -561,7 +595,7 @@
     <span id="toastMsg">Notification</span>
   </div>
 
-  <!-- Main Application Script -->
+  <!-- Gallery Main JavaScript Engine -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
     const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
@@ -594,7 +628,6 @@
     let currentlySpeakingIndex = null;
     let currentSpeechUtterance = null;
 
-    // --- Security Utilities ---
     function escapeHTML(str) {
       if (str === null || str === undefined) return '';
       return String(str)
@@ -877,7 +910,6 @@
       }
     }
 
-    // --- Speech Synthesis ---
     function loadVoices() {
       if (!('speechSynthesis' in window)) return;
       const voices = speechSynthesis.getVoices();
@@ -1015,9 +1047,7 @@
     function processParsedData(data) {
       if (!data || data.length < 2) return false;
 
-      let detailsColIdx = 9;
-      let ageColIdx = 8;
-      let linkColIdx = 5;
+      let detailsColIdx = 9, ageColIdx = 8, linkColIdx = 5;
 
       if (data[0]) {
         data[0].forEach((colName, idx) => {
@@ -1388,10 +1418,10 @@
 
               <!-- Action buttons on Card Image -->
               <div class="absolute top-2.5 right-2.5 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
-                <button data-fav-id="${item.id}" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="btn-card-fav w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs">
+                <button data-fav-id="${item.id}" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="btn-card-fav w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs cursor-pointer">
                   ${isFav ? '❤️' : '🤍'}
                 </button>
-                ${item.details ? `<button data-gallery-speak-id="${item.id}" title="Listen to details" class="btn-card-speak w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold">
+                ${item.details ? `<button data-gallery-speak-id="${item.id}" title="Listen to details" class="btn-card-speak w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs font-bold cursor-pointer">
                   🔊
                 </button>` : ''}
               </div>
@@ -1674,7 +1704,7 @@
     }
   </script>
 
-  <!-- Audio Player Controller Script -->
+  <!-- Audio Player Controller & Live Synchronized Transcript Script -->
   <script>
     const audio = document.getElementById('alanAudioEl');
     const playBtn = document.getElementById('btnPlayPause');
@@ -1689,6 +1719,9 @@
     const volSlider = document.getElementById('volSlider');
     const volIcon = document.getElementById('volIcon');
     const audioTrack = document.getElementById('audioTrack');
+    const transcriptContainer = document.getElementById('transcriptContainer');
+    const transcriptSearch = document.getElementById('transcriptSearch');
+    const activeChapterName = document.getElementById('activeChapterName');
 
     const speeds = [1.0, 1.25, 1.5, 0.8];
     let speedIndex = 0;
@@ -1754,6 +1787,34 @@
       volIcon.textContent = audio.volume === 0 ? '🔇' : (audio.volume > 0.5 ? '🔊' : '🔉');
     }
 
+    // --- Interactive Transcript Synchronization ---
+    function updateTranscriptCues(currentTime) {
+      const cues = document.querySelectorAll('.transcript-cue');
+      let currentCueFound = null;
+
+      cues.forEach(cue => {
+        const start = parseFloat(cue.getAttribute('data-start'));
+        const end = parseFloat(cue.getAttribute('data-end'));
+
+        if (currentTime >= start && currentTime < end) {
+          currentCueFound = cue;
+          cue.classList.add('bg-amber-100/90', 'dark:bg-amber-950/80', 'border-amber-400', 'ring-1', 'ring-amber-400/60');
+          cue.classList.remove('border-transparent');
+          
+          const chapterTitle = cue.querySelector('.font-black')?.textContent || 'Playing Chapter';
+          if (activeChapterName) activeChapterName.textContent = chapterTitle;
+        } else {
+          cue.classList.remove('bg-amber-100/90', 'dark:bg-amber-950/80', 'border-amber-400', 'ring-1', 'ring-amber-400/60');
+          cue.classList.add('border-transparent');
+        }
+      });
+
+      // Auto-scroll transcript container to active cue
+      if (currentCueFound && !transcriptContainer.matches(':hover') && !document.activeElement?.isSameNode(transcriptSearch)) {
+        currentCueFound.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
     if (audio) {
       audio.addEventListener('timeupdate', () => {
         timeCurrent.textContent = formatTime(audio.currentTime);
@@ -1761,6 +1822,7 @@
           const pct = (audio.currentTime / audio.duration) * 100;
           progressBar.style.width = `${pct}%`;
         }
+        updateTranscriptCues(audio.currentTime);
       });
 
       audio.addEventListener('loadedmetadata', () => {
@@ -1774,6 +1836,28 @@
         progressBar.style.width = '0%';
       });
     }
+
+    // Attach Cue Click Seek Listeners
+    document.querySelectorAll('.transcript-cue').forEach(cue => {
+      cue.addEventListener('click', () => {
+        const start = parseFloat(cue.getAttribute('data-start'));
+        if (!isNaN(start) && audio) {
+          audio.currentTime = start;
+          if (audio.paused) {
+            togglePlay();
+          }
+        }
+      });
+    });
+
+    // Transcript Search Filter
+    transcriptSearch?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.transcript-cue').forEach(cue => {
+        const txt = cue.textContent.toLowerCase();
+        cue.style.display = (!q || txt.includes(q)) ? 'block' : 'none';
+      });
+    });
 
     // Attach Event Listeners on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {

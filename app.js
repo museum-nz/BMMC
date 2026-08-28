@@ -1,6 +1,8 @@
-// app.js — BMMC Showcase Application Logic (Dual-Mode: Online & Offline with WebAR)
+// app.js — BMMC Showcase Application Logic (Modular Dual-Mode with WebAR & Curator Passport Engine)
 
-// 1. Environment & Data Source Configuration
+// ==========================================================================
+// 1. Configuration & Global State
+// ==========================================================================
 const IS_LOCAL_ENV = window.location.protocol === 'file:' || 
                      window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1';
@@ -13,7 +15,7 @@ const LOCAL_EXHIBITS_CSV_URL = './data/exhibits.csv';
 const LOCAL_GRAMOPHONE_CSV_URL = './data/gramophone.csv';
 const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
 
-const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
 
@@ -97,7 +99,9 @@ let fuseGramophone = null;
 
 const CHART_PALETTE = ['#C85A32', '#3B7A57', '#B57C1E', '#3182CE', '#708259', '#20807E', '#4A5568', '#D99B43', '#7c3aed', '#db2777'];
 
-// --- Audio Narration Guide Controller ---
+// ==========================================================================
+// 2. Audio Speech Narration & Utilities
+// ==========================================================================
 function stopAudioGuide() {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
@@ -159,7 +163,7 @@ function updateAudioUI() {
     if (currentlySpeakingIndex === idx && isSpeaking) {
       btn.classList.add('bg-blue-600', 'text-white', 'animate-pulse');
       btn.classList.remove('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600', 'dark:text-blue-400');
-      btn.innerHTML = '🔊';
+      btn.innerHTML = '<span class="flex items-center gap-0.5 text-[10px]">🔊 <span class="eq-bar"></span><span class="eq-bar"></span></span>';
     } else {
       btn.classList.remove('bg-blue-600', 'text-white', 'animate-pulse');
       btn.classList.add('bg-white/90', 'dark:bg-slate-800/90', 'text-blue-600', 'dark:text-blue-400');
@@ -171,136 +175,344 @@ function updateAudioUI() {
   if (modalBtn) {
     const origIdx = parseInt(modalBtn.getAttribute('data-row'), 10);
     if (currentlySpeakingIndex === origIdx && isSpeaking) {
-      modalBtn.textContent = '⏹ Stop';
+      modalBtn.innerHTML = '<span class="flex items-center gap-1"><span class="eq-bar"></span><span class="eq-bar"></span> Stop</span>';
       modalBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
       modalBtn.classList.add('bg-rose-600', 'hover:bg-rose-500');
     } else {
-      modalBtn.textContent = '🔊 Listen';
+      modalBtn.innerHTML = '🔊 Listen';
       modalBtn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
       modalBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
     }
   }
 }
 
-// --- Card Multi-Slot Image Switcher ---
-function switchCardImage(rowIndex, dir, event) {
-  if (event) event.stopPropagation();
-  const box = document.getElementById(`card-media-box-${rowIndex}`);
-  const badge = document.getElementById(`card-badge-${rowIndex}`);
-  if (!box) return;
+function loadVoices() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices();
+  availableVoices = voices.filter(v => v.lang.startsWith('en'));
+  const keywords = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'];
+  availableVoices.sort((a, b) => {
+    const aScore = keywords.some(k => a.name.toLowerCase().includes(k)) ? 1 : 0;
+    const bScore = keywords.some(k => b.name.toLowerCase().includes(k)) ? 1 : 0;
+    return bScore - aScore;
+  });
+  populateVoiceDropdown();
+}
 
-  const total = parseInt(box.dataset.totalSlots, 10) || 1;
-  let curr = parseInt(box.dataset.currentSlot, 10) || 1;
+function getSelectedVoice() {
+  if (availableVoices.length === 0) return null;
+  const savedName = localStorage.getItem('bMMC_selectedVoiceName');
+  if (savedName) {
+    const found = availableVoices.find(v => v.name === savedName);
+    if (found) return found;
+  }
+  return availableVoices[0];
+}
 
-  curr = curr + dir;
-  if (curr < 1) curr = total;
-  if (curr > total) curr = 1;
-  box.dataset.currentSlot = curr;
+function populateVoiceDropdown() {
+  const select = document.getElementById('voiceSelect');
+  if (!select) return;
+  select.innerHTML = '';
+  const currentVoice = getSelectedVoice();
 
-  const items = box.querySelectorAll('.card-media-item');
-  items.forEach(el => {
-    const slotIdx = parseInt(el.getAttribute('data-slot-idx'), 10);
-    if (slotIdx === curr) {
-      el.classList.remove('hidden');
-      el.classList.add('flex');
-    } else {
-      el.classList.add('hidden');
-      el.classList.remove('flex');
-    }
+  availableVoices.forEach(voice => {
+    const opt = document.createElement('option');
+    opt.value = voice.name;
+    const isNatural = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'].some(k => voice.name.toLowerCase().includes(k));
+    opt.textContent = `${voice.name} ${isNatural ? '✨' : ''}`;
+    if (currentVoice && currentVoice.name === voice.name) opt.selected = true;
+    select.appendChild(opt);
   });
 
-  if (badge) badge.textContent = `${curr} / ${total}`;
+  select.onchange = function() {
+    localStorage.setItem('bMMC_selectedVoiceName', this.value);
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      const btnModal = document.getElementById('btnAudioGuide');
+      if (btnModal && btnModal.getAttribute('data-row')) speakAudioGuide(parseInt(btnModal.getAttribute('data-row'), 10));
+    }
+  };
 }
 
-// --- Empty Filter State Component ---
-function renderEmptyState(container) {
-  if (!container) return;
-  container.innerHTML = `
-    <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
-      <span class="text-3xl mb-2 block">🔍</span>
-      <p class="text-slate-700 dark:text-slate-300 font-bold text-sm">No exhibits match your current filter selections.</p>
-      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Reset Filters & Show All Exhibits</button>
+if ('speechSynthesis' in window) {
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+// ==========================================================================
+// 3. Theme Initialization & Cross-Tab Broadcast
+// ==========================================================================
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+  // Default to light unless explicitly saved as 'dark'
+  const isDark = (savedTheme === 'dark');
+  if (isDark) document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+  updateThemeUI(isDark);
+}
+
+function updateThemeUI(isDark) {
+  const icon = document.getElementById('themeToggleIcon');
+  const text = document.getElementById('themeToggleText');
+  if (icon && text) { icon.textContent = isDark ? '☀️' : '🌙'; text.textContent = 'Mode'; }
+  if (currentTab === 'stats' && rawExhibitsRows.length > 0) renderMuseumStatistics();
+  else if (isGridActive) filterCatalog(true);
+}
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'theme' || e.key === 'bMMC_theme') {
+    const isDark = (e.newValue === 'dark');
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    updateThemeUI(isDark);
+  }
+});
+
+// ==========================================================================
+// 4. Multi-Page Curator Passport Booklet & Placard Print Engine
+// ==========================================================================
+function printCuratorPocketPassport() {
+  const placard = document.getElementById('printablePlacard');
+  if (!placard) return;
+
+  if (compareItemIndices.size === 0) {
+    showToast('Select artifacts to include in the Passport first', 'ℹ️');
+    return;
+  }
+
+  const items = Array.from(compareItemIndices).map(idx => ({
+    originalIndex: idx,
+    row: rawExhibitsRows[idx]
+  })).filter(i => i.row);
+
+  const originalDocTitle = document.title;
+  document.title = `BMMC-Curator-Passport-Booklet-${new Date().toISOString().slice(0, 10)}`;
+
+  let pagesHTML = `
+    <!-- Passport Cover Page -->
+    <div class="passport-cover">
+      <div style="font-size: 36px; margin-bottom: 8px;">🏛️ 📘</div>
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #1e40af; font-weight: 900;">Bonniefields Museum Collection</div>
+      <h1 style="margin: 6px 0 10px 0; font-size: 24px; font-weight: 900; color: #0f172a;">Curator Field Passport & Comparison Dossier</h1>
+      <p style="margin: 0 0 14px 0; font-size: 11px; color: #475569;">Official field dossier and provenance verification booklet containing ${items.length} cataloged artifacts.</p>
+      
+      <div style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 10px; font-weight: 700; color: #334155; margin-bottom: 14px;">
+        Generated: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} &bull; BMMC Conservation Archive
+      </div>
+
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 9.5px; color: #64748b; text-align: left;">
+        <p style="margin: 0 0 6px 0; font-weight: 800; color: #1e293b;">Catalog Index Manifest:</p>
+        <ul style="margin: 0; padding-left: 18px; line-height: 1.6;">
+          ${items.map(item => {
+            const rTitle = parseTitleAndDetails(getVal(item.row, colIdx.title) || getVal(item.row, colIdx.id)).title;
+            const rItemNo = getVal(item.row, colIdx.itemNoM) || getVal(item.row, colIdx.id) || `#${item.originalIndex + 1}`;
+            return `<li><strong>REF ${escapeHTML(rItemNo)}</strong>: ${escapeHTML(rTitle)}</li>`;
+          }).join('')}
+        </ul>
+      </div>
     </div>
   `;
+
+  // Individual Artifact Passport Leaves
+  items.forEach(({ originalIndex, row }, pageIdx) => {
+    const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+    const { title, details } = parseTitleAndDetails(rawContent);
+    const cleanTitle = title || `Artifact #${originalIndex + 1}`;
+    const notes = getVal(row, colIdx.notes);
+    const age = getVal(row, colIdx.age);
+    const era = getEraByRow(row);
+    const eraDisplay = era ? era.short : age;
+    const category = getVal(row, colIdx.category);
+    const subcategory = getVal(row, colIdx.subcategory);
+    const type = getVal(row, colIdx.type);
+    const made = getVal(row, colIdx.made);
+    const year = getVal(row, colIdx.year);
+    const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
+    const ddoc = getVal(row, colIdx.doc);
+    const dweb = getVal(row, colIdx.web);
+    const d3d = get3DUrlForItem(row);
+    const { img1, img2 } = getImagesForItem(row);
+    const fullImg1 = formatGoogleLh3Url(img1, 's800');
+    const fullImg2 = formatGoogleLh3Url(img2, 's600');
+    const directUrl = `${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`;
+
+    pagesHTML += `
+      <div class="passport-leaf">
+        
+        <!-- Passport Leaf Header -->
+        <div style="border-bottom: 2px solid #0f172a; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">
+              BMMC Passport Leaf &bull; Leaf ${pageIdx + 1} of ${items.length}
+            </div>
+            <h2 style="margin: 2px 0 0 0; font-size: 15px; font-weight: 900; color: #0f172a; line-height: 1.2;">
+              ${escapeHTML(cleanTitle)}
+            </h2>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 10.5px; font-family: monospace; font-weight: 900; background: #0f172a; color: #ffffff; padding: 2px 7px; border-radius: 4px;">
+              REF ${escapeHTML(itemNo)}
+            </span>
+          </div>
+        </div>
+
+        <!-- Dual Slot Media Section -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+          ${fullImg1 ? `
+            <div class="passport-img-box" style="flex: 1; position: relative;">
+              <img src="${fullImg1}" alt="Primary View" />
+              <span style="position: absolute; bottom: 3px; left: 3px; background: rgba(15,23,42,0.8); color: #fff; font-size: 7.5px; padding: 1px 4px; border-radius: 3px; font-weight: 700;">Image 1</span>
+            </div>` : ''}
+          ${fullImg2 ? `
+            <div class="passport-img-box" style="flex: 1; position: relative;">
+              <img src="${fullImg2}" alt="Secondary View" />
+              <span style="position: absolute; bottom: 3px; left: 3px; background: rgba(15,23,42,0.8); color: #fff; font-size: 7.5px; padding: 1px 4px; border-radius: 3px; font-weight: 700;">Image 2 (Alt Angle)</span>
+            </div>` : ''}
+        </div>
+
+        <!-- Archival Specs Grid -->
+        <div class="passport-specs-grid">
+          <div><strong>Historical Era:</strong><br>${escapeHTML(eraDisplay || '—')}</div>
+          <div><strong>Date / Period:</strong><br>${escapeHTML(year || '—')}</div>
+          <div><strong>Origin / Made:</strong><br>${escapeHTML(made || '—')}</div>
+          <div><strong>Category:</strong><br>${escapeHTML(category || '—')}</div>
+          <div><strong>Type:</strong><br>${escapeHTML(type || '—')}</div>
+          <div><strong>Subcategory:</strong><br>${escapeHTML(subcategory || '—')}</div>
+        </div>
+
+        <!-- Curator Provenance Notes -->
+        ${notes ? `
+          <div class="passport-notes-box">
+            <div style="font-weight: 900; text-transform: uppercase; font-size: 8px; color: #b45309; margin-bottom: 2px;">Curator Provenance Notes:</div>
+            <p style="margin: 0; line-height: 1.4; white-space: pre-line;">${escapeHTML(notes.replace(/^#\s*/, ''))}</p>
+          </div>
+        ` : ''}
+
+        <!-- Physical Description -->
+        ${details ? `
+          <div style="margin-bottom: 8px; font-size: 9.5px; color: #334155; line-height: 1.4;">
+            <div style="font-weight: 800; text-transform: uppercase; font-size: 8px; color: #64748b; margin-bottom: 2px;">Physical Description & Specs:</div>
+            <p style="margin: 0; white-space: pre-line;">${escapeHTML(cleanDetailsForModal(details))}</p>
+          </div>
+        ` : ''}
+
+        <!-- Deep Link & Documentation Footer -->
+        <div style="border-top: 1px dashed #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #475569;">
+          <div>
+            ${ddoc ? `<span>📄 Doc: ${escapeHTML(ddoc)}</span> &bull; ` : ''}
+            ${dweb ? `<span>🌐 Web: ${escapeHTML(dweb)}</span> &bull; ` : ''}
+            ${d3d ? `<span>📱 3D Model: Available</span> &bull; ` : ''}
+            <span>Index Ref #${originalIndex + 1}</span>
+          </div>
+          <div style="font-family: monospace; font-weight: 700; color: #0284c7;">
+            ${directUrl}
+          </div>
+        </div>
+
+      </div>
+    `;
+  });
+
+  placard.innerHTML = pagesHTML;
+
+  const cleanupAfterPrint = () => {
+    document.title = originalDocTitle;
+    window.removeEventListener('afterprint', cleanupAfterPrint);
+  };
+  window.addEventListener('afterprint', cleanupAfterPrint);
+
+  setTimeout(() => {
+    window.print();
+    setTimeout(cleanupAfterPrint, 2500);
+  }, 120);
 }
 
-// --- Session State Preservation Engine ---
-function saveCatalogSessionState() {
-  try {
-    const state = {
-      currentTab,
-      catalogViewMode,
-      tableSortCol,
-      tableSortDir,
-      only3DActive,
-      hotOnlyActive,
-      showingFavoritesOnly,
-      isGridActive,
-      compareItems: [...compareItemIndices],
-      search: document.getElementById('searchInput')?.value || '',
-      age: document.getElementById('filterAge')?.value || restoredSessionFilters.filterAge || '',
-      type: document.getElementById('filterType')?.value || restoredSessionFilters.filterType || '',
-      category: document.getElementById('filterCategory')?.value || restoredSessionFilters.filterCategory || '',
-      subcategory: document.getElementById('filterSubcategory')?.value || restoredSessionFilters.filterSubcategory || '',
-      artist: document.getElementById('filterArtist')?.value || restoredSessionFilters.filterArtist || '',
-      label: document.getElementById('filterLabel')?.value || restoredSessionFilters.filterLabel || '',
-      format: document.getElementById('filterFormat')?.value || restoredSessionFilters.filterFormat || '',
-      year: document.getElementById('filterYear')?.value || restoredSessionFilters.filterYear || '',
-      sortBy: document.getElementById('sortBy')?.value || 'default'
-    };
-    sessionStorage.setItem('bMMC_catalog_session', JSON.stringify(state));
-  } catch (e) {}
+function printMuseumPlacard(row, originalIndex) {
+  const placard = document.getElementById('printablePlacard');
+  if (!placard || !row) return;
+
+  const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+  const { title, details } = parseTitleAndDetails(rawContent);
+  const cleanTitle = title || `Exhibit Item ${originalIndex + 1}`;
+  const notes = getVal(row, colIdx.notes);
+  const age = getVal(row, colIdx.age);
+  const era = getEraByRow(row);
+  const eraDisplay = era ? era.short : age;
+  const category = getVal(row, colIdx.category);
+  const subcategory = getVal(row, colIdx.subcategory);
+  const type = getVal(row, colIdx.type);
+  const made = getVal(row, colIdx.made);
+  const year = getVal(row, colIdx.year);
+  const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
+  const { img1, img2 } = getImagesForItem(row);
+  const fullImg1 = formatGoogleLh3Url(img1, 's800');
+  const fullImg2 = formatGoogleLh3Url(img2, 's600');
+
+  const currentUrl = `${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`;
+  const originalDocTitle = document.title;
+  const cleanItemRef = String(itemNo).replace(/[^a-zA-Z0-9_-]/g, '');
+  const cleanFileNameTitle = cleanTitle.replace(/[^a-zA-Z0-9\s_-]/g, '').trim().substring(0, 40);
+  document.title = `BMMC Placard - ${cleanItemRef || 'Item'} - ${cleanFileNameTitle}`;
+
+  placard.innerHTML = `
+    <div class="placard-card">
+      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h4 style="margin: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; font-weight: 800;">Bonniefields Museum Collection</h4>
+          <h1 style="margin: 3px 0 0 0; font-size: 18px; font-weight: 900; color: #0f172a; line-height: 1.2;">${cleanTitle}</h1>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 11px; font-weight: 800; background: #0f172a; color: #ffffff; padding: 2px 7px; border-radius: 4px;">Ref ${itemNo}</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 14px; margin-bottom: 12px;">
+        ${fullImg1 ? `<div style="width: 170px; height: 130px; flex-shrink: 0; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-radius: 6px; overflow: hidden;"><img src="${fullImg1}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>` : ''}
+        ${fullImg2 ? `<div style="width: 110px; height: 130px; flex-shrink: 0; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-radius: 6px; overflow: hidden;"><img src="${fullImg2}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>` : ''}
+        <div style="flex: 1; font-size: 10.5px; line-height: 1.5; color: #334155;">
+          ${eraDisplay ? `<p style="margin: 0 0 3px 0;"><strong>Historical Era:</strong> ${eraDisplay}</p>` : ''}
+          ${year ? `<p style="margin: 0 0 3px 0;"><strong>Date / Period:</strong> ${year}</p>` : ''}
+          ${made ? `<p style="margin: 0 0 3px 0;"><strong>Origin / Location:</strong> ${made}</p>` : ''}
+          ${category ? `<p style="margin: 0 0 3px 0;"><strong>Category:</strong> ${category} ${subcategory ? `&bull; ${subcategory}` : ''}</p>` : ''}
+          ${type ? `<p style="margin: 0 0 3px 0;"><strong>Type:</strong> ${type}</p>` : ''}
+        </div>
+      </div>
+
+      ${notes ? `
+        <div style="background: #f8fafc; border-left: 3px solid #0284c7; padding: 8px 12px; margin-bottom: 10px;">
+          <h5 style="margin: 0 0 3px 0; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; color: #0284c7; font-weight: 800;">Curator's Notes</h5>
+          <p style="margin: 0; font-size: 10.5px; color: #1e293b; line-height: 1.45; white-space: pre-line;">${notes.replace(/^#\s*/, '')}</p>
+        </div>
+      ` : ''}
+
+      ${details ? `
+        <div style="margin-bottom: 12px;">
+          <p style="margin: 0; font-size: 10.5px; color: #475569; line-height: 1.45; white-space: pre-line;">${cleanDetailsForModal(details)}</p>
+        </div>
+      ` : ''}
+
+      <div style="border-top: 1px dashed #94a3b8; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 8.5px; color: #64748b;">
+        <span>BMMC Catalog &bull; Archive Reference System</span>
+        <span>${currentUrl}</span>
+      </div>
+    </div>
+  `;
+
+  const cleanupAfterPrint = () => {
+    document.title = originalDocTitle;
+    window.removeEventListener('afterprint', cleanupAfterPrint);
+  };
+  window.addEventListener('afterprint', cleanupAfterPrint);
+
+  setTimeout(() => {
+    window.print();
+    setTimeout(cleanupAfterPrint, 2000);
+  }, 100);
 }
 
-function restoreCatalogSessionState() {
-  try {
-    const raw = sessionStorage.getItem('bMMC_catalog_session');
-    if (!raw) return false;
-    const state = JSON.parse(raw);
-
-    const hasExplicitHash = window.location.hash && (
-      window.location.hash.startsWith('#exhibit-') || 
-      window.location.hash.startsWith('#gramophone-') || 
-      window.location.hash === '#stats' || 
-      window.location.hash === '#info' || 
-      window.location.hash === '#analytics'
-    );
-
-    if (state.catalogViewMode) catalogViewMode = state.catalogViewMode;
-    if (state.tableSortCol) tableSortCol = state.tableSortCol;
-    if (state.tableSortDir) tableSortDir = state.tableSortDir;
-    if (Array.isArray(state.compareItems)) compareItemIndices = new Set(state.compareItems);
-    if (typeof state.only3DActive === 'boolean') only3DActive = state.only3DActive;
-    if (typeof state.hotOnlyActive === 'boolean') hotOnlyActive = state.hotOnlyActive;
-    if (typeof state.showingFavoritesOnly === 'boolean') showingFavoritesOnly = state.showingFavoritesOnly;
-    if (typeof state.isGridActive === 'boolean') isGridActive = state.isGridActive;
-
-    restoredSessionFilters = {
-      filterAge: state.age || '',
-      filterType: state.type || '',
-      filterCategory: state.category || '',
-      filterSubcategory: state.subcategory || '',
-      filterArtist: state.artist || '',
-      filterLabel: state.label || '',
-      filterFormat: state.format || '',
-      filterYear: state.year || ''
-    };
-
-    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
-    setVal('searchInput', state.search || '');
-    setVal('sortBy', state.sortBy || 'default');
-
-    if (!hasExplicitHash && state.currentTab) {
-      currentTab = state.currentTab;
-    }
-    updateCompareUI();
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-// 2. Helper Functions & Dual-Mode Media Resolvers
+// ==========================================================================
+// 5. Data Helpers, Cleaners & Resolvers
+// ==========================================================================
 function safeReplaceState(urlStr) {
   try { window.history.replaceState(null, '', urlStr); } catch (e) {}
 }
@@ -453,7 +665,6 @@ function toggleCollapsibleControls(show) {
   }
 }
 
-// Dual-Mode CSV Fetcher
 async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
   try {
     const cached = localStorage.getItem(cacheKey);
@@ -604,280 +815,6 @@ function getAgeBadgeStyle(ageStr) {
   if (lower.includes('post war') || lower.includes('post')) return 'bg-sky-600/90 text-white border border-sky-400/40 shadow-sm font-extrabold';
   if (lower.includes('modern')) return 'bg-indigo-600/90 text-white border border-indigo-400/40 shadow-sm font-extrabold';
   return 'bg-slate-900/90 text-white border border-slate-700 font-extrabold';
-}
-
-function initTheme() {
-  const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
-  const isDark = savedTheme === 'dark';
-  if (isDark) document.documentElement.classList.add('dark');
-  else document.documentElement.classList.remove('dark');
-  updateThemeUI(isDark);
-}
-
-function updateThemeUI(isDark) {
-  const icon = document.getElementById('themeToggleIcon');
-  const text = document.getElementById('themeToggleText');
-  if (icon && text) { icon.textContent = isDark ? '☀️' : '🌙'; text.textContent = 'Mode'; }
-  if (currentTab === 'stats' && rawExhibitsRows.length > 0) renderMuseumStatistics();
-  else if (isGridActive) filterCatalog(true);
-}
-
-function loadVoices() {
-  if (!('speechSynthesis' in window)) return;
-  const voices = speechSynthesis.getVoices();
-  availableVoices = voices.filter(v => v.lang.startsWith('en'));
-  const keywords = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'];
-  availableVoices.sort((a, b) => {
-    const aScore = keywords.some(k => a.name.toLowerCase().includes(k)) ? 1 : 0;
-    const bScore = keywords.some(k => b.name.toLowerCase().includes(k)) ? 1 : 0;
-    return bScore - aScore;
-  });
-  populateVoiceDropdown();
-}
-
-function getSelectedVoice() {
-  if (availableVoices.length === 0) return null;
-  const savedName = localStorage.getItem('bMMC_selectedVoiceName');
-  if (savedName) {
-    const found = availableVoices.find(v => v.name === savedName);
-    if (found) return found;
-  }
-  return availableVoices[0];
-}
-
-function populateVoiceDropdown() {
-  const select = document.getElementById('voiceSelect');
-  if (!select) return;
-  select.innerHTML = '';
-  const currentVoice = getSelectedVoice();
-
-  availableVoices.forEach(voice => {
-    const opt = document.createElement('option');
-    opt.value = voice.name;
-    const isNatural = ['natural', 'neural', 'enhanced', 'premium', 'google', 'online', 'siri', 'edge'].some(k => voice.name.toLowerCase().includes(k));
-    opt.textContent = `${voice.name} ${isNatural ? '✨' : ''}`;
-    if (currentVoice && currentVoice.name === voice.name) opt.selected = true;
-    select.appendChild(opt);
-  });
-
-  select.onchange = function() {
-    localStorage.setItem('bMMC_selectedVoiceName', this.value);
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-      const btnModal = document.getElementById('btnAudioGuide');
-      if (btnModal && btnModal.getAttribute('data-row')) speakAudioGuide(parseInt(btnModal.getAttribute('data-row'), 10));
-    }
-  };
-}
-
-if ('speechSynthesis' in window) {
-  loadVoices();
-  speechSynthesis.onvoiceschanged = loadVoices;
-}
-
-function scrollToGrid() {
-  const header = document.getElementById('mainHeader');
-  const headerHeight = header ? header.offsetHeight : 100;
-  const gridElem = document.getElementById('gridSection');
-  if (!gridElem) return;
-  const targetPos = gridElem.getBoundingClientRect().top + window.pageYOffset - headerHeight - 16;
-  window.scrollTo({ top: Math.max(0, targetPos), behavior: 'smooth' });
-}
-
-function getFavorites() {
-  try {
-    const key = currentTab === 'exhibits' ? 'bMMC_favorites' : 'bMMC_gramophone_favorites';
-    return JSON.parse(localStorage.getItem(key) || '[]');
-  } catch(e) { return []; }
-}
-
-function toggleFavorite(rowIndex, event) {
-  if (event) event.stopPropagation();
-  let favs = getFavorites();
-  const key = currentTab === 'exhibits' ? 'bMMC_favorites' : 'bMMC_gramophone_favorites';
-  const adding = !favs.includes(rowIndex);
-  if (adding) { favs.push(rowIndex); showToast('Saved to your collection', '❤️'); }
-  else { favs = favs.filter(i => i !== rowIndex); showToast('Removed from saved items', '🤍'); }
-  localStorage.setItem(key, JSON.stringify(favs));
-  updateFavoritesBadge();
-  saveCatalogSessionState();
-  if (isGridActive) filterCatalog(true);
-}
-
-function updateFavoritesBadge() {
-  const favs = getFavorites();
-  const heartIcon = document.getElementById('favHeartIcon');
-  const favCountText = document.getElementById('favCountText');
-  const btnFav = document.getElementById('btnFavorites');
-  if (favCountText) favCountText.textContent = `Saved (${favs.length})`;
-  if (heartIcon) heartIcon.textContent = favs.length > 0 ? '❤️' : '🤍';
-  if (btnFav) {
-    if (showingFavoritesOnly) {
-      btnFav.classList.add('bg-rose-600', 'text-white', 'border-rose-600');
-      btnFav.classList.remove('bg-white/80', 'text-slate-700', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-200');
-    } else {
-      btnFav.classList.remove('bg-rose-600', 'text-white', 'border-rose-600');
-      btnFav.classList.add('bg-white/80', 'text-slate-700', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-200');
-    }
-  }
-}
-
-// --- Side-by-Side Comparison UI Handlers ---
-function toggleCompareItem(originalIndex, event) {
-  if (event) event.stopPropagation();
-  if (compareItemIndices.has(originalIndex)) {
-    compareItemIndices.delete(originalIndex);
-    showToast('Removed from comparison', '⚖️');
-  } else {
-    if (compareItemIndices.size >= 4) {
-      showToast('Maximum 4 items can be compared at once', '⚠️');
-      return;
-    }
-    compareItemIndices.add(originalIndex);
-    showToast('Added to comparison tray', '⚖️');
-  }
-  updateCompareUI();
-  saveCatalogSessionState();
-  if (isGridActive) filterCatalog(true);
-}
-
-function clearCompareItems() {
-  compareItemIndices.clear();
-  updateCompareUI();
-  closeCompareModal();
-  saveCatalogSessionState();
-  if (isGridActive) filterCatalog(true);
-  showToast('Comparison tray cleared', '🗑️');
-}
-
-function updateCompareUI() {
-  const bar = document.getElementById('floatingCompareBar');
-  const countText = document.getElementById('compareCountText');
-  const count = compareItemIndices.size;
-
-  if (bar) {
-    if (count > 0) {
-      bar.classList.remove('hidden', 'translate-y-4');
-      bar.classList.add('flex', 'translate-y-0');
-      if (countText) countText.textContent = `${count} Item${count > 1 ? 's' : ''} Selected`;
-    } else {
-      bar.classList.add('hidden', 'translate-y-4');
-      bar.classList.remove('flex', 'translate-y-0');
-    }
-  }
-}
-
-function openCompareModal() {
-  const modal = document.getElementById('compareModal');
-  const body = document.getElementById('compareModalBody');
-  if (!modal || !body) return;
-
-  if (compareItemIndices.size === 0) {
-    showToast('Select artifacts using ⚖️ Compare first', 'ℹ️');
-    return;
-  }
-
-  const items = Array.from(compareItemIndices).map(idx => ({
-    originalIndex: idx,
-    row: rawExhibitsRows[idx]
-  })).filter(i => i.row);
-
-  const colsCount = items.length;
-  let gridColsClass = 'grid-cols-1';
-  if (colsCount === 2) gridColsClass = 'grid-cols-1 md:grid-cols-2';
-  else if (colsCount === 3) gridColsClass = 'grid-cols-1 md:grid-cols-3';
-  else if (colsCount >= 4) gridColsClass = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
-
-  let html = `
-    <div class="grid ${gridColsClass} gap-4 sm:gap-6 items-stretch">
-      ${items.map(({ originalIndex, row }) => {
-        const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
-        const { title, details } = parseTitleAndDetails(rawContent);
-        const displayTitle = title || `Exhibit #${originalIndex + 1}`;
-        const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
-        const era = getEraByRow(row);
-        const eraDisplay = era ? era.short : getVal(row, colIdx.age);
-        const category = getVal(row, colIdx.category);
-        const type = getVal(row, colIdx.type);
-        const made = getVal(row, colIdx.made);
-        const year = getVal(row, colIdx.year);
-        const notes = getVal(row, colIdx.notes);
-        const d3d = get3DUrlForItem(row);
-        const { img1 } = getImagesForItem(row);
-        const thumbImg = formatGoogleLh3Url(img1, 's600') || NO_IMAGE_SVG;
-        const theme = getCategoryTheme(category || type);
-
-        return `
-          <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-5 border-2 flex flex-col justify-between shadow-md relative" style="border-color: ${theme.hex}80;">
-            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold">✕</button>
-            
-            <div class="space-y-3.5">
-              <div class="h-48 rounded-2xl overflow-hidden bg-slate-950 p-2 flex items-center justify-center relative">
-                <img src="${thumbImg}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" />
-                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">📱 3D / AR</button>` : ''}
-              </div>
-
-              <div>
-                <span class="text-[10px] font-mono font-bold text-slate-400 block">REF ${escapeHTML(itemNo)}</span>
-                <h4 class="text-base font-black text-slate-900 dark:text-white leading-tight mt-0.5">${escapeHTML(displayTitle)}</h4>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block">Era / Period</span>
-                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(eraDisplay || '—')}</span>
-                </div>
-                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block">Date</span>
-                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(year || '—')}</span>
-                </div>
-                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block">Category</span>
-                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(category || '—')}</span>
-                </div>
-                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block">Origin</span>
-                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(made || '—')}</span>
-                </div>
-              </div>
-
-              ${notes ? `
-                <div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 p-3 rounded-xl text-amber-900 dark:text-amber-300">
-                  <span class="text-[9px] font-black uppercase block text-amber-600 dark:text-amber-400 mb-0.5">Curator Notes</span>
-                  <p class="line-clamp-3">${escapeHTML(notes.replace(/^#\s*/, ''))}</p>
-                </div>
-              ` : ''}
-
-              ${details ? `
-                <div class="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                  ${escapeHTML(cleanDetailsForModal(details))}
-                </div>
-              ` : ''}
-            </div>
-
-            <div class="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
-              <button onclick="closeCompareModal(); window.openModalByOriginalIndex(${originalIndex});" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2 rounded-xl transition shadow">
-                Full Details ↗
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-
-  body.innerHTML = html;
-  modal.classList.remove('hidden');
-  document.body.classList.add('overflow-hidden');
-}
-
-function closeCompareModal() {
-  const modal = document.getElementById('compareModal');
-  if (modal) modal.classList.add('hidden');
-  const detailModal = document.getElementById('detailModal');
-  if (!detailModal || detailModal.classList.contains('hidden')) {
-    document.body.classList.remove('overflow-hidden');
-  }
 }
 
 function formatGoogleLh3Url(url, size = 's200') {
@@ -1068,117 +1005,342 @@ function update3DSkyboxUI() {
   if (lightboxBtn) lightboxBtn.textContent = labelText;
 }
 
-// --- Printable Display Placard Generator ---
-function printMuseumPlacard(row, originalIndex) {
-  const placard = document.getElementById('printablePlacard');
-  if (!placard || !row) return;
+// ==========================================================================
+// 6. View Switcher & Grid Rendering
+// ==========================================================================
+function switchCardImage(rowIndex, dir, event) {
+  if (event) event.stopPropagation();
+  const box = document.getElementById(`card-media-box-${rowIndex}`);
+  const badge = document.getElementById(`card-badge-${rowIndex}`);
+  if (!box) return;
 
-  const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
-  const { title, details } = parseTitleAndDetails(rawContent);
-  const cleanTitle = title || `Exhibit Item ${originalIndex + 1}`;
-  const notes = getVal(row, colIdx.notes);
-  const age = getVal(row, colIdx.age);
-  const era = getEraByRow(row);
-  const eraDisplay = era ? era.short : age;
-  const category = getVal(row, colIdx.category);
-  const subcategory = getVal(row, colIdx.subcategory);
-  const type = getVal(row, colIdx.type);
-  const made = getVal(row, colIdx.made);
-  const year = getVal(row, colIdx.year);
-  const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
-  const { img1 } = getImagesForItem(row);
-  const fullImg = formatGoogleLh3Url(img1, 's800');
+  const total = parseInt(box.dataset.totalSlots, 10) || 1;
+  let curr = parseInt(box.dataset.currentSlot, 10) || 1;
 
-  const currentUrl = `${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`;
-  const originalDocTitle = document.title;
-  const cleanItemRef = String(itemNo).replace(/[^a-zA-Z0-9_-]/g, '');
-  const cleanFileNameTitle = cleanTitle.replace(/[^a-zA-Z0-9\s_-]/g, '').trim().substring(0, 40);
-  document.title = `BMMC Placard - ${cleanItemRef || 'Item'} - ${cleanFileNameTitle}`;
+  curr = curr + dir;
+  if (curr < 1) curr = total;
+  if (curr > total) curr = 1;
+  box.dataset.currentSlot = curr;
 
-  placard.innerHTML = `
-    <div style="border: 3px double #0f172a; padding: 18px 22px; max-width: 650px; margin: 0 auto; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box;">
-      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-          <h4 style="margin: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; font-weight: 800;">Bonniefields Museum Collection</h4>
-          <h1 style="margin: 3px 0 0 0; font-size: 18px; font-weight: 900; color: #0f172a; line-height: 1.2;">${cleanTitle}</h1>
-        </div>
-        <div style="text-align: right;">
-          <span style="font-size: 11px; font-weight: 800; background: #0f172a; color: #ffffff; padding: 2px 7px; border-radius: 4px;">Ref ${itemNo}</span>
-        </div>
+  const items = box.querySelectorAll('.card-media-item');
+  items.forEach(el => {
+    const slotIdx = parseInt(el.getAttribute('data-slot-idx'), 10);
+    if (slotIdx === curr) {
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    } else {
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+  });
+
+  if (badge) badge.textContent = `${curr} / ${total}`;
+}
+
+function renderEmptyState(container) {
+  if (!container) return;
+  container.innerHTML = `
+    <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
+      <span class="text-3xl mb-2 block">🔍</span>
+      <p class="text-slate-700 dark:text-slate-300 font-bold text-sm">No exhibits match your current filter selections.</p>
+      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Reset Filters & Show All Exhibits</button>
+    </div>
+  `;
+}
+
+function saveCatalogSessionState() {
+  try {
+    const state = {
+      currentTab,
+      catalogViewMode,
+      tableSortCol,
+      tableSortDir,
+      only3DActive,
+      hotOnlyActive,
+      showingFavoritesOnly,
+      isGridActive,
+      compareItems: [...compareItemIndices],
+      search: document.getElementById('searchInput')?.value || '',
+      age: document.getElementById('filterAge')?.value || restoredSessionFilters.filterAge || '',
+      type: document.getElementById('filterType')?.value || restoredSessionFilters.filterType || '',
+      category: document.getElementById('filterCategory')?.value || restoredSessionFilters.filterCategory || '',
+      subcategory: document.getElementById('filterSubcategory')?.value || restoredSessionFilters.filterSubcategory || '',
+      artist: document.getElementById('filterArtist')?.value || restoredSessionFilters.filterArtist || '',
+      label: document.getElementById('filterLabel')?.value || restoredSessionFilters.filterLabel || '',
+      format: document.getElementById('filterFormat')?.value || restoredSessionFilters.filterFormat || '',
+      year: document.getElementById('filterYear')?.value || restoredSessionFilters.filterYear || '',
+      sortBy: document.getElementById('sortBy')?.value || 'default'
+    };
+    sessionStorage.setItem('bMMC_catalog_session', JSON.stringify(state));
+  } catch (e) {}
+}
+
+function restoreCatalogSessionState() {
+  try {
+    const raw = sessionStorage.getItem('bMMC_catalog_session');
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+
+    const hasExplicitHash = window.location.hash && (
+      window.location.hash.startsWith('#exhibit-') || 
+      window.location.hash.startsWith('#gramophone-') || 
+      window.location.hash === '#stats' || 
+      window.location.hash === '#info' || 
+      window.location.hash === '#analytics'
+    );
+
+    if (state.catalogViewMode) catalogViewMode = state.catalogViewMode;
+    if (state.tableSortCol) tableSortCol = state.tableSortCol;
+    if (state.tableSortDir) tableSortDir = state.tableSortDir;
+    if (Array.isArray(state.compareItems)) compareItemIndices = new Set(state.compareItems);
+    if (typeof state.only3DActive === 'boolean') only3DActive = state.only3DActive;
+    if (typeof state.hotOnlyActive === 'boolean') hotOnlyActive = state.hotOnlyActive;
+    if (typeof state.showingFavoritesOnly === 'boolean') showingFavoritesOnly = state.showingFavoritesOnly;
+    if (typeof state.isGridActive === 'boolean') isGridActive = state.isGridActive;
+
+    restoredSessionFilters = {
+      filterAge: state.age || '',
+      filterType: state.type || '',
+      filterCategory: state.category || '',
+      filterSubcategory: state.subcategory || '',
+      filterArtist: state.artist || '',
+      filterLabel: state.label || '',
+      filterFormat: state.format || '',
+      filterYear: state.year || ''
+    };
+
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
+    setVal('searchInput', state.search || '');
+    setVal('sortBy', state.sortBy || 'default');
+
+    if (!hasExplicitHash && state.currentTab) {
+      currentTab = state.currentTab;
+    }
+    updateCompareUI();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function getFavorites() {
+  try {
+    const key = currentTab === 'exhibits' ? 'bMMC_favorites' : 'bMMC_gramophone_favorites';
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  } catch(e) { return []; }
+}
+
+function toggleFavorite(rowIndex, event) {
+  if (event) event.stopPropagation();
+  let favs = getFavorites();
+  const key = currentTab === 'exhibits' ? 'bMMC_favorites' : 'bMMC_gramophone_favorites';
+  const adding = !favs.includes(rowIndex);
+  if (adding) { favs.push(rowIndex); showToast('Saved to your collection', '❤️'); }
+  else { favs = favs.filter(i => i !== rowIndex); showToast('Removed from saved items', '🤍'); }
+  localStorage.setItem(key, JSON.stringify(favs));
+  updateFavoritesBadge();
+  saveCatalogSessionState();
+  if (isGridActive) filterCatalog(true);
+}
+
+function updateFavoritesBadge() {
+  const favs = getFavorites();
+  const heartIcon = document.getElementById('favHeartIcon');
+  const favCountText = document.getElementById('favCountText');
+  const btnFav = document.getElementById('btnFavorites');
+  if (favCountText) favCountText.textContent = `Saved (${favs.length})`;
+  if (heartIcon) heartIcon.textContent = favs.length > 0 ? '❤️' : '🤍';
+  if (btnFav) {
+    if (showingFavoritesOnly) {
+      btnFav.classList.add('bg-rose-600', 'text-white', 'border-rose-600');
+      btnFav.classList.remove('bg-white/80', 'text-slate-700', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-200');
+    } else {
+      btnFav.classList.remove('bg-rose-600', 'text-white', 'border-rose-600');
+      btnFav.classList.add('bg-white/80', 'text-slate-700', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-200');
+    }
+  }
+}
+
+function toggleCompareItem(originalIndex, event) {
+  if (event) event.stopPropagation();
+  if (compareItemIndices.has(originalIndex)) {
+    compareItemIndices.delete(originalIndex);
+    showToast('Removed from comparison', '⚖️');
+  } else {
+    if (compareItemIndices.size >= 8) {
+      showToast('Maximum 8 items can be compared / passport generated at once', '⚠️');
+      return;
+    }
+    compareItemIndices.add(originalIndex);
+    showToast('Added to comparison tray', '⚖️');
+  }
+  updateCompareUI();
+  saveCatalogSessionState();
+  if (isGridActive) filterCatalog(true);
+}
+
+function clearCompareItems() {
+  compareItemIndices.clear();
+  updateCompareUI();
+  closeCompareModal();
+  saveCatalogSessionState();
+  if (isGridActive) filterCatalog(true);
+  showToast('Comparison tray cleared', '🗑️');
+}
+
+function updateCompareUI() {
+  const bar = document.getElementById('floatingCompareBar');
+  const countText = document.getElementById('compareCountText');
+  const count = compareItemIndices.size;
+
+  if (bar) {
+    if (count > 0) {
+      bar.classList.remove('hidden', 'translate-y-4');
+      bar.classList.add('flex', 'translate-y-0');
+      if (countText) countText.textContent = `${count} Item${count > 1 ? 's' : ''} Selected`;
+    } else {
+      bar.classList.add('hidden', 'translate-y-4');
+      bar.classList.remove('flex', 'translate-y-0');
+    }
+  }
+}
+
+function openCompareModal() {
+  const modal = document.getElementById('compareModal');
+  const body = document.getElementById('compareModalBody');
+  if (!modal || !body) return;
+
+  if (compareItemIndices.size === 0) {
+    showToast('Select artifacts using ⚖️ Compare first', 'ℹ️');
+    return;
+  }
+
+  const items = Array.from(compareItemIndices).map(idx => ({
+    originalIndex: idx,
+    row: rawExhibitsRows[idx]
+  })).filter(i => i.row);
+
+  const colsCount = items.length;
+  let gridColsClass = 'grid-cols-1';
+  if (colsCount === 2) gridColsClass = 'grid-cols-1 md:grid-cols-2';
+  else if (colsCount === 3) gridColsClass = 'grid-cols-1 md:grid-cols-3';
+  else if (colsCount >= 4) gridColsClass = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
+  let html = `
+    <!-- Top Action Bar inside Comparison Modal -->
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
+      <div class="flex items-center gap-2">
+        <span class="text-base">📘</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Comparing ${items.length} Artifact${items.length > 1 ? 's' : ''}</span>
       </div>
+      <button onclick="window.printCuratorPocketPassport()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-black px-4 py-2 rounded-xl shadow-md transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+        <span>📘</span>
+        <span>Print Curator Pocket Passport (Booklet) ↗</span>
+      </button>
+    </div>
 
-      <div style="display: flex; gap: 14px; margin-bottom: 12px;">
-        ${fullImg ? `<div style="width: 170px; height: 130px; flex-shrink: 0; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-radius: 6px; overflow: hidden;"><img src="${fullImg}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>` : ''}
-        <div style="flex: 1; font-size: 10.5px; line-height: 1.5; color: #334155;">
-          ${eraDisplay ? `<p style="margin: 0 0 3px 0;"><strong>Historical Era:</strong> ${eraDisplay}</p>` : ''}
-          ${year ? `<p style="margin: 0 0 3px 0;"><strong>Date / Period:</strong> ${year}</p>` : ''}
-          ${made ? `<p style="margin: 0 0 3px 0;"><strong>Origin / Location:</strong> ${made}</p>` : ''}
-          ${category ? `<p style="margin: 0 0 3px 0;"><strong>Category:</strong> ${category} ${subcategory ? `&bull; ${subcategory}` : ''}</p>` : ''}
-          ${type ? `<p style="margin: 0 0 3px 0;"><strong>Type:</strong> ${type}</p>` : ''}
-        </div>
-      </div>
+    <div class="grid ${gridColsClass} gap-4 sm:gap-6 items-stretch">
+      ${items.map(({ originalIndex, row }) => {
+        const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
+        const { title, details } = parseTitleAndDetails(rawContent);
+        const displayTitle = title || `Exhibit #${originalIndex + 1}`;
+        const itemNo = getVal(row, colIdx.itemNoM) || getVal(row, colIdx.id) || `#${originalIndex + 1}`;
+        const era = getEraByRow(row);
+        const eraDisplay = era ? era.short : getVal(row, colIdx.age);
+        const category = getVal(row, colIdx.category);
+        const type = getVal(row, colIdx.type);
+        const made = getVal(row, colIdx.made);
+        const year = getVal(row, colIdx.year);
+        const notes = getVal(row, colIdx.notes);
+        const d3d = get3DUrlForItem(row);
+        const ddoc = getVal(row, colIdx.doc);
+        const dweb = getVal(row, colIdx.web);
+        const { img1, img2 } = getImagesForItem(row);
+        const thumbImg1 = formatGoogleLh3Url(img1, 's600') || NO_IMAGE_SVG;
+        const thumbImg2 = formatGoogleLh3Url(img2, 's400');
+        const theme = getCategoryTheme(category || type);
 
-      ${notes ? `
-        <div style="background: #f8fafc; border-left: 3px solid #0284c7; padding: 8px 12px; margin-bottom: 10px;">
-          <h5 style="margin: 0 0 3px 0; font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; color: #0284c7; font-weight: 800;">Curator's Notes</h5>
-          <p style="margin: 0; font-size: 10.5px; color: #1e293b; line-height: 1.45; white-space: pre-line;">${notes.replace(/^#\s*/, '')}</p>
-        </div>
-      ` : ''}
+        return `
+          <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-5 border-2 flex flex-col justify-between shadow-md relative" style="border-color: ${theme.hex}80;">
+            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold">✕</button>
+            
+            <div class="space-y-3.5">
+              <div class="h-48 rounded-2xl overflow-hidden bg-slate-950 p-2 flex items-center justify-center relative">
+                <img src="${thumbImg1}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" />
+                ${thumbImg2 ? `<span class="absolute top-2 left-2 bg-slate-900/80 text-white text-[9px] font-black px-2 py-0.5 rounded-md border border-slate-700 shadow">Dual Angle</span>` : ''}
+                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">📱 3D / AR</button>` : ''}
+              </div>
 
-      ${details ? `
-        <div style="margin-bottom: 12px;">
-          <p style="margin: 0; font-size: 10.5px; color: #475569; line-height: 1.45; white-space: pre-line;">${cleanDetailsForModal(details)}</p>
-        </div>
-      ` : ''}
+              <div>
+                <span class="text-[10px] font-mono font-bold text-slate-400 block">REF ${escapeHTML(itemNo)}</span>
+                <h4 class="text-base font-black text-slate-900 dark:text-white leading-tight mt-0.5">${escapeHTML(displayTitle)}</h4>
+              </div>
 
-      <div style="border-top: 1px dashed #94a3b8; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 8.5px; color: #64748b;">
-        <span>BMMC Catalog &bull; Archive Reference System</span>
-        <span>${currentUrl}</span>
-      </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Era / Period</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(eraDisplay || '—')}</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Date</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(year || '—')}</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Category</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(category || '—')}</span>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block">Origin</span>
+                  <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHTML(made || '—')}</span>
+                </div>
+              </div>
+
+              ${notes ? `
+                <div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 p-3 rounded-xl text-amber-900 dark:text-amber-300">
+                  <span class="text-[9px] font-black uppercase block text-amber-600 dark:text-amber-400 mb-0.5">Curator Notes</span>
+                  <p class="line-clamp-3">${escapeHTML(notes.replace(/^#\s*/, ''))}</p>
+                </div>
+              ` : ''}
+
+              ${details ? `
+                <div class="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                  ${escapeHTML(cleanDetailsForModal(details))}
+                </div>
+              ` : ''}
+
+              ${(ddoc || dweb) ? `
+                <div class="flex items-center gap-2 pt-1">
+                  ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 underline">📄 Archival Document ↗</a>` : ''}
+                  ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">🌐 Reference Web ↗</a>` : ''}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
+              <button onclick="closeCompareModal(); window.openModalByOriginalIndex(${originalIndex});" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2 rounded-xl transition shadow cursor-pointer">
+                Full Details ↗
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
 
-  const cleanupAfterPrint = () => {
-    document.title = originalDocTitle;
-    window.removeEventListener('afterprint', cleanupAfterPrint);
-  };
-  window.addEventListener('afterprint', cleanupAfterPrint);
-
-  setTimeout(() => {
-    window.print();
-    setTimeout(cleanupAfterPrint, 2000);
-  }, 100);
+  body.innerHTML = html;
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
 }
 
-// --- Related Exhibits Finder ---
-function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
-  if (!rawExhibitsRows || rawExhibitsRows.length === 0) return [];
-  const currentCat = getVal(currentRow, colIdx.category).toLowerCase();
-  const currentEra = getEraByRow(currentRow);
-  const currentEraKey = currentEra ? currentEra.short : '';
-
-  const candidates = rawExhibitsRows
-    .map((r, idx) => ({ row: r, originalIndex: idx }))
-    .filter(item => item.originalIndex !== currentOriginalIndex);
-
-  candidates.forEach(item => {
-    let score = 0;
-    const cat = getVal(item.row, colIdx.category).toLowerCase();
-    const era = getEraByRow(item.row);
-    const eraKey = era ? era.short : '';
-
-    if (currentCat && cat && (cat === currentCat || cat.includes(currentCat))) score += 3;
-    if (currentEraKey && eraKey && eraKey === currentEraKey) score += 2;
-    item.score = score;
-  });
-
-  return candidates
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
+function closeCompareModal() {
+  const modal = document.getElementById('compareModal');
+  if (modal) modal.classList.add('hidden');
+  const detailModal = document.getElementById('detailModal');
+  if (!detailModal || detailModal.classList.contains('hidden')) {
+    document.body.classList.remove('overflow-hidden');
+  }
 }
 
-// --- View Switcher State Handler ---
 function setCatalogViewMode(mode) {
   catalogViewMode = mode;
   try { localStorage.setItem('bMMC_view_mode', mode); } catch (e) {}
@@ -1206,7 +1368,6 @@ function updateViewSwitcherUI() {
   }
 }
 
-// --- Interactive Column Sorter for Table View ---
 window.sortTableByColumn = function(colName) {
   if (tableSortCol === colName) {
     tableSortDir = (tableSortDir === 'asc') ? 'desc' : 'asc';
@@ -1218,7 +1379,9 @@ window.sortTableByColumn = function(colName) {
   filterCatalog(true);
 };
 
-// --- Live Search Auto-Suggest Engine ---
+// ==========================================================================
+// 7. Auto-Suggest & Navigation
+// ==========================================================================
 function handleSearchInputSuggestions(val) {
   const box = document.getElementById('searchSuggestionsBox');
   if (!box) return;
@@ -1325,7 +1488,6 @@ window.applyAutoSuggestSearch = function(query) {
   scrollToGrid();
 };
 
-// --- Dedicated Clean Hub Category Selector ---
 window.selectHubCategory = function(catName) {
   clearAllFilters(false);
   setTab('exhibits');
@@ -1408,7 +1570,6 @@ window.selectGramophoneHub = function() {
   scrollToGrid();
 };
 
-// --- Bidirectional 2D Map Jump Bridge (Optimized & Non-Reloading) ---
 window.showExhibitOnMap = function(originalIndex) {
   closeModal();
   closeEnlargeModal();
@@ -1422,19 +1583,16 @@ window.showExhibitOnMap = function(originalIndex) {
   if (mapIframe) {
     const currentSrc = mapIframe.getAttribute('src') || '';
 
-    // If iframe has not been populated yet, initialize it
     if (!currentSrc || currentSrc === 'about:blank') {
       pendingMapExhibitIndex = originalIndex;
       mapIframe.src = `2Dmap.html?exhibit=${originalIndex}`;
     } else {
-      // If already loaded and ready, send message immediately without reloading
       if (isMapIframeReady) {
         mapIframe.contentWindow?.postMessage({
           type: 'FOCUS_EXHIBIT',
           exhibit: originalIndex
         }, '*');
       } else {
-        // Queue it until MAP_READY arrives from the iframe
         pendingMapExhibitIndex = originalIndex;
       }
     }
@@ -1596,7 +1754,9 @@ function checkUrlQueryParams() {
   }
 }
 
-// 3. Fast Parallel Data Loading & Initialization
+// ==========================================================================
+// 8. Catalog Data Loader & Initialization
+// ==========================================================================
 async function loadCatalogData() {
   const loadingElem = document.getElementById('loading');
   if (loadingElem) loadingElem.classList.remove('hidden');
@@ -1650,7 +1810,6 @@ async function loadCatalogData() {
     renderCollectionHubs(rawExhibitsRows);
     updateDynamicDropdowns();
     
-    // Check explicit hash navigation on load
     const hash = window.location.hash;
     if (hash === '#stats' || hash === '#info') {
       setTab('stats');
@@ -1677,7 +1836,7 @@ async function loadCatalogData() {
         <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900">
           <p class="text-rose-600 dark:text-rose-400 font-bold text-base mb-1">Catalog Archive Offline or Missing</p>
           <p class="text-xs text-slate-500 mb-4">Please check your network connection or verify local CSV files in ./data/.</p>
-          <button onclick="localStorage.clear(); sessionStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">🔄 Reload Archive</button>
+          <button onclick="localStorage.clear(); sessionStorage.clear(); location.reload();" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow cursor-pointer">🔄 Reload Archive</button>
         </div>
       `;
     }
@@ -1950,7 +2109,6 @@ function renderActiveFilterPills() {
   }
 }
 
-// 4. Grid Filtering & Multi-View Rendering
 function filterCatalog(forceShowGrid = false) {
   hideLoadingSpinner();
   saveCatalogSessionState();
@@ -2102,7 +2260,6 @@ function renderExhibitsMultiView() {
   }
 }
 
-// 4a. Standard Rich Card Grid
 function renderExhibitsGrid() {
   const grid = document.getElementById('grid');
   const itemCount = document.getElementById('itemCount');
@@ -2192,13 +2349,13 @@ function renderExhibitsGrid() {
         ${mediaItemsHTML}
         <div class="absolute top-3 right-3 flex items-center gap-1.5 z-10" onclick="event.stopPropagation()">
           ${isHot ? `<span title="Hot Item" class="w-8 h-8 rounded-full bg-amber-500/90 text-white backdrop-blur-md transition shadow-md flex items-center justify-center text-[17px] leading-none font-bold pointer-events-none">🔥</span>` : ''}
-          <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from comparison' : 'Compare artifact'}" class="w-8 h-8 rounded-full ${isCompared ? 'bg-indigo-600 text-white ring-2 ring-indigo-400' : 'bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200'} backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none font-bold">⚖️</button>
-          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none">${isFav ? '❤️' : '🤍'}</button>
-          ${notes ? `<button data-grid-audio-idx="${originalIndex}" onclick="speakAudioGuide(${originalIndex}, event)" aria-label="Listen to notes" title="Listen to Museum Notes" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none font-bold">🔊</button>` : ''}
+          <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from comparison' : 'Compare artifact'}" class="w-8 h-8 rounded-full ${isCompared ? 'bg-indigo-600 text-white ring-2 ring-indigo-400' : 'bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200'} backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none font-bold cursor-pointer">⚖️</button>
+          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none cursor-pointer">${isFav ? '❤️' : '🤍'}</button>
+          ${notes ? `<button data-grid-audio-idx="${originalIndex}" onclick="speakAudioGuide(${originalIndex}, event)" aria-label="Listen to notes" title="Listen to Museum Notes" class="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-[17px] leading-none font-bold cursor-pointer">🔊</button>` : ''}
         </div>
         ${totalSlots > 1 ? `
-          <button onclick="switchCardImage(${originalIndex}, -1, event)" title="Previous Media" aria-label="Previous Media" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/75 hover:bg-slate-900 text-white text-xs font-black rounded-full w-7 h-7 flex items-center justify-center backdrop-blur-md shadow-md transition hover:scale-110 z-10">❮</button>
-          <button onclick="switchCardImage(${originalIndex}, 1, event)" title="Next Media" aria-label="Next Media" class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/75 hover:bg-slate-900 text-white text-xs font-black rounded-full w-7 h-7 flex items-center justify-center backdrop-blur-md shadow-md transition hover:scale-110 z-10">❯</button>
+          <button onclick="switchCardImage(${originalIndex}, -1, event)" title="Previous Media" aria-label="Previous Media" class="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/75 hover:bg-slate-900 text-white text-xs font-black rounded-full w-7 h-7 flex items-center justify-center backdrop-blur-md shadow-md transition hover:scale-110 z-10 cursor-pointer">❮</button>
+          <button onclick="switchCardImage(${originalIndex}, 1, event)" title="Next Media" aria-label="Next Media" class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/75 hover:bg-slate-900 text-white text-xs font-black rounded-full w-7 h-7 flex items-center justify-center backdrop-blur-md shadow-md transition hover:scale-110 z-10 cursor-pointer">❯</button>
           <span id="card-badge-${originalIndex}" class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-slate-900/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm pointer-events-none z-10 shadow">1 / ${totalSlots}</span>
         ` : ''}
         ${eraDisplay ? `<span class="absolute top-3 left-3 ${ageBadgeClass} backdrop-blur-sm px-2.5 py-0.5 rounded-full text-xs shadow-md pointer-events-none z-10">${eraDisplay}</span>` : ''}
@@ -2219,7 +2376,7 @@ function renderExhibitsGrid() {
             View Details <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </span>
           <div class="flex gap-1.5" onclick="event.stopPropagation()">
-            ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D & AR Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm flex items-center gap-1"><span>📱</span> 3D / AR</button>` : ''}
+            ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" title="Open 3D & AR Lightbox" class="bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-purple-200 dark:border-purple-800 transition shadow-sm flex items-center gap-1 cursor-pointer"><span>📱</span> 3D / AR</button>` : ''}
             ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" title="Documentation" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-800 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm">Doc</a>` : ''}
             ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" title="Website" class="bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-200 dark:border-blue-800 transition shadow-sm">Web</a>` : ''}
           </div>
@@ -2233,7 +2390,6 @@ function renderExhibitsGrid() {
   updateAudioUI();
 }
 
-// 4b. Single-Line Compact Table View
 function renderExhibitsTableView() {
   const grid = document.getElementById('grid');
   const itemCount = document.getElementById('itemCount');
@@ -2306,9 +2462,9 @@ function renderExhibitsTableView() {
         <td class="py-1.5 px-2.5">${escapeHTML(made || '—')}</td>
         <td class="py-1.5 px-2.5 text-right" onclick="event.stopPropagation()">
           <div class="flex items-center justify-end gap-1.5">
-            <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from compare' : 'Compare'}" class="p-1 rounded-md text-[16px] leading-none font-bold ${isCompared ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}">⚖️</button>
+            <button onclick="window.toggleCompareItem(${originalIndex}, event)" title="${isCompared ? 'Remove from compare' : 'Compare'}" class="p-1 rounded-md text-[16px] leading-none font-bold ${isCompared ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'} cursor-pointer">⚖️</button>
             ${d3d ? `<span class="text-purple-600 dark:text-purple-400 font-bold text-xs" title="3D / AR Available">👓</span>` : ''}
-            <button onclick="toggleFavorite(${originalIndex}, event)" class="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-[16px] leading-none">${isFav ? '❤️' : '🤍'}</button>
+            <button onclick="toggleFavorite(${originalIndex}, event)" class="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-[16px] leading-none cursor-pointer">${isFav ? '❤️' : '🤍'}</button>
           </div>
         </td>
       </tr>
@@ -2319,7 +2475,6 @@ function renderExhibitsTableView() {
   grid.innerHTML = tableHTML;
 }
 
-// 4c. Photo Wall View (Category Tinted & Daylight Adaptive)
 function renderExhibitsPhotoWallView() {
   const grid = document.getElementById('grid');
   const itemCount = document.getElementById('itemCount');
@@ -2367,8 +2522,8 @@ function renderExhibitsPhotoWallView() {
         <div class="flex justify-between items-center" onclick="event.stopPropagation()">
           ${d3d ? `<span class="bg-purple-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow flex items-center gap-1"><span>📱</span> 3D / AR</span>` : `<span></span>`}
           <div class="flex items-center gap-1.5">
-            <button onclick="window.toggleCompareItem(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center ${isCompared ? 'bg-indigo-600 text-white' : 'bg-slate-900/80 text-white'} text-[15px] leading-none shadow">⚖️</button>
-            <button onclick="toggleFavorite(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center bg-slate-900/80 text-[15px] leading-none shadow">${isFav ? '❤️' : '🤍'}</button>
+            <button onclick="window.toggleCompareItem(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center ${isCompared ? 'bg-indigo-600 text-white' : 'bg-slate-900/80 text-white'} text-[15px] leading-none shadow cursor-pointer">⚖️</button>
+            <button onclick="toggleFavorite(${originalIndex}, event)" class="w-7 h-7 rounded-full flex items-center justify-center bg-slate-900/80 text-[15px] leading-none shadow cursor-pointer">${isFav ? '❤️' : '🤍'}</button>
           </div>
         </div>
         <p class="text-[11px] font-bold text-white line-clamp-2 leading-tight drop-shadow">${escapeHTML(displayTitle)}</p>
@@ -2380,7 +2535,6 @@ function renderExhibitsPhotoWallView() {
   });
 }
 
-// 4d. Gramophone Grid View
 function renderGramophoneGrid() {
   const grid = document.getElementById('grid');
   const itemCount = document.getElementById('itemCount');
@@ -2431,7 +2585,7 @@ function renderGramophoneGrid() {
             ${label ? `<span class="text-[10px] font-bold bg-amber-100/80 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 px-2.5 py-0.5 rounded-lg border border-amber-300/80 dark:border-amber-800/80">${label}</span>` : ''}
             ${format ? `<span class="text-[10px] font-bold bg-slate-200/60 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-lg">${format}</span>` : ''}
           </div>
-          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-[17px] leading-none transition">${isFav ? '❤️' : '🤍'}</button>
+          <button onclick="toggleFavorite(${originalIndex}, event)" aria-label="Favorite item" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-[17px] leading-none transition cursor-pointer">${isFav ? '❤️' : '🤍'}</button>
         </div>
         <p class="text-xs font-black text-amber-700 dark:text-amber-400 mb-1 tracking-wide uppercase">${artist}</p>
         <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight">${formattedTitleHTML}</h3>
@@ -2473,7 +2627,9 @@ function closeEnlargeModal() {
   }
 }
 
-// 5. Museum Statistics & Charts
+// ==========================================================================
+// 9. Statistics & Charts Visualizer
+// ==========================================================================
 function renderMuseumStatistics() {
   const mapIframe = document.getElementById('statMapIframe');
   if (mapIframe) {
@@ -2811,6 +2967,9 @@ function renderMuseumStatistics() {
   }, 50);
 }
 
+// ==========================================================================
+// 10. 3D Model Lightbox & WebAR Modal
+// ==========================================================================
 function open3DLightbox(rawUrl, rawTitle) {
   const modal = document.getElementById('lightbox3DModal');
   const titleElem = document.getElementById('lightboxTitle');
@@ -2903,6 +3062,9 @@ function close3DLightbox() {
   }
 }
 
+// ==========================================================================
+// 11. Exhibit Detail Modal Manager
+// ==========================================================================
 function openModalByOriginalIndex(origIdx) {
   if (currentTab !== 'exhibits') setTab('exhibits');
   
@@ -2932,19 +3094,33 @@ function openModalByFilteredIndex(filteredIndex) {
   openModal(row, originalIndex);
 }
 
-// Global Window Exports
-window.openModalByOriginalIndex = openModalByOriginalIndex;
-window.openModalByFilteredIndex = openModalByFilteredIndex;
-window.openExhibitModal = openModalByOriginalIndex;
-window.printMuseumPlacard = printMuseumPlacard;
-window.toggleCompareItem = toggleCompareItem;
-window.open3DLightbox = open3DLightbox;
-window.browseAllExhibits = browseAllExhibits;
-window.switchCardImage = switchCardImage;
-window.speakAudioGuide = speakAudioGuide;
-window.stopAudioGuide = stopAudioGuide;
+function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
+  if (!rawExhibitsRows || rawExhibitsRows.length === 0) return [];
+  const currentCat = getVal(currentRow, colIdx.category).toLowerCase();
+  const currentEra = getEraByRow(currentRow);
+  const currentEraKey = currentEra ? currentEra.short : '';
 
-// 6. Detail Modal Manager
+  const candidates = rawExhibitsRows
+    .map((r, idx) => ({ row: r, originalIndex: idx }))
+    .filter(item => item.originalIndex !== currentOriginalIndex);
+
+  candidates.forEach(item => {
+    let score = 0;
+    const cat = getVal(item.row, colIdx.category).toLowerCase();
+    const era = getEraByRow(item.row);
+    const eraKey = era ? era.short : '';
+
+    if (currentCat && cat && (cat === currentCat || cat.includes(currentCat))) score += 3;
+    if (currentEraKey && eraKey && eraKey === currentEraKey) score += 2;
+    item.score = score;
+  });
+
+  return candidates
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
 function openModal(row, originalIndex) {
   stopAudioGuide();
   const modalContainer = document.getElementById('modalContainer');
@@ -3057,8 +3233,8 @@ function openModal(row, originalIndex) {
               <h2 id="modalTitle" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">${displayTitle}</h2>
               <div class="flex items-center gap-2 shrink-0">
                 ${isHot ? `<span title="Hot Item" class="text-base sm:text-lg px-2 py-0.5 bg-amber-500/20 rounded-full border border-amber-400/40 leading-none flex items-center justify-center">🔥</span>` : ''}
-                <button onclick="window.toggleCompareItem(${originalIndex})" class="px-3 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 ${isCompared ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">⚖️ ${isCompared ? 'Comparing' : 'Compare'}</button>
-                <button onclick="toggleFavorite(${originalIndex}, event)" class="px-3.5 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 ${isFav ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">${isFav ? '❤️ Saved' : '🤍 Save'}</button>
+                <button onclick="window.toggleCompareItem(${originalIndex})" class="px-3 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 cursor-pointer ${isCompared ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">⚖️ ${isCompared ? 'Comparing' : 'Compare'}</button>
+                <button onclick="toggleFavorite(${originalIndex}, event)" class="px-3.5 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 cursor-pointer ${isFav ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">${isFav ? '❤️ Saved' : '🤍 Save'}</button>
               </div>
             </div>
 
@@ -3067,7 +3243,7 @@ function openModal(row, originalIndex) {
               ${category ? createCategoryBadge(category, 'category') : ''}
               ${type ? createCategoryBadge(type, 'type') : ''}
               ${subcategory ? createCategoryBadge(subcategory, 'subcategory') : ''}
-              ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" title="View origin on 2D map" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow transition flex items-center gap-1">📍 Show on Map ↗</button>` : ''}
+              ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" title="View origin on 2D map" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow transition flex items-center gap-1 cursor-pointer">📍 Show on Map ↗</button>` : ''}
             </div>
 
             ${cleanedDetails ? `
@@ -3081,7 +3257,7 @@ function openModal(row, originalIndex) {
                 <div class="flex items-center justify-between gap-2 mb-1.5">
                   <h4 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Museum Notes</h4>
                   <div class="flex items-center gap-1">
-                    <button id="btnAudioGuide" data-row="${originalIndex}" onclick="speakAudioGuide(${originalIndex})" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black transition shadow">🔊 Listen</button>
+                    <button id="btnAudioGuide" data-row="${originalIndex}" onclick="speakAudioGuide(${originalIndex})" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black transition shadow cursor-pointer">🔊 Listen</button>
                     <select id="voiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 font-medium max-w-[100px] truncate outline-none"></select>
                   </div>
                 </div>
@@ -3089,13 +3265,13 @@ function openModal(row, originalIndex) {
               </div>` : ''}
 
             <div class="flex flex-wrap items-center gap-2.5 pt-2">
-              <button id="btnGoogleSearchMain" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">🔍 Google Item</button>
-              ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🗺️ Locate Origin Map</button>` : ''}
-              <button onclick="window.printMuseumPlacard(rawExhibitsRows[${originalIndex}], ${originalIndex})" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">🖨️ Print Display Placard</button>
+              <button id="btnGoogleSearchMain" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer">🔍 Google Item</button>
+              ${hasCoordinates ? `<button onclick="window.showExhibitOnMap(${originalIndex})" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">🗺️ Locate Origin Map</button>` : ''}
+              <button onclick="window.printMuseumPlacard(rawExhibitsRows[${originalIndex}], ${originalIndex})" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer">🖨️ Print Display Placard</button>
             </div>
 
             <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-              ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition flex items-center gap-1.5"><span>📱 View in 3D / AR ↗</span></button>` : ''}
+              ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-purple-500/25 transition flex items-center gap-1.5 cursor-pointer"><span>📱 View in 3D / AR ↗</span></button>` : ''}
               ${ddoc ? `<a href="${formatDocLink(ddoc)}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition">Documentation ↗</a>` : ''}
               ${dweb ? `<a href="${dweb}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-blue-500/25 transition">Web Link ↗</a>` : ''}
             </div>
@@ -3109,8 +3285,8 @@ function openModal(row, originalIndex) {
                     <span>👓</span> Interactive 3D Model & AR
                   </p>
                   <div class="flex items-center gap-2">
-                    <button id="btnToggleModalSkybox" onclick="toggleModal3DSkybox(event)" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-300 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md transition border border-slate-300 dark:border-slate-700">${is3DSkyboxLight ? '🌙 Dark Sky' : '☀️ Light Sky'}</button>
-                    <button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="text-[10px] font-bold text-purple-600 dark:text-purple-300 hover:underline">Expand Fullscreen ⤢</button>
+                    <button id="btnToggleModalSkybox" onclick="toggleModal3DSkybox(event)" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-300 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md transition border border-slate-300 dark:border-slate-700 cursor-pointer">${is3DSkyboxLight ? '🌙 Dark Sky' : '☀️ Light Sky'}</button>
+                    <button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="text-[10px] font-bold text-purple-600 dark:text-purple-300 hover:underline cursor-pointer">Expand Fullscreen ⤢</button>
                   </div>
                 </div>
                 <div id="modal3DContainer" class="w-full h-64 sm:h-72 ${is3DSkyboxLight ? 'bg-slate-100' : 'bg-slate-900'} rounded-2xl overflow-hidden shadow-inner border border-indigo-500/30 relative cursor-pointer transition-colors duration-300">
@@ -3152,7 +3328,7 @@ function openModal(row, originalIndex) {
 
               ${img2 ? `
                 <div class="w-full">
-                  <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image'}</p>
+                  <p class="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">${d3d ? 'Third Media (Image 2)' : 'Secondary Image (Alternate View)'}</p>
                   <a href="${fullImg2 || modalImg2}" target="_blank" rel="noopener noreferrer" title="Click to view image" class="block group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-2 shadow-md w-full" style="border-color: ${theme.hex}80;">
                     <img src="${modalImg2}" class="w-full h-52 sm:h-56 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" onError="this.src='${NO_IMAGE_SVG}'" alt="${displayTitle}" loading="lazy" />
                     <span class="absolute bottom-2.5 right-2.5 bg-blue-600/90 text-white backdrop-blur-md text-[9px] font-black px-2.5 py-1 rounded-lg shadow pointer-events-none">Full Image ↗</span>
@@ -3236,7 +3412,7 @@ function openModal(row, originalIndex) {
       modalContent.innerHTML = `
         <div class="flex items-start justify-between gap-4 mb-2">
           <div><h2 id="modalTitle" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">${formattedTitleHTML}</h2></div>
-          <button onclick="toggleFavorite(${originalIndex}, event)" class="px-3.5 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 shrink-0 ${isFav ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">${isFav ? '❤️ Saved' : '🤍 Save'}</button>
+          <button onclick="toggleFavorite(${originalIndex}, event)" class="px-3.5 py-1.5 rounded-full text-xs font-black border transition flex items-center gap-1 shrink-0 cursor-pointer ${isFav ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200'}">${isFav ? '❤️ Saved' : '🤍 Save'}</button>
         </div>
 
         <div class="flex flex-wrap items-center gap-2 text-xs mb-4">
@@ -3294,7 +3470,35 @@ function closeModal() {
   safeReplaceState(window.location.pathname);
 }
 
-// 7. Event Listeners, View Switcher & Touch Navigation
+function scrollToGrid() {
+  const header = document.getElementById('mainHeader');
+  const headerHeight = header ? header.offsetHeight : 100;
+  const gridElem = document.getElementById('gridSection');
+  if (!gridElem) return;
+  const targetPos = gridElem.getBoundingClientRect().top + window.pageYOffset - headerHeight - 16;
+  window.scrollTo({ top: Math.max(0, targetPos), behavior: 'smooth' });
+}
+
+// ==========================================================================
+// 12. Global Window Exports & Event Listeners
+// ==========================================================================
+window.openModalByOriginalIndex = openModalByOriginalIndex;
+window.openModalByFilteredIndex = openModalByFilteredIndex;
+window.openExhibitModal = openModalByOriginalIndex;
+window.printMuseumPlacard = printMuseumPlacard;
+window.printCuratorPocketPassport = printCuratorPocketPassport;
+window.toggleCompareItem = toggleCompareItem;
+window.clearCompareItems = clearCompareItems;
+window.openCompareModal = openCompareModal;
+window.closeCompareModal = closeCompareModal;
+window.open3DLightbox = open3DLightbox;
+window.close3DLightbox = close3DLightbox;
+window.closeEnlargeModal = closeEnlargeModal;
+window.browseAllExhibits = browseAllExhibits;
+window.switchCardImage = switchCardImage;
+window.speakAudioGuide = speakAudioGuide;
+window.stopAudioGuide = stopAudioGuide;
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('brandLogoLink')?.addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader')?.addEventListener('click', browseAllExhibits);
@@ -3463,7 +3667,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('message', (event) => {
     if (!event.data) return;
 
-    // Listen for Map Ready Signal from 2Dmap.html
     if (event.data.type === 'MAP_READY') {
       isMapIframeReady = true;
       if (pendingMapExhibitIndex !== null) {
@@ -3476,7 +3679,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Handle Item Selection from Map Marker Pop-up
     if (event.data.type === 'BMMC_OPEN_ITEM' || event.data.action === 'openExhibit') {
       const exhibitNum = event.data.exhibit !== undefined ? event.data.exhibit : event.data.id;
       if (typeof closeEnlargeModal === 'function') closeEnlargeModal();

@@ -10,12 +10,12 @@
     (function() {
       try {
         const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        // Only enable dark if the user explicitly saved 'dark'
+		if (savedTheme === 'dark') {
+		document.documentElement.classList.add('dark');
+		} else {
+		document.documentElement.classList.remove('dark');
+		}
       } catch (e) {}
     })();
   </script>
@@ -55,6 +55,9 @@
     };
   </script>
 
+  <!-- Core External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
   <!-- Core Libraries (Deferred & Non-Blocking) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
@@ -63,121 +66,6 @@
 
   <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
-
-  <!-- Google Font: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    .solid-header { background-color: rgba(255, 255, 255, 0.88); }
-    .dark .solid-header { background-color: rgba(15, 23, 42, 0.88); }
-    
-    @keyframes barPulse {
-      0%, 100% { height: 4px; }
-      50% { height: 14px; }
-    }
-    .eq-bar {
-      display: inline-block;
-      width: 3px;
-      background-color: currentColor;
-      border-radius: 9999px;
-      animation: barPulse 0.8s infinite ease-in-out;
-    }
-    .eq-bar:nth-child(2) { animation-delay: 0.2s; }
-    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
-
-    .chart-container canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    @keyframes spin3d { to { transform: rotate(360deg); } }
-    .spinner-3d {
-      width: 44px;
-      height: 44px;
-      border: 4px solid rgba(2, 132, 199, 0.15);
-      border-top-color: #0284c7;
-      border-radius: 50%;
-      animation: spin3d 1s linear infinite;
-    }
-
-    /* --- TIME TRAVEL SEASONAL BACKGROUND --- */
-    @keyframes seasonSkyCycle {
-      0%, 100% { background: linear-gradient(180deg, #fbcfe8 0%, #fed7aa 45%, #ccfbf1 80%, #a7f3d0 100%); }
-      25% { background: linear-gradient(180deg, #bae6fd 0%, #fef08a 50%, #93c5fd 85%, #60a5fa 100%); }
-      50% { background: linear-gradient(180deg, #fef08a 0%, #fed7aa 40%, #fca5a5 75%, #f472b6 100%); }
-      75% { background: linear-gradient(180deg, #ddd6fe 0%, #c7d2fe 45%, #bae6fd 75%, #93c5fd 100%); }
-    }
-
-    .dark .time-sky-animated { filter: brightness(0.45) contrast(1.15) saturate(0.9); }
-    .time-sky-animated { animation: seasonSkyCycle 60s linear infinite; }
-
-    @keyframes poppyArcDrift {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(-12.5%, -8vh) rotate(-2deg); }
-      50% { transform: translate(-25%, -14vh) rotate(0deg); }
-      75% { transform: translate(-37.5%, -8vh) rotate(2deg); }
-      100% { transform: translate(-50%, 0) rotate(0deg); }
-    }
-
-    @keyframes poppyFlutter {
-      0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 3px rgba(220, 38, 38, 0.4)); transform: translateY(0px) rotate(-3deg); }
-      50% { opacity: 1.0; filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.7)); transform: translateY(-4px) rotate(4deg); }
-    }
-
-    .poppy-skyline-drift {
-      width: 200vw;
-      height: 100vh;
-      animation: poppyArcDrift 18s linear infinite;
-      animation-play-state: paused;
-      display: none !important;
-    }
-
-    .poppy-flutter {
-      animation: poppyFlutter 3.5s ease-in-out infinite alternate;
-      animation-play-state: paused;
-    }
-
-    .poppies-animated .poppy-skyline-drift {
-      display: flex !important;
-      animation-play-state: running;
-    }
-
-    .poppies-animated .poppy-flutter {
-      animation-play-state: running;
-    }
-
-    /* --- STRICT 1-PAGE MUSEUM PLACARD PRINT STYLES --- */
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 12mm;
-      }
-      html, body {
-        height: auto !important;
-        min-height: 0 !important;
-        overflow: visible !important;
-        background: #ffffff !important;
-        color: #0f172a !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      #timeSkyBackground, header, main, #detailModal, #enlargeModal, #lightbox3DModal, #compareModal, #floatingCompareBar, #toast, #floatingJumpBtn {
-        display: none !important;
-      }
-      #printablePlacard {
-        display: block !important;
-        position: relative !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        page-break-after: avoid !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-    }
-  </style>
 
   <!-- Main Application Logic (Deferred) -->
   <script defer src="app.js"></script>
@@ -284,23 +172,23 @@
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           
           <!-- Primary Actions -->
-          <button id="btnBrowseAllHeader" title="Browse All Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <button id="btnBrowseAllHeader" title="Browse All Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>🌐</span> <span class="hidden sm:inline">Browse</span>
           </button>
 
-          <button id="btnStatsHeader" title="Museum Insights & Stats" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <button id="btnStatsHeader" title="Museum Insights & Stats" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>ℹ️</span> <span class="hidden sm:inline">Info</span>
           </button>
 
-          <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>👓</span> <span class="hidden md:inline">3D</span>
           </button>
 
-          <button id="btnHotOnly" title="Filter to Hot Items Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <button id="btnHotOnly" title="Filter to Hot Items Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>🔥</span> <span class="hidden md:inline">Hot</span>
           </button>
 
-          <button id="btnSurprise" title="Surprise Me (Random Item)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0">
+          <button id="btnSurprise" title="Surprise Me (Random Item)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>✨</span> <span class="hidden lg:inline">Surprise</span>
           </button>
 
@@ -317,19 +205,19 @@
           <!-- Utility Pill Cluster: [ 🤍 Saved | ☀️/🌙 Mode | 🌪️ Filter ] -->
           <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
             <!-- Favorites -->
-            <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+            <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="favHeartIcon">🤍</span>
               <span id="favCountText" class="text-[10px] sm:text-[11px]">Saved (0)</span>
             </button>
 
             <!-- Theme Toggle -->
-            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
               <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
 
             <!-- Filter Controls Toggle (Filter Funnel Icon) -->
-            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition">
+            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
               </svg>
@@ -352,13 +240,13 @@
             
             <!-- Catalog View Switcher Buttons -->
             <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60" role="group" aria-label="View Switcher">
-              <button id="btnViewGrid" title="Card Grid View" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm">
+              <button id="btnViewGrid" title="Card Grid View" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm cursor-pointer">
                 <span>🔲</span> <span class="hidden md:inline">Grid</span>
               </button>
-              <button id="btnViewTable" title="Compact Table / Ledger View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <button id="btnViewTable" title="Compact Table / Ledger View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
                 <span>📋</span> <span class="hidden md:inline">Table</span>
               </button>
-              <button id="btnViewPhotos" title="Photo Wall View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <button id="btnViewPhotos" title="Photo Wall View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
                 <span>🖼️</span> <span class="hidden md:inline">Photos</span>
               </button>
             </div>
@@ -379,7 +267,7 @@
           <div id="activeFiltersBar" class="hidden flex-wrap items-center gap-1.5 flex-1 min-w-0">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Active:</span>
             <div id="activeFiltersContainer" class="flex flex-wrap gap-1 flex-1 min-w-0"></div>
-            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto">Clear</button>
+            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto cursor-pointer">Clear</button>
           </div>
           
           <!-- Search Input with Auto-Suggest Dropdown -->
@@ -388,7 +276,7 @@
             <svg class="w-4 h-4 text-blue-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center">✕</button>
+            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer">✕</button>
             
             <!-- Live Suggestion Overlay Box -->
             <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden text-xs"></div>
@@ -399,19 +287,19 @@
         <div id="exhibitsFilterGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
           <div>
             <label for="filterAge" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Era / Age</label>
-            <select id="filterAge" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Eras / Ages</option></select>
+            <select id="filterAge" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Eras / Ages</option></select>
           </div>
           <div>
             <label for="filterType" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Type</label>
-            <select id="filterType" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Types</option></select>
+            <select id="filterType" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Types</option></select>
           </div>
           <div>
             <label for="filterCategory" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Category</label>
-            <select id="filterCategory" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Categories</option></select>
+            <select id="filterCategory" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Categories</option></select>
           </div>
           <div>
             <label for="filterSubcategory" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Subcategory</label>
-            <select id="filterSubcategory" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Subcategories</option></select>
+            <select id="filterSubcategory" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Subcategories</option></select>
           </div>
         </div>
 
@@ -419,19 +307,19 @@
         <div id="gramophoneFilterGrid" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div>
             <label for="filterArtist" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Artist</label>
-            <select id="filterArtist" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Artists</option></select>
+            <select id="filterArtist" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Artists</option></select>
           </div>
           <div>
             <label for="filterLabel" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Record Label</label>
-            <select id="filterLabel" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Labels</option></select>
+            <select id="filterLabel" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Labels</option></select>
           </div>
           <div>
             <label for="filterFormat" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Format</label>
-            <select id="filterFormat" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Formats</option></select>
+            <select id="filterFormat" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Formats</option></select>
           </div>
           <div>
             <label for="filterYear" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Release Year</label>
-            <select id="filterYear" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"><option value="">All Years</option></select>
+            <select id="filterYear" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Years</option></select>
           </div>
         </div>
 
@@ -461,7 +349,7 @@
         <div class="w-16 h-16 bg-white/60 dark:bg-slate-900/60 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/60 dark:border-slate-800/80 shadow-inner" id="promptIcon">🔍</div>
         <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 drop-shadow-sm" id="promptTitle">Ready to Explore Exhibits</h3>
         <p class="text-xs text-slate-700 dark:text-slate-300 mt-2 mb-6 leading-relaxed font-semibold" id="promptDesc">Select a Collection Hub above, search by keyword, or view all items in the BMMC archive.</p>
-        <button id="btnBrowseAllPrompt" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition active:scale-95">Browse All →</button>
+        <button id="btnBrowseAllPrompt" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition active:scale-95 cursor-pointer">Browse All →</button>
       </div>
     </div>
 
@@ -475,7 +363,7 @@
             <p class="text-xs text-slate-500 dark:text-slate-400">Visitor traffic, pageviews, and referrer insights</p>
           </div>
         </div>
-        <button onclick="browseAllExhibits()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">← Back to Museum</button>
+        <button onclick="browseAllExhibits()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow cursor-pointer">← Back to Museum</button>
       </div>
       <div class="w-full h-[750px] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-900">
         <iframe src="https://cloud.umami.is/share/dfdc416e-ad5f-4752-9c46-b426a92e30b3" class="w-full h-full border-0" title="Live Website Analytics Dashboard" loading="lazy"></iframe>
@@ -503,7 +391,7 @@
       <div id="statMapCard" class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md flex flex-col gap-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <h3 class="text-base sm:text-lg font-black text-blue-300 uppercase tracking-wider flex items-center gap-2"><span>🗺️</span> Map of item origin</h3>
-          <button onclick="openEnlargeModal('2Dmap.html', true)" title="Open Map in Full Scale Pop-Up" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-md border border-blue-400/40 transition flex items-center gap-1 active:scale-95">Enlarge ↗</button>
+          <button onclick="openEnlargeModal('2Dmap.html', true)" title="Open Map in Full Scale Pop-Up" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-md border border-blue-400/40 transition flex items-center gap-1 active:scale-95 cursor-pointer">Enlarge ↗</button>
         </div>
         <div class="w-full h-[400px] sm:h-[520px] relative overflow-hidden rounded-2xl bg-slate-900 border border-indigo-500/30 shadow-inner">
           <iframe data-src="2Dmap.html" id="statMapIframe" class="w-full h-full border-0 rounded-2xl bg-white" title="Map of item origin"></iframe>
@@ -566,7 +454,7 @@
               <a id="statDocLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Doc ↗</a>
               <a id="statWebLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">🌐 Web ↗</a>
               <a href="restoration-guide.html" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-amber-500 shadow-sm transition flex items-center gap-1">🛠️ Care ↗</a>
-              <button id="btnTogglePoppyMotion" onclick="togglePoppyMotion()" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1 active:scale-95">🌺 Dynamic</button>
+              <button id="btnTogglePoppyMotion" onclick="togglePoppyMotion()" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1 active:scale-95 cursor-pointer">🌺 Dynamic</button>
             </div>
           </div>
         </div>
@@ -615,7 +503,7 @@
   </main>
 
   <!-- Floating Mobile Jump Pill -->
-  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95">
+  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95 cursor-pointer">
     <span>⬇️ View Archive</span>
   </button>
 
@@ -625,10 +513,10 @@
       <span class="text-base">⚖️</span>
       <span id="compareCountText" class="text-xs font-black text-blue-400">2 Items Selected</span>
     </div>
-    <button id="btnOpenCompareModal" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black px-3.5 py-1.5 rounded-xl shadow-md transition active:scale-95">
+    <button id="btnOpenCompareModal" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black px-3.5 py-1.5 rounded-xl shadow-md transition active:scale-95 cursor-pointer">
       Compare Side-by-Side →
     </button>
-    <button id="btnClearCompare" title="Clear Selection" class="text-slate-400 hover:text-rose-400 text-xs font-bold px-1 transition">
+    <button id="btnClearCompare" title="Clear Selection" class="text-slate-400 hover:text-rose-400 text-xs font-bold px-1 transition cursor-pointer">
       ✕
     </button>
   </div>
@@ -644,7 +532,7 @@
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
         <h3 class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Full Scale Interactive View</h3>
-        <button id="closeEnlargeModal" onclick="closeEnlargeModal()" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+        <button id="closeEnlargeModal" onclick="closeEnlargeModal()" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition cursor-pointer">✕</button>
       </div>
       <div id="enlargeModalBody" class="w-full h-full flex items-center justify-center bg-slate-950 p-2 overflow-auto"></div>
     </div>
@@ -655,18 +543,18 @@
     <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
       <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-1.5">
-          <button id="modalPrevBtn" title="Previous Item" aria-label="Previous Item" class="p-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
+          <button id="modalPrevBtn" title="Previous Item" aria-label="Previous Item" class="p-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1 cursor-pointer">
             <span>←</span> <span class="hidden sm:inline">Prev</span>
           </button>
           <span id="modalCounter" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-300 px-2"></span>
-          <button id="modalNextBtn" title="Next Item" aria-label="Next Item" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1">
+          <button id="modalNextBtn" title="Next Item" aria-label="Next Item" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1 cursor-pointer">
             <span class="hidden sm:inline">Next</span> <span>→</span>
           </button>
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="btnShareExhibit" title="Copy Link" aria-label="Copy Link" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition">🔗</button>
-          <button id="closeModal" title="Close (Esc)" aria-label="Close modal" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold transition">✕</button>
+          <button id="btnShareExhibit" title="Copy Link" aria-label="Copy Link" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition cursor-pointer">🔗</button>
+          <button id="closeModal" title="Close (Esc)" aria-label="Close modal" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold transition cursor-pointer">✕</button>
         </div>
       </div>
       <div id="modalContent" class="px-4 sm:px-8 pt-4 pb-6 sm:pb-8"></div>
@@ -682,8 +570,8 @@
           <h3 id="lightboxTitle" class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Interactive 3D Model</h3>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btnToggleLightboxSkybox" onclick="toggleModal3DSkybox(event)" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-1">☀️ Light Sky</button>
-          <button id="close3DLightbox" title="Close 3D View" aria-label="Close 3D View" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+          <button id="btnToggleLightboxSkybox" onclick="toggleModal3DSkybox(event)" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer">☀️ Light Sky</button>
+          <button id="close3DLightbox" title="Close 3D View" aria-label="Close 3D View" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition cursor-pointer">✕</button>
         </div>
       </div>
 
@@ -733,8 +621,8 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btnClearCompareInModal" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline px-2 py-1">Clear All</button>
-          <button id="btnCloseCompareModal" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition">✕</button>
+          <button id="btnClearCompareInModal" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline px-2 py-1 cursor-pointer">Clear All</button>
+          <button id="btnCloseCompareModal" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition cursor-pointer">✕</button>
         </div>
       </div>
 
@@ -743,7 +631,7 @@
     </div>
   </div>
 
-  <!-- Strict 1-Page Printable Museum Display Placard Container -->
+  <!-- Strict Museum Display Placard & Curator Pocket Passport Print Container -->
   <div id="printablePlacard" class="hidden"></div>
 
 </body>
