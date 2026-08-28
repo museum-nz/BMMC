@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>New Zealand Stamp Archive — StampsNZ Showcase</title>
 
-  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <!-- Instant Theme Sync -->
   <script>
     (function() {
       try {
@@ -55,11 +55,13 @@
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
+  <!-- Offline Media Adapter -->
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+
   <style>
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Ultra-Compact Dual-Ended Range Slider CSS */
     .range-slider-container {
       position: relative;
       height: 14px;
@@ -126,7 +128,7 @@
     <div class="absolute top-1/2 -left-28 w-96 h-96 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl"></div>
   </div>
 
-  <!-- Header Navigation -->
+  <!-- Header Navigation (Without Sync Button) -->
   <header id="mainHeader" class="border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90 dark:bg-slate-900/90 transition-colors">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-1.5">
       <div class="flex items-center justify-between gap-2">
@@ -155,10 +157,6 @@
 
           <button onclick="surpriseRandomStamp()" title="Surprise Me (Random Stamp)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-2.5 py-1 rounded-lg transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>✨</span> <span class="hidden lg:inline">Random</span>
-          </button>
-
-          <button onclick="refreshData()" title="Sync Latest Changes from Google Sheets" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 hover:bg-emerald-200 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800 px-2.5 py-1 rounded-lg transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
-            <span>🔄</span> <span class="hidden lg:inline">Sync</span>
           </button>
 
           <!-- Main Museum Link -->
@@ -191,7 +189,6 @@
         <!-- Row 1: Currency Lens & Live Search -->
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-1.5 pt-1 border-t border-slate-200/60 dark:border-slate-800">
           
-          <!-- Exact Currency Lens -->
           <div class="flex items-center bg-slate-100/90 dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shrink-0 text-xs font-extrabold shadow-inner">
             <button id="lensAll" onclick="setCurrencyLens('ALL')" class="px-2.5 py-0.5 rounded-md transition bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm cursor-pointer">
               🌐 All Eras
@@ -204,21 +201,49 @@
             </button>
           </div>
 
-          <!-- Exact Search Input with 🔍 Icon -->
           <div class="w-full lg:w-96 relative shrink-0">
-            <input type="text" id="searchInput" placeholder="Search Chalon, Pictorials, Health, 1d, 45c, Cat #..." autocomplete="off" class="w-full pl-8 pr-7 py-1 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <input type="text" id="searchInput" placeholder="Search Chalon, Lake Matheson, 1d, 78a, Peace, Cat #..." autocomplete="off" class="w-full pl-8 pr-7 py-1 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
             <span class="absolute left-2.5 top-1 text-emerald-600 text-xs">🔍</span>
             <button id="clearSearchBtn" onclick="clearSearchInput()" title="Clear Search" class="hidden absolute right-2 top-1 text-slate-400 hover:text-slate-600 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 items-center justify-center cursor-pointer">✕</button>
           </div>
         </div>
 
-        <!-- Row 2: View Switcher, Sort & Always-Visible Clear All -->
+        <!-- Row 2: Formats & Specialty Items Filter Suite -->
+        <div class="flex items-center gap-1.5 flex-wrap pt-1 border-t border-slate-200/50 dark:border-slate-800/60 text-xs">
+          <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Formats & Types:</span>
+          
+          <button id="btnFormatAll" onclick="setFormatPreset('all')" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm cursor-pointer transition">
+            🌐 All Formats
+          </button>
+
+          <button id="btnFormatSingles" onclick="setFormatPreset('singles')" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            📮 Singles Only
+          </button>
+
+          <button id="btnFormatFDC" onclick="setFormatPreset('fdc')" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            ✉️ First Day Covers (FDC)
+          </button>
+
+          <div class="relative inline-block text-left ml-auto sm:ml-0">
+            <button onclick="toggleFormatMenu()" id="btnFormatMenu" class="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 flex items-center gap-1 cursor-pointer">
+              <span>⚙️ Filter / Hide Types</span> <span id="formatMenuChevron">▼</span>
+            </button>
+            
+            <div id="formatDropdownMenu" class="hidden absolute left-0 sm:right-0 sm:left-auto mt-1 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 p-2 text-[11px] space-y-1 backdrop-blur-xl">
+              <div class="text-[9px] font-black uppercase text-slate-400 px-1 border-b border-slate-100 dark:border-slate-800 pb-1 mb-1 flex justify-between">
+                <span>Check to Include Format</span>
+                <button onclick="toggleAllFormats(true)" class="text-emerald-600 hover:underline">All</button>
+              </div>
+              <div id="formatCheckboxList" class="space-y-1 max-h-56 overflow-y-auto no-scrollbar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: View Switcher, Sort & Active Filter Chips -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 pt-0.5 border-t border-slate-200/50 dark:border-slate-800/60">
           <div class="flex items-center gap-2 flex-wrap">
-            <!-- Exact Dynamic Counter -->
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount">Showing 0 of 0 stamps</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount">Showing 0 stamp designs</p>
             
-            <!-- View Switcher -->
             <div class="flex items-center gap-0.5 bg-slate-100/90 dark:bg-slate-800/90 p-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold">
               <button id="btnViewGrid" onclick="switchView('grid')" class="px-2 py-0.5 rounded-md transition bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm cursor-pointer">
                 <span>🔲</span> <span>Grid</span>
@@ -231,7 +256,6 @@
               </button>
             </div>
 
-            <!-- Sort Dropdown -->
             <div class="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/90 px-2 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60 text-xs">
               <label for="sortBy" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
               <select id="sortBy" onchange="applyFiltersAndRender()" class="bg-transparent font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
@@ -245,7 +269,6 @@
             </div>
           </div>
 
-          <!-- Active Filter Badges & Always-Visible Clear Filter System -->
           <div class="flex items-center gap-1.5 flex-wrap">
             <span class="text-[10px] text-slate-400 font-black uppercase tracking-wider">Active:</span>
             <div id="activeChipsContainer" class="flex flex-wrap items-center gap-1">
@@ -257,10 +280,10 @@
           </div>
         </div>
 
-        <!-- Row 3: 4 Micro Dual-Ended Range Sliders (Tight Vertical Height) -->
+        <!-- Row 4: 4 Micro Dual-Ended Range Sliders -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-1.5 bg-slate-50/70 dark:bg-slate-900/60 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800">
           
-          <!-- Slider 1: Chronological Milestone Years -->
+          <!-- Slider 1: Years -->
           <div class="space-y-0.5 px-1">
             <div class="flex items-center justify-between text-[10px]">
               <span class="font-extrabold text-slate-700 dark:text-slate-300">📅 Years: <strong id="labelYearRange" class="text-emerald-600 dark:text-emerald-400 font-black">1855 – 2026</strong></span>
@@ -274,7 +297,7 @@
             </div>
           </div>
 
-          <!-- Slider 2: Pre-Decimal Values (½d to £100) -->
+          <!-- Slider 2: Pre-Decimal -->
           <div id="preDecSliderContainer" class="space-y-0.5 px-1">
             <div class="flex items-center justify-between text-[10px]">
               <span class="font-extrabold text-amber-800 dark:text-amber-300">💰 Pre-Decimal: <strong id="labelPreRange" class="text-amber-600 dark:text-amber-400 font-black">½d – £100</strong></span>
@@ -288,7 +311,7 @@
             </div>
           </div>
 
-          <!-- Slider 3: Decimal Values (1c to $100) -->
+          <!-- Slider 3: Decimal -->
           <div id="decSliderContainer" class="space-y-0.5 px-1">
             <div class="flex items-center justify-between text-[10px]">
               <span class="font-extrabold text-blue-800 dark:text-blue-300">💵 Decimal: <strong id="labelDecRange" class="text-blue-600 dark:text-blue-400 font-black">1c – $100</strong></span>
@@ -302,7 +325,7 @@
             </div>
           </div>
 
-          <!-- Slider 4: Used Value Range ($0 to $5000+) -->
+          <!-- Slider 4: Used Value -->
           <div class="space-y-0.5 px-1">
             <div class="flex items-center justify-between text-[10px]">
               <span class="font-extrabold text-purple-800 dark:text-purple-300">🏷️ Fine Used: <strong id="labelUsedRange" class="text-purple-600 dark:text-purple-400 font-black">$0 – $5,000+</strong></span>
@@ -318,29 +341,23 @@
 
         </div>
 
-        <!-- Row 4: Reordered Category Tabs: 🌐 All (20) [Default], 📮 Core, 🏛️ Depts, 🌿 Thematic -->
+        <!-- Row 5: Category Tabs -->
         <div class="space-y-1 pt-0.5 border-t border-slate-200/50 dark:border-slate-800/60">
-          
           <div class="flex items-center gap-1 text-[11px] font-extrabold" role="tablist">
-            <!-- 1. 🌐 All (20) - Default Active -->
             <button id="tabCatAll" onclick="switchCategoryGroup('all')" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center gap-1 font-extrabold">
               <span>🌐 All (20)</span>
             </button>
-            <!-- 2. 📮 Core -->
             <button id="tabCatCore" onclick="switchCategoryGroup('core')" class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold">
               <span>📮 Core</span> <span id="badgeCatCore" class="hidden text-[8px] px-1 py-0.2 bg-emerald-600 text-white rounded-full font-black">0</span>
             </button>
-            <!-- 3. 🏛️ Depts -->
             <button id="tabCatDept" onclick="switchCategoryGroup('dept')" class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold">
               <span>🏛️ Depts</span> <span id="badgeCatDept" class="hidden text-[8px] px-1 py-0.2 bg-emerald-600 text-white rounded-full font-black">0</span>
             </button>
-            <!-- 4. 🌿 Thematic -->
             <button id="tabCatThem" onclick="switchCategoryGroup('thematic')" class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition cursor-pointer flex items-center gap-1 font-bold">
               <span>🌿 Thematic</span> <span id="badgeCatThem" class="hidden text-[8px] px-1 py-0.2 bg-emerald-600 text-white rounded-full font-black">0</span>
             </button>
           </div>
 
-          <!-- Dynamic Category Pills Container (Single wrap line) -->
           <div id="activeCategoryPillsBox" class="flex flex-wrap gap-1 text-xs"></div>
         </div>
 
@@ -366,7 +383,7 @@
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
           <div class="w-full h-1 bg-emerald-500 absolute top-0 left-0"></div>
-          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Total Catalogued</span>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Unique Designs</span>
           <div class="text-lg font-black text-emerald-600 dark:text-emerald-400 mt-0.5" id="statTotalCount">0</div>
         </div>
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
@@ -376,15 +393,12 @@
         </div>
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
           <div class="w-full h-1 bg-purple-500 absolute top-0 left-0"></div>
-          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Currency Split</span>
-          <div class="text-xs font-black mt-0.5 space-y-0.5">
-            <div id="statPreDecimal">Pre-Dec: <span class="text-purple-600">--</span></div>
-            <div id="statDecimal">Dec: <span class="text-pink-600">--</span></div>
-          </div>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Total Catalog Varieties</span>
+          <div class="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5" id="statTotalVarieties">0</div>
         </div>
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2.5 shadow-sm relative overflow-hidden">
           <div class="w-full h-1 bg-blue-500 absolute top-0 left-0"></div>
-          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Active Total</span>
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase block">Active Designs</span>
           <div class="text-base font-black text-blue-600 dark:text-blue-400 mt-0.5" id="statActiveCount">0 Issues</div>
         </div>
       </div>
@@ -401,9 +415,9 @@
       </div>
     </div>
 
-    <!-- 1. Grid View (With Favorites Heart Button) -->
+    <!-- 1. Grid View (Consolidated Cards with Variety Details) -->
     <div id="gridSection">
-      <div id="stampGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-3.5"></div>
+      <div id="stampGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4"></div>
       <div id="scrollSentinel" class="h-10 w-full flex items-center justify-center"></div>
     </div>
 
@@ -414,11 +428,12 @@
           <tr>
             <th class="p-2.5">Year</th>
             <th class="p-2.5">Denom</th>
-            <th class="p-2.5">Title & Subject</th>
+            <th class="p-2.5">Title / Issue</th>
+            <th class="p-2.5">Base ID</th>
+            <th class="p-2.5">Cat # Varieties</th>
             <th class="p-2.5">Categories</th>
-            <th class="p-2.5">Cat Ref</th>
-            <th class="p-2.5 text-right">Mint Unhinged (MUH)</th>
-            <th class="p-2.5 text-right">Fine Used</th>
+            <th class="p-2.5 text-right">MUH Range</th>
+            <th class="p-2.5 text-right">Used Range</th>
             <th class="p-2.5 text-center">Save</th>
             <th class="p-2.5 text-center">Action</th>
           </tr>
@@ -453,9 +468,9 @@
     </div>
   </div>
 
-  <!-- Detail Pop-up Modal -->
+  <!-- Detail Pop-up Modal with Full Variety Table & Variant Details -->
   <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[80] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
-    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-emerald-500/40 relative flex flex-col">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-emerald-500/40 relative flex flex-col">
       <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between">
         <div class="flex items-center gap-1.5">
           <button onclick="navigateModal(-1)" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold cursor-pointer">← Prev</button>
@@ -564,8 +579,24 @@
       { id: 'Round Kiwi', label: 'Round Kiwi Die-Cuts', icon: '🥝', group: 'thematic' }
     ];
 
+    const ALL_FORMAT_TYPES = [
+      { id: 'Standard Stamps', label: 'Standard Stamps', icon: '📮' },
+      { id: 'First Day Covers', label: 'First Day Covers (FDC)', icon: '✉️' },
+      { id: 'Self Adhesive Stamps', label: 'Self Adhesive Stamps', icon: '🏷️' },
+      { id: 'Se-tenant Pairs', label: 'Se-tenant Pairs', icon: '🔗' },
+      { id: 'Se-tenant Strips', label: 'Se-tenant Strips', icon: '🔗' },
+      { id: 'Se-tenant Blocks', label: 'Se-tenant Blocks', icon: '🔗' },
+      { id: 'Miniature Sheets', label: 'Miniature Sheets', icon: '🔲' },
+      { id: 'Sheetlets', label: 'Sheetlets', icon: '🔲' },
+      { id: 'Prestige Sheets', label: 'Prestige Sheets', icon: '📜' },
+      { id: 'Booklets', label: 'Booklets', icon: '📖' },
+      { id: 'Prestige Booklets', label: 'Prestige Booklets', icon: '📖' },
+      { id: 'Prestige Covers', label: 'Prestige Covers', icon: '✉️' }
+    ];
+
     let rawCatalog = [];
     let filteredCatalog = [];
+    let totalVarietiesCount = 0;
     let fuseSearch = null;
     let currentCurrencyLens = 'ALL';
     let activeCategories = new Set();
@@ -574,12 +605,184 @@
     let currentView = 'grid';
     let activeModalIndex = -1;
     let renderedCount = 0;
-    const BATCH_SIZE = 48;
+    const BATCH_SIZE = 36;
     let savedStamps = new Set(JSON.parse(localStorage.getItem('saved_stamps') || '[]'));
     let chartEraInstance = null;
     let chartCatInstance = null;
 
-    // Compact Category Tab Switcher
+    let activeFormatTypes = new Set(ALL_FORMAT_TYPES.map(f => f.id));
+
+    function escapeHTML(str) {
+      if (str == null) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function isValidImageUrl(url) {
+      if (!url) return false;
+      const clean = url.trim().toLowerCase().split('?')[0].split('#')[0];
+      if (clean.includes('placeholder') || clean.endsWith('.html') || clean.endsWith('.htm') || clean.endsWith('.php')) return false;
+      if (clean.includes('drive.google') || clean.includes('googleusercontent') || clean.includes('dropbox') || clean.startsWith('./media/') || clean.startsWith('media/')) return true;
+      return /\.(jpg|jpeg|png|webp|gif|avif|svg)$/i.test(clean);
+    }
+
+    // Strips trailing variety letter/number (e.g. "NZ-1945-78a" -> "NZ-1945-78", "NZ-1855-2l" -> "NZ-1855-2")
+    function extractBaseId(idStr) {
+      if (!idStr) return '';
+      const clean = String(idStr).trim();
+      const match = clean.match(/^(NZ-[\d\-]+?)[a-zA-Z]+(?:\d+)?$/i) || clean.match(/^(.*?\d+)[a-zA-Z]+(?:\d+)?$/);
+      if (match) return match[1].trim();
+      return clean;
+    }
+
+    function extractBaseCatNumber(catStr) {
+      if (!catStr) return '';
+      const clean = String(catStr).trim();
+      const match = clean.match(/^([A-Za-z\s]*\d+)/);
+      if (match) return match[1].trim();
+      return clean;
+    }
+
+    function parseStrictCategories(catStr, isPre) {
+      if (!catStr || !catStr.trim()) {
+        return [isPre ? 'Definitives' : 'Commemoratives'];
+      }
+      const rawTokens = catStr.split(/[|;,]/).map(c => c.trim()).filter(Boolean);
+      if (!rawTokens.length) {
+        return [isPre ? 'Definitives' : 'Commemoratives'];
+      }
+
+      const matched = [];
+      rawTokens.forEach(token => {
+        const tokenLower = token.toLowerCase();
+        const defMatch = CATEGORY_DEFINITIONS.find(d => 
+          d.id.toLowerCase() === tokenLower || 
+          d.label.toLowerCase() === tokenLower || 
+          tokenLower.includes(d.id.toLowerCase())
+        );
+        if (defMatch && !matched.includes(defMatch.id)) {
+          matched.push(defMatch.id);
+        } else if (!defMatch && !matched.includes(token)) {
+          matched.push(token);
+        }
+      });
+
+      return matched.length ? matched : [isPre ? 'Definitives' : 'Commemoratives'];
+    }
+
+    function resolveAccurateYear(s) {
+      if (s.Source_Page) {
+        const pageMatch = s.Source_Page.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
+        if (pageMatch) return parseInt(pageMatch[1], 10);
+      }
+      if (s.Image_URL) {
+        const imgMatch = s.Image_URL.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
+        if (imgMatch) return parseInt(imgMatch[1], 10);
+      }
+      if (s.ID) {
+        const idMatch = s.ID.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
+        if (idMatch) return parseInt(idMatch[1], 10);
+      }
+      const parsedYr = parseInt(s.Year, 10);
+      if (!isNaN(parsedYr) && parsedYr >= 1840 && parsedYr <= 2030) return parsedYr;
+      return 1900;
+    }
+
+    function formatTitleFromPageSlug(slug) {
+      if (!slug) return 'New Zealand Philatelic Issue';
+      let title = slug.replace(/^(nz_|\d{4}_)?/, (m) => m ? m.replace('_', ' ') : '');
+      title = slug.replace(/_/g, ' ').replace(/\.(html?|php)$/i, '');
+      return title.replace(/\b\w/g, c => c.toUpperCase()).trim();
+    }
+
+    function classifyFormatType(s) {
+      const combined = `${s.Item_Type || ''} ${s.Subject || ''} ${s.Variant_Details || ''} ${s.Issue_Overview || ''} ${s.Categories || ''}`.toLowerCase();
+      
+      if (combined.includes('prestige cover') || combined.includes('prestige fdc')) return 'Prestige Covers';
+      if (combined.includes('first day cover') || combined.includes('fdc') || /\bfdc\b/.test(combined)) return 'First Day Covers';
+      if (combined.includes('prestige booklet')) return 'Prestige Booklets';
+      if (combined.includes('booklet')) return 'Booklets';
+      if (combined.includes('prestige sheet')) return 'Prestige Sheets';
+      if (combined.includes('sheetlet')) return 'Sheetlets';
+      if (combined.includes('miniature sheet') || combined.includes('minisheet') || /\bm\/s\b/.test(combined)) return 'Miniature Sheets';
+      if (combined.includes('se-tenant block') || (combined.includes('se-tenant') && combined.includes('block')) || combined.includes('block of')) return 'Se-tenant Blocks';
+      if (combined.includes('se-tenant strip') || (combined.includes('se-tenant') && combined.includes('strip')) || combined.includes('strip of')) return 'Se-tenant Strips';
+      if (combined.includes('se-tenant pair') || (combined.includes('se-tenant') && combined.includes('pair')) || combined.includes('pair')) return 'Se-tenant Pairs';
+      if (combined.includes('self adhesive') || combined.includes('self-adhesive') || combined.includes('self-adhesives')) return 'Self Adhesive Stamps';
+
+      return 'Standard Stamps';
+    }
+
+    function setFormatPreset(mode) {
+      if (mode === 'all') {
+        activeFormatTypes = new Set(ALL_FORMAT_TYPES.map(f => f.id));
+      } else if (mode === 'singles') {
+        activeFormatTypes = new Set(['Standard Stamps']);
+        showToast('Showing Regular Single Stamps Only', '📮');
+      } else if (mode === 'fdc') {
+        activeFormatTypes = new Set(['First Day Covers', 'Prestige Covers']);
+        showToast('Showing First Day Covers (FDC) Only', '✉️');
+      }
+      updateFormatFilterUI();
+      applyFiltersAndRender();
+    }
+
+    function toggleFormatType(id) {
+      if (activeFormatTypes.has(id)) {
+        activeFormatTypes.delete(id);
+      } else {
+        activeFormatTypes.add(id);
+      }
+      updateFormatFilterUI();
+      applyFiltersAndRender();
+    }
+
+    function toggleAllFormats(enableAll) {
+      if (enableAll) activeFormatTypes = new Set(ALL_FORMAT_TYPES.map(f => f.id));
+      else activeFormatTypes.clear();
+      updateFormatFilterUI();
+      applyFiltersAndRender();
+    }
+
+    function toggleFormatMenu() {
+      const menu = document.getElementById('formatDropdownMenu');
+      const chev = document.getElementById('formatMenuChevron');
+      menu.classList.toggle('hidden');
+      if (chev) chev.innerText = menu.classList.contains('hidden') ? '▼' : '▲';
+    }
+
+    function updateFormatFilterUI() {
+      const isAll = activeFormatTypes.size === ALL_FORMAT_TYPES.length;
+      const isSingles = activeFormatTypes.size === 1 && activeFormatTypes.has('Standard Stamps');
+      const isFDC = activeFormatTypes.size === 2 && activeFormatTypes.has('First Day Covers') && activeFormatTypes.has('Prestige Covers');
+
+      document.getElementById('btnFormatAll').className = isAll
+        ? "px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm cursor-pointer transition"
+        : "px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition";
+
+      document.getElementById('btnFormatSingles').className = isSingles
+        ? "px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm cursor-pointer transition"
+        : "px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition";
+
+      document.getElementById('btnFormatFDC').className = isFDC
+        ? "px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm cursor-pointer transition"
+        : "px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition";
+
+      const listContainer = document.getElementById('formatCheckboxList');
+      if (listContainer) {
+        listContainer.innerHTML = ALL_FORMAT_TYPES.map(fmt => {
+          const checked = activeFormatTypes.has(fmt.id);
+          return `
+            <label class="flex items-center justify-between p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition select-none">
+              <span class="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+                <span>${fmt.icon}</span> <span>${fmt.label}</span>
+              </span>
+              <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFormatType('${fmt.id}')" class="rounded text-emerald-600 focus:ring-0 cursor-pointer"/>
+            </label>
+          `;
+        }).join('');
+      }
+    }
+
     function switchCategoryGroup(group) {
       currentCategoryGroupTab = group;
       ['tabCatAll', 'tabCatCore', 'tabCatDept', 'tabCatThem'].forEach(id => {
@@ -735,13 +938,13 @@
     resetDecSlider();
     resetUsedSlider();
     switchCategoryGroup('all');
+    updateFormatFilterUI();
 
-    // Dual-Mode Loader (Google Sheets Remote + 24h Cache + Local Fallback)
+    // Dual-Mode Loader
     async function loadCatalog() {
       const loadingScreen = document.getElementById('loadingScreen');
       loadingScreen.classList.remove('hidden');
 
-      // 1. Check local cache
       try {
         const cached = localStorage.getItem(CACHE_KEY);
         const cacheTime = localStorage.getItem(`${CACHE_KEY}_time`);
@@ -755,7 +958,6 @@
         }
       } catch (e) {}
 
-      // 2. Fetch remote Google Sheets CSV
       try {
         const res = await fetch(REMOTE_STAMPS_CSV_URL);
         if (res.ok) {
@@ -775,7 +977,6 @@
         console.warn("Could not fetch remote Google Sheets, trying local fallback...", e);
       }
 
-      // 3. Local fallback
       Papa.parse(LOCAL_STAMPS_CSV_URL, {
         download: true,
         header: true,
@@ -790,60 +991,205 @@
               <span class="text-3xl">⚠️</span>
               <h3 class="text-base font-bold text-rose-800 dark:text-rose-200 mt-2">Could not connect to Stamps archive</h3>
               <p class="text-xs text-rose-600 dark:text-rose-400 mt-1">Please verify your internet connection or Google Sheets sharing permissions.</p>
-              <button onclick="refreshData()" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer">Retry Sync 🔄</button>
             </div>
           `;
         }
       });
     }
 
-    function refreshData() {
-      localStorage.removeItem(CACHE_KEY);
-      localStorage.removeItem(`${CACHE_KEY}_time`);
-      showToast('Syncing latest updates from Google Sheets...', '🔄');
-      loadCatalog();
-    }
-
+    // Process & Group Catalog Data using the New Schema (ID, Issue_Name, Variant_Details, Issue_Overview, etc.)
     function processCatalogData(data) {
-      rawCatalog = (data || [])
-        .filter(s => {
-          if (!s.Title || s.Title.trim() === '') return false;
-          const catRef = (s.Cat_Number || '').toLowerCase().trim();
-          if (catRef === 'cat.' || catRef === 'cat' || catRef === 'no.') return false;
-          const muh = (s.Mint_Unhinged_Price || '').toLowerCase();
-          const fu = (s.Fine_Used_Price || '').toLowerCase();
-          if (muh.includes('mint') || fu.includes('used') || muh.includes('unhinged')) return false;
-          if (s.Title.toLowerCase().includes('first day cover') || s.Title.toLowerCase().includes('fdc')) return false;
-          return true;
-        })
-        .map((s, idx) => {
-          const yr = parseInt(s.Year) || 1900;
-          const isPre = (yr > 0 && yr < 1967) || (s.Currency_Type && s.Currency_Type.toLowerCase().includes('pre'));
-          let cats = (s.Categories || '').split('|').map(c => c.trim()).filter(Boolean);
-          if (!cats.length) cats.push(isPre ? 'Definitives' : 'Commemoratives');
+      const cleanRows = (data || []).filter(s => {
+        const subjectStr = s.Subject || s.Issue_Name || '';
+        if (!subjectStr.trim()) return false;
+        const catRef = (s.Cat_Number || '').toLowerCase().trim();
+        if (catRef === 'cat.' || catRef === 'cat' || catRef === 'no.') return false;
+        const muh = (s.Mint_Unhinged_Price || '').toLowerCase();
+        const fu = (s.Fine_Used_Price || '').toLowerCase();
+        if (muh.includes('mint') || fu.includes('used') || muh.includes('unhinged')) return false;
+        return true;
+      });
 
-          const usedValNum = parseFloat((s.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0;
+      totalVarietiesCount = cleanRows.length;
 
-          return {
-            ...s,
-            internalId: s.ID || `NZ-STAMP-${idx}`,
-            Year: yr,
-            Era: s.Era || (isPre ? 'Pre-Decimal' : 'Decimal Currency'),
+      // PASS 1: Build Local Page & Base ID Artwork Index
+      const pageImageIndex = new Map();
+      const baseIdImageIndex = new Map();
+
+      cleanRows.forEach(s => {
+        const rawImg = (s.Image_URL || '').trim();
+        if (isValidImageUrl(rawImg)) {
+          const cleanImg = window.resolveOfflineMedia ? window.resolveOfflineMedia(rawImg) : rawImg;
+          
+          if (s.Source_Page) {
+            const pageSlug = s.Source_Page.split('/').pop().replace(/\.(html?|php)$/i, '').toLowerCase().trim();
+            if (pageSlug && !pageImageIndex.has(pageSlug)) pageImageIndex.set(pageSlug, cleanImg);
+          }
+          
+          const baseId = extractBaseId(s.ID);
+          if (baseId && !baseIdImageIndex.has(baseId.toLowerCase())) {
+            baseIdImageIndex.set(baseId.toLowerCase(), cleanImg);
+          }
+        }
+      });
+
+      // PASS 2: Robust Issue Grouping
+      const groupMap = new Map();
+
+      cleanRows.forEach((s, idx) => {
+        const rawImg = (s.Image_URL || '').trim();
+        const hasValidImg = isValidImageUrl(rawImg);
+        let resolvedImg = hasValidImg ? (window.resolveOfflineMedia ? window.resolveOfflineMedia(rawImg) : rawImg) : '';
+        
+        let pageSlug = '';
+        if (s.Source_Page) {
+          pageSlug = s.Source_Page.split('/').pop().replace(/\.(html?|php)$/i, '').toLowerCase().trim();
+        }
+
+        const baseId = extractBaseId(s.ID);
+        const accurateYear = resolveAccurateYear(s);
+
+        // Inherit image locally within the same Base ID or same Source Page
+        if (!resolvedImg) {
+          if (baseId && baseIdImageIndex.has(baseId.toLowerCase())) {
+            resolvedImg = baseIdImageIndex.get(baseId.toLowerCase());
+          } else if (pageSlug && pageImageIndex.has(pageSlug)) {
+            resolvedImg = pageImageIndex.get(pageSlug);
+          }
+        }
+
+        // Consolidated Group Key
+        let groupKey;
+        if (resolvedImg) {
+          groupKey = `img:${resolvedImg.toLowerCase()}`;
+        } else if (baseId) {
+          groupKey = `id:${baseId.toLowerCase()}`;
+        } else if (pageSlug) {
+          groupKey = `page:${pageSlug}`;
+        } else {
+          groupKey = `issue:${accurateYear}_${(s.Issue_Name || s.Subject || 'issue').toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+        }
+
+        const isPre = (accurateYear > 0 && accurateYear < 1967) || (s.Currency_Type && s.Currency_Type.toLowerCase().includes('pre'));
+        const cats = parseStrictCategories(s.Categories, isPre);
+
+        const usedValNum = parseFloat((s.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0;
+        const muhValNum = parseFloat((s.Mint_Unhinged_Price || '').replace(/[^0-9.]/g, '')) || 0;
+        const pVal = parseFloat(s.Pence_Value) || 0;
+        const cVal = parseFloat(s.Cent_Value) || 0;
+        const formatType = classifyFormatType(s);
+
+        let finalIssueTitle = (s.Issue_Name || '').trim();
+        if (!finalIssueTitle || finalIssueTitle.length <= 3 || /^(red|orange|blue|green|lilac|brown|yellow)$/i.test(finalIssueTitle)) {
+          if (pageSlug) finalIssueTitle = formatTitleFromPageSlug(pageSlug);
+          else finalIssueTitle = (s.Subject || 'New Zealand Issue').replace(/\s+(1d|2d|3d|6d|1\/-|\d+c|\d+d|\$\d+(\.\d+)?)\s+.*$/i, '').trim();
+        }
+
+        const stampTitle = (s.Subject || finalIssueTitle).trim();
+        const stampId = (s.ID || `NZ-${idx}`).trim();
+        const variantDetails = (s.Variant_Details || '').trim();
+
+        const variety = {
+          internalId: stampId,
+          ID: stampId,
+          Title: stampTitle,
+          Cat_Number: s.Cat_Number || '—',
+          Denomination: s.Denomination || '',
+          Pence_Value: pVal,
+          Cent_Value: cVal,
+          Subject: s.Subject || '',
+          Variant_Details: variantDetails,
+          Format_Type: formatType,
+          Categories: cats.join(', '),
+          Mint_Unhinged_Price: s.Mint_Unhinged_Price && !s.Mint_Unhinged_Price.toLowerCase().includes('mint') ? s.Mint_Unhinged_Price : '—',
+          Fine_Used_Price: s.Fine_Used_Price && !s.Fine_Used_Price.toLowerCase().includes('used') ? s.Fine_Used_Price : '—',
+          Muh_Price_Num: muhValNum,
+          Used_Price_Num: usedValNum,
+          Year: accurateYear
+        };
+
+        if (!groupMap.has(groupKey)) {
+          groupMap.set(groupKey, {
+            groupId: `STAMP-GROUP-${groupMap.size}`,
+            baseId: baseId || stampId,
+            Title: finalIssueTitle,
+            Issue_Name: s.Issue_Name || finalIssueTitle,
+            Year: accurateYear,
+            Era: s.Era || (isPre ? 'Pre-Decimal' : 'Decimal Currency (1967–Present)'),
             Currency_Type: isPre ? 'Pre-Decimal' : 'Decimal',
-            Pence_Value: parseFloat(s.Pence_Value) || 0,
-            Cent_Value: parseFloat(s.Cent_Value) || 0,
-            Used_Price_Num: usedValNum,
-            CategoryList: cats,
+            Denomination: s.Denomination || '',
+            Pence_Value: pVal,
+            Cent_Value: cVal,
+            Format_Type: formatType,
+            CategoryList: [...cats],
             Categories: cats.join('|'),
-            Mint_Unhinged_Price: s.Mint_Unhinged_Price && !s.Mint_Unhinged_Price.toLowerCase().includes('mint') ? s.Mint_Unhinged_Price : '—',
-            Fine_Used_Price: s.Fine_Used_Price && !s.Fine_Used_Price.toLowerCase().includes('used') ? s.Fine_Used_Price : '—',
-            Image_URL: s.Image_URL || '',
-            Description: s.Description || 'Authentic New Zealand postal release from the StampsNZ catalogue.'
-          };
-        });
+            Image_URL: resolvedImg,
+            Description: s.Issue_Overview || s.Variant_Details || 'Authentic New Zealand postal release from the StampsNZ catalogue.',
+            Source_Page: s.Source_Page && !s.Source_Page.includes('javascript') ? s.Source_Page : '',
+            varieties: [variety]
+          });
+        } else {
+          const existing = groupMap.get(groupKey);
+          existing.varieties.push(variety);
+          cats.forEach(c => { if (!existing.CategoryList.includes(c)) existing.CategoryList.push(c); });
+          existing.Categories = existing.CategoryList.join('|');
+          if (!existing.Image_URL && resolvedImg) existing.Image_URL = resolvedImg;
+          if (accurateYear && accurateYear !== 1900 && (!existing.Year || existing.Year === 1900)) {
+            existing.Year = accurateYear;
+          }
+        }
+      });
+
+      rawCatalog = Array.from(groupMap.values()).map(group => {
+        const muhValues = group.varieties.map(v => v.Muh_Price_Num).filter(v => v > 0);
+        const usedValues = group.varieties.map(v => v.Used_Price_Num).filter(v => v > 0);
+
+        const minMuh = muhValues.length ? Math.min(...muhValues) : 0;
+        const maxMuh = muhValues.length ? Math.max(...muhValues) : 0;
+        const minUsed = usedValues.length ? Math.min(...usedValues) : 0;
+        const maxUsed = usedValues.length ? Math.max(...usedValues) : 0;
+
+        const catNums = group.varieties.map(v => v.Cat_Number).filter(c => c && c !== '—');
+        const denoms = Array.from(new Set(group.varieties.map(v => v.Denomination).filter(Boolean)));
+        
+        let displayDenom = group.Denomination;
+        if (denoms.length > 1) {
+          displayDenom = `${denoms[0]} – ${denoms[denoms.length - 1]}`;
+        }
+
+        const groupFormats = Array.from(new Set(group.varieties.map(v => v.Format_Type)));
+
+        return {
+          ...group,
+          Denomination: displayDenom,
+          FormatList: groupFormats,
+          minMuh,
+          maxMuh,
+          minUsed,
+          maxUsed,
+          varietyCount: group.varieties.length,
+          allCatNumbers: catNums.join(', ')
+        };
+      });
 
       fuseSearch = new Fuse(rawCatalog, {
-        keys: ['Title', 'Subject', 'Cat_Number', 'Year', 'Denomination', 'Categories', 'Era'],
+        keys: [
+          'baseId',
+          'Title',
+          'Issue_Name',
+          'Denomination',
+          'allCatNumbers',
+          'Year',
+          'Categories',
+          'Era',
+          'Description',
+          'varieties.ID',
+          'varieties.Title',
+          'varieties.Subject',
+          'varieties.Variant_Details',
+          'varieties.Cat_Number',
+          'varieties.Denomination'
+        ],
         threshold: 0.35
       });
 
@@ -874,30 +1220,33 @@
         if (currentCurrencyLens === 'PRE_DECIMAL' && s.Currency_Type !== 'Pre-Decimal') return false;
         if (currentCurrencyLens === 'DECIMAL' && s.Currency_Type !== 'Decimal') return false;
 
-        // Year Slider
+        if (activeFormatTypes.size < ALL_FORMAT_TYPES.length) {
+          const hasMatchingFormat = s.FormatList.some(f => activeFormatTypes.has(f));
+          if (!hasMatchingFormat) return false;
+        }
+
         if (s.Year < yrMin || s.Year > yrMax) return false;
 
-        // Pre-Decimal Face Value Slider
-        if (s.Currency_Type === 'Pre-Decimal' && s.Pence_Value > 0) {
-          if (s.Pence_Value < preMin || s.Pence_Value > preMax) return false;
+        if (s.Currency_Type === 'Pre-Decimal') {
+          const hasMatchingPence = s.varieties.some(v => v.Pence_Value === 0 || (v.Pence_Value >= preMin && v.Pence_Value <= preMax));
+          if (!hasMatchingPence) return false;
         }
 
-        // Decimal Face Value Slider
-        if (s.Currency_Type === 'Decimal' && s.Cent_Value > 0) {
-          if (s.Cent_Value < decMin || s.Cent_Value > decMax) return false;
+        if (s.Currency_Type === 'Decimal') {
+          const hasMatchingCent = s.varieties.some(v => v.Cent_Value === 0 || (v.Cent_Value >= decMin && v.Cent_Value <= decMax));
+          if (!hasMatchingCent) return false;
         }
 
-        // Used Value Range Slider
         if (usedMinIdx > 0 || usedMaxIdx < 18) {
-          if (s.Used_Price_Num < usedMin || (usedMaxIdx < 18 && s.Used_Price_Num > usedMax)) return false;
+          const matchesUsed = s.varieties.some(v => v.Used_Price_Num >= usedMin && (usedMaxIdx === 18 || v.Used_Price_Num <= usedMax));
+          if (!matchesUsed) return false;
         }
 
-        // Category Multi-Select
         if (activeCategories.size > 0) {
           if (![...activeCategories].some(c => s.CategoryList.includes(c))) return false;
         }
 
-        if (showingSavedOnly && !savedStamps.has(s.internalId)) return false;
+        if (showingSavedOnly && !savedStamps.has(s.groupId)) return false;
 
         return true;
       });
@@ -912,18 +1261,15 @@
         if (sortMode === 'year-desc') return (b.Year || 0) - (a.Year || 0);
         if (sortMode === 'title-asc') return a.Title.localeCompare(b.Title);
         if (sortMode === 'title-desc') return b.Title.localeCompare(a.Title);
-        if (sortMode === 'muh-desc') {
-          return (parseFloat((b.Mint_Unhinged_Price || '').replace(/[^0-9.]/g, '')) || 0) - (parseFloat((a.Mint_Unhinged_Price || '').replace(/[^0-9.]/g, '')) || 0);
-        }
-        if (sortMode === 'used-desc') {
-          return (parseFloat((b.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0) - (parseFloat((a.Fine_Used_Price || '').replace(/[^0-9.]/g, '')) || 0);
-        }
+        if (sortMode === 'muh-desc') return b.maxMuh - a.maxMuh;
+        if (sortMode === 'used-desc') return b.maxUsed - a.maxUsed;
         return 0;
       });
 
       filteredCatalog = results;
-      document.getElementById('itemCount').innerText = `Showing ${filteredCatalog.length} of ${rawCatalog.length} stamps`;
-      document.getElementById('statActiveCount').innerText = `${filteredCatalog.length} Issues`;
+      const activeVarsCount = filteredCatalog.reduce((acc, g) => acc + g.varietyCount, 0);
+      document.getElementById('itemCount').innerText = `Showing ${filteredCatalog.length} stamp designs (${activeVarsCount} total varieties)`;
+      document.getElementById('statActiveCount').innerText = `${filteredCatalog.length} Designs`;
       document.getElementById('noResults').classList.toggle('hidden', filteredCatalog.length > 0);
 
       renderCompactCategoryPills();
@@ -952,7 +1298,7 @@
       else if (currentView === 'photos') renderPhotos();
     }
 
-    // 1. Grid View
+    // 1. Grid View (Consolidated Cards with Variety Details)
     function appendNextBatch() {
       const grid = document.getElementById('stampGrid');
       const batch = filteredCatalog.slice(renderedCount, renderedCount + BATCH_SIZE);
@@ -961,29 +1307,64 @@
       const frag = document.createDocumentFragment();
       batch.forEach((s, idx) => {
         const itemIdx = renderedCount + idx;
-        const isFav = savedStamps.has(s.internalId);
+        const isFav = savedStamps.has(s.groupId);
         const card = document.createElement('article');
-        card.className = "bg-white/90 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow hover:shadow-lg transition flex flex-col overflow-hidden group";
+        card.className = "bg-white/90 dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col overflow-hidden group";
+        
         card.innerHTML = `
-          <div class="relative bg-slate-100 dark:bg-slate-950 p-2.5 flex items-center justify-center min-h-[140px] border-b border-slate-100 dark:border-slate-800 cursor-pointer" onclick="openEnlargeModal('${s.Image_URL || 'placeholder.png'}', '${s.Title.replace(/'/g, "\\'")}')">
-            <span class="absolute top-1.5 left-1.5 bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded shadow">${s.Year || 'NZ'}</span>
-            ${s.Denomination ? `<span class="absolute top-1.5 right-1.5 bg-amber-600 text-white text-[9px] font-bold px-1.5 py-0.2 rounded">${s.Denomination}</span>` : ''}
-            <img src="${s.Image_URL || 'placeholder.png'}" loading="lazy" alt="${s.Title}" class="max-h-28 object-contain rounded drop-shadow hover:scale-105 transition" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>'"/>
-            <span class="absolute bottom-1 right-1.5 text-[8px] font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition">🔍 Enlarge</span>
+          <div class="relative bg-slate-100 dark:bg-slate-950 p-3 flex items-center justify-center min-h-[160px] border-b border-slate-100 dark:border-slate-800 cursor-pointer" onclick="openEnlargeModal('${s.Image_URL || 'placeholder.png'}', '${s.Title.replace(/'/g, "\\'")}')">
+            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded shadow">${s.Year || 'NZ'}</span>
+            ${s.Denomination ? `<span class="absolute top-2 right-2 bg-amber-600 text-white text-[9px] font-bold px-1.5 py-0.2 rounded shadow">${s.Denomination}</span>` : ''}
+            <img src="${s.Image_URL || 'placeholder.png'}" loading="lazy" alt="${s.Title}" class="max-h-32 object-contain rounded drop-shadow hover:scale-105 transition duration-200" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>'"/>
+            <div class="absolute bottom-1.5 right-2 flex items-center gap-1">
+              ${s.varietyCount > 1 ? `<span class="bg-indigo-600/90 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full shadow">${s.varietyCount} Varieties</span>` : ''}
+              <span class="text-[8px] font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition">🔍 Enlarge</span>
+            </div>
           </div>
-          <div class="p-2.5 flex-1 flex flex-col justify-between space-y-1.5">
+
+          <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
             <div>
-              <div class="text-[8px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-0.5 truncate">${s.Era}</div>
+              <div class="flex items-center justify-between text-[8px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-0.5">
+                <span class="truncate">${s.Era}</span>
+                <span class="font-mono text-slate-400 font-bold ml-1">${s.baseId || ''}</span>
+              </div>
               <h3 class="text-xs font-black text-slate-900 dark:text-white leading-tight cursor-pointer hover:text-emerald-600 transition line-clamp-2" onclick="openModalByIndex(${itemIdx})">${s.Title}</h3>
-              ${s.Cat_Number ? `<p class="text-[9px] font-bold text-slate-400 mt-0.5">Cat: <span class="font-mono text-slate-600 dark:text-slate-300">${s.Cat_Number}</span></p>` : ''}
+              ${s.allCatNumbers ? `<p class="text-[9px] font-bold text-slate-400 mt-0.5 truncate">Cat Ref: <span class="font-mono text-slate-700 dark:text-slate-300 font-black">${s.allCatNumbers}</span></p>` : ''}
             </div>
-            <div class="grid grid-cols-2 gap-1 bg-slate-50 dark:bg-slate-800/60 p-1 rounded-lg border border-slate-100 dark:border-slate-800 text-center">
-              <div><span class="block text-[7px] text-slate-400 font-bold uppercase">MUH</span><span class="text-[10px] font-black text-slate-900 dark:text-white truncate block">${s.Mint_Unhinged_Price}</span></div>
-              <div><span class="block text-[7px] text-slate-400 font-bold uppercase">Used</span><span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 truncate block">${s.Fine_Used_Price}</span></div>
+
+            <!-- Scrollable Variety Details Table inside Card (Includes Record ID & Subject) -->
+            <div class="border border-slate-200/80 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/70 dark:bg-slate-950/50">
+              <div class="max-h-28 overflow-y-auto no-scrollbar">
+                <table class="w-full text-left text-[10px] border-collapse">
+                  <thead class="bg-slate-100 dark:bg-slate-800/90 text-[8px] font-black uppercase text-slate-400 sticky top-0 border-b border-slate-200/80 dark:border-slate-800">
+                    <tr>
+                      <th class="px-1.5 py-0.5">ID / Cat</th>
+                      <th class="px-1.5 py-0.5 text-right">MUH</th>
+                      <th class="px-1.5 py-0.5 text-right">Used</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold">
+                    ${s.varieties.map(v => `
+                      <tr class="hover:bg-white dark:hover:bg-slate-800/60 transition">
+                        <td class="px-1.5 py-0.5 max-w-[130px] truncate" title="${escapeHTML(v.ID)} | Cat ${escapeHTML(v.Cat_Number)}: ${escapeHTML(v.Title)}${v.Variant_Details ? ` (${escapeHTML(v.Variant_Details)})` : ''}">
+                          <span class="font-mono text-[9px] text-slate-400 font-bold block">${escapeHTML(v.ID)}</span>
+                          <span class="font-mono text-emerald-700 dark:text-emerald-400 font-black">${escapeHTML(v.Cat_Number)}</span>
+                          <span class="text-slate-600 dark:text-slate-300 text-[9px] font-medium ml-1">${escapeHTML(v.Denomination || v.Title)}</span>
+                        </td>
+                        <td class="px-1.5 py-0.5 text-right text-slate-900 dark:text-white font-black truncate">${escapeHTML(v.Mint_Unhinged_Price)}</td>
+                        <td class="px-1.5 py-0.5 text-right text-emerald-600 dark:text-emerald-400 font-black truncate">${escapeHTML(v.Fine_Used_Price)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-xs">
-              <button onclick="openModalByIndex(${itemIdx})" class="font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer text-[11px]">Specs →</button>
-              <button onclick="toggleFavorite('${s.internalId}', event)" class="p-0.5 text-slate-400 hover:text-rose-500 transition cursor-pointer text-xs" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
+
+            <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-slate-800 text-xs">
+              <button onclick="openModalByIndex(${itemIdx})" class="font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer text-[11px] flex items-center gap-0.5">
+                <span>Specs (${s.varietyCount})</span> <span>→</span>
+              </button>
+              <button onclick="toggleFavorite('${s.groupId}', event)" class="p-0.5 text-slate-400 hover:text-rose-500 transition cursor-pointer text-xs" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
             </div>
           </div>
         `;
@@ -997,23 +1378,27 @@
     function renderTable() {
       const tbody = document.getElementById('stampTableBody');
       tbody.innerHTML = filteredCatalog.map((s, idx) => {
-        const isFav = savedStamps.has(s.internalId);
+        const isFav = savedStamps.has(s.groupId);
+        const muhRange = s.minMuh === s.maxMuh ? (s.varieties[0].Mint_Unhinged_Price) : `$${s.minMuh.toFixed(2)} – $${s.maxMuh.toFixed(2)}`;
+        const usedRange = s.minUsed === s.maxUsed ? (s.varieties[0].Fine_Used_Price) : `$${s.minUsed.toFixed(2)} – $${s.maxUsed.toFixed(2)}`;
+
         return `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-            <td class="p-2 font-black text-emerald-600 dark:text-emerald-400">${s.Year || '—'}</td>
-            <td class="p-2 font-black text-amber-600 dark:text-amber-400">${s.Denomination || '—'}</td>
-            <td class="p-2 font-bold text-slate-900 dark:text-white">
+            <td class="p-2.5 font-black text-emerald-600 dark:text-emerald-400">${s.Year || '—'}</td>
+            <td class="p-2.5 font-black text-amber-600 dark:text-amber-400">${s.Denomination || '—'}</td>
+            <td class="p-2.5 font-bold text-slate-900 dark:text-white">
               <span class="cursor-pointer hover:underline" onclick="openModalByIndex(${idx})">${s.Title}</span>
             </td>
-            <td class="p-2 text-[11px] text-slate-500 dark:text-slate-400">${(s.Categories || '').replace(/\|/g, ', ')}</td>
-            <td class="p-2 font-mono text-[11px] text-slate-600 dark:text-slate-300">${s.Cat_Number || '—'}</td>
-            <td class="p-2 text-right font-black text-slate-900 dark:text-white">${s.Mint_Unhinged_Price}</td>
-            <td class="p-2 text-right font-black text-emerald-600 dark:text-emerald-400">${s.Fine_Used_Price}</td>
-            <td class="p-2 text-center">
-              <button onclick="toggleFavorite('${s.internalId}', event)" class="p-0.5 text-slate-400 hover:text-rose-500 transition cursor-pointer text-xs" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
+            <td class="p-2.5 font-mono text-[11px] text-slate-500 font-bold">${s.baseId || '—'}</td>
+            <td class="p-2.5 font-mono text-[11px] text-slate-700 dark:text-slate-300 font-bold">${s.allCatNumbers || '—'}</td>
+            <td class="p-2.5 text-[11px] text-slate-500 dark:text-slate-400">${(s.Categories || '').replace(/\|/g, ', ')}</td>
+            <td class="p-2.5 text-right font-black text-slate-900 dark:text-white">${muhRange}</td>
+            <td class="p-2.5 text-right font-black text-emerald-600 dark:text-emerald-400">${usedRange}</td>
+            <td class="p-2.5 text-center">
+              <button onclick="toggleFavorite('${s.groupId}', event)" class="p-0.5 text-slate-400 hover:text-rose-500 transition cursor-pointer text-xs" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
             </td>
-            <td class="p-2 text-center">
-              <button onclick="openModalByIndex(${idx})" class="text-xs bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 px-2 py-0.5 rounded-md font-bold transition cursor-pointer">View</button>
+            <td class="p-2.5 text-center">
+              <button onclick="openModalByIndex(${idx})" class="text-xs bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 px-2 py-0.5 rounded-md font-bold transition cursor-pointer">View (${s.varietyCount})</button>
             </td>
           </tr>
         `;
@@ -1024,14 +1409,14 @@
     function renderPhotos() {
       const pGrid = document.getElementById('stampPhotoGrid');
       pGrid.innerHTML = filteredCatalog.map((s, idx) => {
-        const isFav = savedStamps.has(s.internalId);
+        const isFav = savedStamps.has(s.groupId);
         return `
           <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-2 flex flex-col items-center justify-between aspect-square shadow hover:shadow-lg hover:scale-105 transition cursor-pointer relative group overflow-hidden" onclick="openEnlargeModal('${s.Image_URL || 'placeholder.png'}', '${s.Title.replace(/'/g, "\\'")}')">
             <div class="w-full flex items-center justify-between z-10">
               <span class="bg-emerald-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded shadow-sm">${s.Year || 'NZ'}</span>
               <div class="flex items-center gap-1">
                 ${s.Denomination ? `<span class="bg-amber-600 text-white text-[8px] font-bold px-1.5 py-0.2 rounded shadow-sm">${s.Denomination}</span>` : ''}
-                <button onclick="toggleFavorite('${s.internalId}', event)" class="p-0.5 text-xs hover:scale-125 transition cursor-pointer" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
+                <button onclick="toggleFavorite('${s.groupId}', event)" class="p-0.5 text-xs hover:scale-125 transition cursor-pointer" title="Save Favorite">${isFav ? '❤️' : '🤍'}</button>
               </div>
             </div>
             <img src="${s.Image_URL || 'placeholder.png'}" loading="lazy" alt="${s.Title}" class="max-h-20 max-w-full object-contain drop-shadow my-auto" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>'"/>
@@ -1044,43 +1429,80 @@
       }).join('');
     }
 
+    // Detail Pop-up Modal with Full Variety Table, IDs & Variant Details
     function openModalByIndex(idx) {
       activeModalIndex = idx;
       const s = filteredCatalog[idx];
       if (!s) return;
 
       document.getElementById('modalCounter').innerText = `${idx + 1} of ${filteredCatalog.length}`;
-      document.getElementById('modalFavBtn').innerText = savedStamps.has(s.internalId) ? '❤️' : '🤍';
+      document.getElementById('modalFavBtn').innerText = savedStamps.has(s.groupId) ? '❤️' : '🤍';
 
       document.getElementById('modalContent').innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
-          <div class="bg-slate-100 dark:bg-slate-950 p-4 rounded-xl flex flex-col items-center justify-center min-h-[220px] border border-slate-200 dark:border-slate-800 group relative">
-            <img src="${s.Image_URL || 'placeholder.png'}" alt="${s.Title}" class="max-h-56 object-contain rounded-lg drop-shadow-2xl cursor-zoom-in" onclick="openEnlargeModal('${s.Image_URL}', '${s.Title.replace(/'/g, "\\'")}')"/>
-            <button onclick="openEnlargeModal('${s.Image_URL}', '${s.Title.replace(/'/g, "\\'")}')" class="mt-2 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🔍 Click to Enlarge High-Res ↗</button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Image Section -->
+          <div class="lg:col-span-5 bg-slate-100 dark:bg-slate-950 p-4 rounded-2xl flex flex-col items-center justify-center min-h-[260px] border border-slate-200 dark:border-slate-800 relative">
+            <img src="${s.Image_URL || 'placeholder.png'}" alt="${s.Title}" class="max-h-64 object-contain rounded-xl drop-shadow-2xl cursor-zoom-in" onclick="openEnlargeModal('${s.Image_URL}', '${s.Title.replace(/'/g, "\\'")}')"/>
+            <button onclick="openEnlargeModal('${s.Image_URL}', '${s.Title.replace(/'/g, "\\'")}')" class="mt-3 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">🔍 Click to Enlarge High-Res ↗</button>
           </div>
 
-          <div class="space-y-3">
+          <!-- Metadata & Varieties Table -->
+          <div class="lg:col-span-7 space-y-3.5">
             <div>
-              <span class="inline-block bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider mb-1">${s.Era}</span>
-              <h2 class="text-lg font-black text-slate-900 dark:text-white leading-tight">${s.Title}</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${s.Description}</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-1.5 text-xs font-medium bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Year of Issue</span><span class="font-black text-slate-900 dark:text-white">${s.Year || 'Unknown'}</span></div>
-              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Face Value / Denom</span><span class="font-black text-amber-600 dark:text-amber-400">${s.Denomination || '—'}</span></div>
-              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Catalogue Ref</span><span class="font-mono font-bold text-slate-700 dark:text-slate-300">${s.Cat_Number || '—'}</span></div>
-              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Categories</span><span class="font-bold text-slate-700 dark:text-slate-300">${(s.Categories || '').replace(/\|/g, ', ')}</span></div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 text-center">
-              <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg shadow-sm">
-                <span class="block text-[9px] font-extrabold uppercase text-slate-400">Mint Unhinged (MUH)</span>
-                <span class="text-sm font-black text-slate-900 dark:text-white">${s.Mint_Unhinged_Price}</span>
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="inline-block bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider">${s.Era}</span>
+                <span class="inline-block bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider">${s.Format_Type}</span>
+                <span class="text-xs font-bold text-slate-400">•</span>
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400">${s.varietyCount} Catalog Varieties</span>
               </div>
-              <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg shadow-sm">
-                <span class="block text-[9px] font-extrabold uppercase text-slate-400">Fine Used</span>
-                <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">${s.Fine_Used_Price}</span>
+              <h2 class="text-xl font-black text-slate-900 dark:text-white leading-tight">${s.Title}</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${s.Description}</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-medium bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Year</span><span class="font-black text-slate-900 dark:text-white">${s.Year || 'Unknown'}</span></div>
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Face Value</span><span class="font-black text-amber-600 dark:text-amber-400">${s.Denomination || '—'}</span></div>
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Currency</span><span class="font-bold text-slate-700 dark:text-slate-300">${s.Currency_Type}</span></div>
+              <div><span class="text-slate-400 font-bold block text-[9px] uppercase">Categories</span><span class="font-bold text-slate-700 dark:text-slate-300 truncate block">${(s.Categories || '').replace(/\|/g, ', ')}</span></div>
+            </div>
+
+            <!-- Full Philatelic Variety Table with Explicit IDs & Variant Details -->
+            <div>
+              <h4 class="text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-1.5 flex items-center justify-between">
+                <span>📋 Catalog Varieties & Stamp Details</span>
+                <span class="text-[10px] font-normal text-slate-400">${s.varieties.length} items catalogued</span>
+              </h4>
+              <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-900">
+                <div class="max-h-64 overflow-y-auto">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead class="bg-slate-100 dark:bg-slate-800 text-[9px] font-black uppercase text-slate-500 dark:text-slate-400 sticky top-0 border-b border-slate-200 dark:border-slate-700">
+                      <tr>
+                        <th class="p-2">Record ID</th>
+                        <th class="p-2">Cat #</th>
+                        <th class="p-2">Denom</th>
+                        <th class="p-2">Subject / Variant Details</th>
+                        <th class="p-2 text-right">MUH</th>
+                        <th class="p-2 text-right">Fine Used</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                      ${s.varieties.map(v => `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                          <td class="p-2 font-mono text-[10px] text-slate-400 font-bold whitespace-nowrap">${escapeHTML(v.ID)}</td>
+                          <td class="p-2 font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">${escapeHTML(v.Cat_Number)}</td>
+                          <td class="p-2 font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">${escapeHTML(v.Denomination || s.Denomination || '—')}</td>
+                          <td class="p-2 text-slate-700 dark:text-slate-300 text-[11px]">
+                            <span class="font-bold text-slate-900 dark:text-white block">${escapeHTML(v.Title)}</span>
+                            ${v.Variant_Details ? `<span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium block">⚙️ ${escapeHTML(v.Variant_Details)}</span>` : ''}
+                          </td>
+                          <td class="p-2 text-right font-black text-slate-900 dark:text-white whitespace-nowrap">${escapeHTML(v.Mint_Unhinged_Price)}</td>
+                          <td class="p-2 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">${escapeHTML(v.Fine_Used_Price)}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -1155,18 +1577,44 @@
       box.innerHTML = '';
       let hasFilters = false;
 
+      const q = document.getElementById('searchInput').value.trim();
+      if (q) {
+        hasFilters = true;
+        box.innerHTML += `
+          <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-900 dark:text-blue-200 rounded-md text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-blue-300 dark:border-blue-800">
+            <span>🔍 "${escapeHTML(q)}"</span>
+            <button onclick="clearSearchInput()" title="Clear Search" class="hover:text-rose-600 font-black cursor-pointer ml-0.5">✕</button>
+          </span>
+        `;
+      }
+
       if (currentCurrencyLens !== 'ALL') {
         hasFilters = true;
         box.innerHTML += `<span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200 rounded text-[10px] font-bold">${currentCurrencyLens === 'PRE_DECIMAL' ? 'Pre-Decimal' : 'Decimal'}</span>`;
       }
+
+      if (activeFormatTypes.size < ALL_FORMAT_TYPES.length) {
+        hasFilters = true;
+        if (activeFormatTypes.size === 1 && activeFormatTypes.has('Standard Stamps')) {
+          box.innerHTML += `<span class="px-1.5 py-0.2 bg-purple-100 dark:bg-purple-950 text-purple-900 dark:text-purple-200 rounded text-[10px] font-bold flex items-center gap-1">📮 Singles Only <button onclick="setFormatPreset('all')" class="hover:text-rose-600 font-black cursor-pointer">✕</button></span>`;
+        } else if (activeFormatTypes.size === 2 && activeFormatTypes.has('First Day Covers') && activeFormatTypes.has('Prestige Covers')) {
+          box.innerHTML += `<span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-200 rounded text-[10px] font-bold flex items-center gap-1">✉️ FDC Only <button onclick="setFormatPreset('all')" class="hover:text-rose-600 font-black cursor-pointer">✕</button></span>`;
+        } else {
+          const hiddenCount = ALL_FORMAT_TYPES.length - activeFormatTypes.size;
+          box.innerHTML += `<span class="px-1.5 py-0.2 bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-200 rounded text-[10px] font-bold flex items-center gap-1">🚫 ${hiddenCount} Formats Hidden <button onclick="setFormatPreset('all')" class="hover:text-rose-600 font-black cursor-pointer">✕</button></span>`;
+        }
+      }
+
       activeCategories.forEach(c => {
         hasFilters = true;
         box.innerHTML += `<span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200 rounded text-[10px] font-bold flex items-center gap-1">${c} <button onclick="toggleCategoryFilter('${c}')" class="hover:text-rose-600 font-black cursor-pointer">✕</button></span>`;
       });
+
       if (showingSavedOnly) {
         hasFilters = true;
         box.innerHTML += `<span class="px-1.5 py-0.2 bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-200 rounded text-[10px] font-bold">🤍 Saved Only</span>`;
       }
+
       if (!hasFilters) {
         box.innerHTML = `<span class="text-[10px] text-slate-400 italic">No filters active (Showing all)</span>`;
       }
@@ -1175,6 +1623,7 @@
     function clearAllFilters() {
       currentCurrencyLens = 'ALL';
       activeCategories.clear();
+      activeFormatTypes = new Set(ALL_FORMAT_TYPES.map(f => f.id));
       showingSavedOnly = false;
       document.getElementById('searchInput').value = '';
       document.getElementById('clearSearchBtn').classList.add('hidden');
@@ -1186,6 +1635,7 @@
       resetUsedSlider();
       setCurrencyLens('ALL');
       switchCategoryGroup('all');
+      updateFormatFilterUI();
       switchView('grid');
       showToast('All filters cleared & reset', '🌐');
     }
@@ -1215,8 +1665,8 @@
     function toggleModalFav() {
       const s = filteredCatalog[activeModalIndex];
       if (!s) return;
-      toggleFavorite(s.internalId);
-      document.getElementById('modalFavBtn').innerText = savedStamps.has(s.internalId) ? '❤️' : '🤍';
+      toggleFavorite(s.groupId);
+      document.getElementById('modalFavBtn').innerText = savedStamps.has(s.groupId) ? '❤️' : '🤍';
     }
 
     function toggleSavedFilter() {
@@ -1247,7 +1697,6 @@
       }
     }
 
-    // Chronological Era + Decimal Decades Graph Engine
     function updateCharts() {
       if (typeof Chart === 'undefined' || !rawCatalog.length) return;
       const isDark = document.documentElement.classList.contains('dark');
@@ -1255,30 +1704,28 @@
       const gridColor = isDark ? '#334155' : '#e2e8f0';
 
       document.getElementById('statTotalCount').innerText = rawCatalog.length;
-      const preDec = rawCatalog.filter(s => s.Currency_Type === 'Pre-Decimal').length;
-      const dec = rawCatalog.length - preDec;
-      document.getElementById('statPreDecimal').innerHTML = `Pre-Decimal: <span class="text-purple-600">${preDec}</span>`;
-      document.getElementById('statDecimal').innerHTML = `Decimal: <span class="text-pink-600">${dec}</span>`;
+      document.getElementById('statTotalVarieties').innerText = totalVarietiesCount;
 
       const eraMap = {};
       ERA_DECADE_CHART_ORDER.forEach(k => eraMap[k] = 0);
 
       filteredCatalog.forEach(s => {
         const yr = s.Year;
+        const count = s.varietyCount || 1;
         if (yr < 1967) {
-          if (yr <= 1901) eraMap['Victorian (1855–1901)']++;
-          else if (yr <= 1910) eraMap['Edward VII (1901–1910)']++;
-          else if (yr <= 1936) eraMap['George V (1910–1936)']++;
-          else if (yr <= 1952) eraMap['George VI (1936–1952)']++;
-          else eraMap['QEII Pre-Dec (1953–1966)']++;
+          if (yr <= 1901) eraMap['Victorian (1855–1901)'] += count;
+          else if (yr <= 1910) eraMap['Edward VII (1901–1910)'] += count;
+          else if (yr <= 1936) eraMap['George V (1910–1936)'] += count;
+          else if (yr <= 1952) eraMap['George VI (1936–1952)'] += count;
+          else eraMap['QEII Pre-Dec (1953–1966)'] += count;
         } else {
-          if (yr < 1970) eraMap['1960s Dec (1967–69)']++;
-          else if (yr < 1980) eraMap['1970s Decimal']++;
-          else if (yr < 1990) eraMap['1980s Decimal']++;
-          else if (yr < 2000) eraMap['1990s Decimal']++;
-          else if (yr < 2010) eraMap['2000s Decimal']++;
-          else if (yr < 2020) eraMap['2010s Decimal']++;
-          else eraMap['2020s Decimal']++;
+          if (yr < 1970) eraMap['1960s Dec (1967–69)'] += count;
+          else if (yr < 1980) eraMap['1970s Decimal'] += count;
+          else if (yr < 1990) eraMap['1980s Decimal'] += count;
+          else if (yr < 2000) eraMap['1990s Decimal'] += count;
+          else if (yr < 2010) eraMap['2000s Decimal'] += count;
+          else if (yr < 2020) eraMap['2010s Decimal'] += count;
+          else eraMap['2020s Decimal'] += count;
         }
       });
 
@@ -1290,7 +1737,7 @@
           data: {
             labels: Object.keys(eraMap),
             datasets: [{
-              label: 'Catalogued Issues',
+              label: 'Catalogued Varieties',
               data: Object.values(eraMap),
               backgroundColor: '#10b981',
               borderRadius: 4
@@ -1310,7 +1757,7 @@
 
       const catMap = {};
       filteredCatalog.forEach(s => {
-        s.CategoryList.forEach(c => { catMap[c] = (catMap[c] || 0) + 1; });
+        s.CategoryList.forEach(c => { catMap[c] = (catMap[c] || 0) + s.varietyCount; });
       });
       const topCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
 
@@ -1363,10 +1810,22 @@
       applyFiltersAndRender();
     }
 
+    document.addEventListener('click', (e) => {
+      const btn = document.getElementById('btnFormatMenu');
+      const menu = document.getElementById('formatDropdownMenu');
+      if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+        const chev = document.getElementById('formatMenuChevron');
+        if (chev) chev.innerText = '▼';
+      }
+    });
+
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeModal();
         closeEnlargeModal();
+        const menu = document.getElementById('formatDropdownMenu');
+        if (menu) menu.classList.add('hidden');
       }
       if (!document.getElementById('detailModal').classList.contains('hidden')) {
         if (e.key === 'ArrowLeft') navigateModal(-1);
@@ -1374,7 +1833,6 @@
       }
     });
 
-    // Run Initial Loader
     loadCatalog();
   </script>
 </body>
