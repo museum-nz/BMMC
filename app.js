@@ -1,4 +1,4 @@
-// app.js — BMMC Showcase Application Logic (Modular Dual-Mode with WebAR & Curator Passport Engine)
+// app.js — BMMC Showcase Application Logic (Modular Dual-Mode with WebAR, Curator Passport & Multi-Wing Engine)
 
 // ==========================================================================
 // 1. Configuration & Global State
@@ -244,7 +244,6 @@ if ('speechSynthesis' in window) {
 // ==========================================================================
 function initTheme() {
   const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
-  // Default to light unless explicitly saved as 'dark'
   const isDark = (savedTheme === 'dark');
   if (isDark) document.documentElement.classList.add('dark');
   else document.documentElement.classList.remove('dark');
@@ -1085,8 +1084,7 @@ function restoreCatalogSessionState() {
       window.location.hash.startsWith('#exhibit-') || 
       window.location.hash.startsWith('#gramophone-') || 
       window.location.hash === '#stats' || 
-      window.location.hash === '#info' || 
-      window.location.hash === '#analytics'
+      window.location.hash === '#info'
     );
 
     if (state.catalogViewMode) catalogViewMode = state.catalogViewMode;
@@ -1426,13 +1424,13 @@ function handleSearchInputSuggestions(val) {
   if (catMatches.size > 0 || eraMatches.size > 0 || locMatches.size > 0) {
     html += `<div class="flex flex-wrap gap-1 items-center">`;
     Array.from(catMatches).slice(0, 3).forEach(c => {
-      html += `<button onclick="applyAutoSuggestFilter('category', '${escapeHTML(c)}')" class="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-bold text-[10px] hover:bg-blue-100">Category: ${escapeHTML(c)}</button>`;
+      html += `<button onclick="applyAutoSuggestFilter('category', '${escapeHTML(c)}')" class="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-bold text-[10px] hover:bg-blue-100 cursor-pointer">Category: ${escapeHTML(c)}</button>`;
     });
     Array.from(eraMatches).slice(0, 2).forEach(e => {
-      html += `<button onclick="applyAutoSuggestFilter('age', '${escapeHTML(e)}')" class="px-2 py-0.5 rounded-lg bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-bold text-[10px] hover:bg-purple-100">Era: ${escapeHTML(e)}</button>`;
+      html += `<button onclick="applyAutoSuggestFilter('age', '${escapeHTML(e)}')" class="px-2 py-0.5 rounded-lg bg-purple-50 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 font-bold text-[10px] hover:bg-purple-100 cursor-pointer">Era: ${escapeHTML(e)}</button>`;
     });
     Array.from(locMatches).slice(0, 2).forEach(l => {
-      html += `<button onclick="applyAutoSuggestSearch('${escapeHTML(l)}')" class="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] hover:bg-emerald-100">📍 ${escapeHTML(l)}</button>`;
+      html += `<button onclick="applyAutoSuggestSearch('${escapeHTML(l)}')" class="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] hover:bg-emerald-100 cursor-pointer">📍 ${escapeHTML(l)}</button>`;
     });
     html += `</div>`;
   }
@@ -1628,6 +1626,7 @@ function clearAllFilters(shouldScroll = true) {
 
 function browseAllExhibits() {
   hideLoadingSpinner();
+  if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
   document.body.classList.remove('overflow-hidden');
   if (currentTab !== 'exhibits') setTab('exhibits');
   clearAllFilters(false);
@@ -1640,6 +1639,7 @@ function setTab(tabName) {
   currentTab = tabName;
   stopAudioGuide();
   hideLoadingSpinner();
+  if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
   document.body.classList.remove('overflow-hidden');
   saveCatalogSessionState();
 
@@ -1650,12 +1650,9 @@ function setTab(tabName) {
   const gridPrompt = document.getElementById('gridPrompt');
   const gridSection = document.getElementById('gridSection');
   const statsSection = document.getElementById('statsSection');
-  const adminAnalyticsSection = document.getElementById('adminAnalyticsSection');
   const headerTitle = document.getElementById('headerTitleText');
   const headerIcon = document.getElementById('headerLogoIcon');
   const subhead = document.getElementById('subheadingText');
-
-  if (adminAnalyticsSection) adminAnalyticsSection.classList.add('hidden');
 
   if (tabName === 'exhibits') {
     if (statsSection) statsSection.classList.add('hidden');
@@ -1692,23 +1689,10 @@ function setTab(tabName) {
     if (subhead) subhead.textContent = 'Explore live analytics, origin distribution, and chronological evolution from the Bonniefields Museum catalog.';
     safeReplaceState(window.location.pathname + '#stats');
     renderMuseumStatistics();
-  } else if (tabName === 'analytics') {
-    if (gridPrompt) gridPrompt.classList.add('hidden');
-    if (gridSection) gridSection.classList.add('hidden');
-    if (statsSection) statsSection.classList.add('hidden');
-    if (exhibitsFilterGrid) exhibitsFilterGrid.classList.add('hidden');
-    if (gramophoneFilterGrid) gramophoneFilterGrid.classList.add('hidden');
-    if (searchSortBar) searchSortBar.classList.add('hidden');
-    if (collectionHubsSection) collectionHubsSection.classList.add('hidden');
-    if (adminAnalyticsSection) adminAnalyticsSection.classList.remove('hidden');
-    if (headerTitle) headerTitle.textContent = 'Site Traffic Dashboard';
-    if (headerIcon) headerIcon.textContent = '📊';
-    if (subhead) subhead.textContent = 'Live visitor statistics, pageviews, and visitor interactions tracked by Umami.';
-    safeReplaceState(window.location.pathname + '#analytics');
   }
 
   updateFavoritesBadge();
-  if (tabName !== 'stats' && tabName !== 'analytics') {
+  if (tabName !== 'stats') {
     updateDynamicDropdowns();
     filterCatalog(true);
   }
@@ -1813,8 +1797,6 @@ async function loadCatalogData() {
     const hash = window.location.hash;
     if (hash === '#stats' || hash === '#info') {
       setTab('stats');
-    } else if (hash === '#analytics' || hash === '#admin-stats') {
-      setTab('analytics');
     } else if (hash && (hash.startsWith('#exhibit-') || hash.startsWith('#gramophone-'))) {
       checkUrlHashForExhibit();
     } else if (hadRestoredState && isGridActive) {
@@ -1845,8 +1827,7 @@ async function loadCatalogData() {
 
 function checkUrlHashForExhibit() {
   const hash = window.location.hash;
-  if (hash === '#analytics' || hash === '#admin-stats') setTab('analytics');
-  else if (hash === '#stats' || hash === '#info') setTab('stats');
+  if (hash === '#stats' || hash === '#info') setTab('stats');
   else if (hash && hash.startsWith('#exhibit-')) {
     const index = parseInt(hash.replace('#exhibit-', ''), 10);
     if (!isNaN(index) && rawExhibitsRows && rawExhibitsRows[index]) {
@@ -3074,7 +3055,6 @@ function openModalByOriginalIndex(origIdx) {
     document.getElementById('grid')?.classList.remove('hidden');
     document.getElementById('gridSection')?.classList.remove('hidden');
     document.getElementById('statsSection')?.classList.add('hidden');
-    document.getElementById('adminAnalyticsSection')?.classList.add('hidden');
 
     const filteredIndex = currentFilteredRows.findIndex(item => item.originalIndex === origIdx);
     if (filteredIndex !== -1) {
@@ -3482,6 +3462,8 @@ function scrollToGrid() {
 // ==========================================================================
 // 12. Global Window Exports & Event Listeners
 // ==========================================================================
+window.setTab = setTab;
+window.browseAllExhibits = browseAllExhibits;
 window.openModalByOriginalIndex = openModalByOriginalIndex;
 window.openModalByFilteredIndex = openModalByFilteredIndex;
 window.openExhibitModal = openModalByOriginalIndex;
@@ -3494,20 +3476,20 @@ window.closeCompareModal = closeCompareModal;
 window.open3DLightbox = open3DLightbox;
 window.close3DLightbox = close3DLightbox;
 window.closeEnlargeModal = closeEnlargeModal;
-window.browseAllExhibits = browseAllExhibits;
 window.switchCardImage = switchCardImage;
 window.speakAudioGuide = speakAudioGuide;
 window.stopAudioGuide = stopAudioGuide;
+window.toggleModal3DSkybox = toggleModal3DSkybox;
+window.togglePoppyMotion = togglePoppyMotion;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('brandLogoLink')?.addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader')?.addEventListener('click', browseAllExhibits);
   document.getElementById('btnBrowseAllPrompt')?.addEventListener('click', browseAllExhibits);
-  document.getElementById('btnStatsHeader')?.addEventListener('click', () => setTab('stats'));
   document.getElementById('btnSurprise')?.addEventListener('click', () => {
     const rows = (currentTab === 'gramophone') ? rawGramophoneRows : rawExhibitsRows;
     if (!rows || rows.length === 0) return;
-    if (currentTab === 'stats' || currentTab === 'analytics') setTab('exhibits');
+    if (currentTab === 'stats') setTab('exhibits');
     if (!isGridActive) filterCatalog(true);
     openModalByOriginalIndex(Math.floor(Math.random() * rows.length));
   });
@@ -3652,6 +3634,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (e.key === 'Escape') {
       hideSearchSuggestions();
+      if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
       if (compareModal && !compareModal.classList.contains('hidden')) { closeCompareModal(); return; }
       if (enlargeModal && !enlargeModal.classList.contains('hidden')) { closeEnlargeModal(); return; }
       if (lightbox && !lightbox.classList.contains('hidden')) { close3DLightbox(); return; }
