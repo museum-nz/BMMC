@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Zealand Philatelic Photo Map — StampsNZ</title>
+
+  <!-- Inline Favicon (Prevents 404 favicon.ico) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>">
+
+  <!-- Leaflet CSS & MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+  <style>
+    body { 
+      margin: 0; 
+      padding: 0; 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+      background: #064e3b; 
+      overflow: hidden;
+    }
+    #map { 
+      width: 100vw; 
+      height: 100vh; 
+      background: #aad3df; 
+    }
+
+    /* --- Custom Visual Stamp Markers --- */
+    .single-stamp-wrapper {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      border: 2px solid #10b981;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    .single-stamp-wrapper:hover {
+      transform: scale(1.22);
+      z-index: 1000 !important;
+      border-color: #059669;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.45);
+    }
+    .single-stamp-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 3px;
+      display: block;
+      box-sizing: border-box;
+    }
+
+    .cluster-number-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .cluster-number-badge:hover {
+      transform: scale(1.15);
+      background: linear-gradient(135deg, #047857, #065f46);
+      border-color: #34d399;
+    }
+
+    /* --- Large Rich Detail Popups --- */
+    .leaflet-popup-content-wrapper {
+      padding: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      width: 390px !important;
+      max-width: 84vw !important;
+    }
+    .stamp-card-large {
+      padding: 16px;
+      background: #ffffff;
+      text-align: center;
+    }
+    .stamp-card-large h3 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+    .stamp-card-large p.meta-tag {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      color: #059669;
+      font-weight: 700;
+    }
+    .stamp-card-large .img-container {
+      width: 100%;
+      height: 220px;
+      border-radius: 10px;
+      background: #f8fafc;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .stamp-card-large .img-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .stamp-card-large .desc-box {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 8px;
+      text-align: left;
+      line-height: 1.4;
+      max-height: 60px;
+      overflow-y: auto;
+      background: #f1f5f9;
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    .card-footer {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .view-item-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      background: #059669;
+      border: 1px solid #047857;
+      padding: 7px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+    }
+    .view-item-btn:hover {
+      background: #047857;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+    }
+    .val-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+      background: #ecfdf5;
+      padding: 5px 8px;
+      border-radius: 8px;
+      border: 1px solid #a7f3d0;
+    }
+
+    /* --- Top Controls Navigation Bar --- */
+    .top-controls-bar {
+      position: absolute;
+      top: 15px;
+      left: 60px;
+      right: 15px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .map-search-box {
+      pointer-events: auto;
+      position: relative;
+      width: 280px;
+      max-width: 48vw;
+    }
+    .map-search-box input {
+      width: 100%;
+      padding: 8px 30px 8px 32px;
+      border-radius: 12px;
+      background: rgba(6, 78, 59, 0.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      box-sizing: border-box;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .map-search-box input:focus {
+      border-color: #34d399;
+      background: rgba(6, 78, 59, 0.98);
+    }
+    .map-search-box .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #a7f3d0;
+      pointer-events: none;
+    }
+    .map-search-box .clear-search-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #ffffff;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .top-action-btn {
+      pointer-events: auto;
+      background: rgba(6, 78, 59, 0.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      transition: all 0.15s ease;
+    }
+    .top-action-btn:hover {
+      background: rgba(4, 120, 87, 0.98);
+      border-color: #34d399;
+      transform: translateY(-1px);
+      color: #ffffff;
+    }
+
+    /* --- Basemap Dropdown Card --- */
+    .layer-switcher-container {
+      position: relative;
+      pointer-events: auto;
+    }
+    .layer-dropdown-card {
+      position: absolute;
+      top: 42px;
+      right: 0;
+      background: rgba(6, 78, 59, 0.98);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 10px;
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+      z-index: 1100;
+      width: 300px;
+      box-sizing: border-box;
+    }
+    .layer-dropdown-card.show { 
+      display: grid; 
+    }
+    .layer-option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 8px 6px;
+      color: #f8fafc;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .layer-option-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: #34d399;
+    }
+    .layer-option-btn.active {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .layer-option-btn span.icon { 
+      font-size: 18px; 
+    }
+
+    /* --- Bottom Year Slider Bar --- */
+    .year-slider-container {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(6, 78, 59, 0.94);
+      backdrop-filter: blur(12px);
+      padding: 12px 18px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #f8fafc;
+      width: 320px;
+      box-sizing: border-box;
+    }
+    .year-slider-header {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .timeline-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-timeline-play {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .btn-timeline-play:hover { background: #059669; transform: scale(1.08); }
+    .btn-timeline-play.playing { background: #e11d48; }
+
+    .item-counter-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.18);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .year-slider-header span.range-text {
+      color: #34d399;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .dual-slider-track-wrapper {
+      position: relative;
+      width: 100%;
+      height: 22px;
+      display: flex;
+      align-items: center;
+    }
+    .slider-track-bg {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background: #065f46;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .slider-track-fill {
+      position: absolute;
+      height: 6px;
+      background: #10b981;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0%;
+      width: 100%;
+    }
+    .dual-slider-track-wrapper input[type="range"] {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #10b981;
+      pointer-events: auto;
+      -webkit-appearance: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      transition: transform 0.1s ease;
+    }
+    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .dual-slider-track-wrapper input[type="range"]::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #10b981;
+      pointer-events: auto;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .top-controls-bar {
+        left: 50px;
+        right: 10px;
+        top: 10px;
+      }
+      .map-search-box { width: 130px; }
+      .layer-dropdown-card {
+        width: 260px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .year-slider-container {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 15px !important;
+        width: 90vw !important;
+        max-width: 330px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Search & Controls Bar -->
+  <div class="top-controls-bar">
+    <div class="map-search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mapSearchInput" placeholder="Search NZ stamps, regions..." aria-label="Search map stamps">
+      <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
+    </div>
+
+    <!-- Base Layer Switcher -->
+    <div class="layer-switcher-container">
+      <button id="btnLayersToggle" class="top-action-btn" title="Change Basemap">
+        <span>🗺️</span> <span>Layers</span>
+      </button>
+
+      <div id="layerDropdownCard" class="layer-dropdown-card">
+        <button id="btnLayerGoogle" class="layer-option-btn active" title="Google Maps (Streets)">
+          <span class="icon">📍</span>
+          <span>Google</span>
+        </button>
+        <button id="btnLayerHybrid" class="layer-option-btn" title="Google Satellite (Hybrid)">
+          <span class="icon">🛰️</span>
+          <span>Satellite</span>
+        </button>
+        <button id="btnLayerSatellite" class="layer-option-btn" title="Esri Satellite Imagery">
+          <span class="icon">🌍</span>
+          <span>Esri Sat</span>
+        </button>
+        <button id="btnLayerTopo" class="layer-option-btn" title="ESRI World Topographic Survey">
+          <span class="icon">⛰️</span>
+          <span>ESRI Topo</span>
+        </button>
+        <button id="btnLayerNatGeo" class="layer-option-btn" title="National Geographic Cartography">
+          <span class="icon">📜</span>
+          <span>NatGeo</span>
+        </button>
+        <button id="btnLayerVoyager" class="layer-option-btn" title="CARTO Voyager Basemap">
+          <span class="icon">🗺️</span>
+          <span>Voyager</span>
+        </button>
+      </div>
+    </div>
+
+    <button id="btnFitBounds" class="top-action-btn" title="Fit all visible items in view">
+      <span>🧭</span> <span class="hidden-xs">Fit All</span>
+    </button>
+
+    <a href="stamps.html" class="top-action-btn" title="Return to Catalog">
+      <span>📮</span> <span class="hidden-xs">Catalog</span>
+    </a>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- Bottom Timeline & Year Slider Panel -->
+  <div class="year-slider-container">
+    <div class="year-slider-header">
+      <div class="timeline-title-group">
+        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play Timeline Time-Lapse" aria-label="Play timeline">▶</button>
+        <span>Timeline</span>
+        <span id="itemCountBadge" class="item-counter-badge">Loading...</span>
+      </div>
+      <span id="yearRangeText" class="range-text">Loading...</span>
+    </div>
+    <div class="dual-slider-track-wrapper">
+      <div class="slider-track-bg"></div>
+      <div class="slider-track-fill" id="sliderTrackFill"></div>
+      <input type="range" id="minYearSlider" min="1855" max="2026" value="1855" step="1" aria-label="Minimum Year Filter">
+      <input type="range" id="maxYearSlider" min="1855" max="2026" value="2026" step="1" aria-label="Maximum Year Filter">
+    </div>
+  </div>
+
+  <!-- CDN Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+
+  <script>
+    const REMOTE_STAMPS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1362859267&single=true&output=csv';
+    const LOCAL_CSV_CANDIDATES = [
+      'stamps-data.csv',
+      './stamps-data.csv',
+      '../stamps-data.csv',
+      './data/stamps-data.csv',
+      '../data/stamps-data.csv',
+      'exhibits.csv',
+      './data/exhibits.csv'
+    ];
+    const SVG_NO_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%23059669%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENZ%20Stamp%3C%2Ftext%3E%3C%2Fsvg%3E';
+
+    // Comprehensive New Zealand Philatelic Gazetteer
+    const NZ_GEO_LOOKUP = {
+      'auckland': { lat: -36.8485, lng: 174.7633, label: 'Auckland' },
+      'wellington': { lat: -41.2865, lng: 174.7762, label: 'Wellington' },
+      'christchurch': { lat: -43.5321, lng: 172.6362, label: 'Christchurch' },
+      'dunedin': { lat: -45.8788, lng: 170.5028, label: 'Dunedin' },
+      'otago': { lat: -45.4000, lng: 170.0000, label: 'Otago' },
+      'canterbury': { lat: -43.5000, lng: 171.5000, label: 'Canterbury' },
+      'waikato': { lat: -37.7870, lng: 175.2793, label: 'Waikato (Hamilton)' },
+      'hamilton': { lat: -37.7870, lng: 175.2793, label: 'Hamilton' },
+      'rotorua': { lat: -38.1368, lng: 176.2497, label: 'Rotorua' },
+      'taupo': { lat: -38.6857, lng: 176.0702, label: 'Lake Taupō' },
+      'napier': { lat: -39.4928, lng: 176.9120, label: 'Napier' },
+      'hastings': { lat: -39.6394, lng: 176.8441, label: 'Hastings' },
+      'hawke\'s bay': { lat: -39.5000, lng: 176.8000, label: 'Hawke\'s Bay' },
+      'gisborne': { lat: -38.6623, lng: 178.0176, label: 'Gisborne / East Coast' },
+      'taranaki': { lat: -39.2974, lng: 174.0639, label: 'Taranaki / Mt Egmont' },
+      'egmont': { lat: -39.2974, lng: 174.0639, label: 'Mount Taranaki / Egmont' },
+      'new plymouth': { lat: -39.0556, lng: 174.0752, label: 'New Plymouth' },
+      'mt cook': { lat: -43.5950, lng: 170.1418, label: 'Aoraki / Mount Cook' },
+      'aoraki': { lat: -43.5950, lng: 170.1418, label: 'Aoraki / Mount Cook' },
+      'bay of islands': { lat: -35.2500, lng: 174.1500, label: 'Bay of Islands (Waitangi)' },
+      'waitangi': { lat: -35.2650, lng: 174.0850, label: 'Waitangi' },
+      'northland': { lat: -35.5000, lng: 173.9000, label: 'Northland' },
+      'whangarei': { lat: -35.7251, lng: 174.3237, label: 'Whangārei' },
+      'nelson': { lat: -41.2706, lng: 173.2840, label: 'Nelson' },
+      'marlborough': { lat: -41.5000, lng: 173.8000, label: 'Marlborough' },
+      'blenheim': { lat: -41.5134, lng: 173.9528, label: 'Blenheim' },
+      'southland': { lat: -46.0000, lng: 168.0000, label: 'Southland' },
+      'invercargill': { lat: -46.4132, lng: 168.3538, label: 'Invercargill' },
+      'fiordland': { lat: -45.4167, lng: 167.7167, label: 'Fiordland / Milford Sound' },
+      'milford': { lat: -44.6715, lng: 167.9256, label: 'Milford Sound / Mitre Peak' },
+      'mitre peak': { lat: -44.6715, lng: 167.9256, label: 'Mitre Peak' },
+      'queenstown': { lat: -45.0312, lng: 168.6626, label: 'Queenstown / Wakatipu' },
+      'wanaka': { lat: -44.7000, lng: 169.1500, label: 'Lake Wānaka' },
+      'tongariro': { lat: -39.1300, lng: 175.6400, label: 'Tongariro / Ruapehu' },
+      'ruapehu': { lat: -39.2800, lng: 175.5600, label: 'Mount Ruapehu' },
+      'ross dependency': { lat: -77.8500, lng: 166.6667, label: 'Ross Dependency (Antarctica)' },
+      'antarctica': { lat: -77.8500, lng: 166.6667, label: 'Ross Dependency (Antarctica)' },
+      'chatham islands': { lat: -43.9537, lng: -176.5401, label: 'Chatham Islands' },
+      'stewart island': { lat: -46.9000, lng: 167.8500, label: 'Stewart Island / Rakiura' },
+      'rakiura': { lat: -46.9000, lng: 167.8500, label: 'Rakiura' },
+      'palmerston north': { lat: -40.3523, lng: 175.6082, label: 'Palmerston North / Manawatū' },
+      'manawatu': { lat: -40.3523, lng: 175.6082, label: 'Manawatū' },
+      'whanganui': { lat: -39.9301, lng: 175.0489, label: 'Whanganui' },
+      'tauranga': { lat: -37.6878, lng: 176.1651, label: 'Bay of Plenty (Tauranga)' },
+      'bay of plenty': { lat: -37.6878, lng: 176.1651, label: 'Bay of Plenty' },
+      'coromandel': { lat: -36.7500, lng: 175.5000, label: 'Coromandel Peninsula' },
+      'west coast': { lat: -42.4500, lng: 171.2100, label: 'West Coast (Greymouth / Hokitika)' },
+      'greymouth': { lat: -42.4500, lng: 171.2100, label: 'Greymouth' },
+      'hokitika': { lat: -42.7167, lng: 170.9667, label: 'Hokitika' }
+    };
+
+    // Major geographic fallback distribution anchors
+    const NZ_REGIONAL_NODES = [
+      { lat: -36.8485, lng: 174.7633, label: 'Auckland Region' },
+      { lat: -41.2865, lng: 174.7762, label: 'Wellington / Capital' },
+      { lat: -43.5321, lng: 172.6362, label: 'Canterbury' },
+      { lat: -45.8788, lng: 170.5028, label: 'Otago' },
+      { lat: -37.7870, lng: 175.2793, label: 'Waikato' },
+      { lat: -38.1368, lng: 176.2497, label: 'Rotorua' },
+      { lat: -39.4928, lng: 176.9120, label: 'Hawke\'s Bay' },
+      { lat: -39.2974, lng: 174.0639, label: 'Taranaki' },
+      { lat: -41.2706, lng: 173.2840, label: 'Nelson & Bays' },
+      { lat: -45.0312, lng: 168.6626, label: 'Queenstown Lakes' },
+      { lat: -35.2500, lng: 174.1500, label: 'Northland' },
+      { lat: -46.4132, lng: 168.3538, label: 'Southland' }
+    ];
+
+    const defaultCenter = [-41.2865, 174.7762];
+    const defaultZoom = 6;
+
+    const map = L.map('map', {
+      closePopupOnClick: true,
+      minZoom: 3,
+      worldCopyJump: false
+    }).setView(defaultCenter, defaultZoom);
+
+    // Basemaps
+    const layerGoogle = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'] });
+    const layerHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'] });
+    const layerEsriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy;', maxZoom: 18 });
+    const layerEsriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy;', maxZoom: 19 });
+    const layerNatGeo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'NatGeo &copy;', maxZoom: 16 });
+    const layerVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19, subdomains: 'abcd' });
+
+    const baseLayers = {
+      google: layerGoogle,
+      hybrid: layerHybrid,
+      satellite: layerEsriSatellite,
+      topo: layerEsriTopo,
+      natgeo: layerNatGeo,
+      voyager: layerVoyager
+    };
+
+    let currentBasemapKey = 'google';
+    baseLayers[currentBasemapKey].addTo(map);
+
+    function setBasemap(type) {
+      if (!baseLayers[type]) return;
+      Object.values(baseLayers).forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+      baseLayers[type].addTo(map);
+      currentBasemapKey = type;
+      document.querySelectorAll('.layer-option-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
+      });
+      document.getElementById('layerDropdownCard')?.classList.remove('show');
+    }
+
+    const markers = L.markerClusterGroup({
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      maxClusterRadius: 45,
+      iconCreateFunction: function(cluster) {
+        return L.divIcon({
+          html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
+          className: 'custom-cluster-icon',
+          iconSize: [48, 48],
+          iconAnchor: [24, 24]
+        });
+      }
+    });
+
+    let allStampRecords = [];
+    let markerIdMap = new Map();
+    let globalMinYear = 1855;
+    let globalMaxYear = 2026;
+    let timelinePlayTimer = null;
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function formatMediaUrl(url) {
+      if (!url) return SVG_NO_IMG;
+      const clean = String(url).trim();
+      if (window.resolveOfflineMedia) {
+        const local = window.resolveOfflineMedia(clean);
+        if (local) return local;
+      }
+      if (clean.startsWith('http') || clean.startsWith('/') || clean.startsWith('./') || clean.startsWith('data:image/')) {
+        return clean;
+      }
+      return `./media/images/stamps/${clean}`;
+    }
+
+    function pseudoRandomOffset(seedStr, scale = 0.08) {
+      let hash = 0;
+      for (let i = 0; i < seedStr.length; i++) {
+        hash = (hash << 5) - hash + seedStr.charCodeAt(i);
+        hash |= 0;
+      }
+      const x = ((hash & 0xFFFF) / 0xFFFF - 0.5) * scale;
+      const y = (((hash >> 16) & 0xFFFF) / 0xFFFF - 0.5) * scale;
+      return { latOffset: x, lngOffset: y };
+    }
+
+    function renderMarkers(records) {
+      markers.clearLayers();
+      markerIdMap.clear();
+      const markerList = [];
+
+      records.forEach((item, idx) => {
+        const safeImg = formatMediaUrl(item.imgUrl);
+        const safeTitle = escapeHTML(item.title);
+        const safeLocation = escapeHTML(item.location);
+        const safeEra = escapeHTML(item.era || 'General Issue');
+
+        const customIcon = L.divIcon({
+          html: `<div class="single-stamp-wrapper"><img src="${safeImg}" loading="lazy" alt="${safeTitle}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>`,
+          className: 'custom-stamp-icon',
+          iconSize: [72, 72],
+          iconAnchor: [36, 36]
+        });
+
+        const popupHTML = `
+          <div class="stamp-card-large">
+            <h3>${safeTitle}</h3>
+            <p class="meta-tag">📍 ${safeLocation} &bull; 📅 ${item.year} (${safeEra})</p>
+            <div class="img-container">
+              <img src="${safeImg}" loading="lazy" alt="${safeTitle}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/>
+            </div>
+            ${item.details ? `<div class="desc-box">${escapeHTML(item.details)}</div>` : ''}
+            <div class="card-footer">
+              <div class="val-badge">${escapeHTML(item.denomination || 'NZ')}</div>
+              <a href="stamps.html?q=${encodeURIComponent(item.title)}" class="view-item-btn">
+                <span>🔍 View in Catalog ↗</span>
+              </a>
+            </div>
+          </div>
+        `;
+
+        const m = L.marker([item.lat, item.lng], { icon: customIcon });
+        m.bindPopup(popupHTML, { autoPan: true, keepInView: true });
+        markerList.push(m);
+
+        if (item.id) markerIdMap.set(item.id.toLowerCase(), m);
+        markerIdMap.set(String(idx), m);
+        markerIdMap.set(item.title.toLowerCase(), m);
+      });
+
+      markers.addLayers(markerList);
+      map.addLayer(markers);
+
+      const countBadge = document.getElementById('itemCountBadge');
+      if (countBadge) countBadge.textContent = `${records.length} items`;
+    }
+
+    function updateYearFilter() {
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+      const trackFill = document.getElementById('sliderTrackFill');
+      const searchVal = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
+
+      let minVal = parseInt(minSlider.value, 10);
+      let maxVal = parseInt(maxSlider.value, 10);
+
+      if (minVal > maxVal) {
+        minSlider.value = maxVal;
+        minVal = maxVal;
+      }
+
+      const minRange = parseInt(minSlider.min, 10);
+      const maxRange = parseInt(minSlider.max, 10);
+      const rangeSpan = (maxRange - minRange) || 1;
+
+      const leftPercent = ((minVal - minRange) / rangeSpan) * 100;
+      const rightPercent = ((maxVal - minRange) / rangeSpan) * 100;
+
+      trackFill.style.left = leftPercent + '%';
+      trackFill.style.width = (rightPercent - leftPercent) + '%';
+
+      document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
+
+      const filtered = allStampRecords.filter(item => {
+        const y = item.year;
+        const matchesYear = (y >= minVal && y <= maxVal);
+        if (!matchesYear) return false;
+
+        if (searchVal) {
+          const hay = `${item.title} ${item.location} ${item.year} ${item.id || ''} ${item.details || ''}`.toLowerCase();
+          return hay.includes(searchVal);
+        }
+        return true;
+      });
+
+      renderMarkers(filtered);
+    }
+
+    function toggleTimelinePlayback() {
+      const playBtn = document.getElementById('btnPlayTimeline');
+      const maxSlider = document.getElementById('maxYearSlider');
+
+      if (timelinePlayTimer) {
+        clearInterval(timelinePlayTimer);
+        timelinePlayTimer = null;
+        playBtn.textContent = '▶';
+        playBtn.classList.remove('playing');
+      } else {
+        playBtn.textContent = '⏸';
+        playBtn.classList.add('playing');
+
+        timelinePlayTimer = setInterval(() => {
+          let curr = parseInt(maxSlider.value, 10);
+          if (curr >= globalMaxYear) {
+            toggleTimelinePlayback();
+          } else {
+            maxSlider.value = Math.min(globalMaxYear, curr + 2);
+            updateYearFilter();
+          }
+        }, 350);
+      }
+    }
+
+    function processStampData(rows) {
+      allStampRecords = [];
+
+      rows.forEach((r, idx) => {
+        const title = (r.Subject || r.Issue_Name || r.Title || '').trim();
+        if (!title) return;
+
+        let yr = parseInt(r.Year, 10);
+        if (isNaN(yr) || yr < 1840 || yr > 2030) {
+          const m = `${title} ${r.Details || ''}`.match(/\b(18[5-9]\d|19\d{2}|20\d{2})\b/);
+          yr = m ? parseInt(m[1], 10) : 1900;
+        }
+
+        const fullScanText = `${r.Location || ''} ${title} ${r.Details || ''} ${r.Categories || ''}`.toLowerCase();
+        let matchedGeo = null;
+
+        for (const [key, geo] of Object.entries(NZ_GEO_LOOKUP)) {
+          if (fullScanText.includes(key)) {
+            matchedGeo = geo;
+            break;
+          }
+        }
+
+        if (!matchedGeo) {
+          const nodeIdx = Math.abs((title.charCodeAt(0) || 0) + idx) % NZ_REGIONAL_NODES.length;
+          matchedGeo = NZ_REGIONAL_NODES[nodeIdx];
+        }
+
+        const offset = pseudoRandomOffset(`${title}_${idx}_${yr}`, 0.08);
+
+        allStampRecords.push({
+          id: r.ID || `NZ-${idx}`,
+          title: title,
+          year: yr,
+          era: r.Era || (yr <= 1901 ? 'Victorian' : (yr <= 1945 ? 'Pre-War' : 'Modern')),
+          lat: matchedGeo.lat + offset.latOffset,
+          lng: matchedGeo.lng + offset.lngOffset,
+          location: matchedGeo.label,
+          denomination: r.Denomination || '',
+          details: r.Details || r.Description || '',
+          imgUrl: r.Image_URL || r.Image || ''
+        });
+      });
+
+      const years = allStampRecords.map(s => s.year).filter(y => y >= 1855 && y <= 2026);
+      if (years.length) {
+        globalMinYear = Math.min(...years);
+        globalMaxYear = Math.max(...years);
+      }
+
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+      minSlider.min = globalMinYear;
+      minSlider.max = globalMaxYear;
+      maxSlider.min = globalMinYear;
+      maxSlider.max = globalMaxYear;
+
+      minSlider.value = globalMinYear;
+      maxSlider.value = globalMaxYear;
+
+      // Handle URL Parameters for deep-linking
+      const params = new URLSearchParams(window.location.search);
+      const searchParam = params.get('search') || params.get('q');
+      const yearParam = parseInt(params.get('year'), 10);
+      const titleParam = params.get('title') || params.get('id');
+
+      if (searchParam) {
+        document.getElementById('mapSearchInput').value = searchParam;
+        document.getElementById('clearMapSearch').style.display = 'flex';
+      }
+
+      if (!isNaN(yearParam) && yearParam >= globalMinYear) {
+        minSlider.value = Math.max(globalMinYear, yearParam - 5);
+        maxSlider.value = Math.min(globalMaxYear, yearParam + 5);
+      }
+
+      updateYearFilter();
+
+      // Deep Focus Camera on specific Stamp/Location
+      if (titleParam || searchParam) {
+        const query = (titleParam || searchParam).toLowerCase();
+        const found = allStampRecords.find(s => 
+          s.title.toLowerCase().includes(query) || 
+          s.location.toLowerCase().includes(query) || 
+          (s.id && s.id.toLowerCase() === query)
+        );
+
+        if (found) {
+          map.setView([found.lat, found.lng], 9);
+          setTimeout(() => {
+            const marker = markerIdMap.get(found.id ? found.id.toLowerCase() : found.title.toLowerCase());
+            if (marker) {
+              markers.zoomToShowLayer(marker, () => marker.openPopup());
+            }
+          }, 300);
+        } else if (searchParam) {
+          const targetKey = Object.keys(NZ_GEO_LOOKUP).find(k => searchParam.toLowerCase().includes(k));
+          if (targetKey && NZ_GEO_LOOKUP[targetKey]) {
+            map.setView([NZ_GEO_LOOKUP[targetKey].lat, NZ_GEO_LOOKUP[targetKey].lng], 9);
+          }
+        }
+      }
+    }
+
+    async function loadData() {
+      // 1. Check LocalStorage cache first
+      try {
+        const cachedRaw = localStorage.getItem('bMMC_cached_stamps');
+        if (cachedRaw) {
+          const parsed = JSON.parse(cachedRaw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            processStampData(parsed);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch Remote Google Sheets CSV
+      try {
+        const res = await fetch(REMOTE_STAMPS_CSV_URL);
+        if (res.ok) {
+          const csvText = await res.text();
+          const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+          if (parsed.data && parsed.data.length > 0) {
+            try { localStorage.setItem('bMMC_cached_stamps', JSON.stringify(parsed.data)); } catch (e) {}
+            processStampData(parsed.data);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 3. Fallback candidates for offline or relative folder hosting
+      for (const path of LOCAL_CSV_CANDIDATES) {
+        try {
+          const resLocal = await fetch(path);
+          if (resLocal.ok) {
+            const csvText = await resLocal.text();
+            const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+            if (parsed.data && parsed.data.length > 0) {
+              processStampData(parsed.data);
+              return;
+            }
+          }
+        } catch (e) {}
+      }
+
+      document.getElementById('itemCountBadge').textContent = 'Offline';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
+      document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
+      document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
+
+      document.getElementById('btnFitBounds')?.addEventListener('click', () => {
+        if (markers.getLayers().length > 0) map.fitBounds(markers.getBounds(), { padding: [50, 50] });
+      });
+
+      const btnLayers = document.getElementById('btnLayersToggle');
+      const layerCard = document.getElementById('layerDropdownCard');
+      btnLayers?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        layerCard?.classList.toggle('show');
+      });
+
+      document.getElementById('btnLayerGoogle')?.addEventListener('click', () => setBasemap('google'));
+      document.getElementById('btnLayerHybrid')?.addEventListener('click', () => setBasemap('hybrid'));
+      document.getElementById('btnLayerSatellite')?.addEventListener('click', () => setBasemap('satellite'));
+      document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
+      document.getElementById('btnLayerNatGeo')?.addEventListener('click', () => setBasemap('natgeo'));
+      document.getElementById('btnLayerVoyager')?.addEventListener('click', () => setBasemap('voyager'));
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.layer-switcher-container')) layerCard?.classList.remove('show');
+      });
+
+      const searchInput = document.getElementById('mapSearchInput');
+      const clearBtn = document.getElementById('clearMapSearch');
+      searchInput?.addEventListener('input', (e) => {
+        clearBtn.style.display = e.target.value ? 'flex' : 'none';
+        updateYearFilter();
+      });
+      clearBtn?.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        updateYearFilter();
+      });
+
+      loadData();
+    });
+  </script>
+</body>
+</html>
