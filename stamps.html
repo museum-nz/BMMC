@@ -1244,6 +1244,7 @@
         }
 
         const stampId = (s.ID || `NZ-${idx}`).trim();
+        const issueDescription = (s.Details || s.Issue_Overview || s.Variant_Details || '').trim();
 
         const variety = {
           internalId: stampId,
@@ -1280,7 +1281,8 @@
             CategoryList: [...cats],
             Categories: cats.join('|'),
             Image_URL: finalImage || '',
-            Description: s.Issue_Overview || s.Variant_Details || 'New Zealand postal release from the StampsNZ catalogue.',
+            Details: s.Details || '',
+            Description: issueDescription || 'New Zealand postal release from the StampsNZ catalogue.',
             Source_Page: s.Source_Page && !s.Source_Page.includes('javascript') ? s.Source_Page : '',
             Collection: s.Collection || '',
             Location: s.Location || '',
@@ -1292,6 +1294,10 @@
           cats.forEach(c => { if (!existing.CategoryList.includes(c)) existing.CategoryList.push(c); });
           existing.Categories = existing.CategoryList.join('|');
           if (!existing.Image_URL && finalImage) existing.Image_URL = finalImage;
+          if (!existing.Details && s.Details) {
+            existing.Details = s.Details;
+            existing.Description = s.Details;
+          }
           if (accurateYear && accurateYear !== 1900 && (!existing.Year || existing.Year === 1900)) {
             existing.Year = accurateYear;
             existing.Era = dynamicEra;
@@ -1339,6 +1345,7 @@
           { name: 'Categories', weight: 1.0 },
           { name: 'Primary_Category', weight: 0.8 },
           { name: 'Era', weight: 0.8 },
+          { name: 'Details', weight: 0.7 },
           { name: 'Description', weight: 0.5 },
           { name: 'varieties.ID', weight: 1.8 },
           { name: 'varieties.Subject', weight: 1.5 }
@@ -1415,7 +1422,7 @@
         const scored = [];
         results.forEach(s => {
           let score = 0;
-          const fullText = `${s.baseId} ${s.Title} ${s.Subject} ${s.Description} ${s.Categories} ${s.varieties.map(v => `${v.ID} ${v.Subject}`).join(' ')}`;
+          const fullText = `${s.baseId} ${s.Title} ${s.Subject} ${s.Details || ''} ${s.Description} ${s.Categories} ${s.varieties.map(v => `${v.ID} ${v.Subject}`).join(' ')}`;
 
           // Exact user query whole-word match
           if (directRegex.test(s.baseId)) score += 100;
@@ -1666,7 +1673,7 @@
       renderedCount += batch.length;
     }
 
-    // Modal Details Popup
+    // Modal Details Popup (With dedicated Stamp Series Description section)
     function openModalByIndex(idx) {
       activeModalIndex = idx;
       const s = filteredCatalog[idx];
@@ -1674,6 +1681,8 @@
 
       document.getElementById('modalCounter').innerText = `${idx + 1} of ${filteredCatalog.length}`;
       document.getElementById('modalFavBtn').innerText = savedStamps.has(s.groupId) ? '❤️' : '🤍';
+
+      const seriesDesc = (s.Details || s.Description || '').trim();
 
       document.getElementById('modalContent').innerHTML = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1692,8 +1701,20 @@
                 <span class="text-xs font-bold text-slate-500 dark:text-slate-400">${s.varietyCount} Varieties Catalogued</span>
               </div>
               <h2 id="detailModalTitle" class="text-xl font-black text-slate-900 dark:text-white leading-tight">${s.Title}</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${s.Description}</p>
             </div>
+
+            <!-- Stamp Series Description / Issue Background -->
+            ${seriesDesc ? `
+              <div class="bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-3.5 space-y-1.5 shadow-sm">
+                <div class="flex items-center gap-1.5 text-[11px] font-black uppercase text-emerald-800 dark:text-emerald-300 tracking-wider">
+                  <span>📖</span>
+                  <span>Issue Background &amp; Series Details</span>
+                </div>
+                <div class="text-xs leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
+                  ${escapeHTML(seriesDesc)}
+                </div>
+              </div>
+            ` : ''}
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-medium bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
               <div><span class="text-slate-400 font-bold block text-[10px] uppercase">Year</span><span class="font-black text-slate-900 dark:text-white">${s.Year || 'Unknown'}</span></div>
@@ -1979,6 +2000,7 @@
               "Subject": v.Subject,
               "Format_Type": v.Format_Type,
               "Primary_Category": g.Primary_Category,
+              "Details": g.Details || g.Description || '',
               "Mint_Unhinged_Price": v.Mint_Unhinged_Price,
               "Fine_Used_Price": v.Fine_Used_Price,
               "Source_Page": g.Source_Page
