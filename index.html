@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -31,7 +31,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 
   <!-- Tailwind CSS Engine -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../vendor/tailwind.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -55,10 +55,10 @@
   <link rel="stylesheet" href="styles.css">
 
   <!-- Core Libraries (Deferred & Non-Blocking) -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="../vendor/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <script defer src="../vendor/chart.umd.min.js"></script>
+  <script type="module" src="../vendor/model-viewer.min.js"></script>
 
   <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
@@ -215,6 +215,14 @@
                   <div>
                     <div class="leading-none font-black">NZ Stamp Archive</div>
                     <span class="text-[9px] font-normal text-slate-400">Complete philatelic catalogue</span>
+                  </div>
+                </a>
+
+                <a href="currency.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/60 hover:text-amber-600 dark:hover:text-amber-400 transition">
+                  <span class="text-base shrink-0">🪙</span>
+                  <div>
+                    <div class="leading-none font-black">NZ Currency</div>
+                    <span class="text-[9px] font-normal text-slate-400">Numismatic &amp; banknote archive</span>
                   </div>
                 </a>
 
@@ -475,6 +483,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-1.5 min-h-[32px]">
               <a href="stamps.html" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">📮 NZ Stamps ↗</a>
+              <a href="currency.html" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-amber-500 shadow-sm transition flex items-center gap-1">🪙 NZ Currency ↗</a>
               <a href="gallery.html" class="bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-teal-500 shadow-sm transition flex items-center gap-1">📷 Gallery ↗</a>
               <a href="restoration-guide.html" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-amber-500 shadow-sm transition flex items-center gap-1">🛠️ Care ↗</a>
               <a id="statDocLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Doc ↗</a>
@@ -709,7 +718,7 @@
       });
     });
 
-    // #1.4 Cross-Tab Storage & Theme Listener
+    // Cross-Tab Storage & Theme Listener
     window.addEventListener('storage', (e) => {
       if (e.key === 'theme' || e.key === 'bMMC_theme') {
         const isDark = (e.newValue === 'dark');
