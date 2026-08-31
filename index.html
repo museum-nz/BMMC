@@ -23,42 +23,51 @@
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 
-  <!-- Tailwind CSS Engine -->
-  <script src="../vendor/tailwind.js"></script>
+  <!-- Tailwind CSS Engine with Multi-Path & CDN Fallbacks -->
+  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
+  <script src="https://cdn.tailwindcss.com" onerror="this.onerror=null;"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              500: '#2563eb',
-              600: '#1d4ed8',
-              700: '#1e40af',
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f0f7ff',
+                100: '#e0effe',
+                500: '#2563eb',
+                600: '#1d4ed8',
+                700: '#1e40af',
+              }
             }
           }
         }
-      }
-    };
+      };
+    }
   </script>
 
   <!-- Core External Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Core Libraries (Deferred & Non-Blocking) -->
-  <script src="../vendor/papaparse.min.js"></script>
+  <!-- Core Libraries (Multi-Path & Guaranteed CDN Fallbacks) -->
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
-  <script defer src="../vendor/chart.umd.min.js"></script>
-  <script type="module" src="../vendor/model-viewer.min.js"></script>
+  <script defer src="../vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
+  <script defer src="vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="../vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
+  <script type="module" src="vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
   <!-- Offline Media Adapter (Ignored if not present) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
