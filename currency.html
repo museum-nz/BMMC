@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+  <title>NZ Currency — BMMC Showcase</title>
+
+  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://docs.google.com" crossorigin>
+  <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
+
+  <!-- PapaParse for Google Sheets CSV Fetching -->
+  <script src="../vendor/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- Tailwind CSS Engine -->
+  <script src="../vendor/tailwind.js"></script>
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f0f7ff',
+                100: '#e0effe',
+                500: '#2563eb',
+                600: '#1d4ed8',
+                700: '#1e40af',
+              }
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <!-- Core External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .coin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    .badge-silver {
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      color: #334155;
+      border: 1px solid #94a3b8;
+    }
+    .badge-bronze {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+      border: 1px solid #d97706;
+    }
+    .badge-cupro {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .badge-gold {
+      background: linear-gradient(135deg, #fef08a 0%, #eab308 100%);
+      color: #713f12;
+      border: 1px solid #ca8a04;
+    }
+    .badge-polymer {
+      background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+      color: #115e59;
+      border: 1px solid #2dd4bf;
+    }
+    .dark .badge-silver {
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      color: #e2e8f0;
+      border-color: #475569;
+    }
+    .dark .badge-bronze {
+      background: linear-gradient(135deg, #78350f 0%, #451a03 100%);
+      color: #fef3c7;
+      border-color: #b45309;
+    }
+    .dark .badge-cupro {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: #cbd5e1;
+      border-color: #334155;
+    }
+    .dark .badge-gold {
+      background: linear-gradient(135deg, #854d0e 0%, #713f12 100%);
+      color: #fef08a;
+      border-color: #ca8a04;
+    }
+    .dark .badge-polymer {
+      background: linear-gradient(135deg, #134e4a 0%, #042f2e 100%);
+      color: #99f6e4;
+      border-color: #0d9488;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+
+  <!-- Ambient Sky Background -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
+    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
+  </div>
+
+  <!-- Header Section with Collapsible Top Controls (Matching gallery.html and index.html) -->
+  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
+      
+      <!-- Top Row: Brand & Action Buttons -->
+      <div class="flex items-center justify-between gap-2">
+        
+        <!-- Brand Link -->
+        <a href="index.html" class="group flex items-center gap-2 shrink-0">
+          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow">🪙</span>
+          <div class="leading-none">
+            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 dark:from-amber-400 dark:via-yellow-300 dark:to-amber-200 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+              NZ Currency
+            </h1>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">BMMC Numismatic &amp; Banknote Archive</p>
+          </div>
+        </a>
+        
+        <!-- Action Buttons Bar -->
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap">
+          
+          <!-- Surprise Button -->
+          <button id="btnSurprise" title="Surprise Me (Random Item)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span>✨</span> <span class="hidden sm:inline">Surprise</span>
+          </button>
+
+          <!-- Museum Home Link -->
+          <a href="index.html" title="Back to Museum Main Showcase" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
+          </a>
+
+          <!-- Utility Pill Cluster (Theme Toggle + Collapsible Controls Toggle) -->
+          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
+            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
+              <span id="themeToggleIcon">☀️</span>
+              <span id="themeToggleText" class="sr-only">Mode</span>
+            </button>
+
+            <!-- Toggle Filter Controls Button (Funnel with Chevron) -->
+            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              </svg>
+              <span id="toggleChevron" class="text-[8px] text-slate-400 transition-transform">▼</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Collapsible Top Filter Controls Container -->
+      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
+        
+        <!-- Category Filter Tabs (Default: Show All) -->
+        <div class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar" role="tablist">
+          <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer active:scale-95 shrink-0">
+            🌐 Show All
+          </button>
+          <button id="filterBtnPre" onclick="setCategoryFilter('pre-decimal')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            🪙 Pre-Decimal (1933–1967)
+          </button>
+          <button id="filterBtnDec" onclick="setCategoryFilter('decimal-1967')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            💵 Decimal (1967–2006)
+          </button>
+          <button id="filterBtnCurr" onclick="setCategoryFilter('current-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            ✨ Current Circulating ($1, $2, 10c–50c)
+          </button>
+          <button id="filterBtnNotes" onclick="setCategoryFilter('banknotes')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            💴 Banknote Series
+          </button>
+        </div>
+
+        <!-- Search Bar & Live Counter -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="flex items-center gap-2 flex-1 max-w-md relative">
+            <span class="text-sm absolute left-2.5 text-slate-400">🔍</span>
+            <input type="text" id="currencySearchInput" placeholder="Search denominations, flora, fauna, monarchs, designers..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100 shadow-inner" />
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0">
+            <span id="currencyStatsCounter">Loading archive records...</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10 space-y-8">
+    
+    <!-- Full-Width Hero Banner Card (Jump to section removed) -->
+    <div class="w-full bg-gradient-to-r from-amber-950 via-stone-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-950/30 border border-amber-500/30 relative overflow-hidden backdrop-blur-md">
+      <div class="absolute -right-10 -top-10 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-10 -bottom-10 w-64 h-64 bg-yellow-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 w-full">
+        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-3">
+          New Zealand Coins &amp; Banknotes
+        </h2>
+        <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal max-w-5xl">
+          From 1897 British imperial legal tender and the historic Coinage Act of 1933 to the 1967 Decimal currency changeover, 2006 silver coin resize, and modern polymer banknotes.
+        </p>
+      </div>
+    </div>
+
+    <!-- 1. HISTORICAL CONTEXT & CONVERTER TOOL -->
+    <section id="history-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      
+      <!-- History Summary Card -->
+      <div class="lg:col-span-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2.5 mb-3">
+            <span class="p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-xl text-lg border border-amber-200 dark:border-amber-900/60">📜</span>
+            <div>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">Evolution of New Zealand Currency</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">From Imperial British coins to independent decimal money</p>
+            </div>
+          </div>
+          
+          <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+            <p>
+              <strong>Prior to Official NZ (1897–1933):</strong> In 1897, New Zealand's coins became subject to parts of the <em>Imperial Coinage Act 1870 (UK)</em>. This meant only British coin was the official legal tender in the colony, alongside Australian-minted gold sovereign and half-sovereign coins.
+            </p>
+            <p>
+              <strong>Coin Smuggling &amp; The 1933 Act:</strong> By 1933, widespread coin smuggling and severe shortages of lower-value coins forced action. Instead of immediate decimalisation (as advocated by the New Zealand Numismatic Society), New Zealand introduced its own distinctive national coinage under the <strong>Coinage Act 1933</strong>. British coin officially ceased being legal tender on <strong>1 February 1935</strong>.
+            </p>
+            <p>
+              <strong>Decimal Currency Day (10 July 1967):</strong> New Zealand introduced dollars and cents (£1 = $2.00, 10s = $1.00, 1s = 10c, 1d = 5/6c).
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+          <span>Authority: <strong>Reserve Bank of New Zealand (RBNZ)</strong></span>
+          <span>Key Designers: <strong>Percy Metcalfe, George Kruger Gray, Leonard Mitchell, Robert Conly</strong></span>
+        </div>
+      </div>
+
+      <!-- Quick Interactive Currency Calculator (£sd <-> Decimal) -->
+      <div class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-slate-900/10 dark:from-amber-950/40 dark:to-slate-900/40 border border-amber-500/30 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xl">🧮</span>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">1967 Decimal Converter</h3>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
+            Convert historic pre-decimal pounds, shillings, and pence (£sd) into 1967 Decimal Dollars &amp; Cents.
+          </p>
+
+          <div class="space-y-3">
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label for="calcPounds" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pounds (£)</label>
+                <input type="number" id="calcPounds" min="0" value="1" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+              </div>
+              <div>
+                <label for="calcShillings" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Shillings (s)</label>
+                <input type="number" id="calcShillings" min="0" max="19" value="2" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+              </div>
+              <div>
+                <label for="calcPence" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pence (d)</label>
+                <input type="number" id="calcPence" min="0" max="11" value="6" step="0.5" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+              </div>
+            </div>
+
+            <div class="p-4 bg-white/90 dark:bg-slate-900/90 rounded-2xl border border-amber-500/40 text-center shadow-inner">
+              <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Decimal Equivalent (1967 Rate)</span>
+              <span id="calcResultDecimal" class="text-2xl font-black text-amber-600 dark:text-amber-400">$2.25 NZD</span>
+              <span id="calcResultCents" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mt-0.5">225 cents (exact conversion)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-3 border-t border-amber-500/20">
+          Rule: 1 Pound (£) = $2.00 | 1 Shilling (1/-) = 10c | 1 Penny (1d) = 5/6c (0.833c)
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 2. PRE-DECIMAL COINAGE (1933 – JULY 1967) -->
+    <section id="pre-decimal-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🪙</span>
+          <div>
+            <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Pre-Decimal Coinage Series (1933–1967)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">First independent New Zealand legal tender coins featuring iconic native flora, fauna &amp; Māori art (Use ‹ / › to flip sides)</p>
+          </div>
+        </div>
+        <span class="self-start sm:self-auto coin-badge badge-silver text-xs">50% Silver (to 1946) &amp; Bronze</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="preDecimalCoinGrid">
+        <!-- Rendered dynamically from CSV -->
+      </div>
+    </section>
+
+    <!-- 3. DECIMAL COINAGE (JULY 1967 – JULY 2006) -->
+    <section id="decimal-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">💵</span>
+          <div>
+            <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">First Decimal Coinage Series (1967–2006)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Introduced on Decimal Currency Day (10 July 1967) with Queen Elizabeth II Arnold Machin obverse</p>
+          </div>
+        </div>
+        <span class="self-start sm:self-auto coin-badge badge-cupro text-xs">1c to 50c Large Cupronickel</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="decimal1967CoinGrid">
+        <!-- Rendered dynamically from CSV -->
+      </div>
+
+      <!-- 1977 Mintage Reference Banner from Sheet -->
+      <div class="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-md">
+        <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+          <span class="text-xs font-black uppercase text-amber-400 flex items-center gap-1.5">
+            <span>📊</span> Official 1977 Production Mintage Breakdown (From BMMC Archives)
+          </span>
+          <span class="text-[10px] text-slate-400 font-mono">Archive Reference Table</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 text-center text-xs">
+          <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
+            <span class="text-slate-400 text-[10px] block font-bold">1c (One Cent)</span>
+            <span class="font-mono font-black text-white text-sm">--</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
+            <span class="text-amber-400 text-[10px] block font-bold">2c (Two Cents)</span>
+            <span class="font-mono font-black text-amber-300 text-sm">20,000,000</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
+            <span class="text-slate-400 text-[10px] block font-bold">5c (Five Cents)</span>
+            <span class="font-mono font-black text-white text-sm">--</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
+            <span class="text-blue-400 text-[10px] block font-bold">10c (Ten Cents)</span>
+            <span class="font-mono font-black text-blue-300 text-sm">5,000,000</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
+            <span class="text-emerald-400 text-[10px] block font-bold">20c (Twenty Cents)</span>
+            <span class="font-mono font-black text-emerald-300 text-sm">7,500,000</span>
+          </div>
+          <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
+            <span class="text-purple-400 text-[10px] block font-bold">50c (Fifty Cents)</span>
+            <span class="font-mono font-black text-purple-300 text-sm">2,000,000</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CURRENT CIRCULATING COINAGE (2006–PRESENT & $1/$2 1991) -->
+    <section id="current-coins-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">✨</span>
+          <div>
+            <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Current Circulating Coinage (2006–Present)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Downsized lightweight plated-steel silver coins (31 July 2006) and aluminium-bronze $1 &amp; $2 coins (1991)</p>
+          </div>
+        </div>
+        <span class="self-start sm:self-auto coin-badge badge-gold text-xs">Active Legal Tender</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" id="currentCoinGrid">
+        <!-- Rendered dynamically from CSV -->
+      </div>
+    </section>
+
+    <!-- 5. NEW ZEALAND BANKNOTE ARCHIVE -->
+    <section id="banknotes-section" class="currency-group-section space-y-8">
+      
+      <!-- Sub-section: Series 1 & 2 Pre-decimal Pound Banknotes -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>📜</span> Pre-Decimal Pound Banknotes (Series 1 &amp; 2: 1934–1967)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">First uniform Reserve Bank banknotes (King Tāwhiao / King George VI portraits, Mitre Peak, Captain Cook, Waitangi)</p>
+          </div>
+          <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £10, £50</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries12Grid"></div>
+      </div>
+
+      <!-- Sub-section: Series 3 & 4 Decimal Wildlife Paper Banknotes -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>🦜</span> First Decimal Wildlife Series (Series 3 &amp; 4 Paper: 1967–1991)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Queen Elizabeth II obverse paired with iconic native wildlife (Fantail, Rifleman, Tui, Kea, Kereru, Takahē)</p>
+          </div>
+          <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $100</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries34Grid"></div>
+      </div>
+
+      <!-- Sub-section: Series 5, 6 & 7 Modern Polymer Banknotes -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>💎</span> Modern Polymer Series (Series 5, 6 &amp; 7: 1992–Present)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders with tukutuku patterns, holographic security windows, and native wildlife</p>
+          </div>
+          <span class="coin-badge badge-polymer text-[10px]">Active Polymer Series</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries567Grid"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Coin & Banknote Detail Lightbox Modal -->
+  <div id="itemDetailModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
+    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-amber-500/40 relative flex flex-col">
+      <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2 truncate">
+          <span class="text-xl" id="modalItemIcon">🪙</span>
+          <h3 id="modalItemTitle" class="text-base font-black text-slate-900 dark:text-white truncate"></h3>
+        </div>
+        <button id="btnCloseDetailModal" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-bold transition cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-5 sm:p-7 space-y-4" id="modalItemContent">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="solid-header border-t border-slate-200/80 dark:border-slate-800/80 py-6 mt-12 transition-colors relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+      <p>© Bonniefields Museum Collection (BMMC) — NZ Currency Archive</p>
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="hover:text-amber-600 dark:hover:text-amber-400 font-bold transition">Museum Index</a>
+        <a href="stamps.html" class="hover:text-amber-600 dark:hover:text-amber-400 font-bold transition">NZ Stamps</a>
+        <a href="#mainHeader" class="hover:text-amber-600 dark:hover:text-amber-400 font-bold transition">Back to Top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Numismatic Dynamic Data Engine Script -->
+  <script>
+    const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_raw';
+    const CACHE_KEY_TIME = 'bMMC_cached_currency_time';
+    const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+    let currencyItems = [];
+    let currentCategoryFilter = 'all'; // Default to Show All
+
+    function showToast(msg, icon = '✨') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = msg;
+      if (toastIcon) toastIcon.textContent = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 2500);
+    }
+
+    function toggleCollapsibleControls(show) {
+      const controls = document.getElementById('collapsibleControls');
+      const chevron = document.getElementById('toggleChevron');
+      const btn = document.getElementById('toggleControlsBtn');
+      if (!controls) return;
+
+      const shouldShow = show !== undefined ? show : controls.classList.contains('hidden');
+      if (shouldShow) {
+        controls.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        if (btn) btn.classList.add('bg-amber-50', 'dark:bg-amber-950/60', 'text-amber-700', 'dark:text-amber-300', 'border-amber-300');
+      } else {
+        controls.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        if (btn) btn.classList.remove('bg-amber-50', 'dark:bg-amber-950/60', 'text-amber-700', 'dark:text-amber-300', 'border-amber-300');
+      }
+    }
+
+    function resolveMediaUrl(url) {
+      if (!url) return '';
+      const clean = String(url).trim();
+      if (!clean) return '';
+      if (window.resolveOfflineMedia) {
+        const local = window.resolveOfflineMedia(clean);
+        if (local && (local.startsWith('../media/') || local.startsWith('./media/') || local.startsWith('media/'))) {
+          return local;
+        }
+      }
+      return clean;
+    }
+
+    function getFallbackSvg(iconSymbol, labelText, isNote = false) {
+      if (isNote) {
+        return `data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22200%22%20viewBox%3D%220%200%20400%20200%22%3E%3Crect%20fill%3D%22%230f172a%22%20width%3D%22400%22%20height%3D%22200%22%20%2F%3E%3Crect%20x%3D%2220%22%20y%3D%2220%22%20width%3D%22360%22%20height%3D%22160%22%20rx%3D%2210%22%20fill%3D%22%231e293b%22%20stroke%3D%22%2338bdf8%22%20stroke-dasharray%3D%226%22%20stroke-width%3D%222%22%20%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2236%22%20x%3D%22200%22%20y%3D%2295%22%20text-anchor%3D%22middle%22%3E${encodeURIComponent(iconSymbol)}%3C%2Ftext%3E%3Ctext%20fill%3D%22%23cbd5e1%22%20font-family%3D%22sans-serif%22%20font-size%3D%2213%22%20font-weight%3D%22bold%22%20x%3D%22200%22%20y%3D%22135%22%20text-anchor%3D%22middle%22%3E${encodeURIComponent(labelText)}%3C%2Ftext%3E%3C%2Fsvg%3E`;
+      }
+      return `data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%230f172a%22%20width%3D%22400%22%20height%3D%22300%22%20%2F%3E%3Ccircle%20cx%3D%22200%22%20cy%3D%22130%22%20r%3D%2265%22%20fill%3D%22%231e293b%22%20stroke%3D%22%23f59e0b%22%20stroke-width%3D%223%22%20%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2240%22%20x%3D%22200%22%20y%3D%22144%22%20text-anchor%3D%22middle%22%3E${encodeURIComponent(iconSymbol)}%3C%2Ftext%3E%3Ctext%20fill%3D%22%23cbd5e1%22%20font-family%3D%22sans-serif%22%20font-size%3D%2213%22%20font-weight%3D%22bold%22%20x%3D%22200%22%20y%3D%22235%22%20text-anchor%3D%22middle%22%3E${encodeURIComponent(labelText)}%3C%2Ftext%3E%3C%2Fsvg%3E`;
+    }
+
+    function getBadgeClass(comp, cat) {
+      const c = (comp || '').toLowerCase();
+      const catLower = (cat || '').toLowerCase();
+      if (c.includes('silver')) return 'badge-silver';
+      if (c.includes('bronze') && !c.includes('aluminium')) return 'badge-bronze';
+      if (c.includes('aluminium') || c.includes('gold')) return 'badge-gold';
+      if (c.includes('polymer')) return 'badge-polymer';
+      if (catLower.includes('banknote') || c.includes('paper')) return 'badge-cupro';
+      return 'badge-cupro';
+    }
+
+    function getIcon(item) {
+      const val = (item.Denomination || item.ID || '').toLowerCase();
+      const rev = (item.Reverse_Description || '').toLowerCase();
+      if (val.includes('halfpenny') || rev.includes('hei-tiki')) return '🗿';
+      if (val.includes('penny') || rev.includes('tūī') || rev.includes('tui')) return '🌿';
+      if (val.includes('threepence') || rev.includes('patu')) return '⚔️';
+      if (val.includes('sixpence') || rev.includes('huia')) return '🪶';
+      if (val.includes('shilling') || rev.includes('warrior')) return '🛡️';
+      if (val.includes('florin') || rev.includes('kiwi')) return '🥝';
+      if (val.includes('crown')) return '👑';
+      if (val.includes('1c') || rev.includes('fern')) return '🌿';
+      if (val.includes('2c') || rev.includes('kōwhai') || rev.includes('kowhai')) return '🌼';
+      if (val.includes('5c') || rev.includes('tuatara')) return '🦎';
+      if (val.includes('10c') || rev.includes('koruru')) return '🎭';
+      if (val.includes('20c') || rev.includes('pukaki')) return '🌸';
+      if (val.includes('50c') || rev.includes('endeavour')) return '⛵';
+      if (val.includes('$1') || rev.includes('kiwi')) return '🥝';
+      if (val.includes('$2') || rev.includes('kōtuku') || rev.includes('heron')) return '🕊️';
+      if (rev.includes('fantail') || rev.includes('pīwakawaka')) return '🕊️';
+      if (rev.includes('rifleman') || rev.includes('tītitipounamu')) return '🐦';
+      if (rev.includes('kea')) return '🦜';
+      if (rev.includes('kererū') || rev.includes('kereru')) return '🕊️';
+      if (rev.includes('takahē') || rev.includes('takahe')) return '🦤';
+      if (rev.includes('penguin') || rev.includes('hoiho')) return '🐧';
+      if (rev.includes('whio') || rev.includes('duck')) return '🦆';
+      if (rev.includes('falcon') || rev.includes('kārearea')) return '🦅';
+      if (rev.includes('kōkako') || rev.includes('kokako')) return '🐦';
+      if (rev.includes('mōhua') || rev.includes('yellowhead')) return '🐤';
+      if ((item.Category || '').toLowerCase().includes('banknote')) return '💴';
+      return '🪙';
+    }
+
+    // Toggle Coin/Banknote Front/Rear on Card
+    window.toggleItemSide = function(boxId, e) {
+      if (e) e.stopPropagation();
+      const wrap = document.getElementById(boxId);
+      if (!wrap) return;
+      const cur = wrap.getAttribute('data-side') || '0';
+      const next = cur === '0' ? '1' : '0';
+      wrap.setAttribute('data-side', next);
+
+      const obverseEl = wrap.querySelector('.img-obverse');
+      const reverseEl = wrap.querySelector('.img-reverse');
+      const labelEl = wrap.querySelector('.side-label');
+      const dot0 = wrap.querySelector('.dot-0');
+      const dot1 = wrap.querySelector('.dot-1');
+
+      if (next === '1') {
+        if (obverseEl) obverseEl.classList.add('hidden');
+        if (reverseEl) reverseEl.classList.remove('hidden');
+        if (labelEl) labelEl.textContent = 'Rear (Reverse)';
+        if (dot0) dot0.className = 'dot-0 w-1.5 h-1.5 rounded-full bg-slate-500 transition-all';
+        if (dot1) dot1.className = 'dot-1 w-2.5 h-1.5 rounded-full bg-amber-400 transition-all';
+      } else {
+        if (obverseEl) obverseEl.classList.remove('hidden');
+        if (reverseEl) reverseEl.classList.add('hidden');
+        if (labelEl) labelEl.textContent = 'Front (Obverse)';
+        if (dot0) dot0.className = 'dot-0 w-2.5 h-1.5 rounded-full bg-amber-400 transition-all';
+        if (dot1) dot1.className = 'dot-1 w-1.5 h-1.5 rounded-full bg-slate-500 transition-all';
+      }
+    };
+
+    function renderCard(item, isBanknote = false) {
+      const icon = getIcon(item);
+      const badgeClass = getBadgeClass(item.Composition, item.Category);
+      const boxId = `card_box_${item.ID || Math.random().toString(36).substr(2, 9)}`;
+
+      const rawFront = (item.Image_Front_URL || '').trim();
+      const rawRear = (item.Image_Rear_URL || '').trim();
+
+      const fallbackFront = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
+      const fallbackRear = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
+
+      const displayFront = rawFront ? resolveMediaUrl(rawFront) : fallbackFront;
+      const displayRear = rawRear ? resolveMediaUrl(rawRear) : fallbackRear;
+
+      const safeDenom = item.Denomination || item.ID || 'Currency Item';
+      const safeEq = item.Decimal_Equivalent ? `<span class="bg-slate-900/85 backdrop-blur-md text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">${item.Decimal_Equivalent}</span>` : '';
+
+      return `
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer" onclick="openDetailModal('${item.ID}')">
+          <div>
+            <!-- Interactive Carousel Container -->
+            <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-48' : 'h-44'} bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800 select-none">
+              
+              <!-- Front (Obverse) Image -->
+              <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+              
+              <!-- Rear (Reverse) Image -->
+              <img src="${displayRear}" alt="${safeDenom} Rear" class="img-reverse max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300 hidden" loading="lazy" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              
+              <!-- Badges -->
+              <span class="absolute top-2.5 left-2.5 coin-badge ${badgeClass} shadow-md">${(item.Composition || 'Issued').split('(')[0].trim()}</span>
+              <span class="absolute top-2.5 right-2.5">${safeEq}</span>
+
+              <!-- Left/Right Slide Arrows -->
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Front/Rear" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-700/60 z-10 cursor-pointer">
+                ‹
+              </button>
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Front/Rear" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-700/60 z-10 cursor-pointer">
+                ›
+              </button>
+
+              <!-- Pill Indicator -->
+              <div class="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 pointer-events-none">
+                <span class="side-label text-[9px] font-bold uppercase tracking-wider bg-slate-900/80 px-2 py-0.5 rounded-full text-slate-300 border border-slate-700/60 shadow">Front (Obverse)</span>
+                <div class="flex items-center gap-1">
+                  <span class="dot-0 w-2.5 h-1.5 rounded-full bg-amber-400 transition-all"></span>
+                  <span class="dot-1 w-1.5 h-1.5 rounded-full bg-slate-500 transition-all"></span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-4 space-y-2">
+              <h4 class="text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                <span>${icon}</span> ${safeDenom}
+              </h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed font-normal">
+                <strong>Reverse:</strong> ${item.Reverse_Description || 'New Zealand Emblem design'}
+              </p>
+              
+              <div class="grid grid-cols-2 gap-1 text-[10px] bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300">
+                <div><span class="text-slate-400 font-bold block">Dimensions</span>${item.Dimensions_mm || item.Diameter_mm || '--'}</div>
+                <div><span class="text-slate-400 font-bold block">Years Issued</span>${item.Years_Issued || '--'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 pt-0">
+            <button class="w-full py-1.5 bg-slate-100 dark:bg-slate-800 group-hover:bg-amber-500 group-hover:text-slate-950 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-black transition text-center cursor-pointer">
+              View Specifications →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setCategoryFilter(filterKey) {
+      currentCategoryFilter = filterKey;
+
+      const buttons = {
+        'all': document.getElementById('filterBtnAll'),
+        'pre-decimal': document.getElementById('filterBtnPre'),
+        'decimal-1967': document.getElementById('filterBtnDec'),
+        'current-coins': document.getElementById('filterBtnCurr'),
+        'banknotes': document.getElementById('filterBtnNotes')
+      };
+
+      Object.keys(buttons).forEach(k => {
+        const btn = buttons[k];
+        if (!btn) return;
+        if (k === filterKey) {
+          btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer active:scale-95 shrink-0';
+        } else {
+          btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0';
+        }
+      });
+
+      // Show/Hide Main Sections based on category filter
+      const secPre = document.getElementById('pre-decimal-section');
+      const secDec = document.getElementById('decimal-section');
+      const secCurr = document.getElementById('current-coins-section');
+      const secNotes = document.getElementById('banknotes-section');
+
+      if (secPre) secPre.style.display = (filterKey === 'all' || filterKey === 'pre-decimal') ? 'block' : 'none';
+      if (secDec) secDec.style.display = (filterKey === 'all' || filterKey === 'decimal-1967') ? 'block' : 'none';
+      if (secCurr) secCurr.style.display = (filterKey === 'all' || filterKey === 'current-coins') ? 'block' : 'none';
+      if (secNotes) secNotes.style.display = (filterKey === 'all' || filterKey === 'banknotes') ? 'block' : 'none';
+
+      renderAllGrids();
+    }
+
+    function renderAllGrids() {
+      const q = (document.getElementById('currencySearchInput')?.value || '').toLowerCase().trim();
+
+      const filterFn = (item) => {
+        if (!q) return true;
+        return (item.Denomination || '').toLowerCase().includes(q) ||
+               (item.Obverse_Description || '').toLowerCase().includes(q) ||
+               (item.Reverse_Description || '').toLowerCase().includes(q) ||
+               (item.Composition || '').toLowerCase().includes(q) ||
+               (item.Designer_Reverse || '').toLowerCase().includes(q) ||
+               (item.Historical_Notes || '').toLowerCase().includes(q);
+      };
+
+      const preCoins = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Coinage') && filterFn(i));
+      const decCoins = currencyItems.filter(i => (i.Category || '').includes('First Decimal Coinage') && filterFn(i));
+      const currCoins = currencyItems.filter(i => (i.Category || '').includes('Current Circulating') && filterFn(i));
+      
+      const notesS12 = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Banknotes') && filterFn(i));
+      const notesS34 = currencyItems.filter(i => (i.Category || '').includes('First Decimal Paper') && filterFn(i));
+      const notesS567 = currencyItems.filter(i => (i.Category || '').includes('Modern Polymer') && filterFn(i));
+
+      const elPreCoins = document.getElementById('preDecimalCoinGrid');
+      const elDecCoins = document.getElementById('decimal1967CoinGrid');
+      const elCurrCoins = document.getElementById('currentCoinGrid');
+      const elNotesS12 = document.getElementById('banknotesSeries12Grid');
+      const elNotesS34 = document.getElementById('banknotesSeries34Grid');
+      const elNotesS567 = document.getElementById('banknotesSeries567Grid');
+
+      if (elPreCoins) elPreCoins.innerHTML = preCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match search.</div>';
+      if (elDecCoins) elDecCoins.innerHTML = decCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match search.</div>';
+      if (elCurrCoins) elCurrCoins.innerHTML = currCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match search.</div>';
+      
+      if (elNotesS12) elNotesS12.innerHTML = notesS12.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match search.</div>';
+      if (elNotesS34) elNotesS34.innerHTML = notesS34.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match search.</div>';
+      if (elNotesS567) elNotesS567.innerHTML = notesS567.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match search.</div>';
+
+      const statsEl = document.getElementById('currencyStatsCounter');
+      if (statsEl) {
+        const matchingCount = currencyItems.filter(filterFn).length;
+        statsEl.textContent = `Showing ${matchingCount} of ${currencyItems.length} records`;
+      }
+    }
+
+    function surpriseMe() {
+      if (currencyItems.length === 0) return;
+      const randIdx = Math.floor(Math.random() * currencyItems.length);
+      const chosen = currencyItems[randIdx];
+      if (chosen && chosen.ID) {
+        openDetailModal(chosen.ID);
+        showToast(`Discovered: ${chosen.Denomination || chosen.ID}`, '✨');
+      }
+    }
+
+    function openDetailModal(itemId) {
+      const item = currencyItems.find(i => i.ID === itemId);
+      if (!item) return;
+
+      const modal = document.getElementById('itemDetailModal');
+      const title = document.getElementById('modalItemTitle');
+      const icon = document.getElementById('modalItemIcon');
+      const content = document.getElementById('modalItemContent');
+
+      const isBanknote = (item.Category || '').toLowerCase().includes('banknote');
+      const itemIcon = getIcon(item);
+
+      if (title) title.textContent = `${item.Denomination || item.ID} — ${item.Category || ''}`;
+      if (icon) icon.textContent = itemIcon;
+
+      if (content) {
+        const fallbackFront = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
+        const fallbackRear = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
+
+        const rawFront = (item.Image_Front_URL || '').trim();
+        const rawRear = (item.Image_Rear_URL || '').trim();
+
+        const frontImg = rawFront ? resolveMediaUrl(rawFront) : fallbackFront;
+        const rearImg = rawRear ? resolveMediaUrl(rawRear) : fallbackRear;
+
+        content.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-800 shadow-inner">
+              <img src="${frontImg}" alt="Front view" class="max-w-full max-h-36 object-contain drop-shadow-2xl" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Front (Obverse)</span>
+            </div>
+            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-800 shadow-inner">
+              <img src="${rearImg}" alt="Rear view" class="max-w-full max-h-36 object-contain drop-shadow-2xl" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Rear (Reverse)</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+            ${item.Historical_Notes ? `
+            <div class="p-4 bg-amber-50/60 dark:bg-amber-950/40 rounded-2xl border border-amber-200/60 dark:border-amber-900/60">
+              <span class="font-extrabold text-amber-900 dark:text-amber-300 block mb-1 text-xs uppercase tracking-wider">Curator &amp; Historical Notes</span>
+              <p class="leading-relaxed">${item.Historical_Notes}</p>
+            </div>` : ''}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span class="text-slate-400 uppercase text-[9px] font-extrabold block">Obverse (Front)</span>
+                <span class="font-bold text-slate-800 dark:text-slate-100">${item.Obverse_Description || '--'}</span>
+                ${item.Designer_Obverse ? `<span class="block mt-1 text-[10px] text-slate-500">Designer: ${item.Designer_Obverse}</span>` : ''}
+              </div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span class="text-slate-400 uppercase text-[9px] font-extrabold block">Reverse (Back)</span>
+                <span class="font-bold text-slate-800 dark:text-slate-100">${item.Reverse_Description || '--'}</span>
+                ${item.Designer_Reverse ? `<span class="block mt-1 text-[10px] text-slate-500">Designer: ${item.Designer_Reverse}</span>` : ''}
+              </div>
+            </div>
+
+            <table class="w-full text-left text-xs border-collapse">
+              <tbody>
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Composition / Material</td><td class="py-2 font-bold">${item.Composition || '--'}</td></tr>
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Dimensions / Mass</td><td class="py-2 font-bold">${item.Dimensions_mm || item.Diameter_mm || '--'} / ${item.Mass_g || '--'}</td></tr>
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Edge Type</td><td class="py-2 font-bold">${item.Edge_Description || '--'}</td></tr>
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Issued / Withdrawal</td><td class="py-2 font-bold">${item.Years_Issued || '--'} &nbsp;•&nbsp; <span class="text-rose-600 dark:text-rose-400">${item.Withdrawal_Date || '--'}</span></td></tr>
+                ${item.Reference_Link ? `<tr><td class="py-2 text-slate-400">Encyclopedia Reference</td><td class="py-2"><a href="${item.Reference_Link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Wikipedia Article ↗</a></td></tr>` : ''}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('itemDetailModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function loadCurrencyData(forceRefresh = false) {
+      try {
+        if (!forceRefresh) {
+          const cached = localStorage.getItem(CACHE_KEY_RAW);
+          const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
+          if (cached && window.Papa) {
+            const parsed = Papa.parse(cached, { header: true, skipEmptyLines: true });
+            if (parsed.data && parsed.data.length > 0) {
+              currencyItems = parsed.data.filter(r => r.ID && r.ID.trim().length > 0);
+              renderAllGrids();
+              if (cachedTime && (Date.now() - Number(cachedTime) < CACHE_TTL_MS)) {
+                return;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Cache read error:', e);
+      }
+
+      // Check local files first for fast/offline loading
+      let text = '';
+      const localCandidates = ['../data/currency.csv', './data/currency.csv', 'data/currency.csv'];
+      for (const p of localCandidates) {
+        try {
+          const localRes = await fetch(p);
+          if (localRes.ok) {
+            text = await localRes.text();
+            if (text && text.length > 50) break;
+          }
+        } catch (e) {}
+      }
+
+      if (!text) {
+        try {
+          const res = await fetch(GOOGLE_CSV_URL);
+          if (res.ok) text = await res.text();
+        } catch (err) {
+          console.warn('Network fetch error:', err);
+        }
+      }
+
+      if (text && window.Papa) {
+        try {
+          localStorage.setItem(CACHE_KEY_RAW, text);
+          localStorage.setItem(CACHE_KEY_TIME, Date.now());
+        } catch (e) {}
+
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        if (parsed.data && parsed.data.length > 0) {
+          currencyItems = parsed.data.filter(r => r.ID && r.ID.trim().length > 0);
+          renderAllGrids();
+        }
+      }
+    }
+
+    // 1967 Decimal Calculator Logic
+    function updateCalculator() {
+      const pounds = parseFloat(document.getElementById('calcPounds')?.value || 0);
+      const shillings = parseFloat(document.getElementById('calcShillings')?.value || 0);
+      const pence = parseFloat(document.getElementById('calcPence')?.value || 0);
+
+      const totalCents = (pounds * 200) + (shillings * 10) + (pence * (5 / 6));
+      const dollars = totalCents / 100;
+
+      const resDec = document.getElementById('calcResultDecimal');
+      const resCents = document.getElementById('calcResultCents');
+
+      if (resDec) resDec.textContent = `$${dollars.toFixed(2)} NZD`;
+      if (resCents) resCents.textContent = `${totalCents.toFixed(1)} cents (exact decimal value)`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Theme Sync
+      const themeToggleBtn = document.getElementById('btnThemeToggle');
+      const themeIcon = document.getElementById('themeToggleIcon');
+
+      function updateThemeUI(isDark) {
+        if (themeIcon) {
+          themeIcon.textContent = isDark ? '☀️' : '🌙';
+        }
+      }
+      updateThemeUI(document.documentElement.classList.contains('dark'));
+
+      themeToggleBtn?.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('bMMC_theme', isDark ? 'dark' : 'light');
+        updateThemeUI(isDark);
+      });
+
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'theme' || e.key === 'bMMC_theme') {
+          const isDark = (e.newValue === 'dark');
+          if (isDark) document.documentElement.classList.add('dark');
+          else document.documentElement.classList.remove('dark');
+          updateThemeUI(isDark);
+        }
+      });
+
+      // Controls Collapsible Toggle Button
+      document.getElementById('toggleControlsBtn')?.addEventListener('click', () => toggleCollapsibleControls());
+
+      // Surprise button
+      document.getElementById('btnSurprise')?.addEventListener('click', surpriseMe);
+
+      // Calculator Listeners
+      ['calcPounds', 'calcShillings', 'calcPence'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', updateCalculator);
+      });
+
+      // Search Listener
+      document.getElementById('currencySearchInput')?.addEventListener('input', renderAllGrids);
+
+      // Modal Close Listeners
+      document.getElementById('btnCloseDetailModal')?.addEventListener('click', closeDetailModal);
+      document.getElementById('itemDetailModal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('itemDetailModal')) closeDetailModal();
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDetailModal();
+      });
+
+      // Initial Data Fetch & Calculator
+      updateCalculator();
+      loadCurrencyData();
+    });
+  </script>
+</body>
+</html>
