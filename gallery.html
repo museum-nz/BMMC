@@ -10,25 +10,24 @@
     (function() {
       try {
         const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
-        // Only enable dark if the user explicitly saved 'dark'
-		if (savedTheme === 'dark') {
-		document.documentElement.classList.add('dark');
-		} else {
-		document.documentElement.classList.remove('dark');
-		}
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       } catch (e) {}
     })();
   </script>
 
   <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com;
+    default-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.tailwindcss.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.dropboxusercontent.com https://*.dropbox.com;
     media-src 'self' blob: https://www.dropbox.com https://*.dropbox.com https://*.dropboxusercontent.com;
-    connect-src 'self' https://docs.google.com https://drive.google.com;
-    font-src 'self' https://fonts.gstatic.com;
+    connect-src 'self' https://docs.google.com https://drive.google.com https://*.googleusercontent.com https://*.dropbox.com;
+    font-src 'self' https://fonts.gstatic.com data:;
   ">
 
   <!-- Preconnect for Image & Media CDN -->
@@ -42,34 +41,36 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- PapaParse for CSV fetching with SRI -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <!-- Offline Media Adapter (Ignored if not present) -->
+  <!-- Offline Media Adapter (Silently ignored when hosted online without adapter) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+
+  <!-- PapaParse for CSV fetching -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <!-- Tailwind CSS Engine -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              500: '#2563eb',
-              600: '#1d4ed8',
-              700: '#1e40af',
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f0f7ff',
+                100: '#e0effe',
+                500: '#2563eb',
+                600: '#1d4ed8',
+                700: '#1e40af',
+              }
             }
           }
         }
-      }
-    };
+      };
+    }
   </script>
 
-  <!-- Unified External Stylesheet -->
+  <!-- Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -80,7 +81,7 @@
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
 
-  <!-- Header Section (1-Line Desktop Navigation) -->
+  <!-- Header Section -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       
@@ -98,7 +99,7 @@
           </div>
         </a>
         
-        <!-- Action Buttons Bar (Single-Line Fit) -->
+        <!-- Action Buttons Bar -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           
           <!-- Surprise Button -->
@@ -111,21 +112,18 @@
             <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
           </a>
 
-          <!-- Utility Pill Cluster: [ 🤍 Saved | ☀️/🌙 Mode | 🌪️ Filter ] -->
+          <!-- Utility Pill Cluster -->
           <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
-            <!-- Favorites -->
             <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="favHeartIcon">🤍</span>
               <span id="favCountText" class="text-[10px] sm:text-[11px]">0</span>
             </button>
 
-            <!-- Theme Toggle -->
             <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
               <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
 
-            <!-- Filter Controls Toggle (Filter Funnel Icon) -->
             <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -167,7 +165,7 @@
             <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto cursor-pointer">Clear</button>
           </div>
           
-          <!-- Search Input with Clear button -->
+          <!-- Search Input -->
           <div class="w-full sm:w-72 relative shrink-0">
             <input type="text" id="gallerySearchInput" placeholder="Search photo title, details, date..." aria-label="Search photos" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
             <svg class="w-4 h-4 text-emerald-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,7 +212,7 @@
             <!-- Alan War -->
             <div id="tabBtnWW2" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-amber-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #d9770625;">
-                <img id="hubImgWW2" src="https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='./media/images/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo.jpg';}else{this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🪖%3C%2Ftext%3E%3C%2Fsvg%3E';}" alt="Alan War" />
+                <img id="hubImgWW2" src="https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🪖%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Alan War" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountWW2" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-amber-500 text-slate-950">0</span>
                 </div>
@@ -228,7 +226,7 @@
             <!-- Dun & Bonniefields -->
             <div id="tabBtnBNF" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #10b98125;">
-                <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='./media/images/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ.jpg';}else{this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';}" alt="Dun & Bonniefields" />
+                <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Dun & Bonniefields" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountBNF" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-emerald-500 text-slate-950">0</span>
                 </div>
@@ -242,7 +240,7 @@
             <!-- Maitland East Chatton -->
             <div id="tabBtnMTL" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-blue-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #2563eb25;">
-                <img id="hubImgMTL" src="https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='./media/images/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf.jpg';}else{this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🏫%3C%2Ftext%3E%3C%2Fsvg%3E';}" alt="Maitland East Chatton" />
+                <img id="hubImgMTL" src="https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🏫%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Maitland East Chatton" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountMTL" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-blue-600 text-white">0</span>
                 </div>
@@ -296,7 +294,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           
-          <!-- Native Custom Audio Player (5 Cols) -->
+          <!-- Audio Player Card -->
           <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 sm:p-5 border border-amber-500/30 shadow-md flex flex-col justify-between space-y-4">
             <div>
               <div class="flex items-center justify-between gap-1 mb-1.5">
@@ -311,7 +309,6 @@
               <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">North Atlantic convoys, Rudolf Hess capture, signal operations & wartime routine.</p>
             </div>
 
-            <!-- Custom HTML5 Audio Player Card -->
             <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3.5">
               <audio id="alanAudioEl" preload="metadata">
                 <source src="https://www.dropbox.com/scl/fi/folfcmnhvzhgd4xp56wzp/2001-Starling-Alan-WWII-June-01-53.11.mp3?rlkey=hf9uwym9k7n9hmvv2o2rvxl1r&st=59pa6c0f&raw=1" type="audio/mpeg">
@@ -351,7 +348,7 @@
               </div>
             </div>
 
-            <!-- Cross-linked Exhibits Cluster -->
+            <!-- Exhibits Cluster -->
             <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
               <span class="text-[10px] font-black uppercase text-slate-400 block mb-2">Cross-Linked Museum Exhibits</span>
               <div class="grid grid-cols-2 gap-2">
@@ -372,7 +369,7 @@
 
           </div>
 
-          <!-- Synchronized Interactive Scrolling Transcript (7 Cols) -->
+          <!-- Synchronized Transcript -->
           <div class="lg:col-span-7 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-4 sm:p-5 border border-amber-500/30 shadow-md flex flex-col h-[480px]">
             
             <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
@@ -381,14 +378,10 @@
                 <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Synchronized Transcript & Chapter Index</h4>
               </div>
               
-              <!-- Quick Transcript Search -->
               <input type="text" id="transcriptSearch" placeholder="Search transcript..." class="px-2.5 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-amber-500 w-36 sm:w-44" />
             </div>
 
-            <!-- Scrollable Transcript Container -->
             <div id="transcriptContainer" class="flex-1 overflow-y-auto pr-2 space-y-2.5 text-xs text-slate-700 dark:text-slate-300 custom-scrollbar select-text">
-              
-              <!-- Chapter 1 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="0" data-end="270">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 1: Enlistment & Early Naval Training</span>
@@ -397,7 +390,6 @@
                 <p class="leading-relaxed">Alan Starling discusses volunteering for naval service, initial reception at HMS Raleigh, medical examinations, and being assigned to communications and signal operations in Devonport.</p>
               </div>
 
-              <!-- Chapter 2 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="270" data-end="555">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 2: Signal School, Morse Code & Semaphore</span>
@@ -406,7 +398,6 @@
                 <p class="leading-relaxed">Rigorous training in visual signaling, lamp telegraphy, radio silence protocols, and flag hoists under wartime blackout regulations.</p>
               </div>
 
-              <!-- Chapter 3 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="555" data-end="940">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 3: Western Approaches & Convoy Escort Duty</span>
@@ -415,7 +406,6 @@
                 <p class="leading-relaxed">Posting to destroyer escorts screening Atlantic merchant ships against U-boat wolfpack attacks; heavy seas, ASDIC submarine detections, and depth charge patterns.</p>
               </div>
 
-              <!-- Chapter 4 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="940" data-end="1330">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 4: The Rudolf Hess Incident (Scotland, 1941)</span>
@@ -424,7 +414,6 @@
                 <p class="leading-relaxed">First-hand account of the crash of Rudolf Hess's Messerschmitt Bf 110 in Renfrewshire, local Scottish defense response, security details, and the commandeered patrol bicycle.</p>
               </div>
 
-              <!-- Chapter 5 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="1330" data-end="1775">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 5: Arctic Convoys to Murmansk & Archangel</span>
@@ -433,7 +422,6 @@
                 <p class="leading-relaxed">Brutal sub-zero conditions in the Barents Sea, de-icing frozen gun mounts and signal bridges, Luftwaffe torpedo bomber strikes from occupied Norway, and Russian supply logistics.</p>
               </div>
 
-              <!-- Chapter 6 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="1775" data-end="2210">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 6: Mediterranean Fleet & Air-Sea Defense</span>
@@ -442,7 +430,6 @@
                 <p class="leading-relaxed">Naval gunfire support missions, Stuka dive-bomber defense off Malta and Gibraltar, and coordinating signal communication under continuous aerial combat.</p>
               </div>
 
-              <!-- Chapter 7 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2210" data-end="2600">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 7: D-Day Preparations & English Channel Sweeps</span>
@@ -451,7 +438,6 @@
                 <p class="leading-relaxed">Operation Neptune assembly, escorting landing crafts, minefield clearance signaling, and maintaining vital communications along the invasion beachheads.</p>
               </div>
 
-              <!-- Chapter 8 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2600" data-end="2925">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 8: Messdeck Life, Diaries & Wartime Comradeship</span>
@@ -460,7 +446,6 @@
                 <p class="leading-relaxed">Day-to-day naval routines, rations, maintaining handwritten personal journals, keeping morale high in adverse seas, and lifelong bonds forged among shipmates.</p>
               </div>
 
-              <!-- Chapter 9 -->
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2925" data-end="3191">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 9: VE-Day, Demobilization & Legacy</span>
@@ -468,10 +453,8 @@
                 </div>
                 <p class="leading-relaxed">Celebrations at the conclusion of European hostilities, transition back to civilian family life, and reflections on preserving historical wartime memories.</p>
               </div>
-
             </div>
 
-            <!-- Jump to Next/Prev Chapter Footer -->
             <div class="pt-2.5 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
               <span id="activeChapterName" class="font-extrabold text-amber-700 dark:text-amber-400 truncate">Playing: Chapter 1</span>
               <span class="text-slate-400">Click any cue to seek</span>
@@ -486,23 +469,18 @@
 
     <!-- Photographic Archives Section -->
     <section id="photoGridSection" class="space-y-4">
-      
-      <!-- Loading State Indicator -->
       <div id="galleryLoading" class="py-12 flex flex-col items-center justify-center gap-3">
         <div class="animate-spin rounded-full h-8 w-8 border-2 border-emerald-500 border-t-transparent"></div>
         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Loading photographs from archive...</span>
       </div>
 
-      <!-- Photos Cards Grid Container -->
       <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
 
-      <!-- No Results Fallback -->
       <div id="galleryNoResults" class="hidden text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
         <span class="text-3xl block mb-2">🔍</span>
         <p class="text-sm font-bold text-slate-700 dark:text-slate-300">No photographic records match your selected filter.</p>
         <button id="btnResetNoResults" class="mt-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer">Clear Search and Reset Filters</button>
       </div>
-
     </section>
 
   </main>
@@ -511,7 +489,6 @@
   <div id="photoModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalPhotoTitle">
     <div id="photoModalContainer" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-emerald-500/40 relative flex flex-col">
       
-      <!-- Modal Navigation Bar -->
       <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <button id="btnModalPrev" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
@@ -524,12 +501,10 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- Share Link Button -->
           <button id="btnSharePhoto" title="Copy Deep Link to Clipboard" class="px-2.5 py-1 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer">
             <span>🔗</span> <span class="hidden sm:inline">Share</span>
           </button>
 
-          <!-- Favorite Button -->
           <button id="modalFavBtn" class="px-3 py-1 rounded-lg text-xs font-black border transition flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200 cursor-pointer">
             <span id="modalFavIcon">🤍</span> <span id="modalFavText">Save</span>
           </button>
@@ -541,9 +516,7 @@
         </div>
       </div>
 
-      <!-- Modal Body -->
       <div class="p-4 sm:p-6 space-y-4">
-        <!-- Clickable Image Container to Enlarge in Full Scale / New Tab -->
         <div id="modalImageWrapper" class="w-full min-h-[260px] max-h-[58vh] bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-800 shadow-inner p-2 cursor-pointer group/modalimg relative" title="Click image to open in full resolution">
           <img id="modalPhotoImage" src="" alt="Full view" class="max-w-full max-h-[54vh] object-contain rounded-lg drop-shadow-2xl group-hover/modalimg:scale-105 transition-transform duration-300" />
           <span class="absolute bottom-3 right-3 bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-lg shadow border border-slate-700/60 pointer-events-none">Click to Enlarge ↗</span>
@@ -556,7 +529,6 @@
               <span id="modalPhotoDate" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800"></span>
             </div>
             
-            <!-- Speech Narration Controls -->
             <div class="flex items-center gap-1.5">
               <button id="btnModalSpeak" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-black transition shadow flex items-center gap-1 cursor-pointer">
                 <span>🔊 Listen</span>
@@ -568,7 +540,6 @@
           <h2 id="modalPhotoTitle" class="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-snug"></h2>
           <div id="modalPhotoDetails" class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 font-normal"></div>
 
-          <!-- Cross-search & link tools -->
           <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex items-center gap-3">
               <button id="btnModalGoogleSearch" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer">🔍 Google Item</button>
@@ -587,14 +558,13 @@
     <span id="toastMsg">Notification</span>
   </div>
 
-  <!-- Gallery Main JavaScript Engine -->
+  <!-- Main JavaScript Engine -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
-    const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
     const CACHE_KEY_GALLERY = 'bMMC_cached_gallery_raw';
     const CACHE_KEY_TIME = 'bMMC_cached_gallery_time';
     const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
-    const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+    const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     const HUB_IMG_WW2 = 'https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200';
     const HUB_IMG_BNF = 'https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200';
@@ -633,16 +603,16 @@
     function sanitizeUrl(url) {
       if (!url) return '';
       const clean = String(url).trim();
-      if (clean.startsWith('./media/') || clean.startsWith('media/') || clean.startsWith('data:image/') || clean.startsWith('index.html')) {
+      if (clean.startsWith('./') || clean.startsWith('../') || clean.startsWith('media/') || clean.startsWith('data:image/') || clean.startsWith('index.html')) {
         return clean;
       }
       if (/^https?:\/\//i.test(clean)) {
         return clean;
       }
       if (!clean.includes(':')) {
-        return clean.startsWith('./') ? clean : `https://${clean}`;
+        return `https://${clean}`;
       }
-      return '';
+      return clean;
     }
 
     function safeReplaceState(urlStr) {
@@ -689,10 +659,14 @@
 
       if (window.resolveOfflineMedia) {
         const local = window.resolveOfflineMedia(url);
-        if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return sanitizeUrl(local);
+        if (local && (local.startsWith('../media/') || local.startsWith('./media/') || local.startsWith('media/'))) {
+          return sanitizeUrl(local);
+        }
       }
 
-      if (url.startsWith('data:image/') || url.startsWith('./media/') || url.startsWith('media/')) return sanitizeUrl(url);
+      if (url.startsWith('data:image/') || url.startsWith('../media/') || url.startsWith('./media/') || url.startsWith('media/')) {
+        return sanitizeUrl(url);
+      }
 
       if (url.includes('dropbox.com')) {
         let cleanUrl = url.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
@@ -1050,7 +1024,7 @@
           if (lower === 'details' || lower.startsWith('details') || lower === 'description') {
             detailsColIdx = idx;
           }
-          if (lower.includes('link') || lower.includes('url') || lower.includes('image') || lower.includes('img')) {
+          if (lower.includes('link') || lower.includes('url') || lower.includes('image') || lower.includes('img') || lower.includes('photo')) {
             linkColIdx = idx;
           }
         });
@@ -1105,7 +1079,7 @@
           date: rawDate,
           details
         };
-      }).filter(item => item.rawImg && (item.rawImg.includes('http') || item.rawImg.includes('drive.google') || item.rawImg.includes('media/')));
+      }).filter(item => item.rawImg && item.rawImg.length > 2);
 
       populateFilterDropdowns(rawGalleryItems);
       updateHubCounts();
@@ -1131,7 +1105,7 @@
       try {
         const cachedRaw = localStorage.getItem(CACHE_KEY_GALLERY);
         const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
-        if (cachedRaw) {
+        if (cachedRaw && window.Papa) {
           const parsed = Papa.parse(cachedRaw, { header: false, skipEmptyLines: true });
           if (processParsedData(parsed.data)) {
             if (loadingEl) loadingEl.classList.add('hidden');
@@ -1148,10 +1122,14 @@
 
       try {
         let text = '';
-        if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const candidatePaths = ['./data/gallery.csv', '../data/gallery.csv', 'data/gallery.csv'];
+        for (const path of candidatePaths) {
           try {
-            const localRes = await fetch(LOCAL_GALLERY_CSV_URL);
-            if (localRes.ok) text = await localRes.text();
+            const localRes = await fetch(path);
+            if (localRes.ok) {
+              text = await localRes.text();
+              if (text && text.length > 20) break;
+            }
           } catch (e) {}
         }
 
@@ -1160,7 +1138,7 @@
           if (res.ok) text = await res.text();
         }
 
-        if (text) {
+        if (text && window.Papa) {
           try {
             localStorage.setItem(CACHE_KEY_GALLERY, text);
             localStorage.setItem(CACHE_KEY_TIME, Date.now());
@@ -1297,7 +1275,6 @@
 
     function onCategoryFilterDropdownChange() {
       const catVal = (document.getElementById('galleryCategoryFilter')?.value || '').trim();
-      
       if (!catVal) {
         activeHall = 'all';
       } else {
@@ -1408,7 +1385,6 @@
                 ${item.date ? `<span class="bg-amber-500/95 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full shadow border border-amber-300/40 truncate">📅 ${safeDate}</span>` : ''}
               </div>
 
-              <!-- Action buttons on Card Image -->
               <div class="absolute top-2.5 right-2.5 flex items-center gap-1 z-10" onclick="event.stopPropagation()">
                 <button data-fav-id="${item.id}" title="${isFav ? 'Remove from favorites' : 'Save to favorites'}" class="btn-card-fav w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md transition shadow-md hover:scale-110 flex items-center justify-center text-xs cursor-pointer">
                   ${isFav ? '❤️' : '🤍'}
@@ -1419,7 +1395,6 @@
               </div>
             </div>
 
-            <!-- Details Section -->
             <div class="p-4 space-y-1.5">
               <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-tight">
                 ${safeTitle}
@@ -1428,7 +1403,6 @@
             </div>
           </div>
 
-          <!-- Footer Actions -->
           <div class="p-4 pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80">
             <span class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               View Details ↗
@@ -1779,7 +1753,6 @@
       volIcon.textContent = audio.volume === 0 ? '🔇' : (audio.volume > 0.5 ? '🔊' : '🔉');
     }
 
-    // --- Interactive Transcript Synchronization ---
     function updateTranscriptCues(currentTime) {
       const cues = document.querySelectorAll('.transcript-cue');
       let currentCueFound = null;
@@ -1801,7 +1774,6 @@
         }
       });
 
-      // Auto-scroll transcript container to active cue
       if (currentCueFound && !transcriptContainer.matches(':hover') && !document.activeElement?.isSameNode(transcriptSearch)) {
         currentCueFound.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
@@ -1829,7 +1801,6 @@
       });
     }
 
-    // Attach Cue Click Seek Listeners
     document.querySelectorAll('.transcript-cue').forEach(cue => {
       cue.addEventListener('click', () => {
         const start = parseFloat(cue.getAttribute('data-start'));
@@ -1842,7 +1813,6 @@
       });
     });
 
-    // Transcript Search Filter
     transcriptSearch?.addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
       document.querySelectorAll('.transcript-cue').forEach(cue => {
@@ -1851,9 +1821,7 @@
       });
     });
 
-    // Attach Event Listeners on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
-      // Theme Controller matching index.html & restoration-guide.html
       const themeToggleIcon = document.getElementById('themeToggleIcon');
 
       function updateThemeUI(isDark) {
@@ -1871,7 +1839,6 @@
         updateThemeUI(isDark);
       });
 
-      // Live Cross-Tab Theme Sync
       window.addEventListener('storage', (e) => {
         if (e.key === 'theme' || e.key === 'bMMC_theme') {
           const isDark = (e.newValue === 'dark');
@@ -1881,7 +1848,6 @@
         }
       });
 
-      // Controls and Filters
       document.getElementById('toggleControlsBtn')?.addEventListener('click', () => toggleCollapsibleControls());
       document.getElementById('btnSurprise')?.addEventListener('click', surpriseMe);
       document.getElementById('btnFavorites')?.addEventListener('click', toggleFavoritesFilter);
@@ -1894,13 +1860,11 @@
       document.getElementById('galleryCategoryFilter')?.addEventListener('change', onCategoryFilterDropdownChange);
       document.getElementById('galleryDateFilter')?.addEventListener('change', filterGalleryCards);
 
-      // Hub collection cards
       document.getElementById('tabBtnAll')?.addEventListener('click', () => switchHall('all'));
       document.getElementById('tabBtnWW2')?.addEventListener('click', () => switchHall('ww2-alan'));
       document.getElementById('tabBtnBNF')?.addEventListener('click', () => switchHall('bonniefields-1920s'));
       document.getElementById('tabBtnMTL')?.addEventListener('click', () => switchHall('maitland-school'));
 
-      // Modal navigation & controls
       document.getElementById('btnModalPrev')?.addEventListener('click', () => navigatePhotoModal(-1));
       document.getElementById('btnModalNext')?.addEventListener('click', () => navigatePhotoModal(1));
       document.getElementById('btnSharePhoto')?.addEventListener('click', shareCurrentPhoto);
@@ -1923,14 +1887,12 @@
         }
       });
 
-      // Audio controls
       playBtn?.addEventListener('click', togglePlay);
       btnSpeed?.addEventListener('click', cycleSpeed);
       btnMute?.addEventListener('click', toggleMute);
       volSlider?.addEventListener('input', (e) => setVolume(e.target.value));
       audioTrack?.addEventListener('click', seekAudio);
 
-      // Load gallery data
       loadGalleryData();
       switchHall('all');
     });
