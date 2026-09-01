@@ -22,11 +22,11 @@
   <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self' 'unsafe-inline';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net ../vendor/tailwind.js;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.tailwindcss.com ../vendor/tailwind.js;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.dropboxusercontent.com https://*.dropbox.com;
     media-src 'self' blob: https://www.dropbox.com https://*.dropbox.com https://*.dropboxusercontent.com;
-    connect-src 'self' https://docs.google.com https://drive.google.com https://*.googleusercontent.com https://*.dropbox.com;
+    connect-src 'self' https://docs.google.com https://*.google.com https://drive.google.com https://*.googleusercontent.com https://*.dropbox.com;
     font-src 'self' https://fonts.gstatic.com data:;
   ">
 
@@ -41,14 +41,14 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- Offline Media Adapter (Silently ignored when hosted online without adapter) -->
+  <!-- Offline Media Adapter (Silently ignored when hosted online) -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
-  <!-- PapaParse for CSV fetching -->
-  <script src="../vendor/papaparse.min.js"></script>
+  <!-- PapaParse with Online CDN & Offline Local Fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" onerror="this.onerror=null;this.src='../vendor/papaparse.min.js';"></script>
 
-  <!-- Tailwind CSS Engine -->
-  <script src="../vendor/tailwind.js"></script>
+  <!-- Tailwind CSS Engine with Online CDN & Offline Local Fallback -->
+  <script src="https://cdn.tailwindcss.com" onerror="this.onerror=null;this.src='../vendor/tailwind.js';"></script>
   <script>
     if (window.tailwind) {
       tailwind.config = {
