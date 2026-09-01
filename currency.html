@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <meta name="referrer" content="no-referrer-when-downgrade" />
-  <title>NZ Currency — BMMC Showcase</title>
+  <title>NZ Currency Archive — BMMC Showcase</title>
 
   <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
   <script>
@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -68,12 +68,13 @@
       display: inline-flex;
       align-items: center;
       gap: 0.25rem;
-      padding: 0.15rem 0.5rem;
+      padding: 0.2rem 0.55rem;
       border-radius: 9999px;
       font-size: 0.68rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.025em;
+      backdrop-filter: blur(4px);
     }
     .badge-silver {
       background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
@@ -100,6 +101,11 @@
       color: #115e59;
       border: 1px solid #2dd4bf;
     }
+    .badge-special {
+      background: linear-gradient(135deg, #fae8ff 0%, #f3e8ff 100%);
+      color: #7e22ce;
+      border: 1px solid #c084fc;
+    }
     .dark .badge-silver {
       background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
       color: #e2e8f0;
@@ -125,6 +131,14 @@
       color: #99f6e4;
       border-color: #0d9488;
     }
+    .dark .badge-special {
+      background: linear-gradient(135deg, #581c87 0%, #3b0764 100%);
+      color: #f3e8ff;
+      border-color: #a855f7;
+    }
+    .img-zoom-cursor {
+      cursor: zoom-in;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
@@ -135,7 +149,7 @@
   </div>
 
   <!-- Header Section with Collapsible Top Controls -->
-  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
+  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors bg-white/90 dark:bg-slate-900/90">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       
       <!-- Top Row: Brand & Action Buttons -->
@@ -172,7 +186,7 @@
               <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
 
-            <!-- Toggle Filter Controls Button (Funnel with Chevron) -->
+            <!-- Toggle Filter Controls Button -->
             <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -187,22 +201,31 @@
       <!-- Collapsible Top Filter Controls Container -->
       <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
         
-        <!-- Category Filter Tabs (Default: Show All) -->
-        <div class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar" role="tablist">
+        <!-- Category Filter Tabs with Individual Banknote & Special Series -->
+        <div class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar py-0.5" role="tablist">
           <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer active:scale-95 shrink-0">
             🌐 Show All
           </button>
-          <button id="filterBtnPre" onclick="setCategoryFilter('pre-decimal')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
-            🪙 Pre-Decimal (1933–1967)
+          <button id="filterBtnPreCoins" onclick="setCategoryFilter('pre-decimal-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            🪙 Pre-Decimal Coins (1933–1967)
           </button>
-          <button id="filterBtnDec" onclick="setCategoryFilter('decimal-1967')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
-            💵 Decimal (1967–2006)
+          <button id="filterBtnDecCoins" onclick="setCategoryFilter('decimal-1967-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            💵 Decimal Coins (1967–2006)
           </button>
-          <button id="filterBtnCurr" onclick="setCategoryFilter('current-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
-            ✨ Current Circulating ($1, $2, 10c–50c)
+          <button id="filterBtnCurrCoins" onclick="setCategoryFilter('current-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            ✨ Current Coins (2006–Present)
           </button>
-          <button id="filterBtnNotes" onclick="setCategoryFilter('banknotes')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
-            💴 Banknote Series
+          <button id="filterBtnPreNotes" onclick="setCategoryFilter('banknotes-s12')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            📜 Pre-Decimal Notes (S1 &amp; S2: 1934–1967)
+          </button>
+          <button id="filterBtnDecNotes" onclick="setCategoryFilter('banknotes-s34')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            🦜 Decimal Paper Notes (S3 &amp; S4: 1967–1992)
+          </button>
+          <button id="filterBtnPolyNotes" onclick="setCategoryFilter('banknotes-s567')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer active:scale-95 shrink-0">
+            💎 Polymer Notes (S5, 6 &amp; 7: 1992–Present)
+          </button>
+          <button id="filterBtnSpecial" onclick="setCategoryFilter('special-issues')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900 cursor-pointer active:scale-95 shrink-0">
+            🌟 Special &amp; Commemorative
           </button>
         </div>
 
@@ -231,10 +254,10 @@
       <div class="absolute -left-10 -bottom-10 w-64 h-64 bg-yellow-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div class="relative z-10 w-full">
         <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-3">
-          New Zealand Coins &amp; Banknotes
+          New Zealand Coins &amp; Banknotes Archive
         </h2>
         <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal max-w-5xl">
-          From 1897 British imperial legal tender and the historic Coinage Act of 1933 to the 1967 Decimal currency changeover, 2006 silver coin resize, and modern polymer banknotes.
+          From 1897 British imperial legal tender and the historic Coinage Act of 1933 to the 1967 Decimal currency changeover, 2006 silver coin resize, and modern polymer banknotes. Click any image to enlarge and inspect numismatic details.
         </p>
       </div>
     </div>
@@ -255,10 +278,10 @@
           
           <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
             <p>
-              <strong>Prior to Official NZ (1897–1933):</strong> In 1897, New Zealand's coins became subject to parts of the <em>Imperial Coinage Act 1870 (UK)</em>. This meant only British coin was the official legal tender in the colony, alongside Australian-minted gold sovereign and half-sovereign coins.
+              <strong>Prior to Official NZ Coinage (1897–1933):</strong> In 1897, New Zealand's currency became subject to parts of the <em>Imperial Coinage Act 1870 (UK)</em>. Only British coins and Australian-minted sovereigns were official legal tender in the colony.
             </p>
             <p>
-              <strong>Coin Smuggling &amp; The 1933 Act:</strong> By 1933, widespread coin smuggling and severe shortages of lower-value coins forced action. Instead of immediate decimalisation (as advocated by the New Zealand Numismatic Society), New Zealand introduced its own distinctive national coinage under the <strong>Coinage Act 1933</strong>. British coin officially ceased being legal tender on <strong>1 February 1935</strong>.
+              <strong>Coin Smuggling &amp; The 1933 Act:</strong> By 1933, widespread coin smuggling and lower-value coin shortages forced action. New Zealand introduced its own national coinage under the <strong>Coinage Act 1933</strong>. British coins officially ceased being legal tender on <strong>1 February 1935</strong>.
             </p>
             <p>
               <strong>Decimal Currency Day (10 July 1967):</strong> New Zealand introduced dollars and cents (£1 = $2.00, 10s = $1.00, 1s = 10c, 1d = 5/6c).
@@ -314,26 +337,27 @@
 
     </section>
 
-    <!-- 2. PRE-DECIMAL COINAGE (1933 – JULY 1967) -->
-    <section id="pre-decimal-section" class="currency-group-section space-y-4">
+    <!-- 2. PRE-DECIMAL COINAGE (1933 – JULY 1967) - 4 COLS WIDE -->
+    <section id="pre-decimal-coins-section" class="currency-group-section space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
         <div class="flex items-center gap-3">
           <span class="text-2xl">🪙</span>
           <div>
             <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Pre-Decimal Coinage Series (1933–1967)</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">First independent New Zealand legal tender coins featuring iconic native flora, fauna &amp; Māori art (Use ‹ / › to flip sides)</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">First independent New Zealand legal tender coins featuring native flora, fauna &amp; Māori motifs</p>
           </div>
         </div>
         <span class="self-start sm:self-auto coin-badge badge-silver text-xs">50% Silver (to 1946) &amp; Bronze</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="preDecimalCoinGrid">
-        <!-- Rendered dynamically from CSV -->
+      <!-- 4 Wide Grid for Coins -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="preDecimalCoinGrid">
+        <!-- Rendered dynamically -->
       </div>
     </section>
 
-    <!-- 3. DECIMAL COINAGE (JULY 1967 – JULY 2006) -->
-    <section id="decimal-section" class="currency-group-section space-y-4">
+    <!-- 3. DECIMAL COINAGE (JULY 1967 – JULY 2006) - 4 COLS WIDE -->
+    <section id="decimal-coins-section" class="currency-group-section space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
         <div class="flex items-center gap-3">
           <span class="text-2xl">💵</span>
@@ -342,11 +366,12 @@
             <p class="text-xs text-slate-500 dark:text-slate-400">Introduced on Decimal Currency Day (10 July 1967) with Queen Elizabeth II Arnold Machin obverse</p>
           </div>
         </div>
-        <span class="self-start sm:self-auto coin-badge badge-cupro text-xs">1c to 50c Large Cupronickel</span>
+        <span class="self-start sm:self-auto coin-badge badge-cupro text-xs">1c to 50c Large Cupronickel &amp; Bronze</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="decimal1967CoinGrid">
-        <!-- Rendered dynamically from CSV -->
+      <!-- 4 Wide Grid for Coins -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="decimal1967CoinGrid">
+        <!-- Rendered dynamically -->
       </div>
 
       <!-- 1977 Mintage Reference Banner from Sheet -->
@@ -386,74 +411,93 @@
       </div>
     </section>
 
-    <!-- 4. CURRENT CIRCULATING COINAGE (2006–PRESENT & $1/$2 1991) -->
+    <!-- 4. CURRENT CIRCULATING COINAGE (2006–PRESENT & $1/$2 1991) - 4 COLS WIDE -->
     <section id="current-coins-section" class="currency-group-section space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
         <div class="flex items-center gap-3">
           <span class="text-2xl">✨</span>
           <div>
             <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Current Circulating Coinage (2006–Present)</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Downsized lightweight plated-steel silver coins (31 July 2006) and aluminium-bronze $1 &amp; $2 coins (1991)</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Lightweight plated-steel 10c–50c coins (2006) and aluminium-bronze $1 &amp; $2 coins (1991)</p>
           </div>
         </div>
         <span class="self-start sm:self-auto coin-badge badge-gold text-xs">Active Legal Tender</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" id="currentCoinGrid">
-        <!-- Rendered dynamically from CSV -->
+      <!-- 4 Wide Grid for Coins -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="currentCoinGrid">
+        <!-- Rendered dynamically -->
       </div>
     </section>
 
-    <!-- 5. NEW ZEALAND BANKNOTE ARCHIVE -->
-    <section id="banknotes-section" class="currency-group-section space-y-8">
+    <!-- 5. PRE-DECIMAL BANKNOTES (SERIES 1 & 2) - 3 COLS WIDE -->
+    <section id="banknotes-s12-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+        <div>
+          <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📜</span> Pre-Decimal Pound Banknotes (Series 1 &amp; 2: 1934–1967)
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">First uniform Reserve Bank banknotes (King Tāwhiao / King George VI portraits, Mitre Peak, Captain Cook, Treaty of Waitangi)</p>
+        </div>
+        <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £10, £50</span>
+      </div>
       
-      <!-- Sub-section: Series 1 & 2 Pre-decimal Pound Banknotes -->
-      <div class="space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
-          <div>
-            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>📜</span> Pre-Decimal Pound Banknotes (Series 1 &amp; 2: 1934–1967)
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">First uniform Reserve Bank banknotes (King Tāwhiao / King George VI portraits, Mitre Peak, Captain Cook, Waitangi)</p>
-          </div>
-          <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £10, £50</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries12Grid"></div>
-      </div>
+      <!-- 3 Wide Grid for Notes -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries12Grid"></div>
+    </section>
 
-      <!-- Sub-section: Series 3 & 4 Decimal Wildlife Paper Banknotes -->
-      <div class="space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
-          <div>
-            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>🦜</span> First Decimal Wildlife Series (Series 3 &amp; 4 Paper: 1967–1991)
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Queen Elizabeth II obverse paired with iconic native wildlife (Fantail, Rifleman, Tui, Kea, Kereru, Takahē)</p>
-          </div>
-          <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $100</span>
+    <!-- 6. DECIMAL WILDLIFE PAPER BANKNOTES (SERIES 3 & 4) - 3 COLS WIDE -->
+    <section id="banknotes-s34-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+        <div>
+          <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <span>🦜</span> Decimal Wildlife Paper Banknotes (Series 3 &amp; 4: 1967–1992)
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Queen Elizabeth II obverse paired with iconic native wildlife (Fantail, Rifleman, Tūī, Kea, Kererū, Takahē)</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries34Grid"></div>
+        <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $100</span>
       </div>
+      
+      <!-- 3 Wide Grid for Notes -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries34Grid"></div>
+    </section>
 
-      <!-- Sub-section: Series 5, 6 & 7 Modern Polymer Banknotes -->
-      <div class="space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
-          <div>
-            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>💎</span> Modern Polymer Series (Series 5, 6 &amp; 7: 1992–Present)
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders with tukutuku patterns, holographic security windows, and native wildlife</p>
-          </div>
-          <span class="coin-badge badge-polymer text-[10px]">Active Polymer Series</span>
+    <!-- 7. MODERN POLYMER BANKNOTES (SERIES 5, 6 & 7) - 3 COLS WIDE -->
+    <section id="banknotes-s567-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+        <div>
+          <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <span>💎</span> Modern Polymer Banknotes (Series 5, 6 &amp; 7: 1992–Present)
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders with tukutuku patterns, transparent security windows, and native wildlife</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries567Grid"></div>
+        <span class="coin-badge badge-polymer text-[10px]">Active Polymer Series</span>
       </div>
+      
+      <!-- 3 Wide Grid for Notes -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries567Grid"></div>
+    </section>
 
+    <!-- 8. SPECIAL & COMMEMORATIVE ISSUES (NEW SECTION) -->
+    <section id="special-issues-section" class="currency-group-section space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-300/80 dark:border-purple-800 pb-2">
+        <div>
+          <h3 class="text-base sm:text-lg font-black text-purple-900 dark:text-purple-300 flex items-center gap-2">
+            <span>🌟</span> Special, Commemorative &amp; Future Issues
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Coloured commemorative circulating coins (ANZAC, Armistice), Sesquicentennial / Millennium banknotes, and upcoming King Charles III effigies</p>
+        </div>
+        <span class="coin-badge badge-special text-[10px]">Commemorative &amp; Future</span>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="specialItemsGrid">
+        <!-- Rendered dynamically from CSV Special items -->
+      </div>
     </section>
 
   </main>
 
-  <!-- Coin & Banknote Detail Lightbox Modal -->
+  <!-- Spec & Description Modal (Detail Lightbox) -->
   <div id="itemDetailModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-amber-500/40 relative flex flex-col">
       <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 py-3 flex items-center justify-between">
@@ -467,6 +511,23 @@
       <div class="p-5 sm:p-7 space-y-4" id="modalItemContent">
         <!-- Populated dynamically -->
       </div>
+    </div>
+  </div>
+
+  <!-- Dedicated High-Res Image Enlargement Lightbox -->
+  <div id="imageEnlargeModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-2xl z-[60] flex flex-col items-center justify-center p-4 sm:p-8 hidden" role="dialog" aria-modal="true">
+    <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+      <button id="btnCloseImageEnlarge" class="w-10 h-10 rounded-full bg-slate-800/90 text-white text-base font-bold flex items-center justify-center hover:bg-amber-500 hover:text-slate-950 transition cursor-pointer border border-slate-700 shadow-xl" title="Close Enlarge View (Esc)">
+        ✕
+      </button>
+    </div>
+    
+    <div class="relative max-w-5xl max-h-[82vh] flex items-center justify-center select-none">
+      <img id="enlargedImageTarget" src="" alt="Enlarged Currency" class="max-w-full max-h-[82vh] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-xl transition-transform duration-200" />
+    </div>
+
+    <div class="mt-4 text-center">
+      <p id="enlargedImageCaption" class="text-xs sm:text-sm font-bold text-slate-200 bg-slate-900/80 px-4 py-1.5 rounded-full border border-slate-800 inline-block shadow-lg"></p>
     </div>
   </div>
 
@@ -491,12 +552,12 @@
   <!-- Numismatic Dynamic Data Engine Script -->
   <script>
     const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_raw';
-    const CACHE_KEY_TIME = 'bMMC_cached_currency_time';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_raw_v2';
+    const CACHE_KEY_TIME = 'bMMC_cached_currency_time_v2';
     const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
     let currencyItems = [];
-    let currentCategoryFilter = 'all'; // Default to Show All
+    let currentCategoryFilter = 'all';
 
     function showToast(msg, icon = '✨') {
       const toast = document.getElementById('toast');
@@ -552,6 +613,7 @@
     function getBadgeClass(comp, cat) {
       const c = (comp || '').toLowerCase();
       const catLower = (cat || '').toLowerCase();
+      if (catLower.includes('special')) return 'badge-special';
       if (c.includes('silver')) return 'badge-silver';
       if (c.includes('bronze') && !c.includes('aluminium')) return 'badge-bronze';
       if (c.includes('aluminium') || c.includes('gold')) return 'badge-gold';
@@ -563,6 +625,12 @@
     function getIcon(item) {
       const val = (item.Denomination || item.ID || '').toLowerCase();
       const rev = (item.Reverse_Description || '').toLowerCase();
+      const cat = (item.Category || '').toLowerCase();
+      const notes = (item.Historical_Notes || '').toLowerCase();
+
+      if (notes.includes('charles') || val.includes('charles')) return '👑';
+      if (notes.includes('anzac') || val.includes('anzac')) return '🎖️';
+      if (notes.includes('armistice') || rev.includes('poppy')) return '🌺';
       if (val.includes('halfpenny') || rev.includes('hei-tiki')) return '🗿';
       if (val.includes('penny') || rev.includes('tūī') || rev.includes('tui')) return '🌿';
       if (val.includes('threepence') || rev.includes('patu')) return '⚔️';
@@ -588,11 +656,29 @@
       if (rev.includes('falcon') || rev.includes('kārearea')) return '🦅';
       if (rev.includes('kōkako') || rev.includes('kokako')) return '🐦';
       if (rev.includes('mōhua') || rev.includes('yellowhead')) return '🐤';
-      if ((item.Category || '').toLowerCase().includes('banknote')) return '💴';
+      if (cat.includes('banknote') || cat.includes('special')) return '💴';
       return '🪙';
     }
 
-    // Toggle Coin/Banknote Front/Rear on Card
+    // Interactive Image Zoom Lightbox
+    window.enlargeImage = function(src, caption, e) {
+      if (e) e.stopPropagation();
+      const modal = document.getElementById('imageEnlargeModal');
+      const target = document.getElementById('enlargedImageTarget');
+      const capEl = document.getElementById('enlargedImageCaption');
+      if (!modal || !target) return;
+
+      target.src = src;
+      if (capEl) capEl.textContent = caption || 'High-Resolution Specimen View';
+      modal.classList.remove('hidden');
+    };
+
+    window.closeImageEnlarge = function() {
+      const modal = document.getElementById('imageEnlargeModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    // Toggle Coin/Banknote Front/Rear on Card (only called when rear image exists)
     window.toggleItemSide = function(boxId, e) {
       if (e) e.stopPropagation();
       const wrap = document.getElementById(boxId);
@@ -625,10 +711,11 @@
     function renderCard(item, isBanknote = false) {
       const icon = getIcon(item);
       const badgeClass = getBadgeClass(item.Composition, item.Category);
-      const boxId = `card_box_${item.ID || Math.random().toString(36).substr(2, 9)}`;
+      const boxId = `card_box_${item._uid || Math.random().toString(36).substr(2, 9)}`;
 
       const rawFront = (item.Image_Front_URL || '').trim();
       const rawRear = (item.Image_Rear_URL || '').trim();
+      const hasRear = Boolean(rawRear && rawRear.length > 5);
 
       const fallbackFront = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
       const fallbackRear = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
@@ -640,30 +727,32 @@
       const safeEq = item.Decimal_Equivalent ? `<span class="bg-slate-900/85 backdrop-blur-md text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">${item.Decimal_Equivalent}</span>` : '';
 
       return `
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer" onclick="openDetailModal('${item.ID}')">
+        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer" onclick="openDetailModal('${item._uid}')">
           <div>
             <!-- Interactive Carousel Container -->
             <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-48' : 'h-44'} bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800 select-none">
               
-              <!-- Front (Obverse) Image -->
-              <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+              <!-- Front (Obverse) Image - Click to Enlarge -->
+              <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayFront}', '${safeDenom} — Front (Obverse)', event)" onerror="this.onerror=null;this.src='${fallbackFront}';" />
               
-              <!-- Rear (Reverse) Image -->
-              <img src="${displayRear}" alt="${safeDenom} Rear" class="img-reverse max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300 hidden" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              <!-- Rear (Reverse) Image (Only if present) - Click to Enlarge -->
+              ${hasRear ? `
+              <img src="${displayRear}" alt="${safeDenom} Rear" class="img-reverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300 hidden" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayRear}', '${safeDenom} — Rear (Reverse)', event)" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              ` : ''}
               
               <!-- Badges -->
-              <span class="absolute top-2.5 left-2.5 coin-badge ${badgeClass} shadow-md">${(item.Composition || 'Issued').split('(')[0].trim()}</span>
+              <span class="absolute top-2.5 left-2.5 coin-badge ${badgeClass} shadow-md">${(item.Composition || item.Category || 'Issued').split('(')[0].trim()}</span>
               <span class="absolute top-2.5 right-2.5">${safeEq}</span>
 
-              <!-- Left/Right Slide Arrows -->
-              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Front/Rear" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-700/60 z-10 cursor-pointer">
+              <!-- Flip Arrows & Pill: ONLY rendered if there is more than 1 image -->
+              ${hasRear ? `
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Previous Side" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-700/60 z-10 cursor-pointer">
                 ‹
               </button>
-              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Front/Rear" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-700/60 z-10 cursor-pointer">
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Next Side" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-700/60 z-10 cursor-pointer">
                 ›
               </button>
 
-              <!-- Pill Indicator -->
               <div class="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 pointer-events-none">
                 <span class="side-label text-[9px] font-bold uppercase tracking-wider bg-slate-900/80 px-2 py-0.5 rounded-full text-slate-300 border border-slate-700/60 shadow">Front (Obverse)</span>
                 <div class="flex items-center gap-1">
@@ -671,14 +760,19 @@
                   <span class="dot-1 w-1.5 h-1.5 rounded-full bg-slate-500 transition-all"></span>
                 </div>
               </div>
+              ` : `
+              <div class="absolute bottom-2 inset-x-0 flex items-center justify-center pointer-events-none">
+                <span class="text-[9px] font-bold uppercase tracking-wider bg-slate-900/70 px-2 py-0.5 rounded-full text-slate-400 border border-slate-700/40">Front Specimen (🔍 Click to zoom)</span>
+              </div>
+              `}
             </div>
             
             <div class="p-4 space-y-2">
               <h4 class="text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
-                <span>${icon}</span> ${safeDenom}
+                <span>${icon}</span> <span>${safeDenom}</span>
               </h4>
               <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed font-normal">
-                <strong>Reverse:</strong> ${item.Reverse_Description || 'New Zealand Emblem design'}
+                <strong>Description:</strong> ${item.Reverse_Description || item.Obverse_Description || item.Historical_Notes || 'New Zealand Currency Specimen'}
               </p>
               
               <div class="grid grid-cols-2 gap-1 text-[10px] bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300">
@@ -702,10 +796,13 @@
 
       const buttons = {
         'all': document.getElementById('filterBtnAll'),
-        'pre-decimal': document.getElementById('filterBtnPre'),
-        'decimal-1967': document.getElementById('filterBtnDec'),
-        'current-coins': document.getElementById('filterBtnCurr'),
-        'banknotes': document.getElementById('filterBtnNotes')
+        'pre-decimal-coins': document.getElementById('filterBtnPreCoins'),
+        'decimal-1967-coins': document.getElementById('filterBtnDecCoins'),
+        'current-coins': document.getElementById('filterBtnCurrCoins'),
+        'banknotes-s12': document.getElementById('filterBtnPreNotes'),
+        'banknotes-s34': document.getElementById('filterBtnDecNotes'),
+        'banknotes-s567': document.getElementById('filterBtnPolyNotes'),
+        'special-issues': document.getElementById('filterBtnSpecial')
       };
 
       Object.keys(buttons).forEach(k => {
@@ -719,15 +816,21 @@
       });
 
       // Show/Hide Main Sections based on category filter
-      const secPre = document.getElementById('pre-decimal-section');
-      const secDec = document.getElementById('decimal-section');
-      const secCurr = document.getElementById('current-coins-section');
-      const secNotes = document.getElementById('banknotes-section');
+      const secPreCoins = document.getElementById('pre-decimal-coins-section');
+      const secDecCoins = document.getElementById('decimal-coins-section');
+      const secCurrCoins = document.getElementById('current-coins-section');
+      const secNotesS12 = document.getElementById('banknotes-s12-section');
+      const secNotesS34 = document.getElementById('banknotes-s34-section');
+      const secNotesS567 = document.getElementById('banknotes-s567-section');
+      const secSpecial = document.getElementById('special-issues-section');
 
-      if (secPre) secPre.style.display = (filterKey === 'all' || filterKey === 'pre-decimal') ? 'block' : 'none';
-      if (secDec) secDec.style.display = (filterKey === 'all' || filterKey === 'decimal-1967') ? 'block' : 'none';
-      if (secCurr) secCurr.style.display = (filterKey === 'all' || filterKey === 'current-coins') ? 'block' : 'none';
-      if (secNotes) secNotes.style.display = (filterKey === 'all' || filterKey === 'banknotes') ? 'block' : 'none';
+      if (secPreCoins) secPreCoins.style.display = (filterKey === 'all' || filterKey === 'pre-decimal-coins') ? 'block' : 'none';
+      if (secDecCoins) secDecCoins.style.display = (filterKey === 'all' || filterKey === 'decimal-1967-coins') ? 'block' : 'none';
+      if (secCurrCoins) secCurrCoins.style.display = (filterKey === 'all' || filterKey === 'current-coins') ? 'block' : 'none';
+      if (secNotesS12) secNotesS12.style.display = (filterKey === 'all' || filterKey === 'banknotes-s12') ? 'block' : 'none';
+      if (secNotesS34) secNotesS34.style.display = (filterKey === 'all' || filterKey === 'banknotes-s34') ? 'block' : 'none';
+      if (secNotesS567) secNotesS567.style.display = (filterKey === 'all' || filterKey === 'banknotes-s567') ? 'block' : 'none';
+      if (secSpecial) secSpecial.style.display = (filterKey === 'all' || filterKey === 'special-issues') ? 'block' : 'none';
 
       renderAllGrids();
     }
@@ -742,16 +845,26 @@
                (item.Reverse_Description || '').toLowerCase().includes(q) ||
                (item.Composition || '').toLowerCase().includes(q) ||
                (item.Designer_Reverse || '').toLowerCase().includes(q) ||
-               (item.Historical_Notes || '').toLowerCase().includes(q);
+               (item.Historical_Notes || '').toLowerCase().includes(q) ||
+               (item.Category || '').toLowerCase().includes(q);
       };
 
-      const preCoins = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Coinage') && filterFn(i));
-      const decCoins = currencyItems.filter(i => (i.Category || '').includes('First Decimal Coinage') && filterFn(i));
-      const currCoins = currencyItems.filter(i => (i.Category || '').includes('Current Circulating') && filterFn(i));
+      // Segregation rules
+      const isSpecial = (i) => {
+        const cat = (i.Category || '').toLowerCase();
+        const id = (i.ID || '').toLowerCase();
+        return cat.includes('special') || id.includes('anzac') || id.includes('armistice') || id.includes('commemorative') || id === 'new';
+      };
+
+      const preCoins = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Coinage') && !isSpecial(i) && filterFn(i));
+      const decCoins = currencyItems.filter(i => (i.Category || '').includes('First Decimal Coinage') && !isSpecial(i) && filterFn(i));
+      const currCoins = currencyItems.filter(i => (i.Category || '').includes('Current Circulating Coinage') && !isSpecial(i) && filterFn(i));
       
-      const notesS12 = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Banknotes') && filterFn(i));
-      const notesS34 = currencyItems.filter(i => (i.Category || '').includes('First Decimal Paper') && filterFn(i));
-      const notesS567 = currencyItems.filter(i => (i.Category || '').includes('Modern Polymer') && filterFn(i));
+      const notesS12 = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Banknotes') && !isSpecial(i) && filterFn(i));
+      const notesS34 = currencyItems.filter(i => (i.Category || '').includes('First Decimal Paper') && !isSpecial(i) && filterFn(i));
+      const notesS567 = currencyItems.filter(i => (i.Category || '').includes('Modern Polymer') && !isSpecial(i) && filterFn(i));
+      
+      const specialItems = currencyItems.filter(i => isSpecial(i) && filterFn(i));
 
       const elPreCoins = document.getElementById('preDecimalCoinGrid');
       const elDecCoins = document.getElementById('decimal1967CoinGrid');
@@ -759,14 +872,20 @@
       const elNotesS12 = document.getElementById('banknotesSeries12Grid');
       const elNotesS34 = document.getElementById('banknotesSeries34Grid');
       const elNotesS567 = document.getElementById('banknotesSeries567Grid');
+      const elSpecial = document.getElementById('specialItemsGrid');
 
-      if (elPreCoins) elPreCoins.innerHTML = preCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match search.</div>';
-      if (elDecCoins) elDecCoins.innerHTML = decCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match search.</div>';
-      if (elCurrCoins) elCurrCoins.innerHTML = currCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match search.</div>';
+      if (elPreCoins) elPreCoins.innerHTML = preCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match search.</div>';
+      if (elDecCoins) elDecCoins.innerHTML = decCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match search.</div>';
+      if (elCurrCoins) elCurrCoins.innerHTML = currCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match search.</div>';
       
       if (elNotesS12) elNotesS12.innerHTML = notesS12.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match search.</div>';
       if (elNotesS34) elNotesS34.innerHTML = notesS34.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match search.</div>';
       if (elNotesS567) elNotesS567.innerHTML = notesS567.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match search.</div>';
+
+      if (elSpecial) elSpecial.innerHTML = specialItems.map(s => {
+        const isNote = (s.Category || '').toLowerCase().includes('banknote') || (s.Denomination || '').toLowerCase().includes('dollar') && !(s.Denomination || '').includes('coin');
+        return renderCard(s, isNote);
+      }).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No special items match search.</div>';
 
       const statsEl = document.getElementById('currencyStatsCounter');
       if (statsEl) {
@@ -779,14 +898,15 @@
       if (currencyItems.length === 0) return;
       const randIdx = Math.floor(Math.random() * currencyItems.length);
       const chosen = currencyItems[randIdx];
-      if (chosen && chosen.ID) {
-        openDetailModal(chosen.ID);
+      if (chosen && chosen._uid) {
+        openDetailModal(chosen._uid);
         showToast(`Discovered: ${chosen.Denomination || chosen.ID}`, '✨');
       }
     }
 
-    function openDetailModal(itemId) {
-      const item = currencyItems.find(i => i.ID === itemId);
+    // Specification Detail Modal (Only displays 2nd image container if reverse image exists)
+    function openDetailModal(uniqueId) {
+      const item = currencyItems.find(i => i._uid === uniqueId);
       if (!item) return;
 
       const modal = document.getElementById('itemDetailModal');
@@ -794,39 +914,50 @@
       const icon = document.getElementById('modalItemIcon');
       const content = document.getElementById('modalItemContent');
 
-      const isBanknote = (item.Category || '').toLowerCase().includes('banknote');
+      const isBanknote = (item.Category || '').toLowerCase().includes('banknote') || (item.Denomination || '').toLowerCase().includes('dollar') && !(item.Denomination || '').includes('coin');
       const itemIcon = getIcon(item);
 
       if (title) title.textContent = `${item.Denomination || item.ID} — ${item.Category || ''}`;
       if (icon) icon.textContent = itemIcon;
 
       if (content) {
-        const fallbackFront = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
-        const fallbackRear = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
-
         const rawFront = (item.Image_Front_URL || '').trim();
         const rawRear = (item.Image_Rear_URL || '').trim();
+        const hasRear = Boolean(rawRear && rawRear.length > 5);
+
+        const fallbackFront = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
+        const fallbackRear = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
 
         const frontImg = rawFront ? resolveMediaUrl(rawFront) : fallbackFront;
         const rearImg = rawRear ? resolveMediaUrl(rawRear) : fallbackRear;
 
+        const safeDenom = item.Denomination || item.ID || 'Item';
+
         content.innerHTML = `
+          <!-- Image Display Container: 2-column if rear exists, 1-column centered if only front exists -->
+          ${hasRear ? `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-800 shadow-inner">
-              <img src="${frontImg}" alt="Front view" class="max-w-full max-h-36 object-contain drop-shadow-2xl" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
-              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Front (Obverse)</span>
+            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-800 shadow-inner group">
+              <img src="${frontImg}" alt="${safeDenom} Front" class="img-zoom-cursor max-w-full max-h-36 object-contain drop-shadow-2xl hover:scale-105 transition-transform" onclick="enlargeImage('${frontImg}', '${safeDenom} — Front (Obverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Front (Obverse) • 🔍 Click to enlarge</span>
             </div>
-            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-800 shadow-inner">
-              <img src="${rearImg}" alt="Rear view" class="max-w-full max-h-36 object-contain drop-shadow-2xl" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackRear}';" />
-              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Rear (Reverse)</span>
+            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-800 shadow-inner group">
+              <img src="${rearImg}" alt="${safeDenom} Rear" class="img-zoom-cursor max-w-full max-h-36 object-contain drop-shadow-2xl hover:scale-105 transition-transform" onclick="enlargeImage('${rearImg}', '${safeDenom} — Rear (Reverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Rear (Reverse) • 🔍 Click to enlarge</span>
             </div>
           </div>
+          ` : `
+          <div class="w-full ${isBanknote ? 'h-64' : 'h-56'} bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 border border-slate-800 shadow-inner group">
+            <img src="${frontImg}" alt="${safeDenom} Specimen" class="img-zoom-cursor max-w-full max-h-44 object-contain drop-shadow-2xl hover:scale-105 transition-transform" onclick="enlargeImage('${frontImg}', '${safeDenom} — Specimen View', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+            <span class="text-[10px] text-slate-400 font-bold uppercase mt-2">Front Specimen View • 🔍 Click to enlarge</span>
+          </div>
+          `}
 
           <div class="space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
             ${item.Historical_Notes ? `
             <div class="p-4 bg-amber-50/60 dark:bg-amber-950/40 rounded-2xl border border-amber-200/60 dark:border-amber-900/60">
               <span class="font-extrabold text-amber-900 dark:text-amber-300 block mb-1 text-xs uppercase tracking-wider">Curator &amp; Historical Notes</span>
-              <p class="leading-relaxed">${item.Historical_Notes}</p>
+              <p class="leading-relaxed whitespace-pre-line">${item.Historical_Notes}</p>
             </div>` : ''}
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -848,7 +979,7 @@
                 <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Dimensions / Mass</td><td class="py-2 font-bold">${item.Dimensions_mm || item.Diameter_mm || '--'} / ${item.Mass_g || '--'}</td></tr>
                 <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Edge Type</td><td class="py-2 font-bold">${item.Edge_Description || '--'}</td></tr>
                 <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Issued / Withdrawal</td><td class="py-2 font-bold">${item.Years_Issued || '--'} &nbsp;•&nbsp; <span class="text-rose-600 dark:text-rose-400">${item.Withdrawal_Date || '--'}</span></td></tr>
-                ${item.Reference_Link ? `<tr><td class="py-2 text-slate-400">Encyclopedia Reference</td><td class="py-2"><a href="${item.Reference_Link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Wikipedia Article ↗</a></td></tr>` : ''}
+                ${item.Reference_Link ? `<tr><td class="py-2 text-slate-400">Reference</td><td class="py-2"><a href="${item.Reference_Link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Official Information / Encyclopedia ↗</a></td></tr>` : ''}
               </tbody>
             </table>
           </div>
@@ -866,11 +997,35 @@
     function isValidCsvContent(text) {
       if (!text || typeof text !== 'string' || text.length < 50) return false;
       const clean = text.trim();
-      // Guard against HTML error pages returned with HTTP 200/404
       if (clean.startsWith('<!DOCTYPE') || clean.startsWith('<html') || clean.startsWith('<HTML') || clean.startsWith('<?xml')) {
         return false;
       }
       return clean.includes('ID') && (clean.includes('Denomination') || clean.includes('Pre-Decimal') || clean.includes('Category'));
+    }
+
+    function sanitizeRecords(rows) {
+      return rows.map((r, index) => {
+        // Generate a unique index ID to avoid collisions (e.g. for multiple $10 notes)
+        const uid = `${r.ID || 'item'}_${index}`;
+        let denom = (r.Denomination || '').trim();
+        let cat = (r.Category || '').trim();
+
+        // Fix malformed 2000 millennium row if needed
+        if (denom.includes('6 & 7') || denom.includes('1992–Present')) {
+          denom = '$10 (Millennium Commemorative 2000)';
+        }
+
+        if (r.ID === 'New' && !denom) {
+          denom = 'King Charles III Effigy Preview (10c/20c/50c/$1/$2)';
+        }
+
+        return {
+          ...r,
+          _uid: uid,
+          Denomination: denom,
+          Category: cat
+        };
+      }).filter(r => (r.ID && r.ID.trim().length > 0) || (r.Denomination && r.Denomination.trim().length > 0));
     }
 
     async function loadCurrencyData(forceRefresh = false) {
@@ -881,7 +1036,7 @@
           if (cached && isValidCsvContent(cached) && window.Papa) {
             const parsed = Papa.parse(cached, { header: true, skipEmptyLines: true });
             if (parsed.data && parsed.data.length > 0) {
-              currencyItems = parsed.data.filter(r => r.ID && r.ID.trim().length > 0);
+              currencyItems = sanitizeRecords(parsed.data);
               renderAllGrids();
               if (cachedTime && (Date.now() - Number(cachedTime) < CACHE_TTL_MS)) {
                 return;
@@ -895,8 +1050,8 @@
 
       let text = '';
       
-      // 1. Try local candidate paths (offline mode / local server)
-      const localCandidates = ['../data/currency.csv', './data/currency.csv', 'data/currency.csv'];
+      // 1. Try local candidate paths
+      const localCandidates = ['currency.csv', '../data/currency.csv', './data/currency.csv', 'data/currency.csv'];
       for (const p of localCandidates) {
         try {
           const localRes = await fetch(p);
@@ -910,7 +1065,7 @@
         } catch (e) {}
       }
 
-      // 2. Fetch live Google Sheets CSV (online mode)
+      // 2. Fetch live Google Sheets CSV fallback
       if (!text) {
         try {
           const res = await fetch(GOOGLE_CSV_URL);
@@ -933,7 +1088,7 @@
 
         const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
         if (parsed.data && parsed.data.length > 0) {
-          currencyItems = parsed.data.filter(r => r.ID && r.ID.trim().length > 0);
+          currencyItems = sanitizeRecords(parsed.data);
           renderAllGrids();
         }
       }
@@ -997,13 +1152,24 @@
       // Search Listener
       document.getElementById('currencySearchInput')?.addEventListener('input', renderAllGrids);
 
-      // Modal Close Listeners
+      // Detail Modal Close Listeners
       document.getElementById('btnCloseDetailModal')?.addEventListener('click', closeDetailModal);
       document.getElementById('itemDetailModal')?.addEventListener('click', (e) => {
         if (e.target === document.getElementById('itemDetailModal')) closeDetailModal();
       });
+
+      // Enlarged Image Modal Close Listeners
+      document.getElementById('btnCloseImageEnlarge')?.addEventListener('click', closeImageEnlarge);
+      document.getElementById('imageEnlargeModal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('imageEnlargeModal')) closeImageEnlarge();
+      });
+
+      // Global Keydown (Esc closes modals)
       window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeDetailModal();
+        if (e.key === 'Escape') {
+          closeImageEnlarge();
+          closeDetailModal();
+        }
       });
 
       // Initial Data Fetch & Calculator
