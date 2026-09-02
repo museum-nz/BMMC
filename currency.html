@@ -202,25 +202,38 @@
             🌐 Show All
           </button>
           <button id="filterBtnPreCoins" onclick="setCategoryFilter('pre-decimal-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            🪙 Pre-Decimal (1933–1967)
+            🪙 Pre-Decimal Coins
           </button>
           <button id="filterBtnDecCoins" onclick="setCategoryFilter('decimal-1967-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            💵 Decimal (1967–2006)
+            💵 Decimal Coins (1967–2006)
           </button>
           <button id="filterBtnCurrCoins" onclick="setCategoryFilter('current-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
             ✨ Current Coins
           </button>
-          <button id="filterBtnPreNotes" onclick="setCategoryFilter('banknotes-s12')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            📜 £sd Banknotes (S1 &amp; S2)
+
+          <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+          <!-- Individual Banknote Series Filters -->
+          <button id="filterBtnS1Notes" onclick="setCategoryFilter('banknotes-s1')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
+            📜 Series 1 (1934)
           </button>
-          <button id="filterBtnDecNotes" onclick="setCategoryFilter('banknotes-s34')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            🦜 Decimal Paper Notes (S3 &amp; S4)
+          <button id="filterBtnS2Notes" onclick="setCategoryFilter('banknotes-s2')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
+            📜 Series 2 (1940)
           </button>
-          <button id="filterBtnPolyNotes" onclick="setCategoryFilter('banknotes-s567')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            💎 Polymer Notes (S5, 6 &amp; 7)
+          <button id="filterBtnS3Notes" onclick="setCategoryFilter('banknotes-s3')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
+            🦜 Series 3 (1967)
+          </button>
+          <button id="filterBtnS4Notes" onclick="setCategoryFilter('banknotes-s4')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
+            🦜 Series 4 (1981)
+          </button>
+          <button id="filterBtnS56Notes" onclick="setCategoryFilter('banknotes-s56')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
+            💎 Series 5 &amp; 6 (1992–2014)
+          </button>
+          <button id="filterBtnS7Notes" onclick="setCategoryFilter('banknotes-s7')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
+            🌟 Series 7 (2015+)
           </button>
           <button id="filterBtnSpecial" onclick="setCategoryFilter('special-issues')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900 cursor-pointer shrink-0">
-            🌟 Special &amp; Commemorative
+            🎖️ Commemorative
           </button>
 
           <!-- Collector Inventory Filters -->
@@ -231,8 +244,6 @@
           <button id="filterBtnWishlist" onclick="setCategoryFilter('my-wishlist')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition bg-pink-100 dark:bg-pink-950/80 text-pink-800 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900 cursor-pointer shrink-0 flex items-center gap-1">
             <span>⭐</span> Wishlist (<span id="wishlistCountBadge">0</span>)
           </button>
-
-          <!-- Export Button: Visible ONLY in Collections Filter -->
           <button id="btnExportCollection" onclick="exportUserCollectionCsv()" title="Export Owned & Wishlist Items to CSV" class="hidden px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm cursor-pointer shrink-0 flex items-center gap-1">
             <span>📥</span> Export Collection
           </button>
@@ -299,7 +310,7 @@
         <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-xs shrink-0 self-stretch md:self-auto flex flex-col justify-center">
           <div class="flex items-center justify-between gap-3 mb-1">
             <span class="font-black text-amber-300">🎒 Collector Inventory</span>
-            <span id="collectionProgressText" class="font-mono font-bold text-slate-200">0 / 26 (0%)</span>
+            <span id="collectionProgressText" class="font-mono font-bold text-slate-200">0 / 0 (0%)</span>
           </div>
           <div class="w-full h-2 bg-slate-950/60 rounded-full overflow-hidden">
             <div id="collectionProgressBar" class="h-full bg-gradient-to-r from-amber-400 to-emerald-400 w-0 transition-all duration-500"></div>
@@ -431,35 +442,73 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="currentCoinGrid"></div>
       </section>
 
-      <!-- Pre-Decimal Banknotes (Series 1 & 2) -->
-      <section id="banknotes-s12-section" class="currency-group-section space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+      <!-- BANKNOTE TIMELINE BREAK SECTION (SERIES 1 TO 7) -->
+      
+      <!-- SERIES 1: 1934–1940 -->
+      <section id="banknotes-s1-section" class="currency-group-section space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>📜</span> Pre-Decimal Pound Banknotes (Series 1 &amp; 2: 1934–1967)
+              <span>📜</span> Series 1 Banknotes (1934–1940)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">King Tāwhiao and King George VI portraits with scenic New Zealand landscapes</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              <strong>Series 1:</strong> Issued on 1 August 1934 (denominated in pounds, shillings, and pence; portrait of King Tāwhiao).
+            </p>
+          </div>
+          <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £50</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries1Grid"></div>
+      </section>
+
+      <!-- SERIES 2: 1940–1967 -->
+      <section id="banknotes-s2-section" class="currency-group-section space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>📜</span> Series 2 Banknotes (1940–1967)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              <strong>Series 2:</strong> Issued on 6 February 1940 (commemorating the centenary of the Treaty of Waitangi; King George VI in naval uniform).
+            </p>
           </div>
           <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £10, £50</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries12Grid"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries2Grid"></div>
       </section>
 
-      <!-- Decimal Wildlife Paper Banknotes (Series 3 & 4) -->
-      <section id="banknotes-s34-section" class="currency-group-section space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+      <!-- SERIES 3: 1967–1981 -->
+      <section id="banknotes-s3-section" class="currency-group-section space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>🦜</span> Decimal Wildlife Paper Banknotes (Series 3 &amp; 4: 1967–1992)
+              <span>🦜</span> Series 3 Decimal Paper Banknotes (1967–1981)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Queen Elizabeth II obverse paired with iconic native wildlife (Fantail, Tūī, Kea, Takahē, Morepork)</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              <strong>Series 3:</strong> Introduced on 10 July 1967 (marking the switch to decimal currency in dollars; Queen Elizabeth II &amp; native birds).
+            </p>
+          </div>
+          <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $100</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries3Grid"></div>
+      </section>
+
+      <!-- SERIES 4: 1981–1992 -->
+      <section id="banknotes-s4-section" class="currency-group-section space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>🦜</span> Series 4 Decimal Paper Banknotes (1981–1992)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              <strong>Series 4:</strong> Issued from 1981 to 1991/1992 (minor updates, printer change to Bradbury Wilkinson, forward-facing QEII portrait, and $50 introduction in 1983).
+            </p>
           </div>
           <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $50, $100</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries34Grid"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries4Grid"></div>
       </section>
 
-      <!-- SERIES 5 VS SERIES 6 TRANSITION & COMPARISON CARD (NEW) -->
+      <!-- SERIES 5 & 6 TRANSITION & NOTES (1992–2014) -->
       <section id="sectionSeries5vs6Comparison" class="bg-gradient-to-br from-indigo-950/90 via-slate-900 to-slate-950 text-white rounded-3xl p-6 border border-indigo-500/30 shadow-xl space-y-4">
         <div class="flex items-center gap-2.5 border-b border-indigo-500/20 pb-3">
           <span class="text-2xl p-2 bg-indigo-500/20 text-indigo-300 rounded-2xl border border-indigo-500/30">📋</span>
@@ -470,7 +519,8 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed font-normal">
-          The primary difference between <strong>Series 5 (1992–1999)</strong> and <strong>Series 6 (1999–2014)</strong> New Zealand banknotes was the material they were made from and the advanced security features that resulted from that change. While the general artistic designs, prominent New Zealanders, and native birds remained virtually identical between the two series, they differed in several key ways:
+          <strong>Series 5:</strong> Issued from 1992 to 1999 (redesigned with native New Zealand flora, fauna, and historical figures on cotton paper).<br/>
+          <strong>Series 6:</strong> Issued from 1999 to 2014 (transitioned from paper to flexible plastic polymer material with transparent windows while maintaining identical portrait artwork).
         </p>
 
         <div class="overflow-x-auto">
@@ -501,7 +551,7 @@
               <tr class="hover:bg-slate-800/40 transition">
                 <td class="py-2.5 px-3 font-bold text-white">Embossing &amp; Feel</td>
                 <td class="py-2.5 px-3 text-amber-200">Standard paper intaglio printing</td>
-                <td class="py-2.5 px-3 text-emerald-200 font-semibold">Raised ink intaglio (giving an enhanced tactile feel)</td>
+                <td class="py-2.5 px-3 text-emerald-200 font-semibold">Raised ink intaglio (enhanced tactile identification)</td>
               </tr>
               <tr class="hover:bg-slate-800/40 transition">
                 <td class="py-2.5 px-3 font-bold text-white">Watermark / Shadow Image</td>
@@ -513,18 +563,36 @@
         </div>
       </section>
 
-      <!-- Modern Polymer Banknotes (Series 5, 6 & 7) -->
-      <section id="banknotes-s567-section" class="currency-group-section space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+      <!-- SERIES 5 & 6 BANKNOTE SPECIMENS -->
+      <section id="banknotes-s56-section" class="currency-group-section space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>💎</span> Modern Polymer Banknotes (Series 5, 6 &amp; 7: 1992–Present)
+              <span>💎</span> Series 5 &amp; 6 Banknotes (1992–2014)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders with tukutuku patterns, transparent security windows, and native wildlife</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Notable New Zealanders (Hillary, Sheppard, Ngata, Rutherford) and Queen Elizabeth II paired with native birds.
+            </p>
           </div>
-          <span class="coin-badge badge-polymer text-[10px]">Active Polymer Series</span>
+          <span class="coin-badge badge-polymer text-[10px]">$5, $10, $20, $50, $100</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries567Grid"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries56Grid"></div>
+      </section>
+
+      <!-- SERIES 7: 2015–PRESENT -->
+      <section id="banknotes-s7-section" class="currency-group-section space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span>🌟</span> Series 7 "Brighter Money" Banknotes (2015–Present)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              <strong>Series 7:</strong> Introduced starting in 2015 (the current "Brighter Money" polymer series with larger holographic windows and metallic colour-changing birds).
+            </p>
+          </div>
+          <span class="coin-badge badge-polymer text-[10px]">Active Legal Tender</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries7Grid"></div>
       </section>
 
       <!-- Special & Commemorative (3 COLUMNS WIDE) -->
@@ -532,7 +600,7 @@
         <div class="flex items-center justify-between border-b border-purple-300 dark:border-purple-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-purple-900 dark:text-purple-300 flex items-center gap-2">
-              <span>🌟</span> Special, Commemorative &amp; Future Issues
+              <span>🎖️</span> Special, Commemorative &amp; Future Issues
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400">Coloured commemorative circulating coins (ANZAC, Armistice), commemorative notes, and upcoming King Charles III effigies</p>
           </div>
@@ -661,7 +729,7 @@
         </div>
       </div>
 
-      <!-- 1. KEY HISTORICAL & DENOMINATION NOTES (BEFORE MINTAGE BREAKDOWN) -->
+      <!-- 1. KEY HISTORICAL & DENOMINATION NOTES -->
       <section id="sectionHistoricalNotes" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-amber-500/30 p-6 shadow-sm space-y-4">
         <div class="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3">
           <span class="text-2xl p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-2xl border border-amber-200 dark:border-amber-900/60">📌</span>
@@ -978,8 +1046,8 @@
   <!-- Application Logic -->
   <script>
     const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v6';
-    const CACHE_KEY_TIME = 'bMMC_cached_currency_unified_time_v6';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v7';
+    const CACHE_KEY_TIME = 'bMMC_cached_currency_unified_time_v7';
     const USER_COLLECTION_KEY = 'bMMC_user_currency_collection_v1';
     const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
@@ -1026,7 +1094,7 @@
       });
 
       const total = currencyItems.length;
-      const pct = Math.round((ownedCount / total) * 100);
+      const pct = total > 0 ? Math.round((ownedCount / total) * 100) : 0;
 
       const countBadge = document.getElementById('collectionCountBadge');
       const wishlistBadge = document.getElementById('wishlistCountBadge');
@@ -1386,9 +1454,12 @@
         'pre-decimal-coins': document.getElementById('filterBtnPreCoins'),
         'decimal-1967-coins': document.getElementById('filterBtnDecCoins'),
         'current-coins': document.getElementById('filterBtnCurrCoins'),
-        'banknotes-s12': document.getElementById('filterBtnPreNotes'),
-        'banknotes-s34': document.getElementById('filterBtnDecNotes'),
-        'banknotes-s567': document.getElementById('filterBtnPolyNotes'),
+        'banknotes-s1': document.getElementById('filterBtnS1Notes'),
+        'banknotes-s2': document.getElementById('filterBtnS2Notes'),
+        'banknotes-s3': document.getElementById('filterBtnS3Notes'),
+        'banknotes-s4': document.getElementById('filterBtnS4Notes'),
+        'banknotes-s56': document.getElementById('filterBtnS56Notes'),
+        'banknotes-s7': document.getElementById('filterBtnS7Notes'),
         'special-issues': document.getElementById('filterBtnSpecial'),
         'my-collection': document.getElementById('filterBtnCollection'),
         'my-wishlist': document.getElementById('filterBtnWishlist')
@@ -1417,25 +1488,32 @@
       const secPreCoins = document.getElementById('pre-decimal-coins-section');
       const secDecCoins = document.getElementById('decimal-coins-section');
       const secCurrCoins = document.getElementById('current-coins-section');
-      const secNotesS12 = document.getElementById('banknotes-s12-section');
-      const secNotesS34 = document.getElementById('banknotes-s34-section');
-      const secNotesS567 = document.getElementById('banknotes-s567-section');
+      const secNotesS1 = document.getElementById('banknotes-s1-section');
+      const secNotesS2 = document.getElementById('banknotes-s2-section');
+      const secNotesS3 = document.getElementById('banknotes-s3-section');
+      const secNotesS4 = document.getElementById('banknotes-s4-section');
+      const secNotesS56 = document.getElementById('banknotes-s56-section');
+      const secNotesS7 = document.getElementById('banknotes-s7-section');
       const secSpecial = document.getElementById('special-issues-section');
       const secS5vs6 = document.getElementById('sectionSeries5vs6Comparison');
 
-      const isCollectionFilter = filterKey === 'my-collection' || filterKey === 'my-wishlist';
+      const isColl = filterKey === 'my-collection' || filterKey === 'my-wishlist';
 
-      if (secPreCoins) secPreCoins.style.display = (filterKey === 'all' || filterKey === 'pre-decimal-coins' || isCollectionFilter) ? 'block' : 'none';
-      if (secDecCoins) secDecCoins.style.display = (filterKey === 'all' || filterKey === 'decimal-1967-coins' || isCollectionFilter) ? 'block' : 'none';
-      if (secCurrCoins) secCurrCoins.style.display = (filterKey === 'all' || filterKey === 'current-coins' || isCollectionFilter) ? 'block' : 'none';
-      if (secNotesS12) secNotesS12.style.display = (filterKey === 'all' || filterKey === 'banknotes-s12' || isCollectionFilter) ? 'block' : 'none';
-      if (secNotesS34) secNotesS34.style.display = (filterKey === 'all' || filterKey === 'banknotes-s34' || isCollectionFilter) ? 'block' : 'none';
-      if (secNotesS567) secNotesS567.style.display = (filterKey === 'all' || filterKey === 'banknotes-s567' || isCollectionFilter) ? 'block' : 'none';
-      if (secSpecial) secSpecial.style.display = (filterKey === 'all' || filterKey === 'special-issues' || isCollectionFilter) ? 'block' : 'none';
+      if (secPreCoins) secPreCoins.style.display = (filterKey === 'all' || filterKey === 'pre-decimal-coins' || isColl) ? 'block' : 'none';
+      if (secDecCoins) secDecCoins.style.display = (filterKey === 'all' || filterKey === 'decimal-1967-coins' || isColl) ? 'block' : 'none';
+      if (secCurrCoins) secCurrCoins.style.display = (filterKey === 'all' || filterKey === 'current-coins' || isColl) ? 'block' : 'none';
       
-      if (secS5vs6) secS5vs6.style.display = (filterKey === 'all' || filterKey === 'banknotes-s567' || isCollectionFilter) ? 'block' : 'none';
+      if (secNotesS1) secNotesS1.style.display = (filterKey === 'all' || filterKey === 'banknotes-s1' || isColl) ? 'block' : 'none';
+      if (secNotesS2) secNotesS2.style.display = (filterKey === 'all' || filterKey === 'banknotes-s2' || isColl) ? 'block' : 'none';
+      if (secNotesS3) secNotesS3.style.display = (filterKey === 'all' || filterKey === 'banknotes-s3' || isColl) ? 'block' : 'none';
+      if (secNotesS4) secNotesS4.style.display = (filterKey === 'all' || filterKey === 'banknotes-s4' || isColl) ? 'block' : 'none';
+      if (secNotesS56) secNotesS56.style.display = (filterKey === 'all' || filterKey === 'banknotes-s56' || isColl) ? 'block' : 'none';
+      if (secNotesS7) secNotesS7.style.display = (filterKey === 'all' || filterKey === 'banknotes-s7' || isColl) ? 'block' : 'none';
+      
+      if (secSpecial) secSpecial.style.display = (filterKey === 'all' || filterKey === 'special-issues' || isColl) ? 'block' : 'none';
+      if (secS5vs6) secS5vs6.style.display = (filterKey === 'all' || filterKey === 'banknotes-s56' || isColl) ? 'block' : 'none';
 
-      // Crown Heads (Monarchs) is NEVER hidden on the Specimen page
+      // Crown Heads (Monarchs) is permanently visible on Specimen page
       const secMonarchs = document.getElementById('sectionMonarchs');
       if (secMonarchs) secMonarchs.style.display = 'block';
 
@@ -1469,13 +1547,18 @@
         return cat.includes('special') || id.includes('anzac') || id.includes('armistice') || id.includes('commemorative') || id.includes('preview');
       };
 
+      // Coins
       const preCoins = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Coinage') && !isSpecial(i) && filterFn(i));
       const decCoins = currencyItems.filter(i => (i.Category || '').includes('First Decimal Coinage') && !isSpecial(i) && filterFn(i));
       const currCoins = currencyItems.filter(i => (i.Category || '').includes('Current Circulating Coinage') && !isSpecial(i) && filterFn(i));
       
-      const notesS12 = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Banknotes') && !isSpecial(i) && filterFn(i));
-      const notesS34 = currencyItems.filter(i => (i.Category || '').includes('First Decimal Paper') && !isSpecial(i) && filterFn(i));
-      const notesS567 = currencyItems.filter(i => (i.Category || '').includes('Modern Polymer') && !isSpecial(i) && filterFn(i));
+      // Individual Banknote Series
+      const notesS1 = currencyItems.filter(i => (i.Category || '').includes('Series 1') && !isSpecial(i) && filterFn(i));
+      const notesS2 = currencyItems.filter(i => (i.Category || '').includes('Series 2') && !isSpecial(i) && filterFn(i));
+      const notesS3 = currencyItems.filter(i => (i.Category || '').includes('Series 3') && !isSpecial(i) && filterFn(i));
+      const notesS4 = currencyItems.filter(i => (i.Category || '').includes('Series 4') && !isSpecial(i) && filterFn(i));
+      const notesS56 = currencyItems.filter(i => ((i.Category || '').includes('Series 5') || (i.Category || '').includes('Series 6')) && !isSpecial(i) && filterFn(i));
+      const notesS7 = currencyItems.filter(i => (i.Category || '').includes('Series 7') && !isSpecial(i) && filterFn(i));
       
       const specialItems = currencyItems.filter(i => isSpecial(i) && filterFn(i));
 
@@ -1483,9 +1566,12 @@
       document.getElementById('decimal1967CoinGrid').innerHTML = decCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match current filter.</div>';
       document.getElementById('currentCoinGrid').innerHTML = currCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match current filter.</div>';
       
-      document.getElementById('banknotesSeries12Grid').innerHTML = notesS12.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries34Grid').innerHTML = notesS34.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries567Grid').innerHTML = notesS567.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No banknotes match current filter.</div>';
+      document.getElementById('banknotesSeries1Grid').innerHTML = notesS1.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 1 banknotes match current filter.</div>';
+      document.getElementById('banknotesSeries2Grid').innerHTML = notesS2.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 2 banknotes match current filter.</div>';
+      document.getElementById('banknotesSeries3Grid').innerHTML = notesS3.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 3 banknotes match current filter.</div>';
+      document.getElementById('banknotesSeries4Grid').innerHTML = notesS4.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 4 banknotes match current filter.</div>';
+      document.getElementById('banknotesSeries56Grid').innerHTML = notesS56.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 5/6 banknotes match current filter.</div>';
+      document.getElementById('banknotesSeries7Grid').innerHTML = notesS7.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 7 banknotes match current filter.</div>';
       
       document.getElementById('specialItemsGrid').innerHTML = specialItems.map(s => {
         const isNote = (s.Category || '').toLowerCase().includes('banknote') || (s.Denomination || '').toLowerCase().includes('dollar') && !(s.Denomination || '').includes('coin');
@@ -1700,7 +1786,7 @@
         currencyItems = (pMeta.data || []).map((r, idx) => ({
           ...r,
           _uid: `${r.ID || 'item'}_${idx}`
-        })).filter(r => r.ID && r.ID.trim().length > 0);
+        })).filter(r => (r.ID && r.ID.trim().length > 0) || (r.Denomination && r.Denomination.trim().length > 0));
       }
 
       if (sections.predecimal) {
