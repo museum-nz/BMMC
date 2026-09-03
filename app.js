@@ -3072,17 +3072,18 @@ function openModalByFilteredIndex(filteredIndex) {
   openModal(row, originalIndex);
 }
 
-function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
+function getRelatedExhibits(currentRow, currentOriginalIndex, limit) {
+  limit = limit || 4;
   if (!rawExhibitsRows || rawExhibitsRows.length === 0) return [];
   const currentCat = getVal(currentRow, colIdx.category).toLowerCase();
   const currentEra = getEraByRow(currentRow);
   const currentEraKey = currentEra ? currentEra.short : '';
 
   const candidates = rawExhibitsRows
-    .map((r, idx) => ({ row: r, originalIndex: idx }))
-    .filter(item => item.originalIndex !== currentOriginalIndex);
+    .map(function(r, idx) { return { row: r, originalIndex: idx }; })
+    .filter(function(item) { return item.originalIndex !== currentOriginalIndex; });
 
-  candidates.forEach(item => {
+  candidates.forEach(function(item) {
     let score = 0;
     const cat = getVal(item.row, colIdx.category).toLowerCase();
     const era = getEraByRow(item.row);
@@ -3094,8 +3095,8 @@ function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
   });
 
   return candidates
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .filter(function(item) { return item.score > 0; })
+    .sort(function(a, b) { return b.score - a.score; })
     .slice(0, limit);
 }
 
@@ -3116,8 +3117,8 @@ function openModal(row, originalIndex) {
   if (currentTab === 'exhibits') {
     safeReplaceState(`${window.location.pathname}#exhibit-${originalIndex}`);
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
-    const { title, details } = parseTitleAndDetails(rawContent);
-    const displayTitle = title || `Exhibit Item Details`;
+    const parsed = parseTitleAndDetails(rawContent);
+    const displayTitle = parsed.title || `Exhibit Item Details`;
 
     const notes = getVal(row, colIdx.notes);
     const age = getVal(row, colIdx.age);
@@ -3130,10 +3131,12 @@ function openModal(row, originalIndex) {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
-    const { img1, img2 } = getImagesForItem(row);
+    const images = getImagesForItem(row);
+    const img1 = images.img1;
+    const img2 = images.img2;
     const isHot = isItemHot(row);
     const ageBadgeClass = getAgeBadgeStyle(eraDisplay);
-    const cleanedDetails = cleanDetailsForModal(details);
+    const cleanedDetails = cleanDetailsForModal(parsed.details);
     const theme = getCategoryTheme(category || type || subcategory);
 
     let latRaw = getVal(row, colIdx.lat);
@@ -3164,13 +3167,13 @@ function openModal(row, originalIndex) {
           <span class="text-[10px] font-normal text-slate-400">Click to explore</span>
         </h4>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          ${relatedExhibits.map(rel => {
+          ${relatedExhibits.map(function(rel) {
             const relTitle = parseTitleAndDetails(getVal(rel.row, colIdx.title) || getVal(rel.row, colIdx.id)).title;
             const relImg = formatGoogleLh3Url(getImagesForItem(rel.row).img1, 's200') || NO_IMAGE_SVG;
             return `
-              <div onclick="window.openModalByOriginalIndex(${rel.originalIndex})" class="bg-slate-50 dark:bg-slate-900/90 rounded-xl p-2 border border-slate-200 dark:border-slate-800 hover:border-blue-500 cursor-pointer transition flex flex-col group/rel shadow-sm">
+              <div onclick="window.openModalByOriginalIndex(${rel.originalIndex})" class="bg-slate-50 dark:bg-slate-900/90 rounded-xl p-2 border border-slate-200 dark:border-slate-800 hover:border-blue-500 cursor-pointer transition flex flex-col shadow-sm">
                 <div class="h-20 w-full rounded-lg overflow-hidden bg-slate-200/80 dark:bg-slate-950 flex items-center justify-center mb-1.5">
-                  <img src="${relImg}" class="max-w-full max-h-full object-contain group-hover/rel:scale-105 transition-transform duration-200" onError="this.src='${NO_IMAGE_SVG}'" alt="${escapeHTML(relTitle)}" />
+                  <img src="${relImg}" class="max-w-full max-h-full object-contain" onError="this.src='${NO_IMAGE_SVG}'" alt="${escapeHTML(relTitle)}" />
                 </div>
                 <p class="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1 leading-tight">${escapeHTML(relTitle)}</p>
                 <span class="text-[9px] text-blue-600 dark:text-blue-400 font-extrabold mt-0.5">Explore →</span>
@@ -3203,8 +3206,10 @@ function openModal(row, originalIndex) {
 
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
-      shareBtn.onclick = () => {
-        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`).then(() => showToast('Link copied to clipboard!', '🔗'));
+      shareBtn.onclick = function() {
+        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`).then(function() {
+          showToast('Link copied to clipboard!', '🔗');
+        });
       };
     }
 
@@ -3325,13 +3330,13 @@ function openModal(row, originalIndex) {
     }
 
     const btnMain = document.getElementById('btnGoogleSearchMain');
-    if (btnMain) btnMain.onclick = () => googleItemSearch(displayTitle, category, details);
+    if (btnMain) btnMain.onclick = function() { googleItemSearch(displayTitle, category, parsed.details); };
     populateVoiceDropdown();
 
     const modalViewer = document.getElementById('modal3DViewer');
     const modalScaleText = document.getElementById('modal3DScaleText');
     if (modalViewer) {
-      const updateModalDims = () => {
+      const updateModalDims = function() {
         try {
           const dims = modalViewer.getDimensions();
           if (dims && dims.x != null) {
@@ -3388,8 +3393,10 @@ function openModal(row, originalIndex) {
 
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
-      shareBtn.onclick = () => {
-        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#gramophone-${originalIndex}`).then(() => showToast('Record link copied to clipboard!', '🔗'));
+      shareBtn.onclick = function() {
+        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#gramophone-${originalIndex}`).then(function() {
+          showToast('Record link copied to clipboard!', '🔗');
+        });
       };
     }
 
@@ -3525,7 +3532,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTab !== 'exhibits') setTab('exhibits');
     only3DActive = !only3DActive;
     document.getElementById('btn3DOnly')?.classList.toggle('ring-2', only3DActive);
-    if (only3DActive) showToast('Showing 3D Models Only', '👓');
+    if (only3DActive) showToast(only3DActive ? 'Showing 3D Models Only' : '3D Filter Cleared', '👓');
     saveCatalogSessionState();
     filterCatalog(true);
   });
@@ -3534,7 +3541,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTab !== 'exhibits') setTab('exhibits');
     hotOnlyActive = !hotOnlyActive;
     document.getElementById('btnHotOnly')?.classList.toggle('ring-2', hotOnlyActive);
-    if (hotOnlyActive) showToast('Showing Hot Items Only', '🔥');
+    if (hotOnlyActive) showToast(hotOnlyActive ? 'Showing Hot Items Only' : 'Hot Filter Cleared', '🔥');
     saveCatalogSessionState();
     filterCatalog(true);
   });
@@ -3681,3 +3688,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadCatalogData();
 });
+Step 4: Ensure Guaranteed CDN Fallbacks (No 404s for Missing vendor/)
+To guarantee data parsing and styling work under any folder structure, verify the <head> of each file loads PapaParse and Tailwind with CDN fallbacks:
+code
+Html
+<!-- Robust PapaParse with CDN Fallback -->
+<script src="../vendor/papaparse.min.js" onerror="this.onerror=null;this.src='vendor/papaparse.min.js';"></script>
+<script>
+  if (!window.Papa) {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+  }
+</script>
+
+<!-- Robust Tailwind with CDN Fallback -->
+<script src="../vendor/tailwind.js" onerror="this.onerror=null;this.src='vendor/tailwind.js';"></script>
+<script>
+  if (!window.tailwind) {
+    document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+  }
+</script>
