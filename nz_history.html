@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aotearoa NZ History & Colonization Map</title>
+
+  <!-- Leaflet & Plugins CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --accent: #38bdf8;
+      --bg-dark: #0f172a;
+      --color-vessel: #0284c7;
+      --color-war: #dc2626;
+      --color-disaster: #d97706;
+      --color-rights: #7c3aed;
+      --color-general: #059669;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      overflow: hidden;
+    }
+    #map {
+      width: 100vw;
+      height: 100vh;
+      background: #aad3df;
+    }
+
+    /* --- MAP ITEM MARKER (DATE + HEADLINE VISIBLE ON MAP) --- */
+    .nz-history-marker {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    }
+    .nz-history-marker:hover {
+      transform: scale(1.15) translateY(-5px);
+      z-index: 99999 !important;
+    }
+
+    .marker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 3px 10px 3px 4px;
+      white-space: nowrap;
+      border: 1.5px solid #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .nz-history-marker:hover .marker-pill {
+      border-color: #0284c7;
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+    }
+
+    .marker-date-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      padding: 2px 7px;
+      border-radius: 12px;
+      letter-spacing: 0.2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    /* Dynamic category styling for pills */
+    .cat-vessel .marker-date-tag { background: var(--color-vessel); }
+    .cat-war .marker-date-tag { background: var(--color-war); }
+    .cat-disaster .marker-date-tag { background: var(--color-disaster); }
+    .cat-rights .marker-date-tag { background: var(--color-rights); }
+    .cat-general .marker-date-tag { background: var(--color-general); }
+
+    .marker-headline-text {
+      color: #0f172a;
+      font-size: 11px;
+      font-weight: 700;
+      max-width: 175px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .marker-pin-tail {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #475569;
+      margin-top: -1px;
+    }
+    .cat-vessel .marker-pin-tail { border-top-color: var(--color-vessel); }
+    .cat-war .marker-pin-tail { border-top-color: var(--color-war); }
+    .cat-disaster .marker-pin-tail { border-top-color: var(--color-disaster); }
+    .cat-rights .marker-pin-tail { border-top-color: var(--color-rights); }
+    .cat-general .marker-pin-tail { border-top-color: var(--color-general); }
+
+    /* --- CLUSTER BADGE --- */
+    .cluster-number-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #0f172a);
+      color: #ffffff;
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .cluster-number-badge:hover {
+      transform: scale(1.15);
+      border-color: #38bdf8;
+    }
+
+    /* --- DETAILED POPUP CARD --- */
+    .leaflet-popup-content-wrapper {
+      padding: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .leaflet-popup-content {
+      margin: 0 !important;
+      width: 390px !important;
+      max-width: 86vw !important;
+    }
+    .history-card {
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-card-img-wrap {
+      width: 100%;
+      height: 200px;
+      background: #0f172a;
+      position: relative;
+      overflow: hidden;
+    }
+    .history-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .history-card-badge-row {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .category-pill {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(6px);
+      color: #38bdf8;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      text-transform: uppercase;
+    }
+    .date-pill {
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .history-card-body {
+      padding: 16px;
+    }
+    .history-card-body h3 {
+      margin: 0 0 4px 0;
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+    .history-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .history-card-meta .loc-icon { color: #ef4444; }
+    .history-card-desc {
+      margin: 0 0 16px 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #334155;
+    }
+    .history-card-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 12px;
+    }
+    .btn-google-ai {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #38bdf8;
+      border: 1px solid #38bdf8;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-google-ai:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+    }
+    .btn-source-archive {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-source-archive:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    /* --- TOP BAR CONTROLS --- */
+    .top-controls-bar {
+      position: absolute;
+      top: 12px;
+      left: 60px;
+      right: 12px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+    .map-search-box {
+      pointer-events: auto;
+      position: relative;
+      width: 260px;
+      max-width: 45vw;
+    }
+    .map-search-box input {
+      width: 100%;
+      padding: 8px 30px 8px 32px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+    }
+    .map-search-box input:focus { border-color: #38bdf8; }
+    .map-search-box .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .clear-search-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #ffffff;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 10px;
+      display: none;
+      cursor: pointer;
+    }
+
+    .top-action-btn {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .top-action-btn:hover {
+      background: rgba(30, 41, 59, 0.98);
+      border-color: #38bdf8;
+    }
+    .top-action-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+    }
+
+    /* --- ERA QUICK-JUMP FILTER CHIPS --- */
+    .era-bar {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px 0;
+      max-width: 100%;
+      scrollbar-width: none;
+    }
+    .era-bar::-webkit-scrollbar { display: none; }
+    .era-chip {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .era-chip:hover, .era-chip.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    /* --- BOTTOM TIMELINE PANEL --- */
+    .year-slider-container {
+      position: absolute;
+      bottom: 22px;
+      left: 22px;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(14px);
+      padding: 12px 18px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #f8fafc;
+      width: 350px;
+      box-sizing: border-box;
+    }
+    .year-slider-header {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .timeline-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-timeline-play {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      width: 26px;
+      height: 26px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .btn-timeline-play.playing { background: #e11d48; }
+    .item-counter-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .range-text {
+      color: #38bdf8;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .dual-slider-track-wrapper {
+      position: relative;
+      width: 100%;
+      height: 22px;
+      display: flex;
+      align-items: center;
+    }
+    .slider-track-bg {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+    }
+    .slider-track-fill {
+      position: absolute;
+      height: 6px;
+      background: #0284c7;
+      border-radius: 3px;
+      left: 0%;
+      width: 100%;
+    }
+    .dual-slider-track-wrapper input[type="range"] {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background: none;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #0284c7;
+      pointer-events: auto;
+      -webkit-appearance: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* --- LAYER DROPDOWN --- */
+    .layer-switcher-container { position: relative; pointer-events: auto; }
+    .layer-dropdown-card {
+      position: absolute;
+      top: 42px;
+      right: 0;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 10px;
+      display: none;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      width: 220px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+      z-index: 1100;
+    }
+    .layer-dropdown-card.show { display: grid; }
+    .layer-option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      padding: 7px;
+      color: #f8fafc;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .layer-option-btn.active {
+      border-color: #0284c7;
+      background: rgba(2, 132, 199, 0.35);
+      color: #38bdf8;
+    }
+
+    @media (max-width: 768px) {
+      .top-controls-bar { left: 50px; right: 10px; top: 8px; gap: 6px; }
+      .map-search-box { width: 130px; }
+      .era-bar { order: 3; width: 100%; margin-top: 4px; }
+      .year-slider-container {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 15px !important;
+        width: 92vw !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action & Search Bar -->
+  <div class="top-controls-bar">
+    <div class="map-search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mapSearchInput" placeholder="Search events, ships, troops..." aria-label="Search NZ History">
+      <button id="clearMapSearch" class="clear-search-btn">✕</button>
+    </div>
+
+    <!-- Heatmap Toggle -->
+    <button id="btnToggleHeatmap" class="top-action-btn" title="Toggle Historical Activity Density Heatmap">
+      <span>🔥</span> <span>Heatmap</span>
+    </button>
+
+    <!-- Layer Switcher -->
+    <div class="layer-switcher-container">
+      <button id="btnLayersToggle" class="top-action-btn" title="Change Basemap">
+        <span>🗺️</span> <span>Basemap</span>
+      </button>
+      <div id="layerDropdownCard" class="layer-dropdown-card">
+        <button id="btnLayerNatGeo" class="layer-option-btn active"><span>📜</span><span>Historical</span></button>
+        <button id="btnLayerTopo" class="layer-option-btn"><span>⛰️</span><span>Topo</span></button>
+        <button id="btnLayerSat" class="layer-option-btn"><span>🛰️</span><span>Satellite</span></button>
+        <button id="btnLayerStreet" class="layer-option-btn"><span>📍</span><span>Street</span></button>
+      </div>
+    </div>
+
+    <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
+      <span>🇳🇿</span> <span>Fit NZ</span>
+    </button>
+    <button id="btnResetView" class="top-action-btn" title="Reset View & Timeline">
+      <span>↺</span> <span>Reset</span>
+    </button>
+
+    <!-- Era Filter Chips -->
+    <div class="era-bar">
+      <button class="era-chip active" data-min="1280" data-max="2026">All</button>
+      <button class="era-chip" data-min="1280" data-max="1839">Early Contact (<1840)</button>
+      <button class="era-chip" data-min="1840" data-max="1855">Pioneer Ships (1840–1855)</button>
+      <button class="era-chip" data-min="1855" data-max="1890">Wars & Gold (1855–1890)</button>
+      <button class="era-chip" data-min="1890" data-max="1945">Troops to Wars (1899–1945)</button>
+      <button class="era-chip" data-min="1945" data-max="2026">Modern NZ (1945–Now)</button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- Bottom Timeline & Year Slider -->
+  <div class="year-slider-container">
+    <div class="year-slider-header">
+      <div class="timeline-title-group">
+        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play timeline starting from 1800">▶</button>
+        <span>Timeline</span>
+        <span id="itemCountBadge" class="item-counter-badge">Loading...</span>
+      </div>
+      <span id="yearRangeText" class="range-text">1280 – 2026</span>
+    </div>
+    <div class="dual-slider-track-wrapper">
+      <div class="slider-track-bg"></div>
+      <div class="slider-track-fill" id="sliderTrackFill"></div>
+      <input type="range" id="minYearSlider" min="1280" max="2026" value="1280" step="1">
+      <input type="range" id="maxYearSlider" min="1280" max="2026" value="2026" step="1">
+    </div>
+  </div>
+
+  <!-- Embedded High-Fidelity Dataset (Immediate Fallback for file:// or offline) -->
+  <script id="embeddedFallbackCSV" type="text/plain">
+id,year,date,headline,category,location,latitude,longitude,details,image_url,source_url
+NZ01,1280,c. 1280–1300,Arrival of Polynesian Voyagers,Settlement & Voyaging,Wairau Bar (Marlborough),-41.5167,174.0500,"East Polynesian voyagers navigated across Te Moana-nui-a-Kiwa aboard double-hulled waka hourua, settling Aotearoa. Wairau Bar is one of the earliest validated archaeological sites in New Zealand, yielding moa-hunting tools, adzes, and burials confirming Polynesian origins.","https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Polynesian_Migration_Waka.jpg/500px-Polynesian_Migration_Waka.jpg",https://nzhistory.govt.nz/culture/pre-1840-contact
+NZ02,1642,13 Dec 1642,Abel Tasman Sights Aotearoa,Exploration,Mohua / Golden Bay,-40.7500,172.8500,"Dutch navigator Abel Tasman aboard the Heemskerck and Zeehaen became the first recorded European to sight New Zealand. A violent skirmish with Ngāti Tūmatakōkiri in Golden Bay left four Dutch sailors dead, prompting Tasman to chart it as 'Moordenaers' (Murderers) Bay and leave without landing.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Abel_Tasman_First_Contact.jpg/500px-Abel_Tasman_First_Contact.jpg",https://teara.govt.nz/en/first-peoples-in-māori-tradition
+NZ03,1769,8 Oct 1769,Captain Cook Landfall,Exploration,Tūranganui-a-Kiwa / Gisborne,-38.6750,178.0167,"Captain James Cook arrived on HMS Endeavour with Tahitian navigator Tupaia. Misunderstandings led to the shooting death of Rongowhakaata leader Te Maro. Unable to secure provisions, Cook named the place 'Poverty Bay' before circum-navigating and charting both main islands.","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Cook_Landing_Gisborne.jpg/500px-Cook_Landing_Gisborne.jpg",https://nzhistory.govt.nz/culture/first-encounters
+NZ04,1814,25 Dec 1814,First Christian Service in NZ,Religion & Culture,Oihi Bay (Bay of Islands),-35.1917,174.1333,"Rev. Samuel Marsden conducted New Zealand's first recorded Christian service on Christmas Day 1814, welcomed and protected by Rangatira Ruatara of Ngāpuhi. This established the first permanent European missionary settlement in the country.","https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Marsden_cross_Oihi_Bay.jpg/500px-Marsden_cross_Oihi_Bay.jpg",https://teara.govt.nz/en/missions-and-missionaries
+NZ05,1821,5 Sep 1821,Musket Wars: Attack on Mauinaina,Musket Wars,Mauinaina Pā (Panmure Auckland),-36.9030,174.8560,"Armed with hundreds of muskets acquired during his trip to England, Ngāpuhi chief Hongi Hika led a war fleet of 2,000 warriors against Mauinaina and Mokoia pā in the Tamaki isthmus, triggering an era of inter-iwi warfare that displaced populations across the North Island.","https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hongi_Hika_1820.jpg/500px-Hongi_Hika_1820.jpg",https://nzhistory.govt.nz/war/musket-wars
+NZ06,1835,28 Oct 1835,He Whakaputanga Signed,Treaties & Sovereignty,Waitangi (Bay of Islands),-35.2655,174.0817,"Thirty-four northern Māori rangatira signed He Whakaputanga o te Rangatiratanga o Nu Tireni (the Declaration of Independence), asserting the sovereign independence of the Confederation of United Tribes. It was formally acknowledged by British King William IV.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Declaration_of_Independence_of_New_Zealand.jpg/500px-Declaration_of_Independence_of_New_Zealand.jpg",https://nzhistory.govt.nz/culture/declaration-of-independence-he-whakaputanga
+NZ07,1836,1 Nov 1836,Bluff Whaling Station Founded,Colonization & Settlement,Bluff Harbour (Southland),-46.6000,168.3333,"James Spencer established a permanent shore-whaling station at Bluff Harbour (Campbelltown), making Bluff one of the oldest continuously inhabited European-Māori maritime settlements in the South Island and the gateway to Foveaux Strait and Stewart Island.","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Bluff_Harbour_1880s.jpg/500px-Bluff_Harbour_1880s.jpg",https://teara.govt.nz/en/southland-places/page-7
+NZ08,1839,20 Sep 1839,Arrival of the Tory in Wellington,Colonization Vessels,Te Whanganui-a-Tara (Wellington),-41.2865,174.7762,"The New Zealand Company vessel 'Tory', carrying Colonel William Wakefield, arrived in Port Nicholson to survey and purchase vast tracts of Māori land ahead of commercial emigrant fleets, despite dubious titles and mounting tribal tensions.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/New_Zealand_Company_Ship_Tory_1839.jpg/500px-New_Zealand_Company_Ship_Tory_1839.jpg",https://nzhistory.govt.nz/culture/the-new-zealand-company
+NZ09,1840,22 Jan 1840,Arrival of the Aurora (Wellington),Colonization Vessels,Petone Beach (Wellington),-41.2260,174.8720,"The barque 'Aurora' anchored off Petone beach carrying 148 settlers, the first immigrant ship to land New Zealand Company settlers in Port Nicholson. Settlers lived in makeshift tents along the river before winter flooding forced the move across the harbour to Thorndon.","https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Petone_settlement_1840.jpg/500px-Petone_settlement_1840.jpg",https://nzhistory.govt.nz/page/first-nz-company-immigrant-ship-arrives
+NZ10,1840,6 Feb 1840,Te Tiriti o Waitangi Signed,Founding Treaties,Waitangi Treaty Grounds,-35.2655,174.0817,"Lieutenant-Governor William Hobson and over 40 Māori chiefs signed Te Tiriti o Waitangi at the British Residency. Over subsequent months copies were taken around the country, gathering more than 500 signatures to form the nation's foundational founding pact.","https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Signing_of_the_Treaty_of_Waitangi.jpg/500px-Signing_of_the_Treaty_of_Waitangi.jpg",https://nzhistory.govt.nz/politics/treaty-of-waitangi
+NZ11,1841,31 Mar 1841,Arrival of the William Bryan,Colonization Vessels,Ngāmotu / New Plymouth,-39.0550,174.0300,"The pioneer vessel 'William Bryan' dropped anchor off the Sugar Loaf Islands carrying 148 West Country immigrants sent by the Plymouth Company, founding the settlement of New Plymouth under Mount Taranaki.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/New_Plymouth_1843.jpg/500px-New_Plymouth_1843.jpg",https://teara.govt.nz/en/taranaki-places/page-3
+NZ12,1842,1 Feb 1842,Arrival of the Fifeshire in Nelson,Colonization Vessels,Nelson Haven / Boulder Bank,-41.2600,173.2750,"The immigrant ship 'Fifeshire' entered Nelson Haven carrying the vanguard of New Zealand Company settlers to establish Nelson. On attempting to depart through the narrow channel, the ship struck Arrow Rock (Fifeshire Rock) and was wrecked on the reef.","https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Fifeshire_Rock_Nelson.jpg/500px-Fifeshire_Rock_Nelson.jpg",https://teara.govt.nz/en/nelson-places/page-1
+NZ13,1842,9 Oct 1842,Arrival of Jane Gifford & Duchess of Argyle,Colonization Vessels,Mechanics Bay (Auckland),-36.8480,174.7800,"The barques 'Duchess of Argyle' and 'Jane Gifford' arrived simultaneously in Waitematā Harbour carrying over 500 Scottish settlers. They were the first major direct government immigrant vessels to supply labor for New Zealand's new capital, Auckland.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Auckland_Commercial_Bay_1840s.jpg/500px-Auckland_Commercial_Bay_1840s.jpg",https://teara.govt.nz/en/auckland-places/page-2
+NZ14,1843,17 Jun 1843,Wairau Incident,New Zealand Wars,Tuamarina (Marlborough),-41.4167,173.9667,"A violent clash between Nelson settlers led by Arthur Wakefield and Ngāti Toa rangatira Te Rauparaha and Te Rangihaeata over disputed land surveys in the Wairau Valley left 22 settlers and at least four Māori dead, sparking nationwide panic.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Wairau_Affray_Monument.jpg/500px-Wairau_Affray_Monument.jpg",https://nzhistory.govt.nz/war/wairau-incident
+NZ15,1845,11 Mar 1845,Hone Heke Cuts the Flagstaff,New Zealand Wars,Kororāreka / Russell,-35.2600,174.1200,"Ngāpuhi chief Hone Heke felled the British flagstaff on Maiki Hill for the fourth time, triggering the Northern War and the sacking of Kororāreka, challenging Crown authority and custom duty collection.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Flagstaff_Hill_Russell.jpg/500px-Flagstaff_Hill_Russell.jpg",https://nzhistory.govt.nz/war/northern-war
+NZ16,1848,23 Mar 1848,Arrival of the John Wickliffe,Colonization Vessels,Port Chalmers (Dunedin),-45.8167,170.6167,"The barque 'John Wickliffe' arrived at Port Chalmers carrying Captain William Cargill and 97 Free Church of Scotland emigrants. Joined three weeks later by the 'Philip Laing' carrying 247 more settlers, they founded the settlement of Dunedin.","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/John_Wickliffe_and_Philip_Laing_at_Port_Chalmers.jpg/500px-John_Wickliffe_and_Philip_Laing_at_Port_Chalmers.jpg",https://nzhistory.govt.nz/page/first-otago-settlers-arrive
+NZ17,1850,16 Dec 1850,Arrival of Canterbury's First Four Ships,Colonization Vessels,Lyttelton Harbour (Christchurch),-43.6030,172.7190,"The 'Charlotte Jane' and 'Randolph' sailed into Lyttelton Harbour, followed days later by the 'Sir George Seymour' and 'Cressy'. Carrying nearly 800 Canterbury Association pilgrims, their arrival marked the organized founding of Christchurch and the Canterbury plains.","https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/First_Four_Ships_Lyttelton.jpg/500px-First_Four_Ships_Lyttelton.jpg",https://nzhistory.govt.nz/culture/first-four-ships
+NZ18,1858,2 Jun 1858,Crowning of the First Māori King,Māori Autonomy,Ngāruawāhia (Waikato),-37.6667,175.1500,"Pōtatau Te Wherowhero was crowned the first Māori King at Ngāruawāhia to establish the Kīngitanga movement, unifying tribes against alienation of land and defending Māori self-governance.","https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Potatau_Te_Wherowhero.jpg/500px-Potatau_Te_Wherowhero.jpg",https://teara.govt.nz/en/kingitanga-the-maori-king-movement
+NZ19,1861,20 May 1861,Gabriel's Gully Gold Discovery,Gold Rushes & Economy,Lawrence (Otago),-45.8900,169.6900,"Gabriel Read discovered gold in a gully near Lawrence, triggering the Otago Gold Rush. The rush brought thousands of miners from Australia, the Americas, and China, turning Dunedin into New Zealand's wealthiest metropolis.","https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Gabriels_Gully_1862.jpg/500px-Gabriels_Gully_1862.jpg",https://nzhistory.govt.nz/culture/gold-rushes
+NZ20,1863,20 Nov 1863,Battle of Rangiriri,New Zealand Wars,Rangiriri (Waikato),-37.4333,175.1333,"Over 1,400 Imperial troops under General Duncan Cameron assaulted the Kīngitanga defensive line at Rangiriri. Heavy casualties on both sides opened the Waikato basin to military invasion and led to the confiscation of 1.2 million acres of fertile Māori land.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Battle_of_Rangiriri_1863.jpg/500px-Battle_of_Rangiriri_1863.jpg",https://nzhistory.govt.nz/war/war-in-waikato
+NZ21,1864,29 Apr 1864,Battle of Gate Pā (Pukehinahina),New Zealand Wars,Tauranga,-37.7125,176.1378,"A force of 230 Ngāi Te Rangi and Ngāti Ranginui warriors under Rāwiri Puhirake decisively repulsed an assault by 1,700 British soldiers and bluejackets, who suffered severe losses from skillfully designed concealed trench bunkers.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Gate_Pa_Memorial_Reserve.jpg/500px-Gate_Pa_Memorial_Reserve.jpg",https://nzhistory.govt.nz/war/war-in-tauranga/gate-pa
+NZ22,1865,26 Jul 1865,Wellington Becomes National Capital,Government,Parliament Buildings (Wellington),-41.2784,174.7767,"The national seat of government moved from Auckland to Wellington to provide a central administrative location in Cook Strait and prevent South Island parliamentarians from establishing a separate southern colony.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Old_Government_Buildings_Wellington.jpg/500px-Old_Government_Buildings_Wellington.jpg",https://nzhistory.govt.nz/politics/parliament-moves-to-wellington
+NZ23,1881,5 Nov 1881,Invasion of Parihaka,Resistance & Human Rights,Parihaka (Taranaki),-39.2900,173.8500,"Over 1,600 armed colonial volunteers and Armed Constabulary invaded the peaceful, pacifist village of Parihaka. Prophets Te Whiti o Rongomai and Tohu Kākahi were arrested without trial, residents expelled, and homes bulldozed for resisting confiscated land seizures.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Parihaka_Invasion_1881.jpg/500px-Parihaka_Invasion_1881.jpg",https://nzhistory.govt.nz/occupation-pacifist-settlement-at-parihaka
+NZ24,1886,10 Jun 1886,Eruption of Mount Tarawera,Natural Disaster,Mount Tarawera (Rotorua),-38.2260,176.5060,"A violent volcanic eruption ripped open Mount Tarawera, devastating nearby settlements, killing over 120 people, burying Te Wairoa village under hot mud, and destroying the world-renowned Pink and White Terraces.","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Mount_Tarawera_chasm.jpg/500px-Mount_Tarawera_chasm.jpg",https://nzhistory.govt.nz/culture/tarawera-eruption
+NZ25,1893,19 Sep 1893,Women Win Universal Suffrage,Civil Rights,Parliament Buildings (Wellington),-41.2784,174.7767,"Governor Lord Glasgow signed the Electoral Act 1893, making New Zealand the first self-governing nation in the world where women won the legal right to vote in parliamentary elections, following nationwide petition campaigns led by Kate Sheppard.","https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Kate_Sheppard_Suffrage_Petition.jpg/500px-Kate_Sheppard_Suffrage_Petition.jpg",https://nzhistory.govt.nz/politics/womens-suffrage
+NZ26,1899,21 Oct 1899,Boer War Troops Depart on SS Waiwera,Troops to Overseas Wars,Queen's Wharf (Wellington),-41.2850,174.7780,"Amid immense patriotic fervor, the First Contingent of 215 mounted riflemen and 250 horses departed aboard the SS 'Waiwera' for South Africa. This was New Zealand's first military force deployed to an overseas conflict. Over 6,500 Kiwis would serve in the Boer War.","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/First_Contingent_SS_Waiwera_1899.jpg/500px-First_Contingent_SS_Waiwera_1899.jpg",https://nzhistory.govt.nz/war/south-african-boer-war
+NZ27,1914,15 Aug 1914,Samoa Expeditionary Force Departs,Troops to Overseas Wars,Wellington Railway Wharf,-41.2790,174.7820,"Just eleven days after the outbreak of World War I, the 1,400-strong Advance Guard of the New Zealand Expeditionary Force embarked aboard the troopships 'Monowai' and 'Moeraki' to seize German Samoa, completing the British Empire's second overseas action of the war.","https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/NZ_Troops_in_Samoa_1914.jpg/500px-NZ_Troops_in_Samoa_1914.jpg",https://nzhistory.govt.nz/war/capture-of-german-samoa
+NZ28,1914,16 Oct 1914,WWI Main Body Sails for Egypt & Gallipoli,Troops to Overseas Wars,King's Wharf (Wellington),-41.2800,174.7830,"Ten transport ships bearing 8,454 troops and 3,818 horses departed Wellington Harbour, sailing across the Indian Ocean in an Anzac convoy. They trained in Egypt before landing at Anzac Cove on 25 April 1915, entering the crucible of the Gallipoli campaign.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/NZEF_Main_Body_Departs_Wellington_1914.jpg/500px-NZEF_Main_Body_Departs_Wellington_1914.jpg",https://nzhistory.govt.nz/war/first-world-war
+NZ29,1917,12 Oct 1917,Passchendaele: NZ's Darkest Day,Troops to Overseas Wars,Bellevue Spur / Passchendaele (Belgium),-41.2784,174.7767,"During the Battle of Passchendaele, the New Zealand Division attacked Bellevue Spur through impassable mud and intact German barbed wire. In under four hours, 846 New Zealand soldiers were killed and nearly 2,000 wounded—the highest single-day loss of life in NZ military history. (Commemorated at Wellington Cenotaph).","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Passchendaele_Mud_1917.jpg/500px-Passchendaele_Mud_1917.jpg",https://nzhistory.govt.nz/war/passchendaele
+NZ30,1918,1 Nov 1918,1918 Influenza Pandemic,Health & Society,Auckland Wharves,-36.8400,174.7600,"The lethal influenza pandemic swept New Zealand at the end of WWI, killing approximately 9,000 people in just two months. Māori communities were hit particularly hard, suffering death rates over seven times higher than Pākehā.","https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Influenza_inhalation_chamber_1918.jpg/500px-Influenza_inhalation_chamber_1918.jpg",https://nzhistory.govt.nz/culture/1918-influenza-pandemic
+NZ31,1931,3 Feb 1931,Hawke's Bay Earthquake,Natural Disaster,Napier & Hastings,-39.4928,176.9120,"A magnitude 7.8 earthquake ripped through Hawke's Bay, killing 256 people and collapsing commercial centers across Napier and Hastings. Fires leveled the ruins, while seabed uplifts created hundreds of acres of new land. Napier was rebuilt in Art Deco style.","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Napier_Earthquake_1931.jpg/500px-Napier_Earthquake_1931.jpg",https://nzhistory.govt.nz/culture/hawkes-bay-earthquake
+NZ32,1940,23 Feb 1940,HMS Achilles Welcomed After River Plate,Troops to Overseas Wars,Waitematā Harbour (Auckland),-36.8410,174.7680,"HMS 'Achilles', manned largely by New Zealand sailors, sailed triumphantly into Auckland Harbour after playing a decisive role in defeating the German pocket battleship 'Admiral Graf Spee' off Montevideo—New Zealand's first major naval engagement of WWII.","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/HMS_Achilles_Auckland_1940.jpg/500px-HMS_Achilles_Auckland_1940.jpg",https://nzhistory.govt.nz/war/battle-of-the-river-plate
+NZ33,1940,2 May 1940,28th Māori Battalion Departs on Aquitania,Troops to Overseas Wars,Pipitea Point / Wellington Wharf,-41.2750,174.7850,"The all-volunteer 28th (Māori) Battalion (approx. 700 men) embarked aboard the luxury liner turned troop transport RMS 'Aquitania' at Wellington. They served with distinction across Greece, Crete, North Africa, and Italy, earning 28 battle honours and legendary renown.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Maori_Battalion_Aquitania_1940.jpg/500px-Maori_Battalion_Aquitania_1940.jpg",https://28maoribattalion.org.nz
+NZ34,1950,10 Dec 1950,Kayforce Troops Depart for Korea,Troops to Overseas Wars,Wellington Waterfront,-41.2820,174.7800,"In response to the United Nations call to defend South Korea, the volunteer 'Kayforce' (16th Field Regiment RNZA) departed Wellington aboard the inter-island ferry 'Wahine' and the transport 'Ormonde', serving through intensive artillery battles along the 38th Parallel.","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Kayforce_Korea_1951.jpg/500px-Kayforce_Korea_1951.jpg",https://nzhistory.govt.nz/war/korean-war
+NZ35,1953,24 Dec 1953,Tangiwai Railway Disaster,Transport Disaster,Tangiwai Bridge (Whangaehu River),-39.4647,175.5728,"A volcanic lahar from Mount Ruapehu collapsed the rail bridge over the Whangaehu River minutes before the Wellington-to-Auckland express arrived. The train plunged into the torrent on Christmas Eve, claiming 151 lives in New Zealand's worst rail tragedy.","https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Tangiwai_disaster_1953.jpg/500px-Tangiwai_disaster_1953.jpg",https://nzhistory.govt.nz/culture/tangiwai-rail-disaster
+NZ36,1965,27 May 1965,161 Battery Departs for Vietnam War,Troops to Overseas Wars,RNZAF Base Whenuapai (Auckland),-36.7877,174.6220,"Prime Minister Keith Holyoake announced the deployment of 161 Battery Royal New Zealand Artillery to South Vietnam. Flying out from Whenuapai, the battery served with Australian and US forces based at Nui Dat, marking the beginning of combat operations in Vietnam.","https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/161_Battery_Vietnam_1966.jpg/500px-161_Battery_Vietnam_1966.jpg",https://nzhistory.govt.nz/war/vietnam-war
+NZ37,1968,10 Apr 1968,TEV Wahine Capsizes in Wellington Storm,Maritime Disaster,Barrett Reef (Wellington),-41.3500,174.8333,"Battered by 100-knot winds from Cyclone Giselle, the Lyttelton-to-Wellington ferry TEV 'Wahine' foundered on Barrett Reef and capsized near Steeple Rock. Fifty-three passengers and crew died in the disaster, televised live to the nation.","https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wahine_disaster_1968.jpg/500px-Wahine_disaster_1968.jpg",https://nzhistory.govt.nz/culture/wahine-disaster
+NZ38,1975,14 Sep 1975,Māori Land March Begins,Civil Rights & Protest,Te Hāpua (Northland),-34.5000,172.9333,"Eighty-year-old Dame Whina Cooper led the historic Land March (Hīkoi) from Te Hāpua in the Far North to Parliament under the banner 'Not One More Acre of Māori Land', galvanizing the modern Māori renaissance and leading to the Waitangi Tribunal.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Whina_Cooper_H%C4%ABkoi.jpg/500px-Whina_Cooper_H%C4%ABkoi.jpg",https://nzhistory.govt.nz/culture/maori-land-march-1975
+NZ39,1977,5 Jan 1977,Bastion Point (Takaparawhau) Occupation,Land Rights & Protest,Bastion Point (Auckland),-36.8528,174.8250,"Ngāti Whātua Ōrākei led by Joe Hawke occupied ancestral land at Takaparawhau for 506 days to prevent upscale Crown housing subdivision. Police forcibly evicted 222 protesters in May 1978; the land was returned to the hapū a decade later.","https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Bastion_Point_Memorial.jpg/500px-Bastion_Point_Memorial.jpg",https://nzhistory.govt.nz/culture/bastion-point
+NZ40,1981,25 Jul 1981,Springbok Tour Match Cancelled,Social Protest & Sports,Rugby Park (Hamilton),-37.7780,175.2670,"Anti-apartheid protesters breached perimeter security and occupied the center of Rugby Park pitch in Hamilton, causing the live broadcast match against South Africa to be cancelled. The tour divided families and communities across the nation.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/1981_Springbok_Tour_Protest.jpg/500px-1981_Springbok_Tour_Protest.jpg",https://nzhistory.govt.nz/culture/1981-springbok-tour
+NZ41,1985,10 Jul 1985,Sinking of the Rainbow Warrior,International Espionage,Marsden Wharf (Auckland),-36.8433,174.7667,"French DGSE secret service agents attached two underwater limpet mines to Greenpeace's flagship 'Rainbow Warrior' at Marsden Wharf. The blasts sank the vessel and murdered photographer Fernando Pereira before the ship could sail to Moruroa nuclear test atoll.","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Rainbow_Warrior_Wreck.jpg/500px-Rainbow_Warrior_Wreck.jpg",https://nzhistory.govt.nz/culture/sinking-of-the-rainbow-warrior
+NZ42,1987,1 Aug 1987,Te Reo Māori Becomes Official Language,Culture & Legislation,Parliament Buildings (Wellington),-41.2784,174.7767,"Following the 1972 Māori Language Petition and the landmark Waitangi Tribunal WAI 11 finding, Parliament passed the Māori Language Act 1987, granting te reo Māori status as an official language of New Zealand and creating the Māori Language Commission.","https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Te_Reo_Maori_Official.jpg/500px-Te_Reo_Maori_Official.jpg",https://nzhistory.govt.nz/culture/maori-language-petition
+NZ43,2011,22 Feb 2011,Christchurch Earthquake,Natural Disaster,Christchurch CBD,-43.5320,172.6362,"A shallow, violent magnitude 6.2 earthquake struck Christchurch at 12:51 pm. The shaking collapsed multi-story buildings, damaged the historic ChristChurch Cathedral, and killed 185 people in one of New Zealand's worst natural disasters.","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Christchurch_Cathedral_2011_Damage.jpg/500px-Christchurch_Cathedral_2011_Damage.jpg",https://nzhistory.govt.nz/culture/canterbury-earthquakes
+NZ44,2019,15 Mar 2019,Christchurch Mosques Terror Attacks,Modern NZ History,Al Noor Mosque (Christchurch),-43.5330,172.6120,"A terrorist attacked worshippers during Friday prayers at Al Noor Mosque and Linwood Islamic Centre in Christchurch, killing 51 people and injuring 40. The tragedy triggered national mourning, rapid firearm reform laws, and the Christchurch Call initiative.","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Flowers_outside_Al_Noor_Mosque_2019.jpg/500px-Flowers_outside_Al_Noor_Mosque_2019.jpg",https://teara.govt.nz/en/terrorism-and-counter-terrorism
+  </script>
+
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+  <script>
+    const CSV_URL = './nz_history.csv';
+    const NZ_CENTER = [-41.2865, 174.2];
+    const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
+
+    // Leaflet Map Initialization
+    const map = L.map('map', {
+      center: NZ_CENTER,
+      zoom: NZ_ZOOM,
+      minZoom: 4,
+      maxBounds: [[-50, 160], [-30, 185]],
+      closePopupOnClick: true // Clicking outside the popup returns you cleanly to where you were on the map
+    });
+
+    // Basemaps
+    const basemaps = {
+      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; National Geographic Society', maxZoom: 16
+      }),
+      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; Topographic Survey', maxZoom: 18
+      }),
+      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; Earthstar Geographics', maxZoom: 18
+      }),
+      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+      })
+    };
+    basemaps.natgeo.addTo(map);
+
+    function setBasemap(type) {
+      Object.values(basemaps).forEach(l => map.removeLayer(l));
+      basemaps[type].addTo(map);
+      document.querySelectorAll('.layer-option-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      document.getElementById('layerDropdownCard').classList.remove('show');
+    }
+
+    // Clusters & Heatmap layers
+    const markers = L.markerClusterGroup({
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      maxClusterRadius: 32,
+      iconCreateFunction: (cluster) => L.divIcon({
+        html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
+        className: 'custom-cluster-icon',
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      })
+    });
+    map.addLayer(markers);
+
+    let heatLayer = null;
+    let isHeatmapActive = false;
+    let allEvents = [];
+    let globalMinYear = 1280;
+    let globalMaxYear = 2026;
+    let timelineTimer = null;
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      }[m]));
+    }
+
+    // Resolve compliant 500px thumbnail step to prevent https://w.wiki/GHai 429/400 errors
+    function getSafeThumbnail(url) {
+      if (!url) return 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=500&q=80';
+      if (url.includes('upload.wikimedia.org') && url.includes('/thumb/')) {
+        return url.replace(/\/\d+px-/g, '/500px-');
+      }
+      return url;
+    }
+
+    function getCategoryClass(cat) {
+      const c = (cat || '').toLowerCase();
+      if (c.includes('vessel') || c.includes('ship') || c.includes('whaling')) return 'cat-vessel';
+      if (c.includes('war') || c.includes('troop') || c.includes('battle') || c.includes('musket')) return 'cat-war';
+      if (c.includes('disaster') || c.includes('earthquake') || c.includes('eruption')) return 'cat-disaster';
+      if (c.includes('rights') || c.includes('protest') || c.includes('treaty') || c.includes('sovereignty')) return 'cat-rights';
+      return 'cat-general';
+    }
+
+    function getCategoryIcon(cat) {
+      const c = (cat || '').toLowerCase();
+      if (c.includes('vessel') || c.includes('ship')) return '🚢';
+      if (c.includes('war') || c.includes('troop') || c.includes('battle')) return '⚔️';
+      if (c.includes('disaster') || c.includes('earthquake')) return '🌋';
+      if (c.includes('rights') || c.includes('protest') || c.includes('suffrage')) return '✊';
+      if (c.includes('treaty') || c.includes('sovereignty')) return '📜';
+      return '📍';
+    }
+
+    // Render Markers with Micro-Radial Decluttering and Hover-to-Front
+    function renderDataset(items) {
+      markers.clearLayers();
+      const markerList = [];
+      const heatPoints = [];
+
+      // 1. Group items sharing coincident coordinates to avoid map pile-ups
+      const coordBuckets = new Map();
+      items.forEach(item => {
+        const key = `${item.latitude.toFixed(3)}_${item.longitude.toFixed(3)}`;
+        if (!coordBuckets.has(key)) coordBuckets.set(key, []);
+        coordBuckets.get(key).push(item);
+      });
+
+      coordBuckets.forEach((bucket) => {
+        const count = bucket.length;
+        bucket.forEach((ev, i) => {
+          let lat = ev.latitude;
+          let lng = ev.longitude;
+
+          // If more than 1 item exists at the exact coordinate, disperse slightly in a micro-radius rosette
+          if (count > 1) {
+            const angle = (i / count) * (2 * Math.PI);
+            const radius = 0.0035; // approx 350 meters
+            lat += Math.sin(angle) * radius;
+            lng += Math.cos(angle) * radius * 1.3;
+          }
+
+          heatPoints.push([lat, lng, 0.85]);
+
+          const safeYear = escapeHTML(ev.year || '');
+          const safeDate = escapeHTML(ev.date || ev.year || '');
+          const safeHeadline = escapeHTML(ev.headline || 'Untitled Event');
+          const safeLocation = escapeHTML(ev.location || '');
+          const safeCategory = escapeHTML(ev.category || 'History');
+          const safeDetails = escapeHTML(ev.details || '');
+          const safeImg = getSafeThumbnail(ev.image_url);
+          const catClass = getCategoryClass(ev.category);
+          const catIcon = getCategoryIcon(ev.category);
+
+          // Google AI Overview Search query URL
+          const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand history')}`;
+
+          // ON MAP ITEM: Date + Headline pill
+          const markerHTML = `
+            <div class="nz-history-marker ${catClass}">
+              <div class="marker-pill">
+                <span class="marker-date-tag">${catIcon} ${safeYear}</span>
+                <span class="marker-headline-text">${safeHeadline}</span>
+              </div>
+              <div class="marker-pin-tail"></div>
+            </div>
+          `;
+
+          const customIcon = L.divIcon({
+            html: markerHTML,
+            className: 'history-div-icon',
+            iconSize: [210, 34],
+            iconAnchor: [105, 34]
+          });
+
+          // POP-UP: Displays EVERYTHING
+          const popupHTML = `
+            <div class="history-card">
+              <div class="history-card-img-wrap">
+                <img src="${safeImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=500&q=80';" />
+                <div class="history-card-badge-row">
+                  <span class="category-pill">${safeCategory}</span>
+                  <span class="date-pill">${safeDate}</span>
+                </div>
+              </div>
+              <div class="history-card-body">
+                <h3>${safeHeadline}</h3>
+                <div class="history-card-meta">
+                  <span class="loc-icon">📍</span>
+                  <span>${safeLocation}</span>
+                </div>
+                <p class="history-card-desc">${safeDetails}</p>
+                <div class="history-card-footer">
+                  <a href="${googleAiSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai">
+                    <span>✨</span> Ask Google AI Overview ↗
+                  </a>
+                  ${ev.source_url && ev.source_url !== '#' ? `
+                    <a href="${ev.source_url}" target="_blank" rel="noopener noreferrer" class="btn-source-archive">
+                      <span>📖</span> Historical Archive Reference (NZHistory / Te Ara) ↗
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+
+          const marker = L.marker([lat, lng], { icon: customIcon });
+          marker.bindPopup(popupHTML, {
+            maxWidth: 410,
+            autoPan: true,
+            keepInView: true,
+            closeButton: true
+          });
+
+          // Pull Hovered Marker directly to the front!
+          marker.on('mouseover', function () {
+            this.setZIndexOffset(10000);
+          });
+          marker.on('mouseout', function () {
+            this.setZIndexOffset(0);
+          });
+
+          markerList.push(marker);
+        });
+      });
+
+      markers.addLayers(markerList);
+
+      // Update Heatmap
+      if (heatLayer) {
+        heatLayer.setLatLngs(heatPoints);
+      } else if (typeof L.heatLayer === 'function') {
+        heatLayer = L.heatLayer(heatPoints, {
+          radius: 28,
+          blur: 18,
+          maxZoom: 9,
+          gradient: { 0.3: '#0284c7', 0.65: '#f59e0b', 1.0: '#dc2626' }
+        });
+        if (isHeatmapActive) heatLayer.addTo(map);
+      }
+
+      document.getElementById('itemCountBadge').textContent = `${items.length} event${items.length === 1 ? '' : 's'}`;
+    }
+
+    // Filter by Slider and Search
+    function filterEvents() {
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+      const fill = document.getElementById('sliderTrackFill');
+      const search = (document.getElementById('mapSearchInput').value || '').trim().toLowerCase();
+
+      let minVal = parseInt(minSlider.value, 10);
+      let maxVal = parseInt(maxSlider.value, 10);
+
+      if (minVal > maxVal) {
+        const tmp = minVal;
+        minVal = maxVal;
+        maxVal = tmp;
+        minSlider.value = minVal;
+        maxSlider.value = maxVal;
+      }
+
+      const span = (globalMaxYear - globalMinYear) || 1;
+      const left = ((minVal - globalMinYear) / span) * 100;
+      const right = ((maxVal - globalMinYear) / span) * 100;
+
+      fill.style.left = left + '%';
+      fill.style.width = (right - left) + '%';
+
+      document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
+
+      const filtered = allEvents.filter(ev => {
+        const inYear = ev.year >= minVal && ev.year <= maxVal;
+        if (!inYear) return false;
+
+        if (search) {
+          const hay = `${ev.headline} ${ev.location} ${ev.details} ${ev.category} ${ev.date}`.toLowerCase();
+          return hay.includes(search);
+        }
+        return true;
+      });
+
+      renderDataset(filtered);
+    }
+
+    // Timeline Playback (Starts playback strictly at year 1800 per request)
+    function toggleTimelinePlayback() {
+      const btn = document.getElementById('btnPlayTimeline');
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+
+      if (timelineTimer) {
+        clearInterval(timelineTimer);
+        timelineTimer = null;
+        btn.textContent = '▶';
+        btn.classList.remove('playing');
+      } else {
+        btn.textContent = '⏸';
+        btn.classList.add('playing');
+
+        // Start playback at year 1800
+        minSlider.value = 1800;
+        let startMax = Math.max(1800, parseInt(maxSlider.value, 10));
+        if (startMax >= globalMaxYear || startMax <= 1800) {
+          startMax = 1800;
+        }
+        maxSlider.value = startMax;
+        filterEvents();
+
+        timelineTimer = setInterval(() => {
+          let curr = parseInt(maxSlider.value, 10);
+          if (curr >= globalMaxYear) {
+            toggleTimelinePlayback();
+          } else {
+            maxSlider.value = Math.min(globalMaxYear, curr + 4);
+            filterEvents();
+          }
+        }, 260);
+      }
+    }
+
+    // Toggle Heatmap
+    function toggleHeatmap() {
+      const btn = document.getElementById('btnToggleHeatmap');
+      isHeatmapActive = !isHeatmapActive;
+      btn.classList.toggle('active', isHeatmapActive);
+
+      if (heatLayer) {
+        if (isHeatmapActive) {
+          map.addLayer(heatLayer);
+        } else {
+          map.removeLayer(heatLayer);
+        }
+      }
+    }
+
+    function initSliders() {
+      const years = allEvents.map(e => e.year).filter(y => !isNaN(y));
+      globalMinYear = Math.min(...years);
+      globalMaxYear = Math.max(...years);
+
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+
+      minSlider.min = globalMinYear;
+      minSlider.max = globalMaxYear;
+      maxSlider.min = globalMinYear;
+      maxSlider.max = globalMaxYear;
+
+      minSlider.value = globalMinYear;
+      maxSlider.value = globalMaxYear;
+
+      filterEvents();
+    }
+
+    function parseCSVData(csvString) {
+      const parsed = Papa.parse(csvString, { header: true, skipEmptyLines: true });
+      allEvents = parsed.data.map(row => ({
+        id: row.id || '',
+        year: parseInt(row.year, 10) || 0,
+        date: row.date || row.year || '',
+        headline: row.headline || '',
+        category: row.category || 'General',
+        location: row.location || '',
+        latitude: parseFloat(row.latitude),
+        longitude: parseFloat(row.longitude),
+        details: row.details || '',
+        image_url: row.image_url || '',
+        source_url: row.source_url || '#'
+      })).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude));
+
+      initSliders();
+    }
+
+    async function loadDataset() {
+      try {
+        const res = await fetch(CSV_URL);
+        if (res.ok) {
+          const text = await res.text();
+          parseCSVData(text);
+          return;
+        }
+      } catch (e) {
+        console.warn('Local CSV fetch blocked by file:// CORS; utilizing embedded dataset.');
+      }
+
+      // Seamless fallback to embedded dataset
+      const fallback = document.getElementById('embeddedFallbackCSV').textContent;
+      parseCSVData(fallback);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('minYearSlider').addEventListener('input', filterEvents);
+      document.getElementById('maxYearSlider').addEventListener('input', filterEvents);
+      document.getElementById('btnPlayTimeline').addEventListener('click', toggleTimelinePlayback);
+      document.getElementById('btnToggleHeatmap').addEventListener('click', toggleHeatmap);
+
+      document.getElementById('btnFitNZ').addEventListener('click', () => {
+        if (markers.getLayers().length > 0) {
+          map.fitBounds(markers.getBounds(), { padding: [50, 50] });
+        } else {
+          map.setView(NZ_CENTER, NZ_ZOOM);
+        }
+      });
+
+      document.getElementById('btnResetView').addEventListener('click', () => {
+        document.getElementById('minYearSlider').value = globalMinYear;
+        document.getElementById('maxYearSlider').value = globalMaxYear;
+        document.getElementById('mapSearchInput').value = '';
+        document.getElementById('clearMapSearch').style.display = 'none';
+        document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.min == globalMinYear));
+        if (timelineTimer) toggleTimelinePlayback();
+        map.setView(NZ_CENTER, NZ_ZOOM);
+        filterEvents();
+      });
+
+      // Layer Menu
+      const btnLayersToggle = document.getElementById('btnLayersToggle');
+      const layerDropdownCard = document.getElementById('layerDropdownCard');
+      btnLayersToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        layerDropdownCard.classList.toggle('show');
+      });
+      document.addEventListener('click', () => layerDropdownCard.classList.remove('show'));
+
+      document.getElementById('btnLayerNatGeo').addEventListener('click', () => setBasemap('natgeo'));
+      document.getElementById('btnLayerTopo').addEventListener('click', () => setBasemap('topo'));
+      document.getElementById('btnLayerSat').addEventListener('click', () => setBasemap('sat'));
+      document.getElementById('btnLayerStreet').addEventListener('click', () => setBasemap('street'));
+
+      // Search Box
+      const searchInput = document.getElementById('mapSearchInput');
+      const clearSearchBtn = document.getElementById('clearMapSearch');
+      searchInput.addEventListener('input', (e) => {
+        clearSearchBtn.style.display = e.target.value ? 'block' : 'none';
+        filterEvents();
+      });
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        filterEvents();
+        searchInput.focus();
+      });
+
+      // Era Quick-Jump Chips
+      document.querySelectorAll('.era-chip').forEach(chip => {
+        chip.addEventListener('click', function () {
+          document.querySelectorAll('.era-chip').forEach(c => c.classList.remove('active'));
+          this.classList.add('active');
+          document.getElementById('minYearSlider').value = this.dataset.min;
+          document.getElementById('maxYearSlider').value = this.dataset.max;
+          filterEvents();
+        });
+      });
+
+      loadDataset();
+    });
+  </script>
+</body>
+</html>
