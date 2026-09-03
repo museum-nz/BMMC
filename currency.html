@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -30,38 +31,34 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
 
-  <!-- PapaParse for CSV Parsing -->
-  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
-  <script src="../vendor/papaparse.min.js"></script>
+  <!-- PapaParse with Multi-tier Fallback (Local root, Parent dir, CDN) -->
+  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;this.src='../vendor/papaparse.min.js';this.onerror=function(){this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js';};"></script>
 
-  <!-- Chart.js for Statistical Visualisations -->
-  <script src="../vendor/chart.umd.min.js"></script>
+  <!-- Chart.js with Multi-tier Fallback -->
+  <script src="vendor/chart.umd.min.js" onerror="this.onerror=null;this.src='../vendor/chart.umd.min.js';this.onerror=function(){this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';};"></script>
 
-  <!-- Tailwind CSS Engine -->
-  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
-  <script src="../vendor/tailwind.js"></script>
+  <!-- Tailwind CSS Engine & Preset Config -->
   <script>
-    if (window.tailwind) {
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f0f7ff',
-                100: '#e0effe',
-                500: '#2563eb',
-                600: '#1d4ed8',
-                700: '#1e40af',
-              }
+    window.tailwind = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
             }
           }
         }
-      };
-    }
+      }
+    };
   </script>
+  <script src="vendor/tailwind.js" onerror="this.onerror=null;this.src='../vendor/tailwind.js';this.onerror=function(){this.onerror=null;this.src='https://cdn.tailwindcss.com';};"></script>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
 
   <style>
     .coin-badge {
@@ -199,7 +196,7 @@
       <!-- Collapsible Controls Bar -->
       <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
         
-        <!-- Specimen Category Filters (Catalogue & Gallery Modes) -->
+        <!-- Category Filters -->
         <div id="catalogueFilterBar" class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar py-0.5" role="tablist">
           <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer shrink-0">
             🌐 Show All
@@ -216,7 +213,7 @@
 
           <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
 
-          <!-- Individual Banknote Series Filters -->
+          <!-- Banknote Series Filters -->
           <button id="filterBtnS1Notes" onclick="setCategoryFilter('banknotes-s1')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
             📜 Series 1 (1934)
           </button>
@@ -252,7 +249,7 @@
           </button>
         </div>
 
-        <!-- Search Bar in Catalogue & Gallery Modes -->
+        <!-- Search Bar -->
         <div id="catalogueSearchBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
           <div class="flex items-center gap-2 flex-1 max-w-md relative">
             <span class="text-sm absolute left-2.5 text-slate-400">🔍</span>
@@ -445,8 +442,6 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="currentCoinGrid"></div>
       </section>
 
-      <!-- BANKNOTE TIMELINE BREAK SECTION (SERIES 1 TO 7) -->
-      
       <!-- SERIES 1: 1934–1940 -->
       <section id="banknotes-s1-section" class="currency-group-section space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -511,7 +506,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries4Grid"></div>
       </section>
 
-      <!-- SERIES 5 & 6 TRANSITION & NOTES (1992–2014) -->
+      <!-- SERIES 5 & 6 TRANSITION -->
       <section id="sectionSeries5vs6Comparison" class="bg-gradient-to-br from-indigo-950/90 via-slate-900 to-slate-950 text-white rounded-3xl p-6 border border-indigo-500/30 shadow-xl space-y-4">
         <div class="flex items-center gap-2.5 border-b border-indigo-500/20 pb-3">
           <span class="text-2xl p-2 bg-indigo-500/20 text-indigo-300 rounded-2xl border border-indigo-500/30">📋</span>
@@ -612,7 +607,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="specialItemsGrid"></div>
       </section>
 
-      <!-- ROYAL & MONARCHICAL EFFIGIES -->
+      <!-- Monarchs section -->
       <section id="sectionMonarchs" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-amber-500/30 p-6 shadow-sm space-y-4">
         <div class="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3">
           <span class="text-2xl p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-2xl border border-amber-200 dark:border-amber-900/60">👑</span>
@@ -630,7 +625,7 @@
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
               <strong>Sculptor:</strong> Percy Metcalfe.<br/>
-              <strong>Design:</strong> Crowned bust facing left wearing the Imperial Crown and the Robe of State with the Collar of the Most Honourable Order of the Bath. Featured on the introductory 1933, 1934, and 1935 silver series, plus the historic 1935 Waitangi Crown.
+              <strong>Design:</strong> Crowned bust facing left wearing the Imperial Crown and the Robe of State with the Collar of the Most Honourable Order of the Bath.
             </p>
           </div>
 
@@ -641,7 +636,7 @@
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
               <strong>Coins Designer:</strong> Thomas Humphrey Paget (T.H. Paget). Uncrowned left-facing portrait on all coins from 1940 to 1952.<br/>
-              <strong>Banknotes Designer:</strong> Bradbury Wilkinson &amp; Co. Portrait of King George VI in naval uniform on all Series 2 banknotes (10/-, £1, £5, £10, £50) from 1940 to 1967.
+              <strong>Banknotes Designer:</strong> Bradbury Wilkinson &amp; Co. Portrait in naval uniform on all Series 2 banknotes.
             </p>
           </div>
 
@@ -651,10 +646,10 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300">1953–2026 Coins</span>
             </div>
             <div class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs space-y-1">
-              <p><strong>1st Effigy (1953–1965):</strong> Mary Gillick (young laureate bust facing right with tie ribbon).</p>
-              <p><strong>2nd Effigy (1967–1985):</strong> Arnold Machin (wearing the Girls of Great Britain &amp; Ireland Tiara).</p>
-              <p><strong>3rd Effigy (1986–1998):</strong> Raphael Maklouf (crowned with George IV State Diadem).</p>
-              <p><strong>4th Effigy (1999–Present):</strong> Ian Rank-Broadley (mature portrait with tiara).</p>
+              <p><strong>1st Effigy (1953–1965):</strong> Mary Gillick.</p>
+              <p><strong>2nd Effigy (1967–1985):</strong> Arnold Machin.</p>
+              <p><strong>3rd Effigy (1986–1998):</strong> Raphael Maklouf.</p>
+              <p><strong>4th Effigy (1999–Present):</strong> Ian Rank-Broadley.</p>
             </div>
           </div>
 
@@ -664,7 +659,7 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">1967–Present Notes</span>
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Series 3 &amp; 4 (1967–1992):</strong> Anthony Buckley portrait of the Queen wearing the formal Robes, Collar, and Star of the Order of the Garter across all paper decimal denominations ($1 to $100).<br/>
+              <strong>Series 3 &amp; 4 (1967–1992):</strong> Anthony Buckley portrait of the Queen across all paper denominations ($1 to $100).<br/>
               <strong>Series 5, 6 &amp; 7 (1992–Present):</strong> Robert Anderson portrait reserved exclusively on the $20 banknote.
             </p>
           </div>
@@ -675,8 +670,7 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">2027+ Coinage</span>
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Sculptor:</strong> Dan Thorne (Royal Canadian Mint).<br/>
-              <strong>Design:</strong> Official uncrowned effigy of King Charles III facing left (reversing the direction of Queen Elizabeth II in accordance with royal numismatic tradition). The 10-cent piece is scheduled as the first coin to enter general circulation around 2027.
+              <strong>Sculptor:</strong> Dan Thorne (Royal Canadian Mint). Official uncrowned effigy facing left.
             </p>
           </div>
 
@@ -686,8 +680,7 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">Series 1 Notes (1934–1940)</span>
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Banknote Engraver:</strong> Thomas de la Rue &amp; Co.<br/>
-              <strong>Historical Significance:</strong> King Tāwhiao (Potatau Te Wherowhero II) was depicted wearing a huia feather headdress on New Zealand's first national banknotes (10/-, £1, £5, £50) in 1934, symbolising indigenous authority alongside the newly formed Reserve Bank.
+              <strong>Engraver:</strong> Thomas de la Rue &amp; Co. Huia feather headdress on New Zealand's first national banknotes in 1934.
             </p>
           </div>
         </div>
@@ -707,7 +700,7 @@
             <span class="text-2xl">🪙</span>
             <div>
               <h3 class="text-lg font-black text-slate-900 dark:text-white">Coins Visual Gallery</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Complete obverse &amp; reverse photography displayed across 6 columns (Click any item for full numismatic specs)</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Complete obverse &amp; reverse photography displayed across 6 columns (Click any item for details)</p>
             </div>
           </div>
           <span class="coin-badge badge-gold text-xs">6 Columns Display</span>
@@ -761,7 +754,7 @@
         </div>
       </div>
 
-      <!-- 1. KEY HISTORICAL & DENOMINATION NOTES -->
+      <!-- Key Historical Notes -->
       <section id="sectionHistoricalNotes" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-amber-500/30 p-6 shadow-sm space-y-4">
         <div class="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3">
           <span class="text-2xl p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-2xl border border-amber-200 dark:border-amber-900/60">📌</span>
@@ -792,7 +785,7 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">Demonetisation</span>
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong>1c &amp; 2c</strong> coins ceased minting in 1988 and were demonetised on <strong>30 April 1990</strong>. The <strong>5c</strong> piece ceased minting after 2004 and was demonetised on <strong>31 October 2006</strong> under Swedish rounding rules.
+              <strong>1c &amp; 2c</strong> coins ceased minting in 1988 and were demonetised on <strong>30 April 1990</strong>. The <strong>5c</strong> piece ceased minting after 2004 and was demonetised on <strong>31 October 2006</strong>.
             </p>
           </div>
 
@@ -804,7 +797,7 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">Banknote Replacement</span>
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              In <strong>1990</strong>, aluminium-bronze $1 (Kiwi) and $2 (Kōtuku) coins were minted to permanently replace the $1 (brown/fantail) and $2 (purple/rifleman) paper banknotes, officially entering general circulation on <strong>11 February 1991</strong>.
+              In <strong>1990</strong>, aluminium-bronze $1 (Kiwi) and $2 (Kōtuku) coins were minted to permanently replace the $1 and $2 paper banknotes, entering circulation on <strong>11 February 1991</strong>.
             </p>
           </div>
 
@@ -816,13 +809,13 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300">Size &amp; Alloy Reform</span>
             </div>
             <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              In July 2006, the 10c, 20c, and 50c coins were resized (made significantly smaller and lighter using copper- and nickel-plated steel), causing an unprecedented single-year surge of <strong>327,000,000</strong> newly minted replacement coins.
+              In July 2006, the 10c, 20c, and 50c coins were resized using plated steel, causing an unprecedented single-year surge of <strong>327,000,000</strong> replacement coins.
             </p>
           </div>
         </div>
       </section>
 
-      <!-- 2. INTERACTIVE MINTAGE BREAKDOWN EXPLORER -->
+      <!-- Mintage Explorer -->
       <section id="sectionMintageBreakdown" class="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div class="flex items-center gap-3">
@@ -867,7 +860,7 @@
         </div>
       </section>
 
-      <!-- 3. INTERACTIVE BANKNOTES IN PUBLIC HANDS EXPLORER (TABLE F3) -->
+      <!-- Circulation Explorer -->
       <section id="sectionF3CirculationExplorer" class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 border border-indigo-500/30 shadow-xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-indigo-500/20 pb-4">
           <div class="flex items-center gap-3">
@@ -912,7 +905,7 @@
         </div>
       </section>
 
-      <!-- 4. PRODUCTION CHARTS -->
+      <!-- Production Charts -->
       <div id="sectionCharts" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white/90 dark:bg-slate-900/90 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
           <div>
@@ -983,7 +976,7 @@
         </div>
       </div>
 
-      <!-- 5. KEY DATES & NUMISMATIC RARITY TABLE -->
+      <!-- Rarity Table -->
       <div id="sectionRarities" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm">
         <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
           <div class="flex items-center gap-2">
@@ -1065,11 +1058,75 @@
     </div>
   </footer>
 
+  <!-- Embedded Standalone CSV Parser Polyfill (Ensures parsing never fails if external PapaParse is blocked) -->
+  <script>
+    if (!window.Papa) {
+      window.Papa = {
+        parse: function(csvText, config = {}) {
+          const lines = [];
+          let row = [];
+          let curr = '';
+          let inQuotes = false;
+          for (let i = 0; i < csvText.length; i++) {
+            const c = csvText[i];
+            const next = csvText[i + 1];
+            if (c === '"') {
+              if (inQuotes && next === '"') {
+                curr += '"';
+                i++;
+              } else {
+                inQuotes = !inQuotes;
+              }
+            } else if (c === ',' && !inQuotes) {
+              row.push(curr);
+              curr = '';
+            } else if ((c === '\r' || c === '\n') && !inQuotes) {
+              if (c === '\r' && next === '\n') i++;
+              row.push(curr);
+              curr = '';
+              if (!config.skipEmptyLines || row.some(cell => cell.trim().length > 0)) {
+                lines.push(row);
+              }
+              row = [];
+            } else {
+              curr += c;
+            }
+          }
+          if (curr.length > 0 || row.length > 0) {
+            row.push(curr);
+            if (!config.skipEmptyLines || row.some(cell => cell.trim().length > 0)) {
+              lines.push(row);
+            }
+          }
+          if (config.header && lines.length > 0) {
+            const headers = lines[0].map(h => h.trim());
+            const data = [];
+            for (let r = 1; r < lines.length; r++) {
+              const obj = {};
+              for (let c = 0; c < headers.length; c++) {
+                let val = lines[r][c] !== undefined ? lines[r][c].trim() : '';
+                if (config.dynamicTyping) {
+                  if (val !== '' && !isNaN(val)) val = Number(val);
+                  else if (val.toLowerCase() === 'true') val = true;
+                  else if (val.toLowerCase() === 'false') val = false;
+                }
+                obj[headers[c]] = val;
+              }
+              data.push(obj);
+            }
+            return { data };
+          }
+          return { data: lines };
+        }
+      };
+    }
+  </script>
+
   <!-- Application Logic -->
   <script>
     const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v8';
-    const CACHE_KEY_TIME = 'bMMC_cached_currency_unified_time_v8';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v9';
+    const CACHE_KEY_TIME = 'bMMC_cached_currency_unified_time_v9';
     const USER_COLLECTION_KEY = 'bMMC_user_currency_collection_v1';
     const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
@@ -1081,7 +1138,7 @@
     let f3LsdData = [];
     let f3DecimalData = [];
 
-    // Collector Inventory Store { [uid]: { owned: boolean, grade: string, qty: number, notes: string, wishlist: boolean } }
+    // Collector Inventory Store
     let userCollectorData = {};
 
     let currentViewMode = 'catalogue'; // 'catalogue' | 'gallery' | 'stats'
@@ -1149,7 +1206,6 @@
       showToast(userCollectorData[uid].wishlist ? 'Added to Wishlist' : 'Removed from Wishlist', '⭐');
     };
 
-    // Export User Collection & Wishlist as CSV
     function exportUserCollectionCsv() {
       if (!currencyItems || currencyItems.length === 0) {
         showToast('No currency data loaded to export.', '⚠️');
@@ -1286,42 +1342,43 @@
       }
     }
 
-    // Image URL Pipeline: formats Google URLs into s200 or s1000 sizes
+    // Formats Google / Drive URLs into s200 or s1000 sizes for high reliability online and offline
     function formatImageUrl(url, size = 's200') {
       if (!url) return '';
-      const clean = String(url).trim();
+      let clean = String(url).trim();
       if (!clean) return '';
 
       // Check offline adapter
       if (window.resolveOfflineMedia) {
-        const local = window.resolveOfflineMedia(clean);
-        if (local && (local.startsWith('../media/') || local.startsWith('./media/') || local.startsWith('media/'))) {
-          return local;
-        }
+        try {
+          const local = window.resolveOfflineMedia(clean);
+          if (local && (local.startsWith('../media/') || local.startsWith('./media/') || local.startsWith('media/'))) {
+            return local;
+          }
+        } catch (e) {}
       }
 
-      // Check if it's a data URI or local blob
-      if (clean.startsWith('data:') || clean.startsWith('blob:')) {
+      // Keep local or data URIs
+      if (clean.startsWith('data:') || clean.startsWith('blob:') || clean.startsWith('./') || clean.startsWith('../')) {
         return clean;
       }
 
-      // Convert Google Drive / lh3 usercontent URLs to requested size
-      try {
-        if (clean.includes('googleusercontent.com') || clean.includes('drive.google.com')) {
-          if (/=[sw]\d+(-c)?/i.test(clean)) {
-            return clean.replace(/=[sw]\d+(-c)?/i, `=${size}`);
-          }
-          if (clean.includes('=s0')) {
-            return clean.replace('=s0', `=${size}`);
-          }
-          // If googleusercontent without sizing suffix
-          if (clean.includes('googleusercontent.com')) {
-            const sep = clean.includes('?') ? '&' : '=';
-            return `${clean}${sep}${size}`;
-          }
+      // Convert Google Drive share/view URLs to direct Google UserContent images
+      const driveMatch = clean.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/);
+      if (driveMatch && driveMatch[1]) {
+        return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=${size}`;
+      }
+
+      // Convert standard googleusercontent sizing
+      if (clean.includes('googleusercontent.com')) {
+        if (/=[sw]\d+(-c)?/i.test(clean)) {
+          return clean.replace(/=[sw]\d+(-c)?/i, `=${size}`);
         }
-      } catch (e) {
-        return clean;
+        if (clean.includes('=s0')) {
+          return clean.replace('=s0', `=${size}`);
+        }
+        const sep = clean.includes('?') ? '&' : '=';
+        return `${clean}${sep}${size}`;
       }
 
       return clean;
@@ -1393,7 +1450,6 @@
       const target = document.getElementById('enlargedImageTarget');
       const capEl = document.getElementById('enlargedImageCaption');
       if (!modal || !target) return;
-      // Fetch full s1000 image for lightbox zoom
       target.src = formatImageUrl(src, 's1000');
       if (capEl) capEl.textContent = caption || 'High-Resolution Specimen View';
       modal.classList.remove('hidden');
@@ -1433,7 +1489,6 @@
       }
     };
 
-    // Render Specimen Card: uses S200 thumbnail download size and day/night background (bg-white dark:bg-slate-950)
     function renderCard(item, isBanknote = false) {
       const icon = getIcon(item);
       const badgeClass = getBadgeClass(item.Composition, item.Category);
@@ -1446,7 +1501,7 @@
       const fallbackFront = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
       const fallbackRear = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
 
-      // S200 for item cards
+      // Uses S200 for catalogue view
       const displayFront = rawFront ? resolveMediaUrl(rawFront, 's200') : fallbackFront;
       const displayRear = rawRear ? resolveMediaUrl(rawRear, 's200') : fallbackRear;
 
@@ -1528,7 +1583,6 @@
       `;
     }
 
-    // GALLERY CARD RENDERER
     function renderGalleryItemCard(item, side, imgUrl, isNote) {
       const safeDenom = item.Denomination || item.ID || 'Specimen';
       const sideLabel = side === 'obverse' ? 'Front (Obverse)' : 'Rear (Reverse)';
@@ -1574,7 +1628,6 @@
       `;
     }
 
-    // Render Gallery View (Coins 6 cols, Banknotes 4 cols)
     function renderGalleryView() {
       const q = (document.getElementById('currencySearchInput')?.value || '').toLowerCase().trim();
 
@@ -1608,7 +1661,6 @@
       };
 
       const filtered = currencyItems.filter(filterFn);
-
       const coinCardsHtml = [];
       const noteCardsHtml = [];
 
@@ -1672,7 +1724,6 @@
         }
       });
 
-      // Show/Hide Export Button only in Collections filter
       const btnExport = document.getElementById('btnExportCollection');
       if (btnExport) {
         if (filterKey === 'my-collection' || filterKey === 'my-wishlist') {
@@ -1752,7 +1803,7 @@
       const decCoins = currencyItems.filter(i => (i.Category || '').includes('First Decimal Coinage') && !isSpecial(i) && filterFn(i));
       const currCoins = currencyItems.filter(i => (i.Category || '').includes('Current Circulating Coinage') && !isSpecial(i) && filterFn(i));
       
-      // Individual Banknote Series
+      // Notes
       const notesS1 = currencyItems.filter(i => (i.Category || '').includes('Series 1') && !isSpecial(i) && filterFn(i));
       const notesS2 = currencyItems.filter(i => (i.Category || '').includes('Series 2') && !isSpecial(i) && filterFn(i));
       const notesS3 = currencyItems.filter(i => (i.Category || '').includes('Series 3') && !isSpecial(i) && filterFn(i));
@@ -1796,7 +1847,7 @@
       }
     }
 
-    // Detail Modal: uses full resolution s1000 and day/night adaptive background (bg-white dark:bg-slate-950)
+    // Detail Modal with full s1000 resolution
     function openDetailModal(uniqueId) {
       const item = currencyItems.find(i => i._uid === uniqueId);
       if (!item) return;
@@ -1820,7 +1871,6 @@
         const fallbackFront = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
         const fallbackRear = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
 
-        // Full s1000 size for detail lightbox
         const frontImg = rawFront ? resolveMediaUrl(rawFront, 's1000') : fallbackFront;
         const rearImg = rawRear ? resolveMediaUrl(rawRear, 's1000') : fallbackRear;
         const safeDenom = item.Denomination || item.ID || 'Item';
@@ -1830,7 +1880,6 @@
         content.innerHTML = `
           ${hasRear ? `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Day mode white background, Night mode black background -->
             <div class="${isBanknote ? 'h-52' : 'h-48'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-200 dark:border-slate-800 shadow-inner group">
               <img src="${frontImg}" alt="${safeDenom} Front" class="img-zoom-cursor max-w-full max-h-36 object-contain drop-shadow-md hover:scale-105 transition-transform" onclick="enlargeImage('${frontImg}', '${safeDenom} — Front (Obverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
               <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2">Front (Obverse) • 🔍 Click to enlarge</span>
@@ -1944,6 +1993,7 @@
       if (modal) modal.classList.add('hidden');
     }
 
+    // Handles both unified multi-section CSVs and flat single-table catalogue CSVs
     function parseUnifiedCsv(text) {
       const sections = {
         metadata: '',
@@ -1954,42 +2004,49 @@
         f3Decimal: ''
       };
 
-      const lines = text.split(/\r?\n/);
-      let currentSec = null;
-      let currentBuffer = [];
+      const hasSections = text.includes('[SECTION_CATALOGUE_METADATA]') || text.includes('[SECTION_MINTAGES_');
 
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('[SECTION_CATALOGUE_METADATA]')) {
-          if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-          currentSec = 'metadata'; currentBuffer = [];
-        } else if (trimmed.startsWith('[SECTION_MINTAGES_PREDECIMAL]')) {
-          if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-          currentSec = 'predecimal'; currentBuffer = [];
-        } else if (trimmed.startsWith('[SECTION_MINTAGES_DECIMAL]')) {
-          if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-          currentSec = 'decimal'; currentBuffer = [];
-        } else if (trimmed.startsWith('[SECTION_BANKNOTE_PRINT_RUNS]')) {
-          if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-          currentSec = 'banknoteRuns'; currentBuffer = [];
-        } else if (trimmed.startsWith('[SECTION_CIRCULATION_F3_LSD]')) {
-          if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-          currentSec = 'f3Lsd'; currentBuffer = [];
-        } else if (trimmed.startsWith('[SECTION_CIRCULATION_F3_DECIMAL]')) {
-          if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-          currentSec = 'f3Decimal'; currentBuffer = [];
-        } else {
-          currentBuffer.push(line);
+      if (!hasSections) {
+        // Flat standard single-sheet CSV fallback
+        sections.metadata = text;
+      } else {
+        const lines = text.split(/\r?\n/);
+        let currentSec = null;
+        let currentBuffer = [];
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('[SECTION_CATALOGUE_METADATA]')) {
+            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+            currentSec = 'metadata'; currentBuffer = [];
+          } else if (trimmed.startsWith('[SECTION_MINTAGES_PREDECIMAL]')) {
+            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+            currentSec = 'predecimal'; currentBuffer = [];
+          } else if (trimmed.startsWith('[SECTION_MINTAGES_DECIMAL]')) {
+            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+            currentSec = 'decimal'; currentBuffer = [];
+          } else if (trimmed.startsWith('[SECTION_BANKNOTE_PRINT_RUNS]')) {
+            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+            currentSec = 'banknoteRuns'; currentBuffer = [];
+          } else if (trimmed.startsWith('[SECTION_CIRCULATION_F3_LSD]')) {
+            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+            currentSec = 'f3Lsd'; currentBuffer = [];
+          } else if (trimmed.startsWith('[SECTION_CIRCULATION_F3_DECIMAL]')) {
+            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+            currentSec = 'f3Decimal'; currentBuffer = [];
+          } else {
+            currentBuffer.push(line);
+          }
         }
+        if (currentSec) sections[currentSec] = currentBuffer.join('\n');
       }
-      if (currentSec) sections[currentSec] = currentBuffer.join('\n');
 
       if (sections.metadata) {
         const pMeta = Papa.parse(sections.metadata, { header: true, skipEmptyLines: true });
         currencyItems = (pMeta.data || []).map((r, idx) => ({
           ...r,
           _uid: `${r.ID || 'item'}_${idx}`
-        })).filter(r => (r.ID && r.ID.trim().length > 0) || (r.Denomination && r.Denomination.trim().length > 0));
+        })).filter(r => (r.ID && String(r.ID).trim().length > 0) || (r.Denomination && String(r.Denomination).trim().length > 0));
       }
 
       if (sections.predecimal) {
@@ -2011,7 +2068,6 @@
       loadUserCollection();
     }
 
-    // Dynamic Year Mintage Explorer
     window.setMintageExplorerYear = function(year) {
       const input = document.getElementById('mintageYearInput');
       if (input) input.value = year;
@@ -2109,7 +2165,6 @@
       if (totalSumEl) totalSumEl.textContent = sum.toLocaleString();
     }
 
-    // Dynamic Banknotes in Public Hands Explorer (Table F3)
     window.setF3ExplorerYear = function(year) {
       const input = document.getElementById('f3YearInput');
       if (input) input.value = year;
@@ -2227,7 +2282,6 @@
       }
     }
 
-    // Statistical Dashboard Render Engine
     let chartPreDecInst = null;
     let chartDecInst = null;
     let chartGovInst = null;
@@ -2267,10 +2321,15 @@
       const latestCircThousand = latestF3 ? Number(latestF3.Total_All_Notes_Thousands) || 0 : 0;
       const latestCircFormatted = `${(latestCircThousand / 1000).toFixed(2)} Million Notes`;
 
-      document.getElementById('statPreDecimalTotal').textContent = preDecGrandTotal.toLocaleString();
-      document.getElementById('statDecimalTotal').textContent = decGrandTotal.toLocaleString();
-      document.getElementById('statPolymerNotesTotal').textContent = polymerNotesTotal.toLocaleString();
-      document.getElementById('statPublicCirculationTotal').textContent = latestCircFormatted;
+      const elPre = document.getElementById('statPreDecimalTotal');
+      const elDec = document.getElementById('statDecimalTotal');
+      const elPoly = document.getElementById('statPolymerNotesTotal');
+      const elCirc = document.getElementById('statPublicCirculationTotal');
+
+      if (elPre) elPre.textContent = preDecGrandTotal.toLocaleString();
+      if (elDec) elDec.textContent = decGrandTotal.toLocaleString();
+      if (elPoly) elPoly.textContent = polymerNotesTotal.toLocaleString();
+      if (elCirc) elCirc.textContent = latestCircFormatted;
 
       updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
       updateF3CirculationBreakdown(Number(document.getElementById('f3YearInput')?.value || 1977));
@@ -2280,7 +2339,6 @@
       const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
 
       if (window.Chart) {
-        // Chart 1: Pre-Decimal
         const ctxPre = document.getElementById('chartPreDecimalDenoms')?.getContext('2d');
         if (ctxPre) {
           if (chartPreDecInst) chartPreDecInst.destroy();
@@ -2307,7 +2365,6 @@
           });
         }
 
-        // Chart 2: Decimal
         const ctxDec = document.getElementById('chartDecimalDenoms')?.getContext('2d');
         if (ctxDec) {
           if (chartDecInst) chartDecInst.destroy();
@@ -2334,7 +2391,6 @@
           });
         }
 
-        // Chart 3: Banknote Governor Runs
         const ctxGov = document.getElementById('chartGovernorRuns')?.getContext('2d');
         if (ctxGov) {
           if (chartGovInst) chartGovInst.destroy();
@@ -2358,7 +2414,6 @@
           });
         }
 
-        // Chart 4: Circulation Trend
         const ctxCirc = document.getElementById('chartCirculationTrend')?.getContext('2d');
         if (ctxCirc) {
           if (chartCircInst) chartCircInst.destroy();
@@ -2403,7 +2458,7 @@
         { year: 1940, denom: 'Half Crown (2/6)', mintage: 100800, status: 'Semi-Key Date', notes: '1940 Centennial issue' },
         { year: 1944, denom: 'Florin (2/-)', mintage: 140000, status: 'Key Date', notes: 'Wartime production allocation' },
         { year: 1963, denom: 'Florin (2/-)', mintage: 100000, status: 'Key Date', notes: 'Late pre-decimal low production' },
-        { year: '1967–1982', denom: '$50 Banknote', mintage: 0, status: 'Denomination Absent', notes: 'No $50 notes existed in decimal series prior to 1983; introduced in Series 4 to bridge the gap between $20 and $100' },
+        { year: '1967–1982', denom: '$50 Banknote', mintage: 0, status: 'Denomination Absent', notes: 'No $50 notes existed in decimal series prior to 1983; introduced in Series 4' },
         { year: 2005, denom: '50 Cents (50c)', mintage: 1000000, status: 'Decimal Key Date', notes: 'Last large cupronickel 50c piece issued before 2006 resize' },
         { year: 2015, denom: '50 Cents (Anzac)', mintage: 1000000, status: 'Commemorative Issue', notes: 'First coloured circulating coin released in New Zealand' },
         { year: 2018, denom: '50 Cents (Armistice)', mintage: 1600000, status: 'Commemorative Issue', notes: 'Centenary of the 1918 Armistice with red poppy motif' }
@@ -2441,51 +2496,83 @@
       }
     }
 
+    // Resilient data loading routine with multi-path resolution
     async function loadCurrencyData(forceRefresh = false) {
+      const statsCounter = document.getElementById('currencyStatsCounter');
+      if (statsCounter) statsCounter.textContent = 'Loading database...';
+
       try {
         if (!forceRefresh) {
           const cached = localStorage.getItem(CACHE_KEY_RAW);
           const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
-          if (cached && cached.includes('[SECTION_') && window.Papa) {
+          if (cached && (cached.includes('[SECTION_') || cached.includes('Denomination') || cached.includes('ID'))) {
             parseUnifiedCsv(cached);
             renderCurrentView();
             if (cachedTime && (Date.now() - Number(cachedTime) < CACHE_TTL_MS)) return;
           }
         }
       } catch (e) {
-        console.warn('Cache error:', e);
+        console.warn('Cache check notice:', e);
       }
 
       let text = '';
-      const localCandidates = ['currency.csv', '../data/currency.csv', './data/currency.csv', 'data/currency.csv'];
+      
+      // Try local candidate paths
+      const localCandidates = [
+        'currency.csv',
+        './currency.csv',
+        'data/currency.csv',
+        './data/currency.csv',
+        '../data/currency.csv',
+        '../currency.csv'
+      ];
+
       for (const p of localCandidates) {
         try {
           const res = await fetch(p);
           if (res.ok) {
             const t = await res.text();
-            if (t.includes('[SECTION_') || t.includes('pre_halfpenny')) {
-              text = t; break;
+            if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('pre_halfpenny') || t.includes('Category'))) {
+              text = t;
+              break;
             }
           }
         } catch (e) {}
       }
 
+      // If local files not present (e.g. GitHub Pages remote), fetch directly from Google Docs
       if (!text) {
         try {
           const res = await fetch(GOOGLE_CSV_URL);
-          if (res.ok) text = await res.text();
-        } catch (e) {
-          console.warn('Online fetch error:', e);
+          if (res.ok) {
+            text = await res.text();
+          }
+        } catch (onlineErr) {
+          console.warn('Direct Google Sheet fetch failed, testing CORS proxy...', onlineErr);
+          // Fallback via CORS proxy if direct cross-origin request is blocked
+          try {
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_CSV_URL)}`;
+            const resProxy = await fetch(proxyUrl);
+            if (resProxy.ok) {
+              text = await resProxy.text();
+            }
+          } catch (proxyErr) {
+            console.warn('Proxy fetch failed:', proxyErr);
+          }
         }
       }
 
-      if (text && window.Papa) {
+      if (text) {
         try {
           localStorage.setItem(CACHE_KEY_RAW, text);
           localStorage.setItem(CACHE_KEY_TIME, Date.now());
         } catch (e) {}
         parseUnifiedCsv(text);
         renderCurrentView();
+      } else {
+        if (statsCounter) {
+          statsCounter.innerHTML = `<span class="text-rose-500">⚠️ Unable to load database.</span> <button onclick="loadCurrencyData(true)" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry</button>`;
+        }
       }
     }
 
