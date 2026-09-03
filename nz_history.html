@@ -167,17 +167,24 @@
       flex-direction: column;
     }
     .history-card-img-wrap {
+      display: block;
       width: 100%;
       height: 200px;
       background: #0f172a;
       position: relative;
       overflow: hidden;
+      text-decoration: none;
+      cursor: pointer;
     }
     .history-card-img-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.25s ease;
+    }
+    .history-card-img-wrap:hover img {
+      transform: scale(1.05);
     }
     .history-card-badge-row {
       position: absolute;
@@ -187,6 +194,23 @@
       display: flex;
       justify-content: space-between;
       pointer-events: none;
+    }
+    .enlarge-overlay-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .category-pill {
       background: rgba(15, 23, 42, 0.9);
@@ -268,6 +292,26 @@
       gap: 8px;
       border-top: 1px solid #f1f5f9;
       padding-top: 12px;
+    }
+    .btn-enlarge-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #f0f9ff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-enlarge-img:hover {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0284c7;
     }
     .btn-google-ai {
       display: flex;
@@ -405,7 +449,7 @@
 
     /* --- MUSEUM PILL: BLUE & MOVED TO FAR RIGHT --- */
     .museum-pill-btn {
-      margin-left: auto !important; /* Forces the pill all the way to the far right */
+      margin-left: auto !important;
       background: #0284c7 !important;
       border: 1.5px solid #38bdf8 !important;
       color: #ffffff !important;
@@ -617,11 +661,6 @@
         <button id="clearMapSearch" class="clear-search-btn">✕</button>
       </div>
 
-      <!-- Heatmap Toggle -->
-      <button id="btnToggleHeatmap" class="top-action-btn" title="Toggle Historical Density Heatmap">
-        <span>🔥</span> <span>Heatmap</span>
-      </button>
-
       <!-- Basemap Switcher -->
       <div class="layer-switcher-container">
         <button id="btnLayersToggle" class="top-action-btn" title="Change Basemap">
@@ -683,7 +722,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <script>
     // Live Google Sheet CSV Endpoint
@@ -699,7 +737,7 @@
       zoom: NZ_ZOOM,
       minZoom: 4,
       maxBounds: [[-50, 160], [-30, 185]],
-      closePopupOnClick: true // Clicking outside the popup returns you cleanly to where you were on the map
+      closePopupOnClick: true
     });
 
     // Basemaps
@@ -728,7 +766,7 @@
       document.getElementById('layerDropdownCard').classList.remove('show');
     }
 
-    // Clusters & Heatmap layers
+    // Clusters Layer
     const markers = L.markerClusterGroup({
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
@@ -743,8 +781,6 @@
     });
     map.addLayer(markers);
 
-    let heatLayer = null;
-    let isHeatmapActive = false;
     let allEvents = [];
     let globalMinYear = 1280;
     let globalMaxYear = 2026;
@@ -757,12 +793,73 @@
       }[m]));
     }
 
-    // Enforce 500px standard thumbnail width to prevent https://w.wiki/GHai errors
-    function getSafeThumbnail(url) {
+    // --- OPTIMIZED IMAGE RESOLVERS ---
+
+    // Forces s200 thumbnail download from Google/Wikimedia CDNs
+    function getThumbnailUrl(url) {
       if (!url) return '';
-      if (url.includes('upload.wikimedia.org') && url.includes('/thumb/')) {
-        return url.replace(/\/\d+px-/g, '/500px-');
+      url = url.trim();
+
+      // Google UserContent / Google Photos / Blogger
+      if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
+        if (/=s\d+/i.test(url)) {
+          return url.replace(/=s\d+[^?]*/i, '=s200');
+        } else if (/=w\d+/i.test(url)) {
+          return url.replace(/=w\d+[^?]*/i, '=s200');
+        } else if (url.includes('?')) {
+          return url + '&sz=s200';
+        } else {
+          return url + '=s200';
+        }
       }
+
+      // Google Drive shared links
+      if (url.includes('drive.google.com')) {
+        const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (idMatch && idMatch[1]) {
+          return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s200`;
+        }
+      }
+
+      // Wikimedia / Wikipedia thumbnails
+      if (url.includes('upload.wikimedia.org') && url.includes('/thumb/')) {
+        return url.replace(/\/\d+px-/g, '/200px-');
+      }
+
+      return url;
+    }
+
+    // Resolves full-size/original image URL for the enlarge link & new tab
+    function getFullImageUrl(url) {
+      if (!url) return '';
+      url = url.trim();
+
+      // Google UserContent: =s0 requests unconstrained full resolution
+      if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
+        if (/=[sw]\d+/i.test(url)) {
+          return url.replace(/=[sw]\d+[^?]*/i, '=s0');
+        }
+        return url;
+      }
+
+      // Google Drive: direct view link
+      if (url.includes('drive.google.com')) {
+        const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (idMatch && idMatch[1]) {
+          return `https://drive.google.com/uc?id=${idMatch[1]}&export=view`;
+        }
+      }
+
+      // Wikimedia: extract full original image from /thumb/.../.../NNNpx-...
+      if (url.includes('upload.wikimedia.org/wikipedia/') && url.includes('/thumb/')) {
+        const parts = url.split('/thumb/');
+        if (parts.length === 2) {
+          const pathParts = parts[1].split('/');
+          pathParts.pop(); // removes the generated /NNNpx-filename thumbnail segment
+          return parts[0] + '/' + pathParts.join('/');
+        }
+      }
+
       return url;
     }
 
@@ -789,10 +886,9 @@
     function renderDataset(items) {
       markers.clearLayers();
       const markerList = [];
-      const heatPoints = [];
 
-      // Proximity group items to prevent vertical stacking overlap
-      const PROXIMITY_DEG = 0.025; // ~2.5km bucket
+      // Proximity group items to prevent vertical stacking overlap (~2.5km bucket)
+      const PROXIMITY_DEG = 0.025;
       const groups = [];
 
       items.forEach(ev => {
@@ -815,8 +911,6 @@
         grp.items.sort((a, b) => (a.year || 0) - (b.year || 0));
 
         grp.items.forEach((ev, idx) => {
-          heatPoints.push([ev.latitude, ev.longitude, 0.85]);
-
           const safeYear = escapeHTML(ev.year || '');
           const safeDate = escapeHTML(ev.date || ev.year || '');
           const safeHeadline = escapeHTML(ev.headline || 'Untitled Event');
@@ -824,10 +918,11 @@
           const safeCategory = escapeHTML(ev.category || 'History');
           const safeDetails = escapeHTML(ev.details || '');
           
-          // Only show image if URL exists
+          // Image handling: s200 for download & full-res for enlargement
           const rawImg = (ev.image_url || '').trim();
           const hasImage = rawImg.length > 0 && rawImg !== '#';
-          const safeImg = hasImage ? getSafeThumbnail(rawImg) : '';
+          const safeThumbImg = hasImage ? escapeHTML(getThumbnailUrl(rawImg)) : '';
+          const safeFullImg = hasImage ? escapeHTML(getFullImageUrl(rawImg)) : '';
 
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
@@ -855,18 +950,21 @@
             html: markerHTML,
             className: 'history-div-icon',
             iconSize: [210, totalIconHeight],
-            iconAnchor: [105, totalIconHeight] // Pins base of stem directly to ground coordinates
+            iconAnchor: [105, totalIconHeight]
           });
 
-          // POP-UP: Omits image wrapper completely if no image URL
+          // POP-UP: Image wrap links directly to full size + dedicated Enlarge link button
           const popupImageBlock = hasImage ? `
-            <div class="history-card-img-wrap">
-              <img src="${safeImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
+            <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to open full-size image in new window">
+              <img src="${safeThumbImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
               <div class="history-card-badge-row">
                 <span class="category-pill">${safeCategory}</span>
                 <span class="date-pill">${safeDate}</span>
               </div>
-            </div>
+              <div class="enlarge-overlay-badge">
+                <span>🔍 Full Size</span>
+              </div>
+            </a>
           ` : `
             <div class="history-card-no-img-header">
               <span class="category-pill-inline">${safeCategory}</span>
@@ -885,6 +983,11 @@
                 </div>
                 <p class="history-card-desc">${safeDetails}</p>
                 <div class="history-card-footer">
+                  ${hasImage ? `
+                    <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="btn-enlarge-img">
+                      <span>🔍</span> Enlarge Full-Size Image ↗
+                    </a>
+                  ` : ''}
                   <a href="${googleAiSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai">
                     <span>✨</span> Ask Google AI Overview ↗
                   </a>
@@ -919,20 +1022,6 @@
       });
 
       markers.addLayers(markerList);
-
-      // Update Heatmap
-      if (heatLayer) {
-        heatLayer.setLatLngs(heatPoints);
-      } else if (typeof L.heatLayer === 'function') {
-        heatLayer = L.heatLayer(heatPoints, {
-          radius: 28,
-          blur: 18,
-          maxZoom: 9,
-          gradient: { 0.3: '#0284c7', 0.65: '#f59e0b', 1.0: '#dc2626' }
-        });
-        if (isHeatmapActive) heatLayer.addTo(map);
-      }
-
       document.getElementById('itemCountBadge').textContent = `${items.length} event${items.length === 1 ? '' : 's'}`;
     }
 
@@ -992,10 +1081,8 @@
         btn.textContent = '⏸';
         btn.classList.add('playing');
 
-        // Retain minSlider at earliest year so previous history stays visible
         minSlider.value = globalMinYear;
 
-        // Start playback stepping forward from 1800
         let currentMax = parseInt(maxSlider.value, 10);
         if (currentMax >= globalMaxYear || currentMax < 1800) {
           maxSlider.value = 1800;
@@ -1011,21 +1098,6 @@
             filterEvents();
           }
         }, 260);
-      }
-    }
-
-    // Toggle Heatmap
-    function toggleHeatmap() {
-      const btn = document.getElementById('btnToggleHeatmap');
-      isHeatmapActive = !isHeatmapActive;
-      btn.classList.toggle('active', isHeatmapActive);
-
-      if (heatLayer) {
-        if (isHeatmapActive) {
-          map.addLayer(heatLayer);
-        } else {
-          map.removeLayer(heatLayer);
-        }
       }
     }
 
@@ -1050,7 +1122,6 @@
       filterEvents();
     }
 
-    // Flexible column locator to guarantee parsing across any CSV format
     function getCol(row, aliases) {
       for (const key of Object.keys(row)) {
         const clean = key.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1103,14 +1174,12 @@
       let csvText = null;
       let usedCache = false;
 
-      // 1. Attempt to fetch live Google Sheet CSV
       try {
         const res = await fetch(LIVE_CSV_URL, { cache: 'no-cache' });
         if (res.ok) {
           const fetchedText = await res.text();
           if (fetchedText && fetchedText.trim().length > 50) {
             csvText = fetchedText;
-            // Update localStorage cache with latest data
             try {
               localStorage.setItem(CACHE_STORAGE_KEY, fetchedText);
             } catch (storageErr) {
@@ -1122,7 +1191,6 @@
         console.warn('Live Google Sheet fetch failed, switching to cache:', networkErr);
       }
 
-      // 2. Fallback to localStorage cache if live fetch failed
       if (!csvText || csvText.trim().length < 50) {
         try {
           const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
@@ -1136,7 +1204,6 @@
         }
       }
 
-      // 3. Render or display offline status
       if (csvText && csvText.trim().length > 50) {
         parseCSVData(csvText);
         if (usedCache) {
@@ -1153,7 +1220,6 @@
       document.getElementById('minYearSlider').addEventListener('input', filterEvents);
       document.getElementById('maxYearSlider').addEventListener('input', filterEvents);
       document.getElementById('btnPlayTimeline').addEventListener('click', toggleTimelinePlayback);
-      document.getElementById('btnToggleHeatmap').addEventListener('click', toggleHeatmap);
 
       document.getElementById('btnFitNZ').addEventListener('click', () => {
         if (markers.getLayers().length > 0) {
