@@ -34,7 +34,7 @@
   <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.tailwind) {
-      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+      document.write('<script src="../vendor/tailwind.js"><\/script>');
     }
   </script>
   <script>
@@ -88,7 +88,7 @@
   <script type="module" src="vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
   <script type="module">
     if (!customElements.get('model-viewer')) {
-      import('https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js');
+      import('../vendor/model-viewer.min.js');
     }
   </script>
 
