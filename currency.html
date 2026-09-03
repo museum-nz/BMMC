@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -25,19 +24,12 @@
   <!-- Preconnects -->
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
 
-  <!-- PapaParse with Multi-tier Fallback (Local root, Parent dir, CDN) -->
-  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;this.src='../vendor/papaparse.min.js';this.onerror=function(){this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js';};"></script>
-
-  <!-- Chart.js with Multi-tier Fallback -->
-  <script src="vendor/chart.umd.min.js" onerror="this.onerror=null;this.src='../vendor/chart.umd.min.js';this.onerror=function(){this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';};"></script>
-
-  <!-- Tailwind CSS Engine & Preset Config -->
+  <!-- Resilient Dynamic Script Loader (Works offline and online on GitHub Pages) -->
   <script>
     window.tailwind = {
       darkMode: 'class',
@@ -55,8 +47,31 @@
         }
       }
     };
+
+    function loadScriptChain(sources, onComplete) {
+      let idx = 0;
+      function next() {
+        if (idx >= sources.length) {
+          if (onComplete) onComplete(false);
+          return;
+        }
+        const src = sources[idx++];
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = () => { if (onComplete) onComplete(true); };
+        s.onerror = () => { s.remove(); next(); };
+        document.head.appendChild(s);
+      }
+      next();
+    }
+
+    // Load Tailwind CSS (local root -> parent -> CDN)
+    loadScriptChain(['vendor/tailwind.js', '../vendor/tailwind.js', 'https://cdn.tailwindcss.com']);
+    // Load PapaParse
+    loadScriptChain(['vendor/papaparse.min.js', '../vendor/papaparse.min.js', 'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js']);
+    // Load Chart.js
+    loadScriptChain(['vendor/chart.umd.min.js', '../vendor/chart.umd.min.js', 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js']);
   </script>
-  <script src="vendor/tailwind.js" onerror="this.onerror=null;this.src='../vendor/tailwind.js';this.onerror=function(){this.onerror=null;this.src='https://cdn.tailwindcss.com';};"></script>
 
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
 
@@ -143,8 +158,6 @@
   <!-- Header -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90 dark:bg-slate-900/90">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5">
-      
-      <!-- Top Row -->
       <div class="flex items-center justify-between gap-2">
         <a href="index.html" class="group flex items-center gap-2 shrink-0">
           <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow">🪙</span>
@@ -178,7 +191,7 @@
             <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
           </a>
 
-          <!-- Utility Pill -->
+          <!-- Utility Controls -->
           <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm divide-x divide-slate-200 dark:divide-slate-700 shrink-0">
             <button id="btnThemeToggle" title="Toggle Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
@@ -196,7 +209,7 @@
       <!-- Collapsible Controls Bar -->
       <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
         
-        <!-- Category Filters -->
+        <!-- Filter Tabs -->
         <div id="catalogueFilterBar" class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar py-0.5" role="tablist">
           <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer shrink-0">
             🌐 Show All
@@ -213,7 +226,6 @@
 
           <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
 
-          <!-- Banknote Series Filters -->
           <button id="filterBtnS1Notes" onclick="setCategoryFilter('banknotes-s1')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
             📜 Series 1 (1934)
           </button>
@@ -236,7 +248,6 @@
             🎖️ Commemorative
           </button>
 
-          <!-- Collector Inventory Filters -->
           <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
           <button id="filterBtnCollection" onclick="setCategoryFilter('my-collection')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 cursor-pointer shrink-0 flex items-center gap-1">
             <span>🎒</span> My Collection (<span id="collectionCountBadge">0</span>)
@@ -306,7 +317,7 @@
           </p>
         </div>
 
-        <!-- Live Collection Progress Indicator in Banner -->
+        <!-- Collection Progress Pill -->
         <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-xs shrink-0 self-stretch md:self-auto flex flex-col justify-center">
           <div class="flex items-center justify-between gap-3 mb-1">
             <span class="font-black text-amber-300">🎒 Collector Inventory</span>
@@ -326,7 +337,6 @@
       
       <!-- Historical Context & 1967 Decimal Converter -->
       <section id="history-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        
         <div class="lg:col-span-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between">
           <div>
             <div class="flex items-center gap-2.5 mb-3">
@@ -394,10 +404,9 @@
             Conversion: £1 = $2.00 | 1s = 10c | 1d = 5/6c
           </div>
         </div>
-
       </section>
 
-      <!-- Pre-Decimal Coins (1933–1967) -->
+      <!-- Pre-Decimal Coins Section -->
       <section id="pre-decimal-coins-section" class="currency-group-section space-y-4">
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div class="flex items-center gap-3">
@@ -412,7 +421,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="preDecimalCoinGrid"></div>
       </section>
 
-      <!-- Decimal Coins (1967–2006) -->
+      <!-- Decimal Coins Section (1967–2006) -->
       <section id="decimal-coins-section" class="currency-group-section space-y-4">
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div class="flex items-center gap-3">
@@ -427,14 +436,14 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="decimal1967CoinGrid"></div>
       </section>
 
-      <!-- Current Coins (2006–Present) -->
+      <!-- Current Coins Section (2006–Present) -->
       <section id="current-coins-section" class="currency-group-section space-y-4">
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div class="flex items-center gap-3">
             <span class="text-2xl">✨</span>
             <div>
               <h3 class="text-lg font-black text-slate-900 dark:text-white">Current Circulating Coinage (2006–Present)</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Lightweight plated-steel 10c–50c coins (2006) and aluminium-bronze $1 &amp; $2 coins (1991)</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Plated-steel 10c–50c coins (2006) and aluminium-bronze $1 &amp; $2 coins (1991)</p>
             </div>
           </div>
           <span class="coin-badge badge-gold text-xs">Active Legal Tender</span>
@@ -442,248 +451,96 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="currentCoinGrid"></div>
       </section>
 
-      <!-- SERIES 1: 1934–1940 -->
+      <!-- Banknote Sections (Series 1–7) -->
       <section id="banknotes-s1-section" class="currency-group-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>📜</span> Series 1 Banknotes (1934–1940)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              <strong>Series 1:</strong> Issued on 1 August 1934 (denominated in pounds, shillings, and pence; portrait of King Tāwhiao).
-            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Denominated in £sd with portrait of King Tāwhiao</p>
           </div>
           <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £50</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries1Grid"></div>
       </section>
 
-      <!-- SERIES 2: 1940–1967 -->
       <section id="banknotes-s2-section" class="currency-group-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>📜</span> Series 2 Banknotes (1940–1967)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              <strong>Series 2:</strong> Issued on 6 February 1940 (commemorating the centenary of the Treaty of Waitangi; King George VI in naval uniform).
-            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Centenary of the Treaty of Waitangi; King George VI in naval uniform</p>
           </div>
           <span class="coin-badge badge-silver text-[10px]">10/-, £1, £5, £10, £50</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries2Grid"></div>
       </section>
 
-      <!-- SERIES 3: 1967–1981 -->
       <section id="banknotes-s3-section" class="currency-group-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>🦜</span> Series 3 Decimal Paper Banknotes (1967–1981)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              <strong>Series 3:</strong> Introduced on 10 July 1967 (marking the switch to decimal currency in dollars; Queen Elizabeth II &amp; native birds).
-            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">First decimal notes; Queen Elizabeth II &amp; native birds</p>
           </div>
           <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $100</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries3Grid"></div>
       </section>
 
-      <!-- SERIES 4: 1981–1992 -->
       <section id="banknotes-s4-section" class="currency-group-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>🦜</span> Series 4 Decimal Paper Banknotes (1981–1992)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              <strong>Series 4:</strong> Issued from 1981 to 1991/1992 (minor updates, printer change to Bradbury Wilkinson, forward-facing QEII portrait, and $50 introduction in 1983).
-            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Bradbury Wilkinson printing, forward-facing QEII, and $50 introduction in 1983</p>
           </div>
           <span class="coin-badge badge-cupro text-[10px]">$1, $2, $5, $10, $20, $50, $100</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries4Grid"></div>
       </section>
 
-      <!-- SERIES 5 & 6 TRANSITION -->
-      <section id="sectionSeries5vs6Comparison" class="bg-gradient-to-br from-indigo-950/90 via-slate-900 to-slate-950 text-white rounded-3xl p-6 border border-indigo-500/30 shadow-xl space-y-4">
-        <div class="flex items-center gap-2.5 border-b border-indigo-500/20 pb-3">
-          <span class="text-2xl p-2 bg-indigo-500/20 text-indigo-300 rounded-2xl border border-indigo-500/30">📋</span>
-          <div>
-            <h3 class="text-base font-black text-indigo-300">Series 5 (Paper) vs. Series 6 (Polymer) Banknote Transition</h3>
-            <p class="text-xs text-slate-400">Comparing substrate material, transparent security windows, and tactile ink innovations</p>
-          </div>
-        </div>
-
-        <p class="text-xs text-slate-300 leading-relaxed font-normal">
-          <strong>Series 5:</strong> Issued from 1992 to 1999 (redesigned with native New Zealand flora, fauna, and historical figures on cotton paper).<br/>
-          <strong>Series 6:</strong> Issued from 1999 to 2014 (transitioned from paper to flexible plastic polymer material with transparent windows while maintaining identical portrait artwork).
-        </p>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="border-b border-indigo-500/30 text-indigo-300 font-extrabold uppercase text-[10px]">
-                <th class="py-2.5 px-3">Feature</th>
-                <th class="py-2.5 px-3 text-amber-300">Series 5 (1992–1999)</th>
-                <th class="py-2.5 px-3 text-emerald-300">Series 6 (1999–2014)</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800 text-slate-300 text-xs">
-              <tr class="hover:bg-slate-800/40 transition">
-                <td class="py-2.5 px-3 font-bold text-white">Substrate Material</td>
-                <td class="py-2.5 px-3 text-amber-200">Cotton-based banknote paper</td>
-                <td class="py-2.5 px-3 text-emerald-200 font-semibold">Flexible plastic polymer (Guardian substrate)</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40 transition">
-                <td class="py-2.5 px-3 font-bold text-white">Transparent Windows</td>
-                <td class="py-2.5 px-3 text-amber-200">None (solid opaque paper note)</td>
-                <td class="py-2.5 px-3 text-emerald-200 font-semibold">Two transparent windows (one oval, one fern-shaped)</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40 transition">
-                <td class="py-2.5 px-3 font-bold text-white">Durability &amp; Cleanliness</td>
-                <td class="py-2.5 px-3 text-amber-200">Tore easily, absorbed dirt, and degraded when wet</td>
-                <td class="py-2.5 px-3 text-emerald-200 font-semibold">Waterproof, difficult to tear, and significantly cleaner</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40 transition">
-                <td class="py-2.5 px-3 font-bold text-white">Embossing &amp; Feel</td>
-                <td class="py-2.5 px-3 text-amber-200">Standard paper intaglio printing</td>
-                <td class="py-2.5 px-3 text-emerald-200 font-semibold">Raised ink intaglio (enhanced tactile identification)</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40 transition">
-                <td class="py-2.5 px-3 font-bold text-white">Watermark / Shadow Image</td>
-                <td class="py-2.5 px-3 text-amber-200">Traditional watermark embedded in the paper</td>
-                <td class="py-2.5 px-3 text-emerald-200 font-semibold">A shadow image of Queen Elizabeth II next to the oval window</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- SERIES 5 & 6 BANKNOTE SPECIMENS -->
       <section id="banknotes-s56-section" class="currency-group-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>💎</span> Series 5 &amp; 6 Banknotes (1992–2014)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              Notable New Zealanders (Hillary, Sheppard, Ngata, Rutherford) and Queen Elizabeth II paired with native birds.
-            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders (Hillary, Sheppard, Ngata, Rutherford) &amp; polymer introduction</p>
           </div>
           <span class="coin-badge badge-polymer text-[10px]">$5, $10, $20, $50, $100</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries56Grid"></div>
       </section>
 
-      <!-- SERIES 7: 2015–PRESENT -->
       <section id="banknotes-s7-section" class="currency-group-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>🌟</span> Series 7 "Brighter Money" Banknotes (2015–Present)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              <strong>Series 7:</strong> Introduced starting in 2015 (the current "Brighter Money" polymer series with larger holographic windows and metallic colour-changing birds).
-            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Current circulating series with holographic windows and metallic colour-changing birds</p>
           </div>
           <span class="coin-badge badge-polymer text-[10px]">Active Legal Tender</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="banknotesSeries7Grid"></div>
       </section>
 
-      <!-- Special & Commemorative -->
       <section id="special-issues-section" class="currency-group-section space-y-4">
         <div class="flex items-center justify-between border-b border-purple-300 dark:border-purple-800 pb-2">
           <div>
             <h3 class="text-base sm:text-lg font-black text-purple-900 dark:text-purple-300 flex items-center gap-2">
               <span>🎖️</span> Special, Commemorative &amp; Future Issues
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Coloured commemorative circulating coins (ANZAC, Armistice), commemorative notes, and upcoming King Charles III effigies</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Coloured commemorative circulating coins (ANZAC, Armistice) and King Charles III issues</p>
           </div>
           <span class="coin-badge badge-special text-[10px]">Commemorative &amp; Future</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="specialItemsGrid"></div>
-      </section>
-
-      <!-- Monarchs section -->
-      <section id="sectionMonarchs" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-amber-500/30 p-6 shadow-sm space-y-4">
-        <div class="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3">
-          <span class="text-2xl p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-2xl border border-amber-200 dark:border-amber-900/60">👑</span>
-          <div>
-            <h3 class="text-base font-black text-slate-900 dark:text-white">Crown Heads &amp; Monarchical Effigies on NZ Currency</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Historical record of royal portraits featured across circulating coins and Reserve Bank banknotes</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-amber-700 dark:text-amber-400 text-xs uppercase tracking-wider">King George V (1910–1936)</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">1933–1935 Coins</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Sculptor:</strong> Percy Metcalfe.<br/>
-              <strong>Design:</strong> Crowned bust facing left wearing the Imperial Crown and the Robe of State with the Collar of the Most Honourable Order of the Bath.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-blue-700 dark:text-blue-400 text-xs uppercase tracking-wider">King George VI (1936–1952)</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">1940–1952 Coins &amp; S2 Notes</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Coins Designer:</strong> Thomas Humphrey Paget (T.H. Paget). Uncrowned left-facing portrait on all coins from 1940 to 1952.<br/>
-              <strong>Banknotes Designer:</strong> Bradbury Wilkinson &amp; Co. Portrait in naval uniform on all Series 2 banknotes.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-purple-700 dark:text-purple-400 text-xs uppercase tracking-wider">Queen Elizabeth II — Coinage</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300">1953–2026 Coins</span>
-            </div>
-            <div class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs space-y-1">
-              <p><strong>1st Effigy (1953–1965):</strong> Mary Gillick.</p>
-              <p><strong>2nd Effigy (1967–1985):</strong> Arnold Machin.</p>
-              <p><strong>3rd Effigy (1986–1998):</strong> Raphael Maklouf.</p>
-              <p><strong>4th Effigy (1999–Present):</strong> Ian Rank-Broadley.</p>
-            </div>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-emerald-700 dark:text-emerald-400 text-xs uppercase tracking-wider">Queen Elizabeth II — Banknotes</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">1967–Present Notes</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Series 3 &amp; 4 (1967–1992):</strong> Anthony Buckley portrait of the Queen across all paper denominations ($1 to $100).<br/>
-              <strong>Series 5, 6 &amp; 7 (1992–Present):</strong> Robert Anderson portrait reserved exclusively on the $20 banknote.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-rose-700 dark:text-rose-400 text-xs uppercase tracking-wider">King Charles III (2022–Present)</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">2027+ Coinage</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Sculptor:</strong> Dan Thorne (Royal Canadian Mint). Official uncrowned effigy facing left.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-amber-800 dark:text-yellow-400 text-xs uppercase tracking-wider">King Tāwhiao (2nd Māori King)</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">Series 1 Notes (1934–1940)</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-              <strong>Engraver:</strong> Thomas de la Rue &amp; Co. Huia feather headdress on New Zealand's first national banknotes in 1934.
-            </p>
-          </div>
-        </div>
       </section>
 
     </div>
@@ -700,10 +557,10 @@
             <span class="text-2xl">🪙</span>
             <div>
               <h3 class="text-lg font-black text-slate-900 dark:text-white">Coins Visual Gallery</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Complete obverse &amp; reverse photography displayed across 6 columns (Click any item for details)</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">All obverse &amp; reverse coin photography displayed in 6 columns</p>
             </div>
           </div>
-          <span class="coin-badge badge-gold text-xs">6 Columns Display</span>
+          <span class="coin-badge badge-gold text-xs">6 Columns Grid</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4" id="galleryCoinsGrid"></div>
       </section>
@@ -715,10 +572,10 @@
             <span class="text-2xl">💵</span>
             <div>
               <h3 class="text-lg font-black text-slate-900 dark:text-white">Banknotes Visual Gallery</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Complete front &amp; back banknote engravings displayed across 4 columns (Click any note for details)</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">All front &amp; back banknote engravings displayed in 4 columns</p>
             </div>
           </div>
-          <span class="coin-badge badge-polymer text-xs">4 Columns Display</span>
+          <span class="coin-badge badge-polymer text-xs">4 Columns Grid</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5" id="galleryNotesGrid"></div>
       </section>
@@ -750,70 +607,9 @@
         <div class="p-5 bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
           <span class="text-[10px] uppercase font-extrabold text-slate-400 block mb-1">Active Notes in Public</span>
           <span id="statPublicCirculationTotal" class="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400 font-mono">--</span>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">Table F3 Total Volume (2026)</span>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">Table F3 Total Volume</span>
         </div>
       </div>
-
-      <!-- Key Historical Notes -->
-      <section id="sectionHistoricalNotes" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-amber-500/30 p-6 shadow-sm space-y-4">
-        <div class="flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3">
-          <span class="text-2xl p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-2xl border border-amber-200 dark:border-amber-900/60">📌</span>
-          <div>
-            <h3 class="text-base font-black text-slate-900 dark:text-white">Key Historical &amp; Denomination Notes</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Critical numismatic milestones, decimal changeovers, and coinage reforms</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-amber-700 dark:text-amber-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <span>⏸️</span> 1966 Minting Gap
-              </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">Transition Year</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              No regular circulating coins were dated <strong>1966</strong> in order to deplete remaining pre-decimal stocks and prepare for Decimal Currency Day on <strong>10 July 1967</strong>.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-rose-700 dark:text-rose-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <span>🚫</span> Phase-outs (1c, 2c &amp; 5c)
-              </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">Demonetisation</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong>1c &amp; 2c</strong> coins ceased minting in 1988 and were demonetised on <strong>30 April 1990</strong>. The <strong>5c</strong> piece ceased minting after 2004 and was demonetised on <strong>31 October 2006</strong>.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-blue-700 dark:text-blue-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <span>🥇</span> $1 &amp; $2 Coin Introduction (1990)
-              </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">Banknote Replacement</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              In <strong>1990</strong>, aluminium-bronze $1 (Kiwi) and $2 (Kōtuku) coins were minted to permanently replace the $1 and $2 paper banknotes, entering circulation on <strong>11 February 1991</strong>.
-            </p>
-          </div>
-
-          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-purple-700 dark:text-purple-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <span>⚡</span> 2006 Coinage Reform Surge
-              </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300">Size &amp; Alloy Reform</span>
-            </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              In July 2006, the 10c, 20c, and 50c coins were resized using plated steel, causing an unprecedented single-year surge of <strong>327,000,000</strong> replacement coins.
-            </p>
-          </div>
-        </div>
-      </section>
 
       <!-- Mintage Explorer -->
       <section id="sectionMintageBreakdown" class="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl space-y-4">
@@ -822,11 +618,9 @@
             <span class="text-2xl p-2 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">📊</span>
             <div>
               <h3 id="mintageBreakdownTitle" class="text-base sm:text-lg font-black text-amber-400 flex items-center gap-2">
-                Official 1977 Production Mintage Breakdown
+                Official Production Mintage Breakdown
               </h3>
-              <p id="mintageBreakdownSubtitle" class="text-xs text-slate-400">
-                Archive Reference Table &bull; Inspect historical annual mintings for any year between 1933 and 2026
-              </p>
+              <p class="text-xs text-slate-400">Inspect historical annual mintings for any year between 1933 and 2026</p>
             </div>
           </div>
 
@@ -834,20 +628,16 @@
             <div class="flex items-center bg-slate-800 rounded-xl px-2 py-1 border border-slate-700">
               <span class="text-xs text-slate-400 mr-1.5 font-bold">Year:</span>
               <input type="number" id="mintageYearInput" min="1933" max="2026" value="1977" class="w-16 bg-transparent text-amber-300 font-mono font-black text-sm outline-none" />
-              <button id="btnSearchMintageYear" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-black transition cursor-pointer">
-                Go
-              </button>
+              <button id="btnSearchMintageYear" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-black transition cursor-pointer">Go</button>
             </div>
             
             <div class="flex items-center gap-1">
-              <button onclick="setMintageExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1935</button>
-              <button onclick="setMintageExplorerYear(1940)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1940</button>
-              <button onclick="setMintageExplorerYear(1966)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1966</button>
-              <button onclick="setMintageExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1967</button>
-              <button onclick="setMintageExplorerYear(1977)" class="px-2 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-black transition cursor-pointer">1977</button>
-              <button onclick="setMintageExplorerYear(1990)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1990</button>
-              <button onclick="setMintageExplorerYear(2006)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2006</button>
-              <button onclick="setMintageExplorerYear(2019)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2019</button>
+              <button onclick="setMintageExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1935</button>
+              <button onclick="setMintageExplorerYear(1940)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1940</button>
+              <button onclick="setMintageExplorerYear(1966)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1966</button>
+              <button onclick="setMintageExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1967</button>
+              <button onclick="setMintageExplorerYear(1977)" class="px-2 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-black transition">1977</button>
+              <button onclick="setMintageExplorerYear(2006)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">2006</button>
             </div>
           </div>
         </div>
@@ -855,157 +645,10 @@
         <div id="mintageBreakdownCards" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 text-center text-xs"></div>
 
         <div id="mintageBreakdownFooter" class="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-slate-400 gap-2">
-          <span>Total Coins Struck in Selected Year: <strong id="mintageYearTotalSum" class="text-amber-300 font-mono font-black text-sm">36,500,000</strong></span>
+          <span>Total Coins Struck: <strong id="mintageYearTotalSum" class="text-amber-300 font-mono font-black text-sm">--</strong></span>
           <span id="mintageYearEraNote" class="text-[11px] font-mono text-slate-400">First Decimal Coinage Era (1967–2006)</span>
         </div>
       </section>
-
-      <!-- Circulation Explorer -->
-      <section id="sectionF3CirculationExplorer" class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 border border-indigo-500/30 shadow-xl space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-indigo-500/20 pb-4">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 bg-indigo-500/20 text-indigo-300 rounded-2xl border border-indigo-500/30">💵</span>
-            <div>
-              <h3 id="f3ExplorerTitle" class="text-base sm:text-lg font-black text-indigo-300 flex items-center gap-2">
-                Official 1977 Banknotes in Public Hands (Table F3)
-              </h3>
-              <p class="text-xs text-slate-400">
-                Reserve Bank of New Zealand (RBNZ) records representing physical note volume in thousands
-              </p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2 flex-wrap">
-            <div class="flex items-center bg-slate-800 rounded-xl px-2 py-1 border border-slate-700">
-              <span class="text-xs text-slate-400 mr-1.5 font-bold">Year:</span>
-              <input type="number" id="f3YearInput" min="1935" max="2026" value="1977" class="w-16 bg-transparent text-indigo-300 font-mono font-black text-sm outline-none" />
-              <button id="btnSearchF3Year" class="px-2 py-0.5 bg-indigo-500 hover:bg-indigo-400 text-slate-950 rounded-lg text-xs font-black transition cursor-pointer">
-                Go
-              </button>
-            </div>
-            
-            <div class="flex items-center gap-1">
-              <button onclick="setF3ExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1935</button>
-              <button onclick="setF3ExplorerYear(1945)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1945</button>
-              <button onclick="setF3ExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1967</button>
-              <button onclick="setF3ExplorerYear(1968)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1968</button>
-              <button onclick="setF3ExplorerYear(1977)" class="px-2 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black transition cursor-pointer">1977</button>
-              <button onclick="setF3ExplorerYear(1990)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1990</button>
-              <button onclick="setF3ExplorerYear(2000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2000</button>
-              <button onclick="setF3ExplorerYear(2026)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2026</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="f3BreakdownCards" class="space-y-4"></div>
-
-        <div id="f3BreakdownFooter" class="pt-3 border-t border-indigo-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-slate-400 gap-2">
-          <span>Total Physical Banknotes in Circulation: <strong id="f3GrandTotalSum" class="text-indigo-300 font-mono font-black text-sm">--</strong></span>
-          <span id="f3CalculatedFaceValue" class="text-[11px] font-mono text-emerald-400 font-bold">Estimated Face Value: --</span>
-        </div>
-      </section>
-
-      <!-- Production Charts -->
-      <div id="sectionCharts" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white/90 dark:bg-slate-900/90 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>🪙</span> Pre-Decimal Cumulative Mintages (1933–1965)
-              </h3>
-              <span class="text-[10px] text-slate-400 font-mono">Total Coins Struck</span>
-            </div>
-            <div class="relative h-64 sm:h-72 w-full">
-              <canvas id="chartPreDecimalDenoms"></canvas>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            Pennies (138M) and Threepences (129M) formed the bulk of pre-decimal coinage; the 1935 Waitangi Crown is the rarest at 1,128.
-          </p>
-        </div>
-
-        <div class="bg-white/90 dark:bg-slate-900/90 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>💵</span> Decimal Cumulative Mintages (1967–2026)
-              </h3>
-              <span class="text-[10px] text-slate-400 font-mono">Total Coins Struck</span>
-            </div>
-            <div class="relative h-64 sm:h-72 w-full">
-              <canvas id="chartDecimalDenoms"></canvas>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            Over 642M 10c pieces and 616M 5c pieces were produced before the 2006 silver coin resize.
-          </p>
-        </div>
-
-        <div class="bg-white/90 dark:bg-slate-900/90 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>✍️</span> Banknote Print Runs by Governor (Series 6 &amp; 7)
-              </h3>
-              <span class="text-[10px] text-slate-400 font-mono">1999–2022</span>
-            </div>
-            <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
-              <canvas id="chartGovernorRuns"></canvas>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            Graeme Wheeler (Series 7 introduction) and Alan Bollard (Series 6 expansion) account for the highest volume of printed polymer notes.
-          </p>
-        </div>
-
-        <div class="bg-white/90 dark:bg-slate-900/90 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>📈</span> Banknotes in Public Hands (Thousands of Notes) (1968–2026)
-              </h3>
-              <span class="text-[10px] text-slate-400 font-mono">RBNZ Table F3</span>
-            </div>
-            <div class="relative h-64 sm:h-72 w-full">
-              <canvas id="chartCirculationTrend"></canvas>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            Circulation grew from 116M physical notes in 1968 to over 9.5B notes in 2026, driven predominantly by $50 and $100 denominations.
-          </p>
-        </div>
-      </div>
-
-      <!-- Rarity Table -->
-      <div id="sectionRarities" class="bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm">
-        <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">🏆</span>
-            <div>
-              <h3 class="text-base font-black text-slate-900 dark:text-white">New Zealand Key Dates &amp; Low Mintage Rarities</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Coins with production under 1,000,000 pieces &amp; historic denomination gaps</p>
-            </div>
-          </div>
-          <span class="text-xs font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 rounded-full border border-amber-500/30 font-bold">
-            Numismatic Scarcity Index
-          </span>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-extrabold uppercase text-[10px]">
-                <th class="py-2.5 px-3">Year</th>
-                <th class="py-2.5 px-3">Denomination</th>
-                <th class="py-2.5 px-3">Mintage</th>
-                <th class="py-2.5 px-3">Rarity Status</th>
-                <th class="py-2.5 px-3">Historical Context</th>
-              </tr>
-            </thead>
-            <tbody id="rarityTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium"></tbody>
-          </table>
-        </div>
-      </div>
 
     </div>
 
@@ -1046,19 +689,7 @@
     <span id="toastMsg">Notification</span>
   </div>
 
-  <!-- Footer -->
-  <footer class="solid-header border-t border-slate-200/80 dark:border-slate-800/80 py-6 mt-12 transition-colors relative z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-      <p>© Bonniefields Museum Collection (BMMC) — NZ Currency Archive &amp; Statistics</p>
-      <div class="flex items-center gap-4">
-        <a href="index.html" class="hover:text-amber-600 dark:hover:text-amber-400 font-bold transition">Museum Index</a>
-        <a href="stamps.html" class="hover:text-amber-600 dark:hover:text-amber-400 font-bold transition">NZ Stamps</a>
-        <a href="#mainHeader" class="hover:text-amber-600 dark:hover:text-amber-400 font-bold transition">Back to Top ↑</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Embedded Standalone CSV Parser Polyfill (Ensures parsing never fails if external PapaParse is blocked) -->
+  <!-- Embedded Standalone CSV Parser Polyfill -->
   <script>
     if (!window.Papa) {
       window.Papa = {
@@ -1071,22 +702,14 @@
             const c = csvText[i];
             const next = csvText[i + 1];
             if (c === '"') {
-              if (inQuotes && next === '"') {
-                curr += '"';
-                i++;
-              } else {
-                inQuotes = !inQuotes;
-              }
+              if (inQuotes && next === '"') { curr += '"'; i++; }
+              else { inQuotes = !inQuotes; }
             } else if (c === ',' && !inQuotes) {
-              row.push(curr);
-              curr = '';
+              row.push(curr); curr = '';
             } else if ((c === '\r' || c === '\n') && !inQuotes) {
               if (c === '\r' && next === '\n') i++;
-              row.push(curr);
-              curr = '';
-              if (!config.skipEmptyLines || row.some(cell => cell.trim().length > 0)) {
-                lines.push(row);
-              }
+              row.push(curr); curr = '';
+              if (!config.skipEmptyLines || row.some(cell => cell.trim().length > 0)) lines.push(row);
               row = [];
             } else {
               curr += c;
@@ -1094,12 +717,10 @@
           }
           if (curr.length > 0 || row.length > 0) {
             row.push(curr);
-            if (!config.skipEmptyLines || row.some(cell => cell.trim().length > 0)) {
-              lines.push(row);
-            }
+            if (!config.skipEmptyLines || row.some(cell => cell.trim().length > 0)) lines.push(row);
           }
           if (config.header && lines.length > 0) {
-            const headers = lines[0].map(h => h.trim());
+            const headers = lines[0].map(h => h.trim().replace(/^\ufeff/, ''));
             const data = [];
             for (let r = 1; r < lines.length; r++) {
               const obj = {};
@@ -1125,23 +746,18 @@
   <!-- Application Logic -->
   <script>
     const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v9';
-    const CACHE_KEY_TIME = 'bMMC_cached_currency_unified_time_v9';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v10';
     const USER_COLLECTION_KEY = 'bMMC_user_currency_collection_v1';
-    const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
-    // Data stores
     let currencyItems = [];
     let preDecimalMintages = [];
     let decimalMintages = [];
     let banknoteRuns = [];
     let f3LsdData = [];
     let f3DecimalData = [];
-
-    // Collector Inventory Store
     let userCollectorData = {};
 
-    let currentViewMode = 'catalogue'; // 'catalogue' | 'gallery' | 'stats'
+    let currentViewMode = 'catalogue';
     let currentCategoryFilter = 'all';
 
     function loadUserCollection() {
@@ -1163,23 +779,18 @@
 
     function updateCollectorHeaderStats() {
       if (!currencyItems || currencyItems.length === 0) return;
-      let ownedCount = 0;
-      let wishlistCount = 0;
-
+      let ownedCount = 0, wishlistCount = 0;
       currencyItems.forEach(item => {
-        const data = userCollectorData[item._uid];
-        if (data?.owned) ownedCount++;
-        if (data?.wishlist) wishlistCount++;
+        const d = userCollectorData[item._uid];
+        if (d?.owned) ownedCount++;
+        if (d?.wishlist) wishlistCount++;
       });
-
       const total = currencyItems.length;
       const pct = total > 0 ? Math.round((ownedCount / total) * 100) : 0;
-
       const countBadge = document.getElementById('collectionCountBadge');
       const wishlistBadge = document.getElementById('wishlistCountBadge');
       const progText = document.getElementById('collectionProgressText');
       const progBar = document.getElementById('collectionProgressBar');
-
       if (countBadge) countBadge.textContent = ownedCount;
       if (wishlistBadge) wishlistBadge.textContent = wishlistCount;
       if (progText) progText.textContent = `${ownedCount} / ${total} (${pct}%)`;
@@ -1207,82 +818,41 @@
     };
 
     function exportUserCollectionCsv() {
-      if (!currencyItems || currencyItems.length === 0) {
-        showToast('No currency data loaded to export.', '⚠️');
-        return;
-      }
+      if (!currencyItems || currencyItems.length === 0) return;
+      const active = currencyItems.filter(i => userCollectorData[i._uid]?.owned || userCollectorData[i._uid]?.wishlist);
+      if (active.length === 0) { showToast('Collection is empty.', '⚠️'); return; }
 
-      const activeItems = currencyItems.filter(item => {
-        const u = userCollectorData[item._uid];
-        return u && (u.owned || u.wishlist);
-      });
-
-      if (activeItems.length === 0) {
-        showToast('No items currently in My Collection or Wishlist to export.', '⚠️');
-        return;
-      }
-
-      const rows = [
-        ['Status', 'Denomination', 'Type', 'Category', 'Condition_Grade', 'Years_Issued', 'Decimal_Equivalent', 'Composition', 'ID']
-      ];
-
-      activeItems.forEach(item => {
-        const u = userCollectorData[item._uid];
-        const status = u?.owned ? 'In Collection' : 'On Wishlist';
-        const grade = u?.grade || (u?.owned ? 'UNC' : '--');
-        const isNote = (item.Category || '').toLowerCase().includes('banknote');
-
+      const rows = [['Status', 'Denomination', 'Category', 'Grade', 'Years_Issued', 'Decimal_Equivalent', 'ID']];
+      active.forEach(i => {
+        const u = userCollectorData[i._uid];
         rows.push([
-          `"${status}"`,
-          `"${item.Denomination || ''}"`,
-          isNote ? 'Banknote' : 'Coin',
-          `"${item.Category || ''}"`,
-          `"${grade}"`,
-          `"${item.Years_Issued || ''}"`,
-          `"${item.Decimal_Equivalent || ''}"`,
-          `"${item.Composition || ''}"`,
-          `"${item.ID || ''}"`
+          `"${u.owned ? 'Owned' : 'Wishlist'}"`,
+          `"${i.Denomination}"`,
+          `"${i.Category}"`,
+          `"${u.grade || 'UNC'}"`,
+          `"${i.Years_Issued}"`,
+          `"${i.Decimal_Equivalent}"`,
+          `"${i.ID}"`
         ]);
       });
-
-      const csvContent = rows.map(r => r.join(',')).join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `nz_currency_collection_export_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast(`Exported ${activeItems.length} records!`, '📥');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `currency_collection_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
     }
 
     function showToast(msg, icon = '✨') {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      const toastIcon = document.getElementById('toastIcon');
-      if (!toast || !toastMsg) return;
-      toastMsg.textContent = msg;
-      if (toastIcon) toastIcon.textContent = icon;
-      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
-      }, 2500);
-    }
-
-    function toggleCollapsibleControls(show) {
-      const controls = document.getElementById('collapsibleControls');
-      const chevron = document.getElementById('toggleChevron');
-      if (!controls) return;
-      const shouldShow = show !== undefined ? show : controls.classList.contains('hidden');
-      if (shouldShow) {
-        controls.classList.remove('hidden');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-      } else {
-        controls.classList.add('hidden');
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
-      }
+      const t = document.getElementById('toast');
+      const m = document.getElementById('toastMsg');
+      const i = document.getElementById('toastIcon');
+      if (!t || !m) return;
+      m.textContent = msg;
+      if (i) i.textContent = icon;
+      t.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3'), 2500);
     }
 
     function switchViewMode(mode) {
@@ -1290,93 +860,72 @@
       const tabCat = document.getElementById('viewTabCatalogue');
       const tabGal = document.getElementById('viewTabGallery');
       const tabStats = document.getElementById('viewTabStats');
-
       const catCont = document.getElementById('catalogueViewContainer');
       const galCont = document.getElementById('galleryViewContainer');
       const statsCont = document.getElementById('statsViewContainer');
-
       const catFilterBar = document.getElementById('catalogueFilterBar');
       const catSearchBar = document.getElementById('catalogueSearchBar');
-      const analyticsFilterBar = document.getElementById('analyticsFilterBar');
+      const analyticsBar = document.getElementById('analyticsFilterBar');
 
-      const inactiveTabClass = 'px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
-      const activeTabClass = 'px-2.5 sm:px-3 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer';
+      const inactiveClass = 'px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+      const activeClass = 'px-2.5 sm:px-3 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer';
 
-      tabCat.className = inactiveTabClass;
-      tabGal.className = inactiveTabClass;
-      tabStats.className = inactiveTabClass;
+      tabCat.className = inactiveClass;
+      tabGal.className = inactiveClass;
+      tabStats.className = inactiveClass;
 
       catCont.classList.add('hidden');
       galCont.classList.add('hidden');
       statsCont.classList.add('hidden');
 
       if (mode === 'catalogue') {
-        tabCat.className = activeTabClass;
+        tabCat.className = activeClass;
         catCont.classList.remove('hidden');
         if (catFilterBar) catFilterBar.classList.remove('hidden');
         if (catSearchBar) catSearchBar.classList.remove('hidden');
-        if (analyticsFilterBar) analyticsFilterBar.classList.add('hidden');
+        if (analyticsBar) analyticsBar.classList.add('hidden');
         renderAllGrids();
       } else if (mode === 'gallery') {
-        tabGal.className = activeTabClass;
+        tabGal.className = activeClass;
         galCont.classList.remove('hidden');
         if (catFilterBar) catFilterBar.classList.remove('hidden');
         if (catSearchBar) catSearchBar.classList.remove('hidden');
-        if (analyticsFilterBar) analyticsFilterBar.classList.add('hidden');
+        if (analyticsBar) analyticsBar.classList.add('hidden');
         renderGalleryView();
       } else {
-        tabStats.className = activeTabClass;
+        tabStats.className = activeClass;
         statsCont.classList.remove('hidden');
         if (catFilterBar) catFilterBar.classList.add('hidden');
         if (catSearchBar) catSearchBar.classList.add('hidden');
-        if (analyticsFilterBar) analyticsFilterBar.classList.remove('hidden');
+        if (analyticsBar) analyticsBar.classList.remove('hidden');
         renderStatisticalDashboard();
       }
     }
 
     function renderCurrentView() {
-      if (currentViewMode === 'catalogue') {
-        renderAllGrids();
-      } else if (currentViewMode === 'gallery') {
-        renderGalleryView();
-      }
+      if (currentViewMode === 'catalogue') renderAllGrids();
+      else if (currentViewMode === 'gallery') renderGalleryView();
     }
 
-    // Formats Google / Drive URLs into s200 or s1000 sizes for high reliability online and offline
+    // Google image sizing with s200 (cards/gallery) & s1000 (modals/zoom)
     function formatImageUrl(url, size = 's200') {
       if (!url) return '';
       let clean = String(url).trim();
       if (!clean) return '';
 
-      // Check offline adapter
-      if (window.resolveOfflineMedia) {
-        try {
-          const local = window.resolveOfflineMedia(clean);
-          if (local && (local.startsWith('../media/') || local.startsWith('./media/') || local.startsWith('media/'))) {
-            return local;
-          }
-        } catch (e) {}
-      }
-
-      // Keep local or data URIs
       if (clean.startsWith('data:') || clean.startsWith('blob:') || clean.startsWith('./') || clean.startsWith('../')) {
         return clean;
       }
 
-      // Convert Google Drive share/view URLs to direct Google UserContent images
+      // Convert Google Drive share link into high-speed Google UserContent image
       const driveMatch = clean.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/);
       if (driveMatch && driveMatch[1]) {
         return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=${size}`;
       }
 
-      // Convert standard googleusercontent sizing
       if (clean.includes('googleusercontent.com')) {
-        if (/=[sw]\d+(-c)?/i.test(clean)) {
-          return clean.replace(/=[sw]\d+(-c)?/i, `=${size}`);
-        }
-        if (clean.includes('=s0')) {
-          return clean.replace('=s0', `=${size}`);
-        }
+        if (/=[sw]\d+(-c)?/i.test(clean)) return clean.replace(/=[sw]\d+(-c)?/i, `=${size}`);
+        if (clean.includes('=s0')) return clean.replace('=s0', `=${size}`);
         const sep = clean.includes('?') ? '&' : '=';
         return `${clean}${sep}${size}`;
       }
@@ -1409,38 +958,21 @@
     function getIcon(item) {
       const val = (item.Denomination || item.ID || '').toLowerCase();
       const rev = (item.Reverse_Description || '').toLowerCase();
-      const cat = (item.Category || '').toLowerCase();
-      const notes = (item.Historical_Notes || '').toLowerCase();
-
-      if (notes.includes('charles') || val.includes('charles')) return '👑';
-      if (notes.includes('anzac') || val.includes('anzac')) return '🎖️';
-      if (notes.includes('armistice') || rev.includes('poppy')) return '🌺';
-      if (val.includes('halfpenny') || rev.includes('hei-tiki')) return '🗿';
-      if (val.includes('penny') || rev.includes('tūī') || rev.includes('tui')) return '🌿';
-      if (val.includes('threepence') || rev.includes('patu')) return '⚔️';
-      if (val.includes('sixpence') || rev.includes('huia')) return '🪶';
-      if (val.includes('shilling') || rev.includes('warrior')) return '🛡️';
-      if (val.includes('florin') || rev.includes('kiwi')) return '🥝';
       if (val.includes('crown')) return '👑';
-      if (val.includes('1c') || rev.includes('fern')) return '🌿';
-      if (val.includes('2c') || rev.includes('kōwhai')) return '🌼';
-      if (val.includes('5c') || rev.includes('tuatara')) return '🦎';
-      if (val.includes('10c') || rev.includes('koruru')) return '🎭';
-      if (val.includes('20c') || rev.includes('pukaki')) return '🌸';
-      if (val.includes('50c') || rev.includes('endeavour')) return '⛵';
+      if (val.includes('halfpenny')) return '🗿';
+      if (val.includes('penny')) return '🌿';
+      if (val.includes('threepence')) return '⚔️';
+      if (val.includes('sixpence')) return '🪶';
+      if (val.includes('shilling')) return '🛡️';
+      if (val.includes('florin')) return '🥝';
+      if (val.includes('1c')) return '🌿';
+      if (val.includes('2c')) return '🌼';
+      if (val.includes('5c')) return '🦎';
+      if (val.includes('10c')) return '🎭';
+      if (val.includes('20c')) return '🌸';
+      if (val.includes('50c')) return '⛵';
       if (val.includes('$1') || rev.includes('kiwi')) return '🥝';
-      if (val.includes('$2') || rev.includes('kōtuku') || rev.includes('heron')) return '🕊️';
-      if (rev.includes('fantail') || rev.includes('pīwakawaka')) return '🕊️';
-      if (rev.includes('rifleman') || rev.includes('tītitipounamu')) return '🐦';
-      if (rev.includes('kea')) return '🦜';
-      if (rev.includes('kererū')) return '🕊️';
-      if (rev.includes('takahē')) return '🦤';
-      if (rev.includes('penguin') || rev.includes('hoiho')) return '🐧';
-      if (rev.includes('whio')) return '🦆';
-      if (rev.includes('falcon') || rev.includes('kārearea')) return '🦅';
-      if (rev.includes('kōkako')) return '🐦';
-      if (rev.includes('mōhua')) return '🐤';
-      if (cat.includes('banknote') || cat.includes('special')) return '💴';
+      if (val.includes('$2') || rev.includes('kōtuku')) return '🕊️';
       return '🪙';
     }
 
@@ -1489,6 +1021,7 @@
       }
     };
 
+    // Item card with s200 sizing and Day mode white / Night mode black backgrounds
     function renderCard(item, isBanknote = false) {
       const icon = getIcon(item);
       const badgeClass = getBadgeClass(item.Composition, item.Category);
@@ -1501,7 +1034,6 @@
       const fallbackFront = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
       const fallbackRear = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
 
-      // Uses S200 for catalogue view
       const displayFront = rawFront ? resolveMediaUrl(rawFront, 's200') : fallbackFront;
       const displayRear = rawRear ? resolveMediaUrl(rawRear, 's200') : fallbackRear;
 
@@ -1525,14 +1057,9 @@
               <span class="absolute top-2.5 left-2.5 coin-badge ${badgeClass} shadow-md">${(item.Composition || item.Category || 'Issued').split('(')[0].trim()}</span>
               <span class="absolute top-2.5 right-2.5">${safeEq}</span>
 
-              <!-- Flip Controls -->
               ${hasRear ? `
-              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Previous Side" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 dark:bg-slate-900/80 hover:bg-amber-500 hover:text-white dark:hover:text-slate-950 text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700/60 z-10 cursor-pointer">
-                ‹
-              </button>
-              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="View Next Side" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 dark:bg-slate-900/80 hover:bg-amber-500 hover:text-white dark:hover:text-slate-950 text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700/60 z-10 cursor-pointer">
-                ›
-              </button>
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="Previous Side" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 dark:bg-slate-900/80 hover:bg-amber-500 hover:text-white dark:hover:text-slate-950 text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700/60 z-10 cursor-pointer">‹</button>
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="Next Side" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 dark:bg-slate-900/80 hover:bg-amber-500 hover:text-white dark:hover:text-slate-950 text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700/60 z-10 cursor-pointer">›</button>
               <div class="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 pointer-events-none">
                 <span class="side-label text-[9px] font-bold uppercase tracking-wider bg-slate-900/80 text-slate-200 dark:bg-slate-900/90 dark:text-slate-300 px-2 py-0.5 rounded-full border border-slate-700/60 shadow">Front (Obverse)</span>
                 <div class="flex items-center gap-1">
@@ -1554,12 +1081,8 @@
                 </h4>
                 
                 <div class="flex items-center gap-1 shrink-0">
-                  <button type="button" onclick="toggleOwnedItem('${item._uid}', event)" title="${isOwned ? 'In your collection (Click to remove)' : 'Add to My Collection'}" class="w-7 h-7 rounded-lg flex items-center justify-center text-xs transition shadow-sm ${isOwned ? 'bg-emerald-500 text-white font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500'}">
-                    ✓
-                  </button>
-                  <button type="button" onclick="toggleWishlistItem('${item._uid}', event)" title="${isWishlist ? 'In your wishlist' : 'Add to Wishlist'}" class="w-7 h-7 rounded-lg flex items-center justify-center text-xs transition shadow-sm ${isWishlist ? 'bg-pink-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-pink-500'}">
-                    ★
-                  </button>
+                  <button type="button" onclick="toggleOwnedItem('${item._uid}', event)" title="In Collection" class="w-7 h-7 rounded-lg flex items-center justify-center text-xs transition shadow-sm ${isOwned ? 'bg-emerald-500 text-white font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500'}">✓</button>
+                  <button type="button" onclick="toggleWishlistItem('${item._uid}', event)" title="Wishlist" class="w-7 h-7 rounded-lg flex items-center justify-center text-xs transition shadow-sm ${isWishlist ? 'bg-pink-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-pink-500'}">★</button>
                 </div>
               </div>
 
@@ -1583,6 +1106,7 @@
       `;
     }
 
+    // Gallery item renderer
     function renderGalleryItemCard(item, side, imgUrl, isNote) {
       const safeDenom = item.Denomination || item.ID || 'Specimen';
       const sideLabel = side === 'obverse' ? 'Front (Obverse)' : 'Rear (Reverse)';
@@ -1594,7 +1118,6 @@
 
       return `
         <div class="bg-white/95 dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/60 transition-all flex flex-col justify-between group">
-          <!-- Day mode white background, Night mode black background -->
           <div class="${isNote ? 'h-36 sm:h-40' : 'h-32 sm:h-36'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200/80 dark:border-slate-800">
             <img src="${displayImg}" alt="${safeDenom} ${sideLabel}" class="img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${fullImg}', '${safeDenom} — ${sideLabel}', event)" onerror="this.onerror=null;this.src='${fallback}';" />
             <span class="absolute bottom-1.5 left-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-slate-900/80 text-white dark:bg-slate-800/90 dark:text-slate-300 backdrop-blur-sm">
@@ -1628,35 +1151,20 @@
       `;
     }
 
+    // Gallery View (Coins 6 cols, Banknotes 4 cols)
     function renderGalleryView() {
       const q = (document.getElementById('currencySearchInput')?.value || '').toLowerCase().trim();
 
       const filterFn = (item) => {
-        if (currentCategoryFilter === 'my-collection') {
-          if (!userCollectorData[item._uid]?.owned) return false;
-        }
-        if (currentCategoryFilter === 'my-wishlist') {
-          if (!userCollectorData[item._uid]?.wishlist) return false;
-        }
+        if (currentCategoryFilter === 'my-collection' && !userCollectorData[item._uid]?.owned) return false;
+        if (currentCategoryFilter === 'my-wishlist' && !userCollectorData[item._uid]?.wishlist) return false;
         if (currentCategoryFilter !== 'all' && currentCategoryFilter !== 'my-collection' && currentCategoryFilter !== 'my-wishlist') {
-          const cat = (item.Category || '').toLowerCase();
-          if (currentCategoryFilter === 'pre-decimal-coins' && !cat.includes('pre-decimal coinage')) return false;
-          if (currentCategoryFilter === 'decimal-1967-coins' && !cat.includes('first decimal coinage')) return false;
-          if (currentCategoryFilter === 'current-coins' && !cat.includes('current circulating coinage')) return false;
-          if (currentCategoryFilter === 'banknotes-s1' && !cat.includes('series 1')) return false;
-          if (currentCategoryFilter === 'banknotes-s2' && !cat.includes('series 2')) return false;
-          if (currentCategoryFilter === 'banknotes-s3' && !cat.includes('series 3')) return false;
-          if (currentCategoryFilter === 'banknotes-s4' && !cat.includes('series 4')) return false;
-          if (currentCategoryFilter === 'banknotes-s56' && !cat.includes('series 5') && !cat.includes('series 6')) return false;
-          if (currentCategoryFilter === 'banknotes-s7' && !cat.includes('series 7')) return false;
-          if (currentCategoryFilter === 'special-issues' && !cat.includes('special')) return false;
+          if (getNormalizedCategoryType(item) !== currentCategoryFilter) return false;
         }
-
         if (!q) return true;
         return (item.Denomination || '').toLowerCase().includes(q) ||
                (item.Obverse_Description || '').toLowerCase().includes(q) ||
                (item.Reverse_Description || '').toLowerCase().includes(q) ||
-               (item.Composition || '').toLowerCase().includes(q) ||
                (item.Category || '').toLowerCase().includes(q);
       };
 
@@ -1665,9 +1173,8 @@
       const noteCardsHtml = [];
 
       filtered.forEach(item => {
-        const isNote = (item.Category || '').toLowerCase().includes('banknote') || 
-                       ((item.Denomination || '').toLowerCase().includes('dollar') && !(item.Denomination || '').toLowerCase().includes('coin'));
-
+        const catType = getNormalizedCategoryType(item);
+        const isNote = catType.startsWith('banknotes');
         const rawFront = (item.Image_Front_URL || '').trim();
         const rawRear = (item.Image_Rear_URL || '').trim();
 
@@ -1682,40 +1189,33 @@
 
       const coinsGrid = document.getElementById('galleryCoinsGrid');
       const notesGrid = document.getElementById('galleryNotesGrid');
-
-      if (coinsGrid) {
-        coinsGrid.innerHTML = coinCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No coin images match current filter.</div>';
-      }
-      if (notesGrid) {
-        notesGrid.innerHTML = noteCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No banknote images match current filter.</div>';
-      }
+      if (coinsGrid) coinsGrid.innerHTML = coinCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No coin images match current filter.</div>';
+      if (notesGrid) notesGrid.innerHTML = noteCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No banknote images match current filter.</div>';
 
       const statsEl = document.getElementById('currencyStatsCounter');
-      if (statsEl) {
-        statsEl.textContent = `Gallery: ${coinCardsHtml.length + noteCardsHtml.length} photos from ${filtered.length} specimens`;
-      }
+      if (statsEl) statsEl.textContent = `Gallery: ${coinCardsHtml.length + noteCardsHtml.length} photos from ${filtered.length} specimens`;
     }
 
     function setCategoryFilter(filterKey) {
       currentCategoryFilter = filterKey;
-      const buttons = {
-        'all': document.getElementById('filterBtnAll'),
-        'pre-decimal-coins': document.getElementById('filterBtnPreCoins'),
-        'decimal-1967-coins': document.getElementById('filterBtnDecCoins'),
-        'current-coins': document.getElementById('filterBtnCurrCoins'),
-        'banknotes-s1': document.getElementById('filterBtnS1Notes'),
-        'banknotes-s2': document.getElementById('filterBtnS2Notes'),
-        'banknotes-s3': document.getElementById('filterBtnS3Notes'),
-        'banknotes-s4': document.getElementById('filterBtnS4Notes'),
-        'banknotes-s56': document.getElementById('filterBtnS56Notes'),
-        'banknotes-s7': document.getElementById('filterBtnS7Notes'),
-        'special-issues': document.getElementById('filterBtnSpecial'),
-        'my-collection': document.getElementById('filterBtnCollection'),
-        'my-wishlist': document.getElementById('filterBtnWishlist')
+      const filterIds = {
+        'all': 'filterBtnAll',
+        'pre-decimal-coins': 'filterBtnPreCoins',
+        'decimal-1967-coins': 'filterBtnDecCoins',
+        'current-coins': 'filterBtnCurrCoins',
+        'banknotes-s1': 'filterBtnS1Notes',
+        'banknotes-s2': 'filterBtnS2Notes',
+        'banknotes-s3': 'filterBtnS3Notes',
+        'banknotes-s4': 'filterBtnS4Notes',
+        'banknotes-s56': 'filterBtnS56Notes',
+        'banknotes-s7': 'filterBtnS7Notes',
+        'special-issues': 'filterBtnSpecial',
+        'my-collection': 'filterBtnCollection',
+        'my-wishlist': 'filterBtnWishlist'
       };
 
-      Object.keys(buttons).forEach(k => {
-        const btn = buttons[k];
+      Object.entries(filterIds).forEach(([k, id]) => {
+        const btn = document.getElementById(id);
         if (!btn) return;
         if (k === filterKey) {
           btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer shrink-0';
@@ -1726,44 +1226,28 @@
 
       const btnExport = document.getElementById('btnExportCollection');
       if (btnExport) {
-        if (filterKey === 'my-collection' || filterKey === 'my-wishlist') {
-          btnExport.classList.remove('hidden');
-        } else {
-          btnExport.classList.add('hidden');
-        }
+        btnExport.classList.toggle('hidden', !(filterKey === 'my-collection' || filterKey === 'my-wishlist'));
       }
 
       if (currentViewMode === 'catalogue') {
-        const secPreCoins = document.getElementById('pre-decimal-coins-section');
-        const secDecCoins = document.getElementById('decimal-coins-section');
-        const secCurrCoins = document.getElementById('current-coins-section');
-        const secNotesS1 = document.getElementById('banknotes-s1-section');
-        const secNotesS2 = document.getElementById('banknotes-s2-section');
-        const secNotesS3 = document.getElementById('banknotes-s3-section');
-        const secNotesS4 = document.getElementById('banknotes-s4-section');
-        const secNotesS56 = document.getElementById('banknotes-s56-section');
-        const secNotesS7 = document.getElementById('banknotes-s7-section');
-        const secSpecial = document.getElementById('special-issues-section');
-        const secS5vs6 = document.getElementById('sectionSeries5vs6Comparison');
-
         const isColl = filterKey === 'my-collection' || filterKey === 'my-wishlist';
+        const sectionMap = {
+          'pre-decimal-coins': 'pre-decimal-coins-section',
+          'decimal-1967-coins': 'decimal-coins-section',
+          'current-coins': 'current-coins-section',
+          'banknotes-s1': 'banknotes-s1-section',
+          'banknotes-s2': 'banknotes-s2-section',
+          'banknotes-s3': 'banknotes-s3-section',
+          'banknotes-s4': 'banknotes-s4-section',
+          'banknotes-s56': 'banknotes-s56-section',
+          'banknotes-s7': 'banknotes-s7-section',
+          'special-issues': 'special-issues-section'
+        };
 
-        if (secPreCoins) secPreCoins.style.display = (filterKey === 'all' || filterKey === 'pre-decimal-coins' || isColl) ? 'block' : 'none';
-        if (secDecCoins) secDecCoins.style.display = (filterKey === 'all' || filterKey === 'decimal-1967-coins' || isColl) ? 'block' : 'none';
-        if (secCurrCoins) secCurrCoins.style.display = (filterKey === 'all' || filterKey === 'current-coins' || isColl) ? 'block' : 'none';
-        
-        if (secNotesS1) secNotesS1.style.display = (filterKey === 'all' || filterKey === 'banknotes-s1' || isColl) ? 'block' : 'none';
-        if (secNotesS2) secNotesS2.style.display = (filterKey === 'all' || filterKey === 'banknotes-s2' || isColl) ? 'block' : 'none';
-        if (secNotesS3) secNotesS3.style.display = (filterKey === 'all' || filterKey === 'banknotes-s3' || isColl) ? 'block' : 'none';
-        if (secNotesS4) secNotesS4.style.display = (filterKey === 'all' || filterKey === 'banknotes-s4' || isColl) ? 'block' : 'none';
-        if (secNotesS56) secNotesS56.style.display = (filterKey === 'all' || filterKey === 'banknotes-s56' || isColl) ? 'block' : 'none';
-        if (secNotesS7) secNotesS7.style.display = (filterKey === 'all' || filterKey === 'banknotes-s7' || isColl) ? 'block' : 'none';
-        
-        if (secSpecial) secSpecial.style.display = (filterKey === 'all' || filterKey === 'special-issues' || isColl) ? 'block' : 'none';
-        if (secS5vs6) secS5vs6.style.display = (filterKey === 'all' || filterKey === 'banknotes-s56' || isColl) ? 'block' : 'none';
-
-        const secMonarchs = document.getElementById('sectionMonarchs');
-        if (secMonarchs) secMonarchs.style.display = 'block';
+        Object.entries(sectionMap).forEach(([k, id]) => {
+          const sec = document.getElementById(id);
+          if (sec) sec.style.display = (filterKey === 'all' || filterKey === k || isColl) ? 'block' : 'none';
+        });
 
         renderAllGrids();
       } else if (currentViewMode === 'gallery') {
@@ -1771,17 +1255,48 @@
       }
     }
 
+    // Flexible Category Classifier (Handles spaces, naming variations, etc.)
+    function getNormalizedCategoryType(item) {
+      const cat = (item.Category || '').toLowerCase().replace(/[-_]/g, ' ');
+      const id = (item.ID || '').toLowerCase();
+      const denom = (item.Denomination || '').toLowerCase();
+      const notes = (item.Historical_Notes || '').toLowerCase();
+
+      if (cat.includes('special') || cat.includes('commemorative') || id.includes('anzac') || id.includes('armistice') || notes.includes('anzac') || notes.includes('armistice')) {
+        return 'special-issues';
+      }
+      if (cat.includes('series 1') || cat.includes('s1') || id.includes('note_s1') || id.includes('s1_')) return 'banknotes-s1';
+      if (cat.includes('series 2') || cat.includes('s2') || id.includes('note_s2') || id.includes('s2_')) return 'banknotes-s2';
+      if (cat.includes('series 3') || cat.includes('s3') || id.includes('note_s3') || id.includes('s3_')) return 'banknotes-s3';
+      if (cat.includes('series 4') || cat.includes('s4') || id.includes('note_s4') || id.includes('s4_')) return 'banknotes-s4';
+      if (cat.includes('series 5') || cat.includes('series 6') || cat.includes('s5') || cat.includes('s6') || id.includes('s5_') || id.includes('s6_')) return 'banknotes-s56';
+      if (cat.includes('series 7') || cat.includes('s7') || id.includes('s7_') || cat.includes('brighter money')) return 'banknotes-s7';
+
+      if (cat.includes('banknote') || cat.includes('note')) {
+        return (denom.includes('shilling') || denom.includes('pound')) ? 'banknotes-s1' : 'banknotes-s7';
+      }
+
+      if (cat.includes('pre decimal') || id.startsWith('pre_') || denom.includes('halfpenny') || denom.includes('threepence') || denom.includes('sixpence') || denom.includes('florin') || denom.includes('half crown')) {
+        return 'pre-decimal-coins';
+      }
+
+      if (cat.includes('current') || id.startsWith('curr_') || ((denom.includes('10c') || denom.includes('20c') || denom.includes('50c') || denom.includes('$1') || denom.includes('$2')) && (cat.includes('current') || cat.includes('2006')))) {
+        return 'current-coins';
+      }
+
+      if (cat.includes('decimal') || cat.includes('1967') || id.startsWith('dec_')) {
+        return 'decimal-1967-coins';
+      }
+
+      return 'pre-decimal-coins';
+    }
+
     function renderAllGrids() {
       const q = (document.getElementById('currencySearchInput')?.value || '').toLowerCase().trim();
 
       const filterFn = (item) => {
-        if (currentCategoryFilter === 'my-collection') {
-          if (!userCollectorData[item._uid]?.owned) return false;
-        }
-        if (currentCategoryFilter === 'my-wishlist') {
-          if (!userCollectorData[item._uid]?.wishlist) return false;
-        }
-
+        if (currentCategoryFilter === 'my-collection' && !userCollectorData[item._uid]?.owned) return false;
+        if (currentCategoryFilter === 'my-wishlist' && !userCollectorData[item._uid]?.wishlist) return false;
         if (!q) return true;
         return (item.Denomination || '').toLowerCase().includes(q) ||
                (item.Obverse_Description || '').toLowerCase().includes(q) ||
@@ -1792,62 +1307,45 @@
                (item.Category || '').toLowerCase().includes(q);
       };
 
-      const isSpecial = (i) => {
-        const cat = (i.Category || '').toLowerCase();
-        const id = (i.ID || '').toLowerCase();
-        return cat.includes('special') || id.includes('anzac') || id.includes('armistice') || id.includes('commemorative') || id.includes('preview');
+      const groups = {
+        'pre-decimal-coins': [],
+        'decimal-1967-coins': [],
+        'current-coins': [],
+        'banknotes-s1': [],
+        'banknotes-s2': [],
+        'banknotes-s3': [],
+        'banknotes-s4': [],
+        'banknotes-s56': [],
+        'banknotes-s7': [],
+        'special-issues': []
       };
 
-      // Coins
-      const preCoins = currencyItems.filter(i => (i.Category || '').includes('Pre-Decimal Coinage') && !isSpecial(i) && filterFn(i));
-      const decCoins = currencyItems.filter(i => (i.Category || '').includes('First Decimal Coinage') && !isSpecial(i) && filterFn(i));
-      const currCoins = currencyItems.filter(i => (i.Category || '').includes('Current Circulating Coinage') && !isSpecial(i) && filterFn(i));
-      
-      // Notes
-      const notesS1 = currencyItems.filter(i => (i.Category || '').includes('Series 1') && !isSpecial(i) && filterFn(i));
-      const notesS2 = currencyItems.filter(i => (i.Category || '').includes('Series 2') && !isSpecial(i) && filterFn(i));
-      const notesS3 = currencyItems.filter(i => (i.Category || '').includes('Series 3') && !isSpecial(i) && filterFn(i));
-      const notesS4 = currencyItems.filter(i => (i.Category || '').includes('Series 4') && !isSpecial(i) && filterFn(i));
-      const notesS56 = currencyItems.filter(i => ((i.Category || '').includes('Series 5') || (i.Category || '').includes('Series 6')) && !isSpecial(i) && filterFn(i));
-      const notesS7 = currencyItems.filter(i => (i.Category || '').includes('Series 7') && !isSpecial(i) && filterFn(i));
-      
-      const specialItems = currencyItems.filter(i => isSpecial(i) && filterFn(i));
+      currencyItems.filter(filterFn).forEach(item => {
+        const type = getNormalizedCategoryType(item);
+        if (groups[type]) groups[type].push(item);
+      });
 
-      document.getElementById('preDecimalCoinGrid').innerHTML = preCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match current filter.</div>';
-      document.getElementById('decimal1967CoinGrid').innerHTML = decCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match current filter.</div>';
-      document.getElementById('currentCoinGrid').innerHTML = currCoins.map(c => renderCard(c, false)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No coins match current filter.</div>';
-      
-      document.getElementById('banknotesSeries1Grid').innerHTML = notesS1.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 1 banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries2Grid').innerHTML = notesS2.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 2 banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries3Grid').innerHTML = notesS3.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 3 banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries4Grid').innerHTML = notesS4.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 4 banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries56Grid').innerHTML = notesS56.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 5/6 banknotes match current filter.</div>';
-      document.getElementById('banknotesSeries7Grid').innerHTML = notesS7.map(n => renderCard(n, true)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No Series 7 banknotes match current filter.</div>';
-      
-      document.getElementById('specialItemsGrid').innerHTML = specialItems.map(s => {
-        const isNote = (s.Category || '').toLowerCase().includes('banknote') || (s.Denomination || '').toLowerCase().includes('dollar') && !(s.Denomination || '').includes('coin');
-        return renderCard(s, isNote);
-      }).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No special items match current filter.</div>';
+      const setGrid = (id, items, isNote) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = items.map(c => renderCard(c, isNote)).join('') || '<div class="col-span-full py-4 text-xs text-slate-400">No items match filter.</div>';
+      };
+
+      setGrid('preDecimalCoinGrid', groups['pre-decimal-coins'], false);
+      setGrid('decimal1967CoinGrid', groups['decimal-1967-coins'], false);
+      setGrid('currentCoinGrid', groups['current-coins'], false);
+      setGrid('banknotesSeries1Grid', groups['banknotes-s1'], true);
+      setGrid('banknotesSeries2Grid', groups['banknotes-s2'], true);
+      setGrid('banknotesSeries3Grid', groups['banknotes-s3'], true);
+      setGrid('banknotesSeries4Grid', groups['banknotes-s4'], true);
+      setGrid('banknotesSeries56Grid', groups['banknotes-s56'], true);
+      setGrid('banknotesSeries7Grid', groups['banknotes-s7'], true);
+      setGrid('specialItemsGrid', groups['special-issues'], false);
 
       const statsEl = document.getElementById('currencyStatsCounter');
-      if (statsEl) {
-        statsEl.textContent = `Showing ${currencyItems.filter(filterFn).length} of ${currencyItems.length} records`;
-      }
-
+      if (statsEl) statsEl.textContent = `Showing ${currencyItems.filter(filterFn).length} of ${currencyItems.length} records`;
       updateCollectorHeaderStats();
     }
 
-    function surpriseMe() {
-      if (currencyItems.length === 0) return;
-      const randIdx = Math.floor(Math.random() * currencyItems.length);
-      const chosen = currencyItems[randIdx];
-      if (chosen && chosen._uid) {
-        openDetailModal(chosen._uid);
-        showToast(`Discovered: ${chosen.Denomination || chosen.ID}`, '✨');
-      }
-    }
-
-    // Detail Modal with full s1000 resolution
     function openDetailModal(uniqueId) {
       const item = currencyItems.find(i => i._uid === uniqueId);
       if (!item) return;
@@ -1857,7 +1355,7 @@
       const icon = document.getElementById('modalItemIcon');
       const content = document.getElementById('modalItemContent');
 
-      const isBanknote = (item.Category || '').toLowerCase().includes('banknote') || (item.Denomination || '').toLowerCase().includes('dollar') && !(item.Denomination || '').includes('coin');
+      const isBanknote = getNormalizedCategoryType(item).startsWith('banknotes');
       const itemIcon = getIcon(item);
 
       if (title) title.textContent = `${item.Denomination || item.ID} — ${item.Category || ''}`;
@@ -1874,7 +1372,6 @@
         const frontImg = rawFront ? resolveMediaUrl(rawFront, 's1000') : fallbackFront;
         const rearImg = rawRear ? resolveMediaUrl(rawRear, 's1000') : fallbackRear;
         const safeDenom = item.Denomination || item.ID || 'Item';
-
         const userEntry = userCollectorData[item._uid] || { owned: false, grade: 'UNC', qty: 1, notes: '', wishlist: false };
 
         content.innerHTML = `
@@ -1896,32 +1393,6 @@
           </div>
           `}
 
-          <!-- Collector Inventory Modal Bar -->
-          <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
-            <div class="flex items-center gap-3">
-              <label class="flex items-center gap-2 cursor-pointer font-bold text-slate-800 dark:text-slate-100">
-                <input type="checkbox" id="modalCheckboxOwned" onchange="modalUpdateOwned('${item._uid}', this.checked)" ${userEntry.owned ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500" />
-                <span>I Own This Specimen</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer font-bold text-pink-600 dark:text-pink-400">
-                <input type="checkbox" id="modalCheckboxWishlist" onchange="modalUpdateWishlist('${item._uid}', this.checked)" ${userEntry.wishlist ? 'checked' : ''} class="w-4 h-4 rounded text-pink-600 focus:ring-pink-500" />
-                <span>Wishlist</span>
-              </label>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <label class="text-slate-400 font-bold">Grade:</label>
-              <select id="modalSelectGrade" onchange="modalUpdateGrade('${item._uid}', this.value)" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 text-xs outline-none">
-                <option value="Good" ${userEntry.grade === 'Good' ? 'selected' : ''}>Good (G)</option>
-                <option value="Fine" ${userEntry.grade === 'Fine' ? 'selected' : ''}>Fine (F)</option>
-                <option value="VF" ${userEntry.grade === 'VF' ? 'selected' : ''}>Very Fine (VF)</option>
-                <option value="EF" ${userEntry.grade === 'EF' ? 'selected' : ''}>Extremely Fine (EF)</option>
-                <option value="UNC" ${userEntry.grade === 'UNC' || !userEntry.grade ? 'selected' : ''}>Uncirculated (UNC)</option>
-                <option value="Proof" ${userEntry.grade === 'Proof' ? 'selected' : ''}>Proof (FDC)</option>
-              </select>
-            </div>
-          </div>
-
           <div class="space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
             ${item.Historical_Notes ? `
             <div class="p-4 bg-amber-50/60 dark:bg-amber-950/40 rounded-2xl border border-amber-200/60 dark:border-amber-900/60">
@@ -1929,124 +1400,107 @@
               <p class="leading-relaxed whitespace-pre-line">${item.Historical_Notes}</p>
             </div>` : ''}
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                <span class="text-slate-400 uppercase text-[9px] font-extrabold block">Obverse (Front)</span>
-                <span class="font-bold text-slate-800 dark:text-slate-100">${item.Obverse_Description || '--'}</span>
-                ${item.Designer_Obverse ? `<span class="block mt-1 text-[10px] text-slate-500">Designer: ${item.Designer_Obverse}</span>` : ''}
-              </div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                <span class="text-slate-400 uppercase text-[9px] font-extrabold block">Reverse (Back)</span>
-                <span class="font-bold text-slate-800 dark:text-slate-100">${item.Reverse_Description || '--'}</span>
-                ${item.Designer_Reverse ? `<span class="block mt-1 text-[10px] text-slate-500">Designer: ${item.Designer_Reverse}</span>` : ''}
-              </div>
-            </div>
-
             <table class="w-full text-left text-xs border-collapse">
               <tbody>
-                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Composition / Material</td><td class="py-2 font-bold">${item.Composition || '--'}</td></tr>
-                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Dimensions / Mass</td><td class="py-2 font-bold">${item.Dimensions_mm || item.Diameter_mm || '--'} mm / ${item.Mass_g || '--'} g</td></tr>
-                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Edge Type</td><td class="py-2 font-bold">${item.Edge_Description || '--'}</td></tr>
-                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Issued / Withdrawal</td><td class="py-2 font-bold">${item.Years_Issued || '--'} &nbsp;•&nbsp; <span class="text-rose-600 dark:text-rose-400">${item.Withdrawal_Date || '--'}</span></td></tr>
-                ${item.Reference_Link ? `<tr><td class="py-2 text-slate-400">Reference</td><td class="py-2"><a href="${item.Reference_Link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Official Information / Encyclopedia ↗</a></td></tr>` : ''}
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Composition</td><td class="py-2 font-bold">${item.Composition || '--'}</td></tr>
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Dimensions</td><td class="py-2 font-bold">${item.Dimensions_mm || item.Diameter_mm || '--'} mm / ${item.Mass_g || '--'} g</td></tr>
+                <tr class="border-b border-slate-200 dark:border-slate-800"><td class="py-2 text-slate-400">Years Issued</td><td class="py-2 font-bold">${item.Years_Issued || '--'}</td></tr>
               </tbody>
             </table>
           </div>
         `;
       }
-
       if (modal) modal.classList.remove('hidden');
     }
-
-    window.modalUpdateOwned = function(uid, isOwned) {
-      if (!userCollectorData[uid]) userCollectorData[uid] = { owned: false, grade: 'UNC', qty: 1, notes: '', wishlist: false };
-      userCollectorData[uid].owned = isOwned;
-      if (isOwned) {
-        userCollectorData[uid].wishlist = false;
-        const wlCb = document.getElementById('modalCheckboxWishlist');
-        if (wlCb) wlCb.checked = false;
-      }
-      saveUserCollection();
-      renderCurrentView();
-    };
-
-    window.modalUpdateWishlist = function(uid, isWl) {
-      if (!userCollectorData[uid]) userCollectorData[uid] = { owned: false, grade: 'UNC', qty: 1, notes: '', wishlist: false };
-      userCollectorData[uid].wishlist = isWl;
-      if (isWl) {
-        userCollectorData[uid].owned = false;
-        const ownCb = document.getElementById('modalCheckboxOwned');
-        if (ownCb) ownCb.checked = false;
-      }
-      saveUserCollection();
-      renderCurrentView();
-    };
-
-    window.modalUpdateGrade = function(uid, grade) {
-      if (!userCollectorData[uid]) userCollectorData[uid] = { owned: false, grade: 'UNC', qty: 1, notes: '', wishlist: false };
-      userCollectorData[uid].grade = grade;
-      saveUserCollection();
-    };
 
     function closeDetailModal() {
       const modal = document.getElementById('itemDetailModal');
       if (modal) modal.classList.add('hidden');
     }
 
-    // Handles both unified multi-section CSVs and flat single-table catalogue CSVs
-    function parseUnifiedCsv(text) {
-      const sections = {
-        metadata: '',
-        predecimal: '',
-        decimal: '',
-        banknoteRuns: '',
-        f3Lsd: '',
-        f3Decimal: ''
+    // Normalizes row keys (strips UTF-8 BOM, removes spaces, handles aliases)
+    function normalizeRow(row) {
+      const norm = {};
+      for (const [rawKey, rawVal] of Object.entries(row)) {
+        if (!rawKey) continue;
+        const cleanKey = rawKey.trim().replace(/^\ufeff/, '').replace(/\s+/g, '_');
+        const val = typeof rawVal === 'string' ? rawVal.trim() : rawVal;
+        norm[cleanKey] = val;
+        const simple = cleanKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+        norm['_k_' + simple] = val;
+      }
+      const getVal = (...keys) => {
+        for (const k of keys) {
+          if (norm[k] !== undefined && norm[k] !== '') return norm[k];
+          const s = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (norm['_k_' + s] !== undefined && norm['_k_' + s] !== '') return norm['_k_' + s];
+        }
+        return '';
       };
 
-      const hasSections = text.includes('[SECTION_CATALOGUE_METADATA]') || text.includes('[SECTION_MINTAGES_');
+      return {
+        ...norm,
+        ID: getVal('ID', 'Identifier', 'Coin_ID', 'Note_ID'),
+        Category: getVal('Category', 'Cat', 'Section', 'Type'),
+        Denomination: getVal('Denomination', 'Denom', 'Face_Value', 'Value', 'Name'),
+        Composition: getVal('Composition', 'Material', 'Metal', 'Substrate'),
+        Decimal_Equivalent: getVal('Decimal_Equivalent', 'Decimal', 'Decimal_Value', 'Eq'),
+        Dimensions_mm: getVal('Dimensions_mm', 'Dimensions', 'Diameter_mm', 'Diameter', 'Size'),
+        Mass_g: getVal('Mass_g', 'Mass', 'Weight_g', 'Weight'),
+        Edge_Description: getVal('Edge_Description', 'Edge', 'Edge_Type'),
+        Years_Issued: getVal('Years_Issued', 'Years', 'Issued', 'Date', 'Period'),
+        Withdrawal_Date: getVal('Withdrawal_Date', 'Withdrawal', 'Demonetised', 'Demonetized'),
+        Image_Front_URL: getVal('Image_Front_URL', 'Image_Front', 'Front_Image', 'Front_URL', 'Image_URL'),
+        Image_Rear_URL: getVal('Image_Rear_URL', 'Image_Rear', 'Rear_Image', 'Reverse_Image', 'Back_Image', 'Rear_URL'),
+        Obverse_Description: getVal('Obverse_Description', 'Obverse', 'Front_Description', 'Obverse_Design'),
+        Reverse_Description: getVal('Reverse_Description', 'Reverse', 'Rear_Description', 'Reverse_Design'),
+        Designer_Obverse: getVal('Designer_Obverse', 'Obverse_Designer'),
+        Designer_Reverse: getVal('Designer_Reverse', 'Reverse_Designer', 'Designer'),
+        Historical_Notes: getVal('Historical_Notes', 'Notes', 'History', 'Description', 'Context'),
+        Reference_Link: getVal('Reference_Link', 'Link', 'Reference', 'Source')
+      };
+    }
 
-      if (!hasSections) {
-        // Flat standard single-sheet CSV fallback
+    // Safe extraction of sections without breaking quoted newlines
+    function extractSections(text) {
+      const sectionKeys = [
+        { key: 'metadata', marker: '[SECTION_CATALOGUE_METADATA]' },
+        { key: 'predecimal', marker: '[SECTION_MINTAGES_PREDECIMAL]' },
+        { key: 'decimal', marker: '[SECTION_MINTAGES_DECIMAL]' },
+        { key: 'banknoteRuns', marker: '[SECTION_BANKNOTE_PRINT_RUNS]' },
+        { key: 'f3Lsd', marker: '[SECTION_CIRCULATION_F3_LSD]' },
+        { key: 'f3Decimal', marker: '[SECTION_CIRCULATION_F3_DECIMAL]' }
+      ];
+
+      const sections = { metadata: '', predecimal: '', decimal: '', banknoteRuns: '', f3Lsd: '', f3Decimal: '' };
+      const found = [];
+      sectionKeys.forEach(s => {
+        const idx = text.indexOf(s.marker);
+        if (idx !== -1) found.push({ key: s.key, rawIdx: idx, start: idx + s.marker.length });
+      });
+
+      if (found.length === 0) {
         sections.metadata = text;
-      } else {
-        const lines = text.split(/\r?\n/);
-        let currentSec = null;
-        let currentBuffer = [];
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('[SECTION_CATALOGUE_METADATA]')) {
-            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-            currentSec = 'metadata'; currentBuffer = [];
-          } else if (trimmed.startsWith('[SECTION_MINTAGES_PREDECIMAL]')) {
-            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-            currentSec = 'predecimal'; currentBuffer = [];
-          } else if (trimmed.startsWith('[SECTION_MINTAGES_DECIMAL]')) {
-            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-            currentSec = 'decimal'; currentBuffer = [];
-          } else if (trimmed.startsWith('[SECTION_BANKNOTE_PRINT_RUNS]')) {
-            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-            currentSec = 'banknoteRuns'; currentBuffer = [];
-          } else if (trimmed.startsWith('[SECTION_CIRCULATION_F3_LSD]')) {
-            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-            currentSec = 'f3Lsd'; currentBuffer = [];
-          } else if (trimmed.startsWith('[SECTION_CIRCULATION_F3_DECIMAL]')) {
-            if (currentSec) sections[currentSec] = currentBuffer.join('\n');
-            currentSec = 'f3Decimal'; currentBuffer = [];
-          } else {
-            currentBuffer.push(line);
-          }
-        }
-        if (currentSec) sections[currentSec] = currentBuffer.join('\n');
+        return sections;
       }
+
+      found.sort((a, b) => a.rawIdx - b.rawIdx);
+      for (let i = 0; i < found.length; i++) {
+        const end = (i + 1 < found.length) ? found[i + 1].rawIdx : text.length;
+        sections[found[i].key] = text.slice(found[i].start, end).trim();
+      }
+      return sections;
+    }
+
+    function parseUnifiedCsv(text) {
+      const sections = extractSections(text);
 
       if (sections.metadata) {
         const pMeta = Papa.parse(sections.metadata, { header: true, skipEmptyLines: true });
-        currencyItems = (pMeta.data || []).map((r, idx) => ({
-          ...r,
-          _uid: `${r.ID || 'item'}_${idx}`
-        })).filter(r => (r.ID && String(r.ID).trim().length > 0) || (r.Denomination && String(r.Denomination).trim().length > 0));
+        currencyItems = (pMeta.data || []).map((r, idx) => {
+          const norm = normalizeRow(r);
+          return { ...norm, _uid: `${norm.ID || 'item'}_${idx}` };
+        }).filter(r => (r.ID && r.ID.length > 0) || (r.Denomination && r.Denomination.length > 0));
       }
 
       if (sections.predecimal) {
@@ -2076,519 +1530,113 @@
 
     function updateMintageBreakdown(selectedYear = 1977) {
       const container = document.getElementById('mintageBreakdownCards');
-      const titleEl = document.getElementById('mintageBreakdownTitle');
       const totalSumEl = document.getElementById('mintageYearTotalSum');
       const eraNoteEl = document.getElementById('mintageYearEraNote');
       if (!container) return;
 
-      if (titleEl) titleEl.textContent = `Official ${selectedYear} Production Mintage Breakdown`;
-
-      if (selectedYear === 1966) {
-        container.innerHTML = `
-          <div class="col-span-full p-6 bg-slate-800/90 rounded-2xl border border-amber-500/40 text-center space-y-2">
-            <span class="text-2xl">⏸️</span>
-            <h4 class="text-base font-black text-amber-400">1966 Official Minting Gap</h4>
-            <p class="text-xs text-slate-300 max-w-xl mx-auto">
-              Zero regular circulating coins were dated 1966 in order to prepare and distribute the new decimal coins for Decimal Currency Day on 10 July 1967.
-            </p>
-          </div>
-        `;
-        if (totalSumEl) totalSumEl.textContent = '0 (Minting Pause)';
-        if (eraNoteEl) eraNoteEl.textContent = 'Decimal Transition Preparation Year';
-        return;
-      }
-
-      let cardsHtml = '';
-      let sum = 0;
-
       if (selectedYear >= 1933 && selectedYear <= 1965) {
         const row = preDecimalMintages.find(r => Number(r.Year) === selectedYear);
         if (eraNoteEl) eraNoteEl.textContent = 'Pre-Decimal Currency Era (1933–1965)';
-        
         const preDenoms = [
-          { key: 'Halfpenny', name: '1/2d (Halfpenny)', color: 'text-amber-400' },
-          { key: 'Penny', name: '1d (Penny)', color: 'text-amber-300' },
-          { key: 'Threepence', name: '3d (Threepence)', color: 'text-slate-300' },
-          { key: 'Sixpence', name: '6d (Sixpence)', color: 'text-slate-200' },
-          { key: 'Shilling', name: '1/- (Shilling)', color: 'text-blue-300' },
-          { key: 'Florin', name: '2/- (Florin)', color: 'text-emerald-300' },
-          { key: 'Half_Crown', name: '2/6 (Half Crown)', color: 'text-purple-300' },
-          { key: 'Crown', name: '5/- (Crown)', color: 'text-yellow-300' }
+          { key: 'Halfpenny', name: '1/2d' }, { key: 'Penny', name: '1d' }, { key: 'Threepence', name: '3d' },
+          { key: 'Sixpence', name: '6d' }, { key: 'Shilling', name: '1/-' }, { key: 'Florin', name: '2/-' },
+          { key: 'Half_Crown', name: '2/6' }, { key: 'Crown', name: '5/-' }
         ];
-
-        cardsHtml = preDenoms.map(d => {
+        let sum = 0;
+        container.innerHTML = preDenoms.map(d => {
           const val = row && row[d.key] ? Number(row[d.key]) : 0;
           sum += val;
           return `
-            <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-amber-500/40 transition">
-              <span class="text-slate-400 text-[10px] block font-bold truncate">${d.name}</span>
-              <span class="font-mono font-black ${d.color} text-sm block mt-1">
-                ${val > 0 ? val.toLocaleString() : '--'}
-              </span>
+            <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700">
+              <span class="text-slate-400 text-[10px] block font-bold">${d.name}</span>
+              <span class="font-mono font-black text-amber-300 text-sm block mt-1">${val > 0 ? val.toLocaleString() : '--'}</span>
             </div>
           `;
         }).join('');
+        if (totalSumEl) totalSumEl.textContent = sum.toLocaleString();
       } else if (selectedYear >= 1967 && selectedYear <= 2026) {
         const row = decimalMintages.find(r => Number(r.Year) === selectedYear);
-        if (eraNoteEl) {
-          eraNoteEl.textContent = selectedYear >= 2006 ? 'Current Plated Steel / Al-Bronze Coinage Era (2006–Present)' : 'First Decimal Series Era (1967–2006)';
-        }
-
+        if (eraNoteEl) eraNoteEl.textContent = selectedYear >= 2006 ? 'Current Plated Steel Era' : 'First Decimal Series Era';
         const decDenoms = [
-          { key: '1c', name: '1c (One Cent)', color: 'text-amber-400' },
-          { key: '2c', name: '2c (Two Cents)', color: 'text-amber-300' },
-          { key: '5c', name: '5c (Five Cents)', color: 'text-slate-300' },
-          { key: '10c', name: '10c (Ten Cents)', color: 'text-blue-300' },
-          { key: '20c', name: '20c (Twenty Cents)', color: 'text-emerald-300' },
-          { key: '50c', name: '50c (Fifty Cents)', color: 'text-purple-300' },
-          { key: '1_Dollar', name: '$1 (One Dollar)', color: 'text-yellow-400' },
-          { key: '2_Dollar', name: '$2 (Two Dollars)', color: 'text-yellow-300' }
+          { key: '1c', name: '1c' }, { key: '2c', name: '2c' }, { key: '5c', name: '5c' }, { key: '10c', name: '10c' },
+          { key: '20c', name: '20c' }, { key: '50c', name: '50c' }, { key: '1_Dollar', name: '$1' }, { key: '2_Dollar', name: '$2' }
         ];
-
-        cardsHtml = decDenoms.map(d => {
+        let sum = 0;
+        container.innerHTML = decDenoms.map(d => {
           const val = row && row[d.key] ? Number(row[d.key]) : 0;
           sum += val;
           return `
-            <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 hover:border-amber-500/40 transition">
-              <span class="text-slate-400 text-[10px] block font-bold truncate">${d.name}</span>
-              <span class="font-mono font-black ${d.color} text-sm block mt-1">
-                ${val > 0 ? val.toLocaleString() : '--'}
-              </span>
+            <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700">
+              <span class="text-slate-400 text-[10px] block font-bold">${d.name}</span>
+              <span class="font-mono font-black text-blue-300 text-sm block mt-1">${val > 0 ? val.toLocaleString() : '--'}</span>
             </div>
           `;
         }).join('');
-      } else {
-        cardsHtml = '<div class="col-span-full py-4 text-xs text-slate-400">Please enter a valid year between 1933 and 2026.</div>';
-      }
-
-      container.innerHTML = cardsHtml;
-      if (totalSumEl) totalSumEl.textContent = sum.toLocaleString();
-    }
-
-    window.setF3ExplorerYear = function(year) {
-      const input = document.getElementById('f3YearInput');
-      if (input) input.value = year;
-      updateF3CirculationBreakdown(Number(year));
-    };
-
-    function updateF3CirculationBreakdown(selectedYear = 1977) {
-      const container = document.getElementById('f3BreakdownCards');
-      const titleEl = document.getElementById('f3ExplorerTitle');
-      const grandTotalEl = document.getElementById('f3GrandTotalSum');
-      const faceValueEl = document.getElementById('f3CalculatedFaceValue');
-      if (!container) return;
-
-      if (titleEl) titleEl.textContent = `Official ${selectedYear} Banknotes in Public Hands (Table F3)`;
-
-      const lsdRow = f3LsdData.find(r => Number(r.Year) === selectedYear);
-      const decRow = f3DecimalData.find(r => Number(r.Year) === selectedYear);
-
-      let html = '';
-      let totalNotesCountThousand = 0;
-      let calculatedFaceValueNzd = 0;
-
-      if (decRow) {
-        const decDenoms = [
-          { key: '1_Dollar_Thousands', name: '$1 Note', multiplier: 1, color: 'text-amber-300' },
-          { key: '2_Dollar_Thousands', name: '$2 Note', multiplier: 2, color: 'text-purple-300' },
-          { key: '5_Dollar_Thousands', name: '$5 Note', multiplier: 5, color: 'text-orange-300' },
-          { key: '10_Dollar_Thousands', name: '$10 Note', multiplier: 10, color: 'text-blue-300' },
-          { key: '20_Dollar_Thousands', name: '$20 Note', multiplier: 20, color: 'text-emerald-300' },
-          { key: '50_Dollar_Thousands', name: '$50 Note', multiplier: 50, color: 'text-pink-300' },
-          { key: '100_Dollar_Thousands', name: '$100 Note', multiplier: 100, color: 'text-rose-300' }
-        ];
-
-        html += `
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-black text-indigo-300 uppercase tracking-wider">Decimal Banknotes in Public Hands (Count in 000s of Notes)</span>
-              <span class="text-[10px] text-slate-400 font-mono">Total Dollar Notes: ${(Number(decRow.Total_Dollar_Notes_Thousands) || 0).toLocaleString()}k</span>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center text-xs">
-              ${decDenoms.map(d => {
-                const countThousand = Number(decRow[d.key]) || 0;
-                calculatedFaceValueNzd += (countThousand * 1000 * d.multiplier);
-                return `
-                  <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
-                    <span class="text-slate-400 text-[10px] block font-bold">${d.name}</span>
-                    <span class="font-mono font-black ${d.color} text-xs sm:text-sm block mt-0.5">
-                      ${countThousand > 0 ? countThousand.toLocaleString() : '--'}
-                    </span>
-                    <span class="text-[9px] text-slate-500 font-mono block mt-0.5">(${countThousand > 0 ? (countThousand * 1000).toLocaleString() : 0} notes)</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-        totalNotesCountThousand += Number(decRow.Total_Dollar_Notes_Thousands) || 0;
-      }
-
-      if (lsdRow) {
-        const lsdDenoms = [
-          { key: '10s_Thousands', name: '10/- (Ten Shillings)', nzdValue: 1.00 },
-          { key: '1_Pound_Thousands', name: '£1 (One Pound)', nzdValue: 2.00 },
-          { key: '5_Pound_Thousands', name: '£5 (Five Pounds)', nzdValue: 10.00 },
-          { key: '10_Pound_Thousands', name: '£10 (Ten Pounds)', nzdValue: 20.00 },
-          { key: '50_Pound_Thousands', name: '£50 (Fifty Pounds)', nzdValue: 100.00 }
-        ];
-
-        const isUnredeemed = selectedYear >= 1968;
-        html += `
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-black ${isUnredeemed ? 'text-amber-400' : 'text-indigo-300'} uppercase tracking-wider">
-                ${isUnredeemed ? 'Pre-Decimal (£sd) Unredeemed Notes in Public Hands (Count in 000s of Notes)' : 'Pre-Decimal (£sd) Banknotes in Circulation (Count in 000s of Notes)'}
-              </span>
-              <span class="text-[10px] text-slate-400 font-mono">Total £sd Notes: ${(Number(lsdRow.Total_LSD_Thousands) || 0).toLocaleString()}k</span>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-center text-xs">
-              ${lsdDenoms.map(d => {
-                const countThousand = Number(lsdRow[d.key]) || 0;
-                calculatedFaceValueNzd += (countThousand * 1000 * d.nzdValue);
-                return `
-                  <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700">
-                    <span class="text-slate-400 text-[10px] block font-bold truncate">${d.name}</span>
-                    <span class="font-mono font-black text-slate-200 text-xs sm:text-sm block mt-0.5">
-                      ${countThousand > 0 ? countThousand.toLocaleString() : '--'}
-                    </span>
-                    <span class="text-[9px] text-slate-500 font-mono block mt-0.5">(${countThousand > 0 ? (countThousand * 1000).toLocaleString() : 0} notes)</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-
-        totalNotesCountThousand += Number(lsdRow.Total_LSD_Thousands) || 0;
-      }
-
-      container.innerHTML = html || '<div class="py-4 text-xs text-slate-400">No circulation records available for this year.</div>';
-      
-      if (grandTotalEl) {
-        if (totalNotesCountThousand >= 1000000) {
-          grandTotalEl.textContent = `${(totalNotesCountThousand / 1000000).toFixed(3)} Billion Notes (${totalNotesCountThousand.toLocaleString()}k)`;
-        } else {
-          grandTotalEl.textContent = `${(totalNotesCountThousand / 1000).toFixed(2)} Million Notes (${totalNotesCountThousand.toLocaleString()}k)`;
-        }
-      }
-
-      if (faceValueEl) {
-        if (calculatedFaceValueNzd >= 1000000000) {
-          faceValueEl.textContent = `Calculated Aggregate Face Value: $${(calculatedFaceValueNzd / 1000000000).toFixed(3)} Billion NZD`;
-        } else {
-          faceValueEl.textContent = `Calculated Aggregate Face Value: $${(calculatedFaceValueNzd / 1000000).toFixed(2)} Million NZD`;
-        }
+        if (totalSumEl) totalSumEl.textContent = sum.toLocaleString();
       }
     }
-
-    let chartPreDecInst = null;
-    let chartDecInst = null;
-    let chartGovInst = null;
-    let chartCircInst = null;
 
     function renderStatisticalDashboard() {
       let preDecGrandTotal = 0;
-      const preDecDenoms = { Halfpenny: 0, Penny: 0, Threepence: 0, Sixpence: 0, Shilling: 0, Florin: 0, Half_Crown: 0, Crown: 0 };
-      preDecimalMintages.forEach(row => {
-        Object.keys(preDecDenoms).forEach(k => {
-          const val = Number(row[k]) || 0;
-          preDecDenoms[k] += val;
-          preDecGrandTotal += val;
+      preDecimalMintages.forEach(r => {
+        ['Halfpenny', 'Penny', 'Threepence', 'Sixpence', 'Shilling', 'Florin', 'Half_Crown', 'Crown'].forEach(k => {
+          preDecGrandTotal += Number(r[k]) || 0;
         });
       });
 
       let decGrandTotal = 0;
-      const decDenoms = { '1c': 0, '2c': 0, '5c': 0, '10c': 0, '20c': 0, '50c': 0, '1_Dollar': 0, '2_Dollar': 0 };
-      decimalMintages.forEach(row => {
-        Object.keys(decDenoms).forEach(k => {
-          const val = Number(row[k]) || 0;
-          decDenoms[k] += val;
-          decGrandTotal += val;
+      decimalMintages.forEach(r => {
+        ['1c', '2c', '5c', '10c', '20c', '50c', '1_Dollar', '2_Dollar'].forEach(k => {
+          decGrandTotal += Number(r[k]) || 0;
         });
       });
 
-      let polymerNotesTotal = 0;
-      const govTotals = {};
-      banknoteRuns.forEach(r => {
-        const qty = Number(r.Total_Printed) || 0;
-        polymerNotesTotal += qty;
-        const gov = r.Signature || 'Other';
-        govTotals[gov] = (govTotals[gov] || 0) + qty;
-      });
-
-      const latestF3 = f3DecimalData[f3DecimalData.length - 1];
-      const latestCircThousand = latestF3 ? Number(latestF3.Total_All_Notes_Thousands) || 0 : 0;
-      const latestCircFormatted = `${(latestCircThousand / 1000).toFixed(2)} Million Notes`;
-
       const elPre = document.getElementById('statPreDecimalTotal');
       const elDec = document.getElementById('statDecimalTotal');
-      const elPoly = document.getElementById('statPolymerNotesTotal');
-      const elCirc = document.getElementById('statPublicCirculationTotal');
-
       if (elPre) elPre.textContent = preDecGrandTotal.toLocaleString();
       if (elDec) elDec.textContent = decGrandTotal.toLocaleString();
-      if (elPoly) elPoly.textContent = polymerNotesTotal.toLocaleString();
-      if (elCirc) elCirc.textContent = latestCircFormatted;
-
       updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
-      updateF3CirculationBreakdown(Number(document.getElementById('f3YearInput')?.value || 1977));
-
-      const isDark = document.documentElement.classList.contains('dark');
-      const textColor = isDark ? '#e2e8f0' : '#334155';
-      const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-
-      if (window.Chart) {
-        const ctxPre = document.getElementById('chartPreDecimalDenoms')?.getContext('2d');
-        if (ctxPre) {
-          if (chartPreDecInst) chartPreDecInst.destroy();
-          chartPreDecInst = new Chart(ctxPre, {
-            type: 'bar',
-            data: {
-              labels: ['1/2d', '1d', '3d', '6d', '1/-', '2/-', '2/6', '5/- Crown'],
-              datasets: [{
-                label: 'Coins Minted',
-                data: Object.values(preDecDenoms),
-                backgroundColor: '#f59e0b',
-                borderRadius: 8
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                y: { ticks: { color: textColor }, grid: { color: gridColor } }
-              }
-            }
-          });
-        }
-
-        const ctxDec = document.getElementById('chartDecimalDenoms')?.getContext('2d');
-        if (ctxDec) {
-          if (chartDecInst) chartDecInst.destroy();
-          chartDecInst = new Chart(ctxDec, {
-            type: 'bar',
-            data: {
-              labels: ['1c', '2c', '5c', '10c', '20c', '50c', '$1', '$2'],
-              datasets: [{
-                label: 'Coins Minted',
-                data: Object.values(decDenoms),
-                backgroundColor: '#3b82f6',
-                borderRadius: 8
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                y: { ticks: { color: textColor }, grid: { color: gridColor } }
-              }
-            }
-          });
-        }
-
-        const ctxGov = document.getElementById('chartGovernorRuns')?.getContext('2d');
-        if (ctxGov) {
-          if (chartGovInst) chartGovInst.destroy();
-          chartGovInst = new Chart(ctxGov, {
-            type: 'doughnut',
-            data: {
-              labels: Object.keys(govTotals),
-              datasets: [{
-                data: Object.values(govTotals),
-                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899'],
-                borderWidth: 0
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { position: 'bottom', labels: { color: textColor, boxWidth: 12 } }
-              }
-            }
-          });
-        }
-
-        const ctxCirc = document.getElementById('chartCirculationTrend')?.getContext('2d');
-        if (ctxCirc) {
-          if (chartCircInst) chartCircInst.destroy();
-          chartCircInst = new Chart(ctxCirc, {
-            type: 'line',
-            data: {
-              labels: f3DecimalData.map(d => d.Year),
-              datasets: [
-                {
-                  label: 'Total All Notes (000s Count)',
-                  data: f3DecimalData.map(d => d.Total_All_Notes_Thousands),
-                  borderColor: '#8b5cf6',
-                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                  fill: true,
-                  tension: 0.3
-                },
-                {
-                  label: '$50 Notes (000s Count)',
-                  data: f3DecimalData.map(d => d['50_Dollar_Thousands'] || 0),
-                  borderColor: '#10b981',
-                  tension: 0.3
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { labels: { color: textColor } } },
-              scales: {
-                x: { ticks: { color: textColor, maxTicksLimit: 12 }, grid: { color: gridColor } },
-                y: { ticks: { color: textColor }, grid: { color: gridColor } }
-              }
-            }
-          });
-        }
-      }
-
-      const rarities = [
-        { year: 1935, denom: 'Crown (5/-)', mintage: 1128, status: 'Ultra-Rare Key Date', notes: 'Waitangi Crown; New Zealand’s foremost numismatic rarity' },
-        { year: 1935, denom: 'Threepence (3d)', mintage: 40364, status: 'Rare Key Date', notes: 'Great Depression era low mintage' },
-        { year: 1961, denom: 'Half Crown (2/6)', mintage: 80000, status: 'Key Date', notes: 'Lowest mintage circulating Half Crown' },
-        { year: 1940, denom: 'Half Crown (2/6)', mintage: 100800, status: 'Semi-Key Date', notes: '1940 Centennial issue' },
-        { year: 1944, denom: 'Florin (2/-)', mintage: 140000, status: 'Key Date', notes: 'Wartime production allocation' },
-        { year: 1963, denom: 'Florin (2/-)', mintage: 100000, status: 'Key Date', notes: 'Late pre-decimal low production' },
-        { year: '1967–1982', denom: '$50 Banknote', mintage: 0, status: 'Denomination Absent', notes: 'No $50 notes existed in decimal series prior to 1983; introduced in Series 4' },
-        { year: 2005, denom: '50 Cents (50c)', mintage: 1000000, status: 'Decimal Key Date', notes: 'Last large cupronickel 50c piece issued before 2006 resize' },
-        { year: 2015, denom: '50 Cents (Anzac)', mintage: 1000000, status: 'Commemorative Issue', notes: 'First coloured circulating coin released in New Zealand' },
-        { year: 2018, denom: '50 Cents (Armistice)', mintage: 1600000, status: 'Commemorative Issue', notes: 'Centenary of the 1918 Armistice with red poppy motif' }
-      ];
-
-      const tbody = document.getElementById('rarityTableBody');
-      if (tbody) {
-        tbody.innerHTML = rarities.map(r => {
-          const mintageDisplay = typeof r.mintage === 'number' && r.mintage > 0 
-            ? r.mintage.toLocaleString() 
-            : typeof r.mintage === 'number' && r.mintage === 0 
-              ? '0 (None Struck)' 
-              : r.mintage;
-
-          const badgeColor = r.mintage === 0 
-            ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300' 
-            : typeof r.mintage === 'number' && r.mintage < 50000 
-              ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300' 
-              : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
-
-          return `
-            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-              <td class="py-2.5 px-3 font-mono font-bold text-slate-900 dark:text-white">${r.year}</td>
-              <td class="py-2.5 px-3 font-bold">${r.denom}</td>
-              <td class="py-2.5 px-3 font-mono text-amber-600 dark:text-amber-400 font-black">${mintageDisplay}</td>
-              <td class="py-2.5 px-3">
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${badgeColor}">
-                  ${r.status}
-                </span>
-              </td>
-              <td class="py-2.5 px-3 text-slate-500 dark:text-slate-400 text-[11px]">${r.notes}</td>
-            </tr>
-          `;
-        }).join('');
-      }
     }
 
-    // Resilient data loading routine with multi-path resolution
     async function loadCurrencyData(forceRefresh = false) {
       const statsCounter = document.getElementById('currencyStatsCounter');
       if (statsCounter) statsCounter.textContent = 'Loading database...';
 
-      try {
-        if (!forceRefresh) {
-          const cached = localStorage.getItem(CACHE_KEY_RAW);
-          const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
-          if (cached && (cached.includes('[SECTION_') || cached.includes('Denomination') || cached.includes('ID'))) {
-            parseUnifiedCsv(cached);
-            renderCurrentView();
-            if (cachedTime && (Date.now() - Number(cachedTime) < CACHE_TTL_MS)) return;
-          }
-        }
-      } catch (e) {
-        console.warn('Cache check notice:', e);
-      }
-
       let text = '';
-      
-      // Try local candidate paths
-      const localCandidates = [
-        'currency.csv',
-        './currency.csv',
-        'data/currency.csv',
-        './data/currency.csv',
-        '../data/currency.csv',
-        '../currency.csv'
-      ];
-
-      for (const p of localCandidates) {
+      const candidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
+      for (const p of candidates) {
         try {
           const res = await fetch(p);
           if (res.ok) {
             const t = await res.text();
-            if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('pre_halfpenny') || t.includes('Category'))) {
-              text = t;
-              break;
+            if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('ID'))) {
+              text = t; break;
             }
           }
         } catch (e) {}
       }
 
-      // If local files not present (e.g. GitHub Pages remote), fetch directly from Google Docs
       if (!text) {
         try {
           const res = await fetch(GOOGLE_CSV_URL);
-          if (res.ok) {
-            text = await res.text();
-          }
-        } catch (onlineErr) {
-          console.warn('Direct Google Sheet fetch failed, testing CORS proxy...', onlineErr);
-          // Fallback via CORS proxy if direct cross-origin request is blocked
+          if (res.ok) text = await res.text();
+        } catch (e1) {
           try {
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_CSV_URL)}`;
-            const resProxy = await fetch(proxyUrl);
-            if (resProxy.ok) {
-              text = await resProxy.text();
-            }
-          } catch (proxyErr) {
-            console.warn('Proxy fetch failed:', proxyErr);
-          }
+            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_CSV_URL)}`;
+            const res2 = await fetch(proxy);
+            if (res2.ok) text = await res2.text();
+          } catch (e2) {}
         }
       }
 
       if (text) {
-        try {
-          localStorage.setItem(CACHE_KEY_RAW, text);
-          localStorage.setItem(CACHE_KEY_TIME, Date.now());
-        } catch (e) {}
         parseUnifiedCsv(text);
         renderCurrentView();
       } else {
         if (statsCounter) {
-          statsCounter.innerHTML = `<span class="text-rose-500">⚠️ Unable to load database.</span> <button onclick="loadCurrencyData(true)" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry</button>`;
+          statsCounter.innerHTML = `<span class="text-rose-500">⚠️ Database load error.</span> <button onclick="loadCurrencyData(true)" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry</button>`;
         }
       }
-    }
-
-    function updateCalculator() {
-      const pounds = parseFloat(document.getElementById('calcPounds')?.value || 0);
-      const shillings = parseFloat(document.getElementById('calcShillings')?.value || 0);
-      const pence = parseFloat(document.getElementById('calcPence')?.value || 0);
-
-      const totalCents = (pounds * 200) + (shillings * 10) + (pence * (5 / 6));
-      const dollars = totalCents / 100;
-
-      const resDec = document.getElementById('calcResultDecimal');
-      const resCents = document.getElementById('calcResultCents');
-
-      if (resDec) resDec.textContent = `$${dollars.toFixed(2)} NZD`;
-      if (resCents) resCents.textContent = `${totalCents.toFixed(1)} cents (exact decimal value)`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -2604,45 +1652,18 @@
       themeToggleBtn?.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        localStorage.setItem('bMMC_theme', isDark ? 'dark' : 'light');
         updateThemeUI(isDark);
       });
 
-      document.getElementById('toggleControlsBtn')?.addEventListener('click', () => toggleCollapsibleControls());
-      document.getElementById('btnSurprise')?.addEventListener('click', surpriseMe);
-
-      ['calcPounds', 'calcShillings', 'calcPence'].forEach(id => {
-        document.getElementById(id)?.addEventListener('input', updateCalculator);
+      document.getElementById('toggleControlsBtn')?.addEventListener('click', () => {
+        document.getElementById('collapsibleControls')?.classList.toggle('hidden');
       });
 
-      // Mintage Year Listeners
       document.getElementById('btnSearchMintageYear')?.addEventListener('click', () => {
-        const yr = Number(document.getElementById('mintageYearInput')?.value || 1977);
-        updateMintageBreakdown(yr);
-      });
-      document.getElementById('mintageYearInput')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const yr = Number(document.getElementById('mintageYearInput')?.value || 1977);
-          updateMintageBreakdown(yr);
-        }
+        updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
       });
 
-      // F3 Circulation Year Listeners
-      document.getElementById('btnSearchF3Year')?.addEventListener('click', () => {
-        const yr = Number(document.getElementById('f3YearInput')?.value || 1977);
-        updateF3CirculationBreakdown(yr);
-      });
-      document.getElementById('f3YearInput')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const yr = Number(document.getElementById('f3YearInput')?.value || 1977);
-          updateF3CirculationBreakdown(yr);
-        }
-      });
-
-      document.getElementById('currencySearchInput')?.addEventListener('input', () => {
-        renderCurrentView();
-      });
-
+      document.getElementById('currencySearchInput')?.addEventListener('input', () => renderCurrentView());
       document.getElementById('btnCloseDetailModal')?.addEventListener('click', closeDetailModal);
       document.getElementById('itemDetailModal')?.addEventListener('click', (e) => {
         if (e.target === document.getElementById('itemDetailModal')) closeDetailModal();
@@ -2660,7 +1681,6 @@
         }
       });
 
-      updateCalculator();
       loadCurrencyData();
     });
   </script>
