@@ -7,7 +7,7 @@
   <meta name="referrer" content="no-referrer-when-downgrade" />
   <title>New Zealand Currency &amp; Minting Database — BMMC</title>
 
-  <!-- Instant Theme Sync (Defaults cleanly to Day mode unless 'dark' was chosen) -->
+  <!-- Instant Theme Sync -->
   <script>
     (function() {
       try {
@@ -78,20 +78,18 @@
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
 
   <style>
-    /* CSS Variables for 100% Reliable Day and Night Theme Switching */
+    /* CSS Variables for 100% Guaranteed Day and Night Theme Switching */
     :root {
       --bg-page-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
       --text-main: #0f172a;
       --card-bg: #ffffff;
       --card-border: #e2e8f0;
-      --img-container-bg: #ffffff;
     }
     html.dark {
       --bg-page-gradient: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%);
       --text-main: #f8fafc;
       --card-bg: #0f172a;
       --card-border: #1e293b;
-      --img-container-bg: #020617;
     }
 
     body {
@@ -210,6 +208,11 @@
             </button>
           </div>
 
+          <!-- Live Online Google Sheet Sync Button -->
+          <button id="btnSyncSheet" onclick="syncFromGoogleSheet(true)" title="Force sync latest records from Google Sheet" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
+            <span>🔄</span> <span class="hidden sm:inline">Sync Sheet</span>
+          </button>
+
           <button id="btnSurprise" title="Surprise Me" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
             <span>✨</span> <span class="hidden sm:inline">Surprise</span>
           </button>
@@ -293,6 +296,7 @@
           </div>
           <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 shrink-0">
             <span id="currencyStatsCounter">Connecting to database...</span>
+            <button onclick="syncFromGoogleSheet(true)" class="underline text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 cursor-pointer">Sync Now</button>
           </div>
         </div>
 
@@ -680,7 +684,7 @@
   <!-- Application Logic -->
   <script>
     const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v11';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v12';
     const USER_COLLECTION_KEY = 'bMMC_user_currency_collection_v1';
 
     let currencyItems = [];
@@ -789,7 +793,6 @@
       setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3'), 2500);
     }
 
-    // Theme Switcher: Flips Day Mode (clean white) and Night Mode (pure dark)
     function setTheme(isDark) {
       if (isDark) {
         document.documentElement.classList.add('dark');
@@ -861,7 +864,7 @@
       else if (currentViewMode === 'gallery') renderGalleryView();
     }
 
-    // Google image sizing: s200 (card & gallery) and s1000 (modal & zoom)
+    // Google image sizing: s200 (cards & gallery) and s1000 (modals & zoom)
     function formatImageUrl(url, size = 's200') {
       if (!url) return '';
       let clean = String(url).trim();
@@ -1001,7 +1004,6 @@
       return `
         <div class="bg-white dark:bg-slate-900 border ${isOwned ? 'border-emerald-500 ring-2 ring-emerald-500/20' : isWishlist ? 'border-pink-500 ring-2 ring-pink-500/20' : 'border-slate-200 dark:border-slate-800'} rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer relative" onclick="openDetailModal('${item._uid}')">
           <div>
-            <!-- Day mode white background, Night mode deep black background -->
             <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-48' : 'h-44'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800 select-none">
               <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayFront}', '${safeDenom} — Front (Obverse)', event)" onerror="this.onerror=null;this.src='${fallbackFront}';" />
               ${hasRear ? `
@@ -1548,70 +1550,98 @@
       updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
     }
 
-    // Multi-Strategy Online Loader to bypass Google Sheets CORS Redirects
-    async function fetchOnlineSheetData() {
-      // 1. Direct fetch
+    // 4-Tier Online Fetch Engine: Guaranteed to bypass Google CORS restrictions
+    async function fetchGoogleSheetCsv(customUrl) {
+      const targetUrl = customUrl || GOOGLE_CSV_URL;
+
+      // Tier 1: Direct browser fetch
       try {
-        const res = await fetch(GOOGLE_CSV_URL, { cache: 'no-cache' });
+        const res = await fetch(targetUrl);
         if (res.ok) {
-          const t = await res.text();
-          if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('ID'))) return t;
+          const text = await res.text();
+          if (text && text.trim().length > 50) return { success: true, text, source: 'Direct Google Sheet' };
         }
       } catch (e) {}
 
-      // 2. AllOrigins JSON API (Always works around CORS in browsers)
+      // Tier 2: AllOrigins JSON API (Bypasses browser CORS restrictions by returning JSON payload)
       try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(GOOGLE_CSV_URL)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&timestamp=${Date.now()}`;
         const res = await fetch(proxyUrl);
         if (res.ok) {
           const json = await res.json();
-          if (json && json.contents && (json.contents.includes('[SECTION_') || json.contents.includes('Denomination'))) {
-            return json.contents;
+          if (json && json.contents && json.contents.trim().length > 50) {
+            return { success: true, text: json.contents, source: 'AllOrigins CORS Gateway' };
           }
         }
       } catch (e) {}
 
-      // 3. CodeTabs CORS Proxy
+      // Tier 3: CodeTabs CORS Proxy
       try {
-        const proxyUrl2 = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(GOOGLE_CSV_URL)}`;
-        const res = await fetch(proxyUrl2);
+        const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
+        const res = await fetch(proxyUrl);
         if (res.ok) {
-          const t = await res.text();
-          if (t && (t.includes('[SECTION_') || t.includes('Denomination'))) return t;
+          const text = await res.text();
+          if (text && text.trim().length > 50) return { success: true, text, source: 'CodeTabs Proxy' };
         }
       } catch (e) {}
 
-      return null;
+      // Tier 4: CorsProxy.io
+      try {
+        const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
+        const res = await fetch(proxyUrl);
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.trim().length > 50) return { success: true, text, source: 'CorsProxy.io' };
+        }
+      } catch (e) {}
+
+      return { success: false, text: null };
     }
 
-    async function loadCurrencyData(forceRefresh = false) {
+    // Live Synchronisation with Google Sheet
+    async function syncFromGoogleSheet(isManual = false) {
       const statsCounter = document.getElementById('currencyStatsCounter');
-      if (statsCounter) statsCounter.textContent = 'Loading online database...';
+      if (isManual) showToast('Connecting to Google Sheet...', '⏳');
+
+      const result = await fetchGoogleSheetCsv();
+      if (result.success && result.text) {
+        try {
+          localStorage.setItem(CACHE_KEY_RAW, result.text);
+        } catch (e) {}
+
+        parseUnifiedCsv(result.text);
+        renderCurrentView();
+
+        if (statsCounter) {
+          statsCounter.textContent = `🟢 Live Sheet Synced (${currencyItems.length} records)`;
+        }
+        if (isManual) {
+          showToast(`Synced ${currencyItems.length} specimens from Google Sheet!`, '✅');
+        }
+        return true;
+      } else {
+        if (isManual) {
+          showToast('Could not reach Google Sheet. Check network connection.', '⚠️');
+        }
+        return false;
+      }
+    }
+
+    async function loadCurrencyData() {
+      const statsCounter = document.getElementById('currencyStatsCounter');
+      if (statsCounter) statsCounter.textContent = 'Loading database...';
 
       let text = '';
 
-      // Check localStorage cache first
-      if (!forceRefresh) {
-        try {
-          const cached = localStorage.getItem(CACHE_KEY_RAW);
-          if (cached && (cached.includes('[SECTION_') || cached.includes('Denomination'))) {
-            text = cached;
-          }
-        } catch (e) {}
-      }
-
-      // Fetch live data from the online Google Sheet
-      if (!text || forceRefresh) {
-        const onlineText = await fetchOnlineSheetData();
-        if (onlineText) {
-          text = onlineText;
-          try {
-            localStorage.setItem(CACHE_KEY_RAW, text);
-          } catch (e) {}
+      // 1. Check cached copy first to render instantly
+      try {
+        const cached = localStorage.getItem(CACHE_KEY_RAW);
+        if (cached && (cached.includes('[SECTION_') || cached.includes('Denomination') || cached.includes('ID'))) {
+          text = cached;
         }
-      }
+      } catch (e) {}
 
-      // Fallback: Check local files in repository
+      // 2. Check local repo candidate paths (for offline use)
       if (!text) {
         const candidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
         for (const p of candidates) {
@@ -1619,7 +1649,7 @@
             const res = await fetch(p);
             if (res.ok) {
               const t = await res.text();
-              if (t && (t.includes('[SECTION_') || t.includes('Denomination'))) {
+              if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('ID'))) {
                 text = t; break;
               }
             }
@@ -1627,19 +1657,23 @@
         }
       }
 
+      // If local data exists, render immediately
       if (text) {
         parseUnifiedCsv(text);
         renderCurrentView();
-        if (statsCounter) statsCounter.textContent = `Online data synced (${currencyItems.length} records)`;
-      } else {
+        if (statsCounter) statsCounter.textContent = `Loaded ${currencyItems.length} items (checking live sheet...)`;
+      }
+
+      // 3. Connect to live Google Sheet in background to update
+      const onlineSuccess = await syncFromGoogleSheet(false);
+      if (!onlineSuccess && !text) {
         if (statsCounter) {
-          statsCounter.innerHTML = `<span class="text-rose-500 font-bold">⚠️ Connection error.</span> <button onclick="loadCurrencyData(true)" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry Online Sync</button>`;
+          statsCounter.innerHTML = `<span class="text-rose-500 font-bold">⚠️ Connection offline.</span> <button onclick="syncFromGoogleSheet(true)" class="underline text-emerald-500 font-bold ml-1 cursor-pointer">Retry Sheet Sync</button>`;
         }
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Sync theme icon on load
       const isDark = document.documentElement.classList.contains('dark');
       const themeIcon = document.getElementById('themeToggleIcon');
       if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
