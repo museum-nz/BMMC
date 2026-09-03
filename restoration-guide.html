@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
-  <title>Artifact Care & Restoration Guide — BMMC Showcase</title>
+  <title>Artifact Care &amp; Restoration Guide — BMMC Showcase</title>
 
-  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <!-- Instant Theme Sync -->
   <script>
     (function() {
       try {
         const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
-        // Only enable dark if the user explicitly saved 'dark'
-		if (savedTheme === 'dark') {
-		document.documentElement.classList.add('dark');
-		} else {
-		document.documentElement.classList.remove('dark');
-		}
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       } catch (e) {}
     })();
   </script>
 
   <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -30,37 +30,39 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
 
   <!-- Tailwind CSS Engine -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              500: '#2563eb',
-              600: '#1d4ed8',
-              700: '#1e40af',
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f0f7ff',
+                100: '#e0effe',
+                500: '#2563eb',
+                600: '#1d4ed8',
+                700: '#1e40af',
+              }
             }
           }
         }
-      }
-    };
+      };
+    }
   </script>
 
-  <!-- Core External Stylesheet -->
+  <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
   <!-- Ambient Sky Background -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
-    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
+    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
 
-  <!-- Header Section (1-Line Desktop Navigation matching index.html) -->
+  <!-- Header Section -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       <div class="flex items-center justify-between gap-2">
@@ -72,18 +74,24 @@
             <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
               BMMC Showcase
             </h1>
-            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Conservation & Care Guide</p>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Conservation &amp; Care Guide</p>
           </div>
         </a>
         
-        <!-- Action Buttons & Navigation Cluster (Single-Line Fit) -->
+        <!-- Action Buttons & Navigation Cluster -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           
+          <!-- Universal Navigation Drawer Trigger (Hamburger) -->
+          <button class="btn-bmmc-menu-trigger flex items-center gap-1 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
+            <span class="text-sm leading-none">☰</span>
+            <span class="hidden sm:inline">Wings</span>
+          </button>
+
           <a href="index.html" title="Back to Museum" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
           </a>
 
-          <!-- Utility Pill Cluster: [ ☀️/🌙 Mode ] -->
+          <!-- Utility Pill Cluster -->
           <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm shrink-0">
             <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
@@ -105,10 +113,10 @@
       <div class="absolute -left-10 -bottom-10 w-52 h-52 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div class="relative z-10 max-w-4xl">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">
-          <span>🛠️ Curator & Collector Field Manual</span>
+          <span>🛠️ Curator &amp; Collector Field Manual</span>
         </div>
         <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-3">
-          Artifact Care, Cleaning & Surface Restoration
+          Artifact Care, Cleaning &amp; Surface Restoration
         </h2>
         <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
           Time-tested workshop techniques, safe chemical recipes, and preventative maintenance strategies for metals, fine hardwoods, leather, and heritage finishes.
@@ -117,10 +125,10 @@
         <!-- Quick Jump Links Bar -->
         <div class="mt-6 flex flex-wrap items-center gap-2 pt-4 border-t border-indigo-800/60">
           <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider mr-2">Jump to:</span>
-          <a href="#workshop-safety" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">⚠️ Safety & Patina</a>
+          <a href="#workshop-safety" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">⚠️ Safety &amp; Patina</a>
           <a href="#metal-care" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">🪙 Metals (Silver, Brass, Iron)</a>
-          <a href="#wood-care" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">🪵 Hardwood & Finishes</a>
-          <a href="#other-materials" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">📜 Leather, Pewter & Cookware</a>
+          <a href="#wood-care" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">🪵 Hardwood &amp; Finishes</a>
+          <a href="#other-materials" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-lg transition">📜 Leather, Pewter &amp; Cookware</a>
         </div>
       </div>
     </div>
@@ -135,14 +143,14 @@
           <div class="flex items-center gap-2.5 mb-3">
             <span class="p-2 bg-rose-50 dark:bg-rose-950/80 text-rose-600 rounded-xl text-lg border border-rose-200 dark:border-rose-900/60">⚠️</span>
             <div>
-              <h3 class="text-base font-black text-slate-900 dark:text-white">Workshop Safety & Fire Prevention</h3>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">Workshop Safety &amp; Fire Prevention</h3>
               <p class="text-xs text-slate-500 dark:text-slate-400">Essential PPE and chemical precautions</p>
             </div>
           </div>
           <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
             <li class="flex items-start gap-2">
               <span class="text-rose-500 font-bold">•</span>
-              <span><strong>Ventilation & PPE:</strong> Always work in well-ventilated areas when using Mineral Turpentine, Kerosene, or Methylated Spirits. Use chemical-resistant nitrile gloves and eye protection.</span>
+              <span><strong>Ventilation &amp; PPE:</strong> Always work in well-ventilated areas when using Mineral Turpentine, Kerosene, or Methylated Spirits. Use chemical-resistant nitrile gloves and eye protection.</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-rose-500 font-bold">•</span>
@@ -186,7 +194,7 @@
         <div class="flex items-center gap-3">
           <span class="text-2xl">🪙</span>
           <div>
-            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Metal Cleaning & Preservation</h2>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Metal Cleaning &amp; Preservation</h2>
             <p class="text-xs text-slate-500 dark:text-slate-400">Gentle electrochemical dips, natural formulas, and rust conversion</p>
           </div>
         </div>
@@ -234,7 +242,7 @@
           <div>
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>🎺</span> Brass & Copper
+                <span>🎺</span> Brass &amp; Copper
               </h3>
               <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-300">Natural Acid</span>
             </div>
@@ -251,7 +259,7 @@
 
               <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
                 <span class="font-bold text-slate-900 dark:text-white block mb-1">2. Heavy Encrustation (Simmer Method):</span>
-                Immerse tarnished solid copper or brass into a pot of water with the salt & vinegar mixture. Bring to a gentle boil until grime releases. Let cool, wash with warm soapy water, rinse, and buff to a warm luster.
+                Immerse tarnished solid copper or brass into a pot of water with the salt &amp; vinegar mixture. Bring to a gentle boil until grime releases. Let cool, wash with warm soapy water, rinse, and buff to a warm luster.
               </div>
             </div>
           </div>
@@ -263,7 +271,7 @@
           <div>
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>🔩</span> Iron & Rust Derusting
+                <span>🔩</span> Iron &amp; Rust Derusting
               </h3>
               <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">De-Oxidation</span>
             </div>
@@ -279,7 +287,7 @@
               </div>
 
               <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
-                <span class="font-bold text-slate-900 dark:text-white block mb-1">Rinse & Immediate Protection:</span>
+                <span class="font-bold text-slate-900 dark:text-white block mb-1">Rinse &amp; Immediate Protection:</span>
                 Wash down with clean water, dry immediately with a clean towel or heat gun to prevent flash rust. Coat decorative iron with <strong>Liberon Iron Paste</strong> or <strong>CRC Zinc Rust Protection</strong>.
               </div>
             </div>
@@ -297,7 +305,7 @@
         <div class="flex items-center gap-3">
           <span class="text-2xl">🪵</span>
           <div>
-            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Hardwood Furniture & Cabinet Care</h2>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Hardwood Furniture &amp; Cabinet Care</h2>
             <p class="text-xs text-slate-500 dark:text-slate-400">Environmental defenses, homemade archival wax, and spot repairs</p>
           </div>
         </div>
@@ -312,9 +320,9 @@
             <span>🌡️</span> Environmental Threats to Avoid
           </h3>
           <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
-            <li><strong>Thermal & Humidity Shock:</strong> Hot, dry air causes shrinkage, joint failure, and cracking. Cold, damp air causes swelling, binding drawers, and warping.</li>
+            <li><strong>Thermal &amp; Humidity Shock:</strong> Hot, dry air causes shrinkage, joint failure, and cracking. Cold, damp air causes swelling, binding drawers, and warping.</li>
             <li><strong>Direct UV Sunlight:</strong> Bleaches natural timber pigmentation, dries wood grain, and degrades French polish and lacquer.</li>
-            <li><strong>Mould & Rot Fungi:</strong> Fungi thrive in still, damp environments. Ensure continuous gentle air circulation.</li>
+            <li><strong>Mould &amp; Rot Fungi:</strong> Fungi thrive in still, damp environments. Ensure continuous gentle air circulation.</li>
             <li><strong>House Borer (Common in NZ):</strong> Common wood-boring beetle causing flight holes and structural powdering.</li>
           </ul>
         </div>
@@ -322,7 +330,7 @@
         <!-- Routine Maintenance & Dos/Don'ts -->
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
           <h3 class="text-base font-black text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-            <span>🧽</span> Routine Maintenance & Strict DO NOTs
+            <span>🧽</span> Routine Maintenance &amp; Strict DO NOTs
           </h3>
           <ul class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
             <li><strong>Dusting:</strong> Dust regularly with a lightly dampened cloth, followed immediately by buffing with a soft dry cloth. Dust unfinished wood with a completely dry cloth only.</li>
@@ -385,7 +393,7 @@
               <tr>
                 <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">White Spots / Rings</td>
                 <td class="py-3.5 px-3">Moisture trapped in varnish layer</td>
-                <td class="py-3.5 px-3">Gently polish with <code>0000</code> steel wool lubricated with a mix of mineral turpentine & oil (cooking or baby oil). If spot persists, moisture penetrated bare wood and localized refinishing is required.</td>
+                <td class="py-3.5 px-3">Gently polish with <code>0000</code> steel wool lubricated with a mix of mineral turpentine &amp; oil (cooking or baby oil). If spot persists, moisture penetrated bare wood and localized refinishing is required.</td>
               </tr>
               <tr>
                 <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Blushing / White Haze</td>
@@ -403,13 +411,13 @@
                 <td class="py-3.5 px-3">Re-dissolve and level the surface by carefully brushing methylated spirits/alcohol over the crack until it softens. Let cure and re-wax.</td>
               </tr>
               <tr>
-                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Chips & Deep Scratches</td>
+                <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Chips &amp; Deep Scratches</td>
                 <td class="py-3.5 px-3">Physical impact</td>
                 <td class="py-3.5 px-3">Fill void using a color-matched wax or shellac burn-in stick, level flush with a razor blade, and buff.</td>
               </tr>
               <tr>
                 <td class="py-3.5 px-3 font-bold text-slate-900 dark:text-white">Heavy Wax / Dirt Grime</td>
-                <td class="py-3.5 px-3">Accumulated grime & mould</td>
+                <td class="py-3.5 px-3">Accumulated grime &amp; mould</td>
                 <td class="py-3.5 px-3">Wipe with pure mineral turpentine on a lint-free cloth. Cuts through grime and mould build-up without dissolving the underlying shellac or varnish.</td>
               </tr>
             </tbody>
@@ -420,7 +428,7 @@
       <!-- Wood Borer / Woodworm Eradication -->
       <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
         <h3 class="text-base font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-          <span>🪲</span> House Borer & Woodworm Eradication (NZ Protocol)
+          <span>🪲</span> House Borer &amp; Woodworm Eradication (NZ Protocol)
         </h3>
         <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
           House borer flight holes indicate active larvae feeding inside timber cores.
@@ -449,7 +457,7 @@
         <div class="flex items-center gap-3">
           <span class="text-2xl">📜</span>
           <div>
-            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Specialist Materials: Leather, Pewter & Cookware</h2>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">Specialist Materials: Leather, Pewter &amp; Cookware</h2>
             <p class="text-xs text-slate-500 dark:text-slate-400">Preserving organic desk inlays, soft alloys, and distinguishing cookware from decorative cast iron</p>
           </div>
         </div>
@@ -464,7 +472,7 @@
             <h3 class="text-base font-black text-slate-900 dark:text-white">Antique Leather</h3>
           </div>
           <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            <strong>Desk tops & Chair upholstery:</strong> Dust with a dry microfibre cloth. Treat twice yearly with high-grade leather dressing containing lanolin and beeswax. Never use silicone sprays or dish detergents, which strip natural tanning oils and cause "red rot" powdering.
+            <strong>Desk tops &amp; Chair upholstery:</strong> Dust with a dry microfibre cloth. Treat twice yearly with high-grade leather dressing containing lanolin and beeswax. Never use silicone sprays or dish detergents, which strip natural tanning oils and cause "red rot" powdering.
           </p>
         </div>
 
@@ -472,7 +480,7 @@
         <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
           <div class="flex items-center gap-2 mb-3">
             <span class="p-1.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 rounded-xl text-base">🫖</span>
-            <h3 class="text-base font-black text-slate-900 dark:text-white">Pewter & Soft Alloys</h3>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">Pewter &amp; Soft Alloys</h3>
           </div>
           <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
             <strong>Avoid acidic dips:</strong> Pewter contains tin and lead. <strong>Never</strong> use vinegar, lemon juice, or harsh abrasives on pewter as they cause permanent etching. Wash with warm water and mild soap, then polish gently with a paste of whiting powder and methylated spirits.
@@ -499,13 +507,16 @@
   <!-- Footer -->
   <footer class="solid-header border-t border-slate-200/80 dark:border-slate-800/80 py-6 mt-12 transition-colors relative z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-      <p>© Bonniefields Museum Collection (BMMC) — Conservation Archive</p>
+      <p>&copy; Bonniefields Museum Collection (BMMC) — Conservation Archive</p>
       <div class="flex items-center gap-4">
         <a href="index.html" class="hover:text-blue-600 dark:hover:text-blue-400 font-bold transition">Museum Index</a>
-        <a href="#mainHeader" class="hover:text-blue-600 dark:hover:text-blue-400 font-bold transition">Back to Top ↑</a>
+        <a href="#mainHeader" class="hover:text-blue-600 dark:hover:text-blue-400 font-bold transition">Back to Top &uarr;</a>
       </div>
     </div>
   </footer>
+
+  <!-- Universal BMMC Navigation Drawer Script -->
+  <script src="shared-nav.js"></script>
 
   <!-- Theme Synchronization Script -->
   <script>
@@ -518,7 +529,6 @@
       }
     }
 
-    // Initialize icon based on current state
     updateThemeUI(document.documentElement.classList.contains('dark'));
 
     if (themeToggleBtn) {
@@ -536,7 +546,6 @@
       });
     }
 
-    // Live Cross-Tab Synchronization
     window.addEventListener('storage', (e) => {
       if (e.key === 'theme' || e.key === 'bMMC_theme') {
         const isDark = (e.newValue === 'dark');

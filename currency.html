@@ -7,7 +7,7 @@
   <meta name="referrer" content="no-referrer-when-downgrade" />
   <title>New Zealand Currency &amp; Minting Database — BMMC</title>
 
-  <!-- Instant Theme Sync (Defaults to Day mode unless 'dark' was chosen) -->
+  <!-- Instant Theme Sync -->
   <script>
     (function() {
       try {
@@ -24,13 +24,13 @@
   <!-- Preconnects -->
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
 
-  <!-- Tailwind CSS Play CDN with Synchronous Class-Based Dark Mode -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS Play CDN with Class-Based Dark Mode -->
+  <script src="../vendor/tailwind.js"></script>
   <script>
     if (window.tailwind) {
       tailwind.config = {
@@ -52,134 +52,36 @@
     }
   </script>
 
-  <!-- Fallback Local Tailwind for Offline Environments -->
+  <!-- Fallback Local Tailwind -->
   <script>
     if (!window.tailwind) {
       document.write('<script src="vendor/tailwind.js"><\/script><script src="../vendor/tailwind.js"><\/script>');
     }
   </script>
 
-  <!-- PapaParse for CSV Parsing (CDN + Local Fallbacks) -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- PapaParse for CSV Parsing -->
+  <script src="../vendor/papaparse.min.js"></script>
   <script>
     if (!window.Papa) {
       document.write('<script src="vendor/papaparse.min.js"><\/script><script src="../vendor/papaparse.min.js"><\/script>');
     }
   </script>
 
-  <!-- Chart.js for Analytics Visualisations (CDN + Local Fallbacks) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Chart.js for Analytics Visualisations -->
+  <script src="../vendor/chart.umd.min.js"></script>
   <script>
     if (!window.Chart) {
       document.write('<script src="vendor/chart.umd.min.js"><\/script><script src="../vendor/chart.umd.min.js"><\/script>');
     }
   </script>
 
+  <!-- Master Unified Stylesheet (Replaces redundant inline CSS) -->
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
-
-  <style>
-    /* CSS Variables for Day and Night Theme Switching */
-    :root {
-      --bg-page-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
-      --text-main: #0f172a;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-    }
-    html.dark {
-      --bg-page-gradient: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%);
-      --text-main: #f8fafc;
-      --card-bg: #0f172a;
-      --card-border: #1e293b;
-    }
-
-    body {
-      background: var(--bg-page-gradient);
-      color: var(--text-main);
-      min-height: 100vh;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-
-    .coin-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 9999px;
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.025em;
-      backdrop-filter: blur(4px);
-    }
-    .badge-silver {
-      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-      color: #334155;
-      border: 1px solid #94a3b8;
-    }
-    .badge-bronze {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-      color: #92400e;
-      border: 1px solid #d97706;
-    }
-    .badge-cupro {
-      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-      color: #475569;
-      border: 1px solid #cbd5e1;
-    }
-    .badge-gold {
-      background: linear-gradient(135deg, #fef08a 0%, #eab308 100%);
-      color: #713f12;
-      border: 1px solid #ca8a04;
-    }
-    .badge-polymer {
-      background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
-      color: #115e59;
-      border: 1px solid #2dd4bf;
-    }
-    .badge-special {
-      background: linear-gradient(135deg, #fae8ff 0%, #f3e8ff 100%);
-      color: #7e22ce;
-      border: 1px solid #c084fc;
-    }
-    .dark .badge-silver {
-      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-      color: #e2e8f0;
-      border-color: #475569;
-    }
-    .dark .badge-bronze {
-      background: linear-gradient(135deg, #78350f 0%, #451a03 100%);
-      color: #fef3c7;
-      border-color: #b45309;
-    }
-    .dark .badge-cupro {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      color: #cbd5e1;
-      border-color: #334155;
-    }
-    .dark .badge-gold {
-      background: linear-gradient(135deg, #854d0e 0%, #713f12 100%);
-      color: #fef08a;
-      border-color: #ca8a04;
-    }
-    .dark .badge-polymer {
-      background: linear-gradient(135deg, #134e4a 0%, #042f2e 100%);
-      color: #99f6e4;
-      border-color: #0d9488;
-    }
-    .dark .badge-special {
-      background: linear-gradient(135deg, #581c87 0%, #3b0764 100%);
-      color: #f3e8ff;
-      border-color: #a855f7;
-    }
-    .img-zoom-cursor {
-      cursor: zoom-in;
-    }
-  </style>
 </head>
 <body class="flex flex-col antialiased relative overflow-x-hidden">
 
   <!-- Header -->
-  <header id="mainHeader" class="solid-header border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/95 dark:bg-slate-900/95 transition-colors">
+  <header id="mainHeader" class="solid-header border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5">
       
       <!-- Top Bar -->
@@ -195,6 +97,12 @@
         </a>
         
         <div class="flex items-center gap-1.5 flex-nowrap">
+          <!-- Universal Navigation Drawer Trigger (Hamburger) -->
+          <button class="btn-bmmc-menu-trigger flex items-center gap-1 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
+            <span class="text-sm leading-none">☰</span>
+            <span class="hidden sm:inline">Wings</span>
+          </button>
+
           <!-- View Switcher -->
           <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
             <button id="viewTabCatalogue" onclick="switchViewMode('catalogue')" class="px-2.5 sm:px-3 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer">
@@ -702,7 +610,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- SECTION B: VISUAL GALLERY VIEW (COINS 6-COLS, NOTES 4-COLS)               -->
+    <!-- SECTION B: VISUAL GALLERY VIEW                                            -->
     <!-- ========================================================================= -->
     <div id="galleryViewContainer" class="hidden space-y-8">
       
@@ -1019,7 +927,7 @@
 
   </main>
 
-  <!-- Spec & Description Modal (Detail Lightbox) -->
+  <!-- Spec & Description Modal -->
   <div id="itemDetailModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border-2 border-amber-500/40 relative flex flex-col">
       <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 py-3 flex items-center justify-between">
@@ -1053,6 +961,9 @@
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification</span>
   </div>
+
+  <!-- Universal BMMC Navigation Drawer -->
+  <script src="shared-nav.js"></script>
 
   <!-- Embedded Standalone CSV Parser Polyfill -->
   <script>
@@ -2012,7 +1923,6 @@
       }
     }
 
-    // Dynamic Banknotes in Public Hands Explorer (Table F3)
     window.setF3ExplorerYear = function(year) {
       const input = document.getElementById('f3YearInput');
       if (input) input.value = year;
@@ -2348,11 +2258,10 @@
       }
     }
 
-    // Multi-Tier Fetch Engine (Bypasses Google 307 CORS redirect blocks)
+    // Multi-Tier Fetch Engine
     async function fetchPublishedSheet(url) {
       const targetUrl = url || CURRENCY_CSV_URL;
 
-      // Tier 1: Direct browser fetch
       try {
         const res = await fetch(targetUrl);
         if (res.ok) {
@@ -2363,7 +2272,6 @@
         }
       } catch (e) {}
 
-      // Tier 2: AllOrigins JSON API (Bypasses browser CORS redirects)
       try {
         const pUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&t=${Date.now()}`;
         const res = await fetch(pUrl);
@@ -2375,7 +2283,6 @@
         }
       } catch (e) {}
 
-      // Tier 3: CodeTabs Proxy
       try {
         const pUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
         const res = await fetch(pUrl);
@@ -2387,7 +2294,6 @@
         }
       } catch (e) {}
 
-      // Tier 4: CorsProxy.io
       try {
         const pUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
         const res = await fetch(pUrl);
@@ -2418,7 +2324,7 @@
         }
       } catch (e) {}
 
-      // 2. Try Local Files in Repo (for offline operation)
+      // 2. Try Local Files in Repo
       if (!text) {
         const localCandidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
         for (const p of localCandidates) {

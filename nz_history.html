@@ -1,34 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="offline-adapter.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aotearoa NZ History & Colonization Map</title>
+  <title>Aotearoa NZ History &amp; Colonization Map — BMMC</title>
 
   <!-- Leaflet & Plugins CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" />
+
+  <!-- Master Unified Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 
   <style>
-    :root {
-      --primary: #0284c7;
-      --primary-dark: #0369a1;
-      --accent: #38bdf8;
-      --bg-dark: #0f172a;
-      --color-vessel: #0284c7;
-      --color-war: #dc2626;
-      --color-disaster: #d97706;
-      --color-rights: #7c3aed;
-      --color-general: #059669;
-    }
-
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-dark);
+      background: #0f172a;
       overflow: hidden;
     }
     #map {
@@ -37,134 +28,10 @@
       background: #aad3df;
     }
 
-    /* --- MAP ITEM MARKERS & VERTICAL LADDERING (NO VERTICAL OVERLAP) --- */
+    /* History Specific Vertical Laddering */
     .history-div-icon {
       background: none !important;
       border: none !important;
-    }
-
-    .nz-history-marker {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      pointer-events: auto;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
-    }
-    .nz-history-marker:hover {
-      transform: scale(1.12);
-      z-index: 100000 !important;
-    }
-
-    .marker-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(8px);
-      border-radius: 20px;
-      padding: 3px 10px 3px 4px;
-      white-space: nowrap;
-      border: 1.5px solid #cbd5e1;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-    .nz-history-marker:hover .marker-pill {
-      border-color: #0284c7;
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
-    }
-
-    .marker-date-tag {
-      font-size: 11px;
-      font-weight: 800;
-      color: #ffffff;
-      padding: 2px 7px;
-      border-radius: 12px;
-      letter-spacing: 0.2px;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .cat-vessel .marker-date-tag { background: var(--color-vessel); }
-    .cat-war .marker-date-tag { background: var(--color-war); }
-    .cat-disaster .marker-date-tag { background: var(--color-disaster); }
-    .cat-rights .marker-date-tag { background: var(--color-rights); }
-    .cat-general .marker-date-tag { background: var(--color-general); }
-
-    .marker-headline-text {
-      color: #0f172a;
-      font-size: 11px;
-      font-weight: 700;
-      max-width: 175px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .marker-pin-tail {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 6px solid #475569;
-      margin-top: -1px;
-    }
-    .cat-vessel .marker-pin-tail { border-top-color: var(--color-vessel); }
-    .cat-war .marker-pin-tail { border-top-color: var(--color-war); }
-    .cat-disaster .marker-pin-tail { border-top-color: var(--color-disaster); }
-    .cat-rights .marker-pin-tail { border-top-color: var(--color-rights); }
-    .cat-general .marker-pin-tail { border-top-color: var(--color-general); }
-
-    /* Vertical stem connector for laddered items */
-    .marker-stem {
-      width: 2px;
-      background: rgba(71, 85, 105, 0.75);
-      margin: 0 auto;
-      transition: background 0.15s, width 0.15s;
-    }
-    .nz-history-marker:hover .marker-stem {
-      background: #0284c7;
-      width: 3px;
-    }
-
-    /* --- CLUSTER BADGES --- */
-    .cluster-number-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0284c7, #0f172a);
-      color: #ffffff;
-      border: 2.5px solid #ffffff;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-    .cluster-number-badge:hover {
-      transform: scale(1.15);
-      border-color: #38bdf8;
-    }
-
-    /* --- POP-UP MODAL CARD --- */
-    .leaflet-popup-content-wrapper {
-      padding: 0;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .leaflet-popup-content {
-      margin: 0 !important;
-      width: 390px !important;
-      max-width: 86vw !important;
-    }
-    .history-card {
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
     }
     .history-card-img-wrap {
       display: block;
@@ -224,7 +91,7 @@
       text-transform: uppercase;
     }
     .date-pill {
-      background: var(--primary);
+      background: var(--bmmc-primary);
       color: #ffffff;
       font-size: 11px;
       font-weight: 800;
@@ -233,7 +100,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* Inline header shown ONLY when image is missing from CSV */
+    /* Fallback headers when image is absent */
     .history-card-no-img-header {
       padding: 14px 16px 0;
       display: flex;
@@ -262,6 +129,7 @@
 
     .history-card-body {
       padding: 16px;
+      text-align: left;
     }
     .history-card-body h3 {
       margin: 0 0 4px 0;
@@ -354,117 +222,7 @@
       color: #0f172a;
     }
 
-    /* --- TOP CONTROLS & NAVIGATION HEADER --- */
-    .top-controls-wrapper {
-      position: absolute;
-      top: 12px;
-      left: 60px;
-      right: 14px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-    .top-controls-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      pointer-events: none;
-    }
-    .top-controls-bar > * {
-      pointer-events: auto;
-    }
-
-    .map-search-box {
-      position: relative;
-      width: 240px;
-      max-width: 36vw;
-    }
-    .map-search-box input {
-      width: 100%;
-      padding: 8px 30px 8px 32px;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.94);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
-      outline: none;
-    }
-    .map-search-box input:focus { border-color: #38bdf8; }
-    .map-search-box .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 12px;
-      color: #94a3b8;
-    }
-    .clear-search-btn {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      color: #ffffff;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      font-size: 10px;
-      display: none;
-      cursor: pointer;
-    }
-
-    .top-action-btn {
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      border-radius: 12px;
-      padding: 7px 12px;
-      font-size: 11px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-    .top-action-btn:hover {
-      background: rgba(30, 41, 59, 0.98);
-      border-color: #38bdf8;
-      color: #ffffff;
-    }
-    .top-action-btn.active {
-      background: #0284c7;
-      border-color: #38bdf8;
-    }
-
-    /* --- MUSEUM PILL: BLUE & MOVED TO FAR RIGHT --- */
-    .museum-pill-btn {
-      margin-left: auto !important;
-      background: #0284c7 !important;
-      border: 1.5px solid #38bdf8 !important;
-      color: #ffffff !important;
-      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5);
-      font-weight: 800;
-      padding: 7px 14px;
-    }
-    .museum-pill-btn:hover {
-      background: #0369a1 !important;
-      border-color: #bae6fd !important;
-      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.75);
-      transform: translateY(-1px);
-    }
-
-    /* --- ERA QUICK-JUMP FILTER CHIPS --- */
+    /* Era Quick-Jump Filter Chips */
     .era-bar {
       pointer-events: auto;
       display: flex;
@@ -495,146 +253,19 @@
       border-color: #38bdf8;
     }
 
-    /* --- BOTTOM TIMELINE PANEL --- */
-    .year-slider-container {
-      position: absolute;
-      bottom: 22px;
-      left: 22px;
-      z-index: 1000;
-      background: rgba(15, 23, 42, 0.94);
-      backdrop-filter: blur(14px);
-      padding: 12px 18px;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #f8fafc;
-      width: 350px;
-      box-sizing: border-box;
-    }
-    .year-slider-header {
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .timeline-title-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-timeline-play {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      width: 26px;
-      height: 26px;
-      font-size: 11px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s;
-    }
-    .btn-timeline-play.playing { background: #e11d48; }
-    .item-counter-badge {
-      font-size: 10px;
+    .museum-pill-btn {
+      margin-left: auto !important;
+      background: #0284c7 !important;
+      border: 1.5px solid #38bdf8 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5);
       font-weight: 800;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 2px 7px;
-      border-radius: 6px;
+      padding: 7px 14px;
     }
-    .range-text {
-      color: #38bdf8;
-      font-weight: 800;
-      font-size: 13px;
-    }
-
-    .dual-slider-track-wrapper {
-      position: relative;
-      width: 100%;
-      height: 22px;
-      display: flex;
-      align-items: center;
-    }
-    .slider-track-bg {
-      position: absolute;
-      width: 100%;
-      height: 6px;
-      background: #334155;
-      border-radius: 3px;
-    }
-    .slider-track-fill {
-      position: absolute;
-      height: 6px;
-      background: #0284c7;
-      border-radius: 3px;
-      left: 0%;
-      width: 100%;
-    }
-    .dual-slider-track-wrapper input[type="range"] {
-      position: absolute;
-      width: 100%;
-      height: 6px;
-      background: none;
-      pointer-events: none;
-      -webkit-appearance: none;
-      appearance: none;
-      margin: 0;
-    }
-    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
-      height: 18px;
-      width: 18px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 2px solid #0284c7;
-      pointer-events: auto;
-      -webkit-appearance: none;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-
-    /* --- LAYER DROPDOWN --- */
-    .layer-switcher-container { position: relative; pointer-events: auto; }
-    .layer-dropdown-card {
-      position: absolute;
-      top: 42px;
-      right: 0;
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 14px;
-      padding: 10px;
-      display: none;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      width: 220px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
-      z-index: 1100;
-    }
-    .layer-dropdown-card.show { display: grid; }
-    .layer-option-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid transparent;
-      border-radius: 8px;
-      padding: 7px;
-      color: #f8fafc;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .layer-option-btn.active {
-      border-color: #0284c7;
-      background: rgba(2, 132, 199, 0.35);
-      color: #38bdf8;
+    .museum-pill-btn:hover {
+      background: #0369a1 !important;
+      border-color: #bae6fd !important;
+      transform: translateY(-1px);
     }
 
     @media (max-width: 768px) {
@@ -654,6 +285,12 @@
   <!-- Top Controls & Navigation Header -->
   <div class="top-controls-wrapper">
     <div class="top-controls-bar">
+      <!-- Universal Navigation Drawer Trigger (Hamburger) -->
+      <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
+        <span class="text-sm leading-none">☰</span>
+        <span>Wings</span>
+      </button>
+
       <!-- Search Input -->
       <div class="map-search-box">
         <span class="search-icon">🔍</span>
@@ -677,11 +314,11 @@
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
-      <button id="btnResetView" class="top-action-btn" title="Reset View & Timeline">
+      <button id="btnResetView" class="top-action-btn" title="Reset View &amp; Timeline">
         <span>↺</span> <span>Reset</span>
       </button>
 
-      <!-- Museum Pill: Stays on the far right and is styled blue -->
+      <!-- Museum Pill Link -->
       <a href="index.html" class="top-action-btn museum-pill-btn" title="Back to Museum Gallery">
         <span>🏛️</span> <span>Museum</span>
       </a>
@@ -718,20 +355,21 @@
     </div>
   </div>
 
+  <!-- Universal Navigation Drawer Script -->
+  <script src="shared-nav.js"></script>
+
   <!-- External Leaflet & Parsing Libraries -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="../vendor/leaflet/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="../vendor/leaflet/markercluster.js"></script>
 
   <script>
-    // Live Google Sheet CSV Endpoint
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1659493611&single=true&output=csv';
     const CACHE_STORAGE_KEY = 'bMMC_nz_history_csv_cache';
 
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
 
-    // Leaflet Map Initialization
     const map = L.map('map', {
       center: NZ_CENTER,
       zoom: NZ_ZOOM,
@@ -740,7 +378,6 @@
       closePopupOnClick: true
     });
 
-    // Basemaps
     const basemaps = {
       natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Esri &copy; National Geographic Society', maxZoom: 16
@@ -766,7 +403,6 @@
       document.getElementById('layerDropdownCard').classList.remove('show');
     }
 
-    // Clusters Layer
     const markers = L.markerClusterGroup({
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
@@ -793,14 +429,10 @@
       }[m]));
     }
 
-    // --- OPTIMIZED IMAGE RESOLVERS ---
-
-    // Forces s200 thumbnail download from Google/Wikimedia CDNs
     function getThumbnailUrl(url) {
       if (!url) return '';
       url = url.trim();
 
-      // Google UserContent / Google Photos / Blogger
       if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
         if (/=s\d+/i.test(url)) {
           return url.replace(/=s\d+[^?]*/i, '=s200');
@@ -813,7 +445,6 @@
         }
       }
 
-      // Google Drive shared links
       if (url.includes('drive.google.com')) {
         const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (idMatch && idMatch[1]) {
@@ -821,7 +452,6 @@
         }
       }
 
-      // Wikimedia / Wikipedia thumbnails
       if (url.includes('upload.wikimedia.org') && url.includes('/thumb/')) {
         return url.replace(/\/\d+px-/g, '/200px-');
       }
@@ -829,12 +459,10 @@
       return url;
     }
 
-    // Resolves full-size/original image URL for the enlarge link & new tab
     function getFullImageUrl(url) {
       if (!url) return '';
       url = url.trim();
 
-      // Google UserContent: =s0 requests unconstrained full resolution
       if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
         if (/=[sw]\d+/i.test(url)) {
           return url.replace(/=[sw]\d+[^?]*/i, '=s0');
@@ -842,7 +470,6 @@
         return url;
       }
 
-      // Google Drive: direct view link
       if (url.includes('drive.google.com')) {
         const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (idMatch && idMatch[1]) {
@@ -850,12 +477,11 @@
         }
       }
 
-      // Wikimedia: extract full original image from /thumb/.../.../NNNpx-...
       if (url.includes('upload.wikimedia.org/wikipedia/') && url.includes('/thumb/')) {
         const parts = url.split('/thumb/');
         if (parts.length === 2) {
           const pathParts = parts[1].split('/');
-          pathParts.pop(); // removes the generated /NNNpx-filename thumbnail segment
+          pathParts.pop();
           return parts[0] + '/' + pathParts.join('/');
         }
       }
@@ -882,12 +508,10 @@
       return '📍';
     }
 
-    // Render Markers with Vertical Laddering & Hover-to-Front
     function renderDataset(items) {
       markers.clearLayers();
       const markerList = [];
 
-      // Proximity group items to prevent vertical stacking overlap (~2.5km bucket)
       const PROXIMITY_DEG = 0.025;
       const groups = [];
 
@@ -907,7 +531,6 @@
       });
 
       groups.forEach(grp => {
-        // Chronological order for stacking
         grp.items.sort((a, b) => (a.year || 0) - (b.year || 0));
 
         grp.items.forEach((ev, idx) => {
@@ -918,7 +541,6 @@
           const safeCategory = escapeHTML(ev.category || 'History');
           const safeDetails = escapeHTML(ev.details || '');
           
-          // Image handling: s200 for download & full-res for enlargement
           const rawImg = (ev.image_url || '').trim();
           const hasImage = rawImg.length > 0 && rawImg !== '#';
           const safeThumbImg = hasImage ? escapeHTML(getThumbnailUrl(rawImg)) : '';
@@ -927,14 +549,11 @@
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
 
-          // Vertical ladder offset: each item is elevated by 38px
           const stemHeight = idx * 38;
           const totalIconHeight = 34 + stemHeight;
 
-          // Google AI Overview Search query
           const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand history')}`;
 
-          // ON-MAP MARKER: Date + Headline + Vertical stem
           const markerHTML = `
             <div class="nz-history-marker ${catClass}">
               <div class="marker-pill">
@@ -953,7 +572,6 @@
             iconAnchor: [105, totalIconHeight]
           });
 
-          // POP-UP: Image wrap links directly to full size + dedicated Enlarge link button
           const popupImageBlock = hasImage ? `
             <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to open full-size image in new window">
               <img src="${safeThumbImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
@@ -1009,7 +627,6 @@
             closeButton: true
           });
 
-          // Hover brings marker to the front
           marker.on('mouseover', function () {
             this.setZIndexOffset(100000);
           });
@@ -1025,7 +642,6 @@
       document.getElementById('itemCountBadge').textContent = `${items.length} event${items.length === 1 ? '' : 's'}`;
     }
 
-    // Filter Events by Sliders & Search
     function filterEvents() {
       const minSlider = document.getElementById('minYearSlider');
       const maxSlider = document.getElementById('maxYearSlider');
@@ -1066,7 +682,6 @@
       renderDataset(filtered);
     }
 
-    // Timeline Playback: Starts at 1800 with earlier items (1280-1799) already shown
     function toggleTimelinePlayback() {
       const btn = document.getElementById('btnPlayTimeline');
       const minSlider = document.getElementById('minYearSlider');
@@ -1169,7 +784,6 @@
       initSliders();
     }
 
-    // Load Dataset from Live Google Sheet with Cache Fallback
     async function loadDataset() {
       let csvText = null;
       let usedCache = false;
@@ -1197,7 +811,6 @@
           if (cachedText && cachedText.trim().length > 50) {
             csvText = cachedText;
             usedCache = true;
-            console.log('Successfully loaded NZ History data from browser cache.');
           }
         } catch (cacheErr) {
           console.warn('LocalStorage cache retrieval failed:', cacheErr);
@@ -1240,7 +853,6 @@
         filterEvents();
       });
 
-      // Basemap Dropdown
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
       btnLayersToggle.addEventListener('click', (e) => {
@@ -1254,7 +866,6 @@
       document.getElementById('btnLayerSat').addEventListener('click', () => setBasemap('sat'));
       document.getElementById('btnLayerStreet').addEventListener('click', () => setBasemap('street'));
 
-      // Search Box
       const searchInput = document.getElementById('mapSearchInput');
       const clearSearchBtn = document.getElementById('clearMapSearch');
       searchInput.addEventListener('input', (e) => {
@@ -1268,7 +879,6 @@
         searchInput.focus();
       });
 
-      // Era Quick-Jump Chips
       document.querySelectorAll('.era-chip').forEach(chip => {
         chip.addEventListener('click', function () {
           document.querySelectorAll('.era-chip').forEach(c => c.classList.remove('active'));

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
-  <title>BMMC Showcase — Museum & Gramophone Archive</title>
+  <title>BMMC Showcase — Museum &amp; Gramophone Archive</title>
 
-  <!-- Instant Theme Sync (Prevents Flash of Light Mode) & Cross-Tab Sync -->
+  <!-- Instant Theme Sync -->
   <script>
     (function() {
       try {
@@ -29,10 +29,9 @@
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 
-  <!-- Tailwind CSS Engine with Multi-Path & CDN Fallbacks -->
+  <!-- Tailwind CSS Engine with Local & CDN Fallbacks -->
   <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
   <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
-  <script src="https://cdn.tailwindcss.com" onerror="this.onerror=null;"></script>
   <script>
     if (window.tailwind) {
       tailwind.config = {
@@ -54,25 +53,22 @@
     }
   </script>
 
-  <!-- Core External Stylesheet -->
+  <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Core Libraries (Multi-Path & Guaranteed CDN Fallbacks) -->
+  <!-- Core Libraries -->
   <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
   <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   <script defer src="../vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
   <script defer src="vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="../vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
   <script type="module" src="vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
-  <!-- Offline Media Adapter (Ignored if not present) -->
+  <!-- Offline Media Adapter -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
-  <!-- Main Application Logic (Deferred) -->
+  <!-- Application Logic -->
   <script defer src="app.js"></script>
   <meta name="google-site-verification" content="Lvkay0ZyA_Iz04oh-s2SERucN0aVLn_R-emAvrkY-S0" />
 </head>
@@ -157,7 +153,7 @@
     </div>
   </div>
 
-  <!-- Header Section (1-Line Desktop Navigation with Standardized Explore Wings Dropdown) -->
+  <!-- Header Section with Universal Hamburger Drawer Trigger -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       <div class="flex items-start sm:items-center justify-between gap-2">
@@ -173,88 +169,19 @@
           </div>
         </a>
         
-        <!-- Action Buttons & Navigation Cluster (Wraps on mobile to allow Utility Pill on new line) -->
+        <!-- Action Buttons & Navigation Cluster -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap sm:flex-nowrap justify-end overflow-visible">
           
+          <!-- Universal Navigation Drawer Trigger (Hamburger) -->
+          <button id="btnExploreDropdown" class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
+            <span class="text-sm leading-none">☰</span>
+            <span class="hidden sm:inline">Wings</span>
+          </button>
+
           <!-- Primary Actions -->
           <button id="btnBrowseAllHeader" title="Browse All Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>🌐</span> <span class="hidden sm:inline">Browse</span>
           </button>
-
-          <!-- Standardized Explore Wings Dropdown Menu -->
-          <div class="relative inline-block text-left" id="exploreDropdownContainer">
-            <button id="btnExploreDropdown" type="button" aria-haspopup="true" aria-expanded="false" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-slate-800 dark:text-slate-100 bg-white/90 dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
-              <span>🏛️</span>
-              <span class="hidden md:inline">Wings &amp; Info</span>
-              <span id="exploreDropdownChevron" class="text-[9px] text-slate-400 transition-transform">▼</span>
-            </button>
-
-            <!-- Dropdown Menu Flyout -->
-            <div id="exploreDropdownMenu" class="hidden absolute right-0 mt-2 w-60 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-1.5 divide-y divide-slate-100 dark:divide-slate-800 focus:outline-none animate-in fade-in zoom-in-95 duration-100">
-              
-              <div class="py-1 space-y-0.5">
-                <a href="#" onclick="browseAllExhibits(); closeExploreDropdown(); return false;" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/60 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                  <span class="text-base shrink-0">🌐</span>
-                  <div>
-                    <div class="leading-none font-black">Exhibits Catalog</div>
-                    <span class="text-[9px] font-normal text-slate-400">Main artifact &amp; item archive</span>
-                  </div>
-                </a>
-
-                <a href="#stats" onclick="setTab('stats'); closeExploreDropdown();" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
-                  <span class="text-base shrink-0">ℹ️</span>
-                  <div>
-                    <div class="leading-none font-black">Insights &amp; Map</div>
-                    <span class="text-[9px] font-normal text-slate-400">Analytics &amp; origin map</span>
-                  </div>
-                </a>
-              </div>
-
-              <div class="py-1 space-y-0.5">
-                <!-- NZ History Online Root Wing -->
-                <a href="nz_history.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition">
-                  <span class="text-base shrink-0">📜</span>
-                  <div>
-                    <div class="leading-none font-black">NZ History</div>
-                    <span class="text-[9px] font-normal text-slate-400">Online root &amp; historical archive</span>
-                  </div>
-                </a>
-
-                <a href="gallery.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-teal-950/60 hover:text-teal-600 dark:hover:text-teal-400 transition">
-                  <span class="text-base shrink-0">📷</span>
-                  <div>
-                    <div class="leading-none font-black">Photo Archives</div>
-                    <span class="text-[9px] font-normal text-slate-400">Historical photo gallery &amp; audio</span>
-                  </div>
-                </a>
-
-                <a href="stamps.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
-                  <span class="text-base shrink-0">📮</span>
-                  <div>
-                    <div class="leading-none font-black">NZ Stamp Archive</div>
-                    <span class="text-[9px] font-normal text-slate-400">Complete philatelic catalogue</span>
-                  </div>
-                </a>
-
-                <a href="currency.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/60 hover:text-amber-600 dark:hover:text-amber-400 transition">
-                  <span class="text-base shrink-0">🪙</span>
-                  <div>
-                    <div class="leading-none font-black">NZ Currency</div>
-                    <span class="text-[9px] font-normal text-slate-400">Numismatic &amp; banknote archive</span>
-                  </div>
-                </a>
-
-                <a href="restoration-guide.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/60 hover:text-amber-600 dark:hover:text-amber-400 transition">
-                  <span class="text-base shrink-0">🛠️</span>
-                  <div>
-                    <div class="leading-none font-black">Artifact Care Guide</div>
-                    <span class="text-[9px] font-normal text-slate-400">Restoration &amp; preservation manual</span>
-                  </div>
-                </a>
-              </div>
-
-            </div>
-          </div>
 
           <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>👓</span> <span class="hidden md:inline">3D</span>
@@ -268,10 +195,10 @@
             <span>✨</span> <span class="hidden lg:inline">Surprise</span>
           </button>
 
-          <!-- Utility Pill Cluster Wrapper (Pushed down to its own line on mobile, inline on desktop) -->
+          <!-- Utility Pill Cluster Wrapper -->
           <div class="basis-full sm:basis-auto flex justify-end mt-1.5 sm:mt-0 shrink-0">
-            <!-- Utility Pill Cluster: [ 🤍 Saved | ☀️/🌙 Mode | 🌪️ Filter ] -->
             <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
+              
               <!-- Favorites -->
               <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
                 <span id="favHeartIcon">🤍</span>
@@ -284,7 +211,7 @@
                 <span id="themeToggleText" class="sr-only">Mode</span>
               </button>
 
-              <!-- Filter Controls Toggle (Filter Funnel Icon) -->
+              <!-- Filter Controls Toggle -->
               <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
                 <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -563,7 +490,7 @@
     <span>⬇️ View Archive</span>
   </button>
 
-  <!-- Floating Compare Bar (Bottom Pill) -->
+  <!-- Floating Compare Bar -->
   <div id="floatingCompareBar" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white dark:bg-slate-800/95 dark:text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-xl flex items-center gap-3 hidden transition-all duration-300 transform translate-y-4">
     <div class="flex items-center gap-2">
       <span class="text-base">⚖️</span>
@@ -577,13 +504,13 @@
     </button>
   </div>
 
-  <!-- Toast Notification System (Z-Index: 100) -->
+  <!-- Toast Notification System -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification message</span>
   </div>
 
-  <!-- Fullscale Enlarge Modal Pop-Up (Z-Index: 85) -->
+  <!-- Fullscale Enlarge Modal Pop-Up -->
   <div id="enlargeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[85] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
@@ -594,7 +521,7 @@
     </div>
   </div>
 
-  <!-- Item Detail Pop-up Modal (Z-Index: 80) -->
+  <!-- Item Detail Pop-up Modal -->
   <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[80] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
       <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -617,7 +544,7 @@
     </div>
   </div>
 
-  <!-- Standalone 3D & Augmented Reality (AR) Lightbox Modal (Z-Index: 85) -->
+  <!-- Standalone 3D & Augmented Reality (AR) Lightbox Modal -->
   <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[85] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
@@ -664,7 +591,7 @@
     </div>
   </div>
 
-  <!-- Side-by-Side Artifact Compare Modal (Z-Index: 85) -->
+  <!-- Side-by-Side Artifact Compare Modal -->
   <div id="compareModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-[85] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
     <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/40 relative flex flex-col overflow-hidden">
       <!-- Header -->
@@ -682,78 +609,15 @@
         </div>
       </div>
 
-      <!-- Body (Scrollable comparison columns) -->
+      <!-- Body -->
       <div id="compareModalBody" class="w-full flex-1 overflow-y-auto p-4 sm:px-6"></div>
     </div>
   </div>
 
-  <!-- Strict Museum Display Placard & Curator Pocket Passport Print Container -->
+  <!-- Print Placard & Passport Container -->
   <div id="printablePlacard" class="hidden"></div>
 
-  <!-- Dropdown Controller Script & Cross-Tab Theme Sync -->
-  <script>
-    function toggleExploreDropdown(e) {
-      if (e) e.stopPropagation();
-      const menu = document.getElementById('exploreDropdownMenu');
-      const btn = document.getElementById('btnExploreDropdown');
-      const chev = document.getElementById('exploreDropdownChevron');
-      if (!menu) return;
-      const isClosed = menu.classList.contains('hidden');
-      if (isClosed) {
-        menu.classList.remove('hidden');
-        btn?.setAttribute('aria-expanded', 'true');
-        if (chev) chev.style.transform = 'rotate(180deg)';
-      } else {
-        menu.classList.add('hidden');
-        btn?.setAttribute('aria-expanded', 'false');
-        if (chev) chev.style.transform = 'rotate(0deg)';
-      }
-    }
-
-    function closeExploreDropdown() {
-      const menu = document.getElementById('exploreDropdownMenu');
-      const btn = document.getElementById('btnExploreDropdown');
-      const chev = document.getElementById('exploreDropdownChevron');
-      if (menu && !menu.classList.contains('hidden')) {
-        menu.classList.add('hidden');
-        btn?.setAttribute('aria-expanded', 'false');
-        if (chev) chev.style.transform = 'rotate(0deg)';
-      }
-    }
-
-    window.closeExploreDropdown = closeExploreDropdown;
-    window.toggleExploreDropdown = toggleExploreDropdown;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('btnExploreDropdown')?.addEventListener('click', toggleExploreDropdown);
-      
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('#exploreDropdownContainer')) {
-          closeExploreDropdown();
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeExploreDropdown();
-        }
-      });
-    });
-
-    // Cross-Tab Storage & Theme Listener
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'theme' || e.key === 'bMMC_theme') {
-        const isDark = (e.newValue === 'dark');
-        if (isDark) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-        if (typeof updateThemeUI === 'function') {
-          updateThemeUI(isDark);
-        }
-      }
-    });
-  </script>
+  <!-- Universal BMMC Navigation Drawer Engine -->
+  <script src="shared-nav.js"></script>
 </body>
 </html>

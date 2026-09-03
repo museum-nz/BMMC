@@ -15,7 +15,7 @@ const LOCAL_EXHIBITS_CSV_URL = './data/exhibits.csv';
 const LOCAL_GRAMOPHONE_CSV_URL = './data/gramophone.csv';
 const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
 
-const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
 
@@ -312,7 +312,6 @@ function printCuratorPocketPassport() {
     </div>
   `;
 
-  // Individual Artifact Passport Leaves
   items.forEach(({ originalIndex, row }, pageIdx) => {
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
     const { title, details } = parseTitleAndDetails(rawContent);
@@ -337,8 +336,6 @@ function printCuratorPocketPassport() {
 
     pagesHTML += `
       <div class="passport-leaf">
-        
-        <!-- Passport Leaf Header -->
         <div style="border-bottom: 2px solid #0f172a; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
             <div style="font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">
@@ -355,7 +352,6 @@ function printCuratorPocketPassport() {
           </div>
         </div>
 
-        <!-- Dual Slot Media Section -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
           ${fullImg1 ? `
             <div class="passport-img-box" style="flex: 1; position: relative;">
@@ -369,7 +365,6 @@ function printCuratorPocketPassport() {
             </div>` : ''}
         </div>
 
-        <!-- Archival Specs Grid -->
         <div class="passport-specs-grid">
           <div><strong>Historical Era:</strong><br>${escapeHTML(eraDisplay || '—')}</div>
           <div><strong>Date / Period:</strong><br>${escapeHTML(year || '—')}</div>
@@ -379,7 +374,6 @@ function printCuratorPocketPassport() {
           <div><strong>Subcategory:</strong><br>${escapeHTML(subcategory || '—')}</div>
         </div>
 
-        <!-- Curator Provenance Notes -->
         ${notes ? `
           <div class="passport-notes-box">
             <div style="font-weight: 900; text-transform: uppercase; font-size: 8px; color: #b45309; margin-bottom: 2px;">Curator Provenance Notes:</div>
@@ -387,7 +381,6 @@ function printCuratorPocketPassport() {
           </div>
         ` : ''}
 
-        <!-- Physical Description -->
         ${details ? `
           <div style="margin-bottom: 8px; font-size: 9.5px; color: #334155; line-height: 1.4;">
             <div style="font-weight: 800; text-transform: uppercase; font-size: 8px; color: #64748b; margin-bottom: 2px;">Physical Description & Specs:</div>
@@ -395,7 +388,6 @@ function printCuratorPocketPassport() {
           </div>
         ` : ''}
 
-        <!-- Deep Link & Documentation Footer -->
         <div style="border-top: 1px dashed #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #475569;">
           <div>
             ${ddoc ? `<span>📄 Doc: ${escapeHTML(ddoc)}</span> &bull; ` : ''}
@@ -407,7 +399,6 @@ function printCuratorPocketPassport() {
             ${directUrl}
           </div>
         </div>
-
       </div>
     `;
   });
@@ -795,6 +786,10 @@ function parseYearForSort(val) {
 }
 
 function showToast(msg, icon = '✨') {
+  if (typeof window.showBMMCToast === 'function') {
+    window.showBMMCToast(msg, icon);
+    return;
+  }
   const toast = document.getElementById('toast');
   if (!toast) return;
   document.getElementById('toastMsg').textContent = msg;
@@ -1166,7 +1161,7 @@ function toggleCompareItem(originalIndex, event) {
     showToast('Removed from comparison', '⚖️');
   } else {
     if (compareItemIndices.size >= 8) {
-      showToast('Maximum 8 items can be compared / passport generated at once', '⚠️');
+      showToast('Maximum 8 items can be compared at once', '⚠️');
       return;
     }
     compareItemIndices.add(originalIndex);
@@ -1213,6 +1208,8 @@ function openCompareModal() {
     return;
   }
 
+  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
+
   const items = Array.from(compareItemIndices).map(idx => ({
     originalIndex: idx,
     row: rawExhibitsRows[idx]
@@ -1225,7 +1222,6 @@ function openCompareModal() {
   else if (colsCount >= 4) gridColsClass = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
 
   let html = `
-    <!-- Top Action Bar inside Comparison Modal -->
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
       <div class="flex items-center gap-2">
         <span class="text-base">📘</span>
@@ -1573,6 +1569,7 @@ window.showExhibitOnMap = function(originalIndex) {
   closeEnlargeModal();
   close3DLightbox();
   closeCompareModal();
+  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
   document.body.classList.remove('overflow-hidden');
 
   setTab('stats');
@@ -1626,7 +1623,7 @@ function clearAllFilters(shouldScroll = true) {
 
 function browseAllExhibits() {
   hideLoadingSpinner();
-  if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
+  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
   document.body.classList.remove('overflow-hidden');
   if (currentTab !== 'exhibits') setTab('exhibits');
   clearAllFilters(false);
@@ -1639,7 +1636,7 @@ function setTab(tabName) {
   currentTab = tabName;
   stopAudioGuide();
   hideLoadingSpinner();
-  if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
+  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
   document.body.classList.remove('overflow-hidden');
   saveCatalogSessionState();
 
@@ -2578,7 +2575,7 @@ function renderGramophoneGrid() {
         </span>
         <div class="flex items-center gap-1.5 flex-wrap justify-end">
           ${hasDiscogsRecording ? `<a href="${discogsUrl || '#'}" target="_blank" rel="noopener noreferrer" class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-emerald-600 flex items-center gap-1">🎙️ Discogs Recording</a>` : ''}
-          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-sky-700 flex items-center gap-1">📻 Archives 78s Recording</a>` : ''}
+          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-sky-700 flex items-center gap-1">📻 Archives 78s Recording ↗</a>` : ''}
           ${discogsUrl && !hasDiscogsRecording ? `<a href="${discogsUrl}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-black text-white px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">📀 Discogs ↗</a>` : ''}
         </div>
       </div>
@@ -2960,6 +2957,8 @@ function open3DLightbox(rawUrl, rawTitle) {
 
   if (!modal || !viewer || !rawUrl) return;
 
+  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
+
   let url = rawUrl;
   let title = rawTitle || 'Interactive 3D Model';
   try { url = decodeURIComponent(rawUrl); } catch(e) {}
@@ -3042,7 +3041,6 @@ function close3DLightbox() {
     document.body.classList.remove('overflow-hidden');
   }
 }
-
 // ==========================================================================
 // 11. Exhibit Detail Modal Manager
 // ==========================================================================
@@ -3103,6 +3101,8 @@ function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
 
 function openModal(row, originalIndex) {
   stopAudioGuide();
+  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
+
   const modalContainer = document.getElementById('modalContainer');
   const modalContent = document.getElementById('modalContent');
   const counterElem = document.getElementById('modalCounter');
@@ -3161,7 +3161,7 @@ function openModal(row, originalIndex) {
       <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800">
         <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
           <span>🏛️ Related Artifacts (${category || eraDisplay})</span>
-          <span class="text-[10px] font-normal text-slate-400">Swipe or Click to explore</span>
+          <span class="text-[10px] font-normal text-slate-400">Click to explore</span>
         </h4>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           ${relatedExhibits.map(rel => {
@@ -3182,7 +3182,8 @@ function openModal(row, originalIndex) {
     ` : '';
 
     if (modalContainer) {
-      modalContainer.style.borderColor = theme.hex; modalContainer.style.borderWidth = '3px';
+      modalContainer.style.borderColor = theme.hex;
+      modalContainer.style.borderWidth = '3px';
       modalContainer.style.backgroundColor = getSolidTint(theme.hex, isDark);
     }
 
@@ -3196,7 +3197,9 @@ function openModal(row, originalIndex) {
         nextBtn.disabled = currentModalIndex === currentFilteredRows.length - 1;
         nextBtn.classList.toggle('opacity-40', currentModalIndex === currentFilteredRows.length - 1);
       }
-    } else { if (counterElem) counterElem.textContent = ''; }
+    } else {
+      if (counterElem) counterElem.textContent = '';
+    }
 
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
@@ -3262,7 +3265,7 @@ function openModal(row, originalIndex) {
               <div class="relative group/model w-full">
                 <div class="flex items-center justify-between mb-2">
                   <p class="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest flex items-center gap-1">
-                    <span>👓</span> Interactive 3D Model & AR
+                    <span>👓</span> Interactive 3D Model &amp; AR
                   </p>
                   <div class="flex items-center gap-2">
                     <button id="btnToggleModalSkybox" onclick="toggleModal3DSkybox(event)" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-300 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md transition border border-slate-300 dark:border-slate-700 cursor-pointer">${is3DSkyboxLight ? '🌙 Dark Sky' : '☀️ Light Sky'}</button>
@@ -3359,13 +3362,13 @@ function openModal(row, originalIndex) {
     const discogsUrl = getDiscogsUrl(row);
     const hasDiscogsRecording = checkIfHasRecording(row);
     const hasArchiveRecording = (getVal(row, 11) || '').toLowerCase().includes('yes');
-    const hasAnyRecording = hasDiscogsRecording || hasArchiveRecording;
     const archiveUrl = buildArchiveSearchUrl(rawTitle, catalogNum);
     const ytQuery = encodeURIComponent(`${unescapeHTML(artist)} ${unescapeHTML(rawTitle)}`.replace(/^[AB][\s\.:-]+/gi, '').trim()).replace(/%20/g, '+');
     const gramTheme = CATEGORY_PALETTE.gramophones;
 
     if (modalContainer) {
-      modalContainer.style.borderColor = gramTheme.hex; modalContainer.style.borderWidth = '3px';
+      modalContainer.style.borderColor = gramTheme.hex;
+      modalContainer.style.borderWidth = '3px';
       modalContainer.style.backgroundColor = getSolidTint(gramTheme.hex, isDark);
     }
 
@@ -3379,7 +3382,9 @@ function openModal(row, originalIndex) {
         nextBtn.disabled = currentModalIndex === currentFilteredRows.length - 1;
         nextBtn.classList.toggle('opacity-40', currentModalIndex === currentFilteredRows.length - 1);
       }
-    } else { if (counterElem) counterElem.textContent = ''; }
+    } else {
+      if (counterElem) counterElem.textContent = '';
+    }
 
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
@@ -3431,7 +3436,7 @@ function openModal(row, originalIndex) {
 
           ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-2"><span>📻 Archives 78s Recording ↗</span></a>` : ''}
 
-          ${!hasAnyRecording ? `
+          ${!hasDiscogsRecording && !hasArchiveRecording ? `
             <a href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener noreferrer" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5"><span>🎵 Search YouTube ↗</span></a>
             <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5" title="Search the 78 RPM Collection on Internet Archive"><span>📻 Search Archive 78s ↗</span></a>` : ''}
         </div>`;
@@ -3520,7 +3525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTab !== 'exhibits') setTab('exhibits');
     only3DActive = !only3DActive;
     document.getElementById('btn3DOnly')?.classList.toggle('ring-2', only3DActive);
-    if (only3DActive) showToast(only3DActive ? 'Showing 3D Models Only' : '3D Filter Cleared', '👓');
+    if (only3DActive) showToast('Showing 3D Models Only', '👓');
     saveCatalogSessionState();
     filterCatalog(true);
   });
@@ -3529,7 +3534,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTab !== 'exhibits') setTab('exhibits');
     hotOnlyActive = !hotOnlyActive;
     document.getElementById('btnHotOnly')?.classList.toggle('ring-2', hotOnlyActive);
-    if (hotOnlyActive) showToast(hotOnlyActive ? 'Showing Hot Items Only' : 'Hot Filter Cleared', '🔥');
+    if (hotOnlyActive) showToast('Showing Hot Items Only', '🔥');
     saveCatalogSessionState();
     filterCatalog(true);
   });
@@ -3634,7 +3639,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (e.key === 'Escape') {
       hideSearchSuggestions();
-      if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
+      if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
       if (compareModal && !compareModal.classList.contains('hidden')) { closeCompareModal(); return; }
       if (enlargeModal && !enlargeModal.classList.contains('hidden')) { closeEnlargeModal(); return; }
       if (lightbox && !lightbox.classList.contains('hidden')) { close3DLightbox(); return; }
@@ -3667,6 +3672,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof closeEnlargeModal === 'function') closeEnlargeModal();
       if (typeof close3DLightbox === 'function') close3DLightbox();
       if (typeof closeCompareModal === 'function') closeCompareModal();
+      if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
       if (exhibitNum !== undefined && exhibitNum !== null) {
         openModalByOriginalIndex(Number(exhibitNum));
       }

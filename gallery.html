@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <title>BMMC Photo Archives — Historical Photographic Galleries</title>
 
-  <!-- Instant Theme Sync (Prevents Flash of Light Mode) -->
+  <!-- Instant Theme Sync -->
   <script>
     (function() {
       try {
@@ -19,10 +19,10 @@
     })();
   </script>
 
-  <!-- Content Security Policy -->
+  <!-- Clean Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self' 'unsafe-inline';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.tailwindcss.com ../vendor/tailwind.js;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.dropboxusercontent.com https://*.dropbox.com;
     media-src 'self' blob: https://www.dropbox.com https://*.dropbox.com https://*.dropboxusercontent.com;
@@ -41,14 +41,14 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- Offline Media Adapter (Silently ignored when hosted online) -->
+  <!-- Offline Media Adapter -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
-  <!-- PapaParse with Online CDN & Offline Local Fallback -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" onerror="this.onerror=null;this.src='../vendor/papaparse.min.js';"></script>
+  <!-- PapaParse -->
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;this.src='../vendor/papaparse.min.js';"></script>
 
-  <!-- Tailwind CSS Engine with Online CDN & Offline Local Fallback -->
-  <script src="https://cdn.tailwindcss.com" onerror="this.onerror=null;this.src='../vendor/tailwind.js';"></script>
+  <!-- Tailwind CSS Engine -->
+  <script src="../vendor/tailwind.js" onerror="this.onerror=null;this.src='../vendor/tailwind.js';"></script>
   <script>
     if (window.tailwind) {
       tailwind.config = {
@@ -70,7 +70,7 @@
     }
   </script>
 
-  <!-- Unified Stylesheet -->
+  <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -102,6 +102,12 @@
         <!-- Action Buttons Bar -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           
+          <!-- Universal Navigation Drawer Trigger (Hamburger) -->
+          <button class="btn-bmmc-menu-trigger flex items-center gap-1 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
+            <span class="text-sm leading-none">☰</span>
+            <span class="hidden sm:inline">Wings</span>
+          </button>
+
           <!-- Surprise Button -->
           <button id="btnSurprise" title="Surprise Me (Random Photo)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>✨</span> <span class="hidden lg:inline">Surprise</span>
@@ -124,7 +130,7 @@
               <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
 
-            <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
+            <button id="toggleControlsBtn" title="Toggle Search &amp; Filters" aria-label="Toggle Search &amp; Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
               </svg>
@@ -148,7 +154,7 @@
             <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
               <label for="gallerySortSelect" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
               <select id="gallerySortSelect" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
-                <option value="default" class="dark:bg-slate-900">Default (Date & Title)</option>
+                <option value="default" class="dark:bg-slate-900">Default (Date &amp; Title)</option>
                 <option value="date-asc" class="dark:bg-slate-900">Date (Oldest First)</option>
                 <option value="date-desc" class="dark:bg-slate-900">Date (Newest First)</option>
                 <option value="title-asc" class="dark:bg-slate-900">Title (A-Z)</option>
@@ -226,13 +232,13 @@
             <!-- Dun & Bonniefields -->
             <div id="tabBtnBNF" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
               <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #10b98125;">
-                <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Dun & Bonniefields" />
+                <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Dun &amp; Bonniefields" />
                 <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
                   <span id="hubCountBNF" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-emerald-500 text-slate-950">0</span>
                 </div>
               </div>
               <div class="p-2.5 flex-1 flex flex-col justify-between">
-                <h3 class="font-black text-xs line-clamp-1 text-emerald-600 dark:text-emerald-400">Dun & Bonniefields</h3>
+                <h3 class="font-black text-xs line-clamp-1 text-emerald-600 dark:text-emerald-400">Dun &amp; Bonniefields</h3>
                 <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">1920s Farm →</span>
               </div>
             </div>
@@ -247,7 +253,7 @@
               </div>
               <div class="p-2.5 flex-1 flex flex-col justify-between">
                 <h3 class="font-black text-xs line-clamp-1 text-blue-600 dark:text-blue-400">Maitland East Chatton</h3>
-                <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-blue-600 dark:text-blue-400">School & Village →</span>
+                <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-blue-600 dark:text-blue-400">School &amp; Village →</span>
               </div>
             </div>
 
@@ -283,7 +289,7 @@
           <div class="flex items-center gap-2">
             <span class="text-xl">🎙️</span>
             <div>
-              <h3 class="text-base sm:text-lg font-black text-amber-900 dark:text-amber-300">Alan Starling WWII Oral History & Interactive Transcript</h3>
+              <h3 class="text-base sm:text-lg font-black text-amber-900 dark:text-amber-300">Alan Starling WWII Oral History &amp; Interactive Transcript</h3>
               <p class="text-xs text-amber-700/80 dark:text-amber-400">Click any transcript cue or chapter to immediately jump audio to that point</p>
             </div>
           </div>
@@ -306,7 +312,7 @@
                 </span>
               </div>
               <h4 class="text-sm font-black text-slate-900 dark:text-white">Alan Starling — WWII Royal Navy Memories</h4>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">North Atlantic convoys, Rudolf Hess capture, signal operations & wartime routine.</p>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">North Atlantic convoys, Rudolf Hess capture, signal operations &amp; wartime routine.</p>
             </div>
 
             <div class="w-full rounded-2xl bg-slate-950 p-4 border border-slate-800 text-white shadow-inner space-y-3.5">
@@ -375,7 +381,7 @@
             <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
               <div class="flex items-center gap-2">
                 <span class="text-sm">📜</span>
-                <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Synchronized Transcript & Chapter Index</h4>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Synchronized Transcript &amp; Chapter Index</h4>
               </div>
               
               <input type="text" id="transcriptSearch" placeholder="Search transcript..." class="px-2.5 py-1 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-amber-500 w-36 sm:w-44" />
@@ -384,7 +390,7 @@
             <div id="transcriptContainer" class="flex-1 overflow-y-auto pr-2 space-y-2.5 text-xs text-slate-700 dark:text-slate-300 custom-scrollbar select-text">
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="0" data-end="270">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 1: Enlistment & Early Naval Training</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 1: Enlistment &amp; Early Naval Training</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">00:00</span>
                 </div>
                 <p class="leading-relaxed">Alan Starling discusses volunteering for naval service, initial reception at HMS Raleigh, medical examinations, and being assigned to communications and signal operations in Devonport.</p>
@@ -392,7 +398,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="270" data-end="555">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 2: Signal School, Morse Code & Semaphore</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 2: Signal School, Morse Code &amp; Semaphore</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">04:30</span>
                 </div>
                 <p class="leading-relaxed">Rigorous training in visual signaling, lamp telegraphy, radio silence protocols, and flag hoists under wartime blackout regulations.</p>
@@ -400,7 +406,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="555" data-end="940">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 3: Western Approaches & Convoy Escort Duty</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 3: Western Approaches &amp; Convoy Escort Duty</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">09:15</span>
                 </div>
                 <p class="leading-relaxed">Posting to destroyer escorts screening Atlantic merchant ships against U-boat wolfpack attacks; heavy seas, ASDIC submarine detections, and depth charge patterns.</p>
@@ -416,7 +422,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="1330" data-end="1775">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 5: Arctic Convoys to Murmansk & Archangel</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 5: Arctic Convoys to Murmansk &amp; Archangel</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">22:10</span>
                 </div>
                 <p class="leading-relaxed">Brutal sub-zero conditions in the Barents Sea, de-icing frozen gun mounts and signal bridges, Luftwaffe torpedo bomber strikes from occupied Norway, and Russian supply logistics.</p>
@@ -424,7 +430,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="1775" data-end="2210">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 6: Mediterranean Fleet & Air-Sea Defense</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 6: Mediterranean Fleet &amp; Air-Sea Defense</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">29:35</span>
                 </div>
                 <p class="leading-relaxed">Naval gunfire support missions, Stuka dive-bomber defense off Malta and Gibraltar, and coordinating signal communication under continuous aerial combat.</p>
@@ -432,7 +438,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2210" data-end="2600">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 7: D-Day Preparations & English Channel Sweeps</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 7: D-Day Preparations &amp; English Channel Sweeps</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">36:50</span>
                 </div>
                 <p class="leading-relaxed">Operation Neptune assembly, escorting landing crafts, minefield clearance signaling, and maintaining vital communications along the invasion beachheads.</p>
@@ -440,7 +446,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2600" data-end="2925">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 8: Messdeck Life, Diaries & Wartime Comradeship</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 8: Messdeck Life, Diaries &amp; Wartime Comradeship</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">43:20</span>
                 </div>
                 <p class="leading-relaxed">Day-to-day naval routines, rations, maintaining handwritten personal journals, keeping morale high in adverse seas, and lifelong bonds forged among shipmates.</p>
@@ -448,7 +454,7 @@
 
               <div class="transcript-cue p-2.5 rounded-xl border border-transparent hover:border-amber-400/50 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer" data-start="2925" data-end="3191">
                 <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 9: VE-Day, Demobilization & Legacy</span>
+                  <span class="font-black text-amber-600 dark:text-amber-400 text-[11px]">Chapter 9: VE-Day, Demobilization &amp; Legacy</span>
                   <span class="font-mono text-[10px] font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">48:45</span>
                 </div>
                 <p class="leading-relaxed">Celebrations at the conclusion of European hostilities, transition back to civilian family life, and reflections on preserving historical wartime memories.</p>
@@ -557,6 +563,9 @@
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification</span>
   </div>
+
+  <!-- Universal BMMC Navigation Drawer Script -->
+  <script src="shared-nav.js"></script>
 
   <!-- Main JavaScript Engine -->
   <script>
