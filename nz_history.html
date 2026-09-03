@@ -212,7 +212,7 @@
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      width: 270px;
+      width: 280px;
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
       border: 1px solid #cbd5e1;
@@ -499,7 +499,7 @@
     .history-card-img-wrap {
       display: block;
       width: 100%;
-      height: 160px;
+      height: 150px;
       background: #0f172a;
       position: relative;
       overflow: hidden;
@@ -537,12 +537,79 @@
       padding: 3px 8px;
       border-radius: 6px;
     }
+
+    /* Chronological Popup Stepper Bar */
+    .history-card-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 3px 6px;
+      margin-bottom: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .dark .history-card-stepper {
+      background: #0f172a;
+      border-color: #334155;
+    }
+    .btn-step-nav {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+      user-select: none;
+    }
+    .btn-step-nav:hover:not(:disabled) {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      transform: scale(1.08);
+    }
+    .btn-step-nav:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: transparent;
+    }
+    .dark .btn-step-nav {
+      background: #1e293b;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+    .dark .btn-step-nav:hover:not(:disabled) {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+    }
+    .step-index-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      letter-spacing: 0.2px;
+    }
+    .dark .step-index-label { color: #94a3b8; }
+    .step-index-label strong {
+      color: #0284c7;
+      font-weight: 900;
+    }
+    .dark .step-index-label strong { color: #38bdf8; }
+
     .history-card-body {
-      padding: 12px;
+      padding: 10px 12px 12px;
     }
     .history-card-body h3 {
       margin: 0 0 4px 0;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 900;
       color: #0f172a;
       line-height: 1.3;
@@ -554,20 +621,20 @@
       color: #64748b;
       font-size: 11px;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .history-card-desc {
-      margin: 0 0 12px 0;
+      margin: 0 0 10px 0;
       font-size: 12px;
-      line-height: 1.5;
+      line-height: 1.45;
       color: #334155;
     }
     .history-card-footer {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       border-top: 1px solid #f1f5f9;
-      padding-top: 10px;
+      padding-top: 8px;
     }
     .btn-google-ai {
       display: flex;
@@ -577,7 +644,7 @@
       background: #0f172a;
       color: #38bdf8;
       border: 1px solid #38bdf8;
-      padding: 7px 10px;
+      padding: 6px 10px;
       border-radius: 8px;
       font-size: 11px;
       font-weight: 800;
@@ -593,7 +660,7 @@
       background: #f8fafc;
       color: #475569;
       border: 1px solid #cbd5e1;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 8px;
       font-size: 10px;
       font-weight: 700;
@@ -644,7 +711,7 @@
           <span>🗺️</span> <span>Basemap</span>
         </button>
         <div id="layerDropdownCard" class="layer-dropdown-card">
-          <button id="btnLayerNatGeo" class="layer-option-btn active"><span>📜</span><span>Historical</span></button>
+          <button id="btnLayerNatGeo" class="layer-option-btn active" title="Auto-switches to detailed topo when zoomed in"><span>📜</span><span>Historical (Auto)</span></button>
           <button id="btnLayerTopo" class="layer-option-btn"><span>⛰️</span><span>Topo</span></button>
           <button id="btnLayerSat" class="layer-option-btn"><span>🛰️</span><span>Satellite</span></button>
           <button id="btnLayerStreet" class="layer-option-btn"><span>📍</span><span>Street</span></button>
@@ -727,63 +794,121 @@
 
   <script>
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1659493611&single=true&output=csv';
-    const LOCAL_CSV_CANDIDATES = [
-      './data/nz_history.csv',
-      'data/nz_history.csv',
-      '../data/nz_history.csv',
-      './nz_history.csv',
-      'nz_history.csv'
-    ];
     const CACHE_STORAGE_KEY = 'bMMC_nz_history_csv_cache';
 
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
+    const CONSISTENT_EVENT_ZOOM = 14; // Standardized zoom level for tour inspection
 
-    // Initialize Map with zoom control disabled by default so we can place it top-right
-    const map = L.map('map', {
-      center: NZ_CENTER,
-      zoom: NZ_ZOOM,
-      minZoom: 4,
-      maxBounds: [[-50, 160], [-30, 185]],
-      closePopupOnClick: true,
-      zoomControl: false
-    });
-
-    // Add Zoom Control explicitly to Top-Right
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    let map;
+    let markers;
 
     const basemaps = {
-      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy; National Geographic Society', maxZoom: 16 }),
-      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy; Topographic Survey', maxZoom: 18 }),
-      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy; Earthstar Geographics', maxZoom: 18 }),
-      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 })
+      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; National Geographic Society',
+        maxNativeZoom: 12,
+        maxZoom: 19
+      }),
+      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; Topographic Survey',
+        maxNativeZoom: 18,
+        maxZoom: 19
+      }),
+      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; Earthstar Geographics',
+        maxNativeZoom: 18,
+        maxZoom: 19
+      }),
+      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxNativeZoom: 19,
+        maxZoom: 19
+      })
     };
-    basemaps.natgeo.addTo(map);
+
+    let userSelectedBasemap = 'natgeo';
+    let isAutoSwitchedToTopo = false;
+    const AUTO_SWITCH_ZOOM_THRESHOLD = 12;
+
+    function applyLayer(type) {
+      Object.values(basemaps).forEach(l => {
+        if (map && map.hasLayer(l)) map.removeLayer(l);
+      });
+      if (map) basemaps[type].addTo(map);
+    }
+
+    function checkBasemapAutoSwitch() {
+      if (!map || userSelectedBasemap !== 'natgeo') return;
+
+      const currentZoom = map.getZoom();
+      if (currentZoom > AUTO_SWITCH_ZOOM_THRESHOLD) {
+        if (!isAutoSwitchedToTopo) {
+          isAutoSwitchedToTopo = true;
+          applyLayer('topo');
+        }
+      } else {
+        if (isAutoSwitchedToTopo) {
+          isAutoSwitchedToTopo = false;
+          applyLayer('natgeo');
+        }
+      }
+    }
 
     function setBasemap(type) {
-      Object.values(basemaps).forEach(l => map.removeLayer(l));
-      basemaps[type].addTo(map);
+      userSelectedBasemap = type;
+      isAutoSwitchedToTopo = false;
+
+      if (type === 'natgeo') {
+        if (map && map.getZoom() > AUTO_SWITCH_ZOOM_THRESHOLD) {
+          isAutoSwitchedToTopo = true;
+          applyLayer('topo');
+        } else {
+          applyLayer('natgeo');
+        }
+      } else {
+        applyLayer(type);
+      }
+
       document.querySelectorAll('.layer-option-btn').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
       if (activeBtn) activeBtn.classList.add('active');
       document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
-    const markers = L.markerClusterGroup({
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      maxClusterRadius: 35,
-      iconCreateFunction: (cluster) => L.divIcon({
-        html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
-        className: 'custom-cluster-icon',
-        iconSize: [44, 44],
-        iconAnchor: [22, 22]
-      })
-    });
-    map.addLayer(markers);
+    function initMap() {
+      map = L.map('map', {
+        center: NZ_CENTER,
+        zoom: NZ_ZOOM,
+        minZoom: 4,
+        maxZoom: 19,
+        maxBounds: [[-50, 160], [-30, 185]],
+        closePopupOnClick: false,
+        zoomControl: false
+      });
+
+      L.control.zoom({ position: 'topright' }).addTo(map);
+      basemaps.natgeo.addTo(map);
+      map.on('zoomend', checkBasemapAutoSwitch);
+
+      markers = L.markerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        maxClusterRadius: 35,
+        disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM, // Unclusters markers at level 14 so it never zooms past it!
+        iconCreateFunction: (cluster) => L.divIcon({
+          html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
+          className: 'custom-cluster-icon',
+          iconSize: [44, 44],
+          iconAnchor: [22, 22]
+        })
+      });
+      map.addLayer(markers);
+    }
 
     let allEvents = [];
+    let currentActiveEvents = [];
+    let currentActiveIndex = 0;
     let globalMinYear = 1280;
     let globalMaxYear = 2026;
     let timelineTimer = null;
@@ -857,13 +982,52 @@
       return '📍';
     }
 
+    // Stepping function with consistent zoom level 14
+    window.stepHistory = function(delta) {
+      if (!currentActiveEvents || currentActiveEvents.length === 0) return;
+      let nextIdx = currentActiveIndex + delta;
+      if (nextIdx < 0) nextIdx = 0;
+      if (nextIdx >= currentActiveEvents.length) nextIdx = currentActiveEvents.length - 1;
+      if (nextIdx === currentActiveIndex) return;
+
+      currentActiveIndex = nextIdx;
+      const targetEv = currentActiveEvents[nextIdx];
+      if (targetEv && targetEv._marker) {
+        // Uncluster if needed, but guarantee we stay at the comfortable zoom level 14
+        markers.zoomToShowLayer(targetEv._marker, () => {
+          const curZoom = map.getZoom();
+          // If zoom went deeper than 14 or was zoomed way out, snap smoothly to 14
+          if (curZoom > CONSISTENT_EVENT_ZOOM || curZoom < 12) {
+            map.setView([targetEv.latitude, targetEv.longitude], CONSISTENT_EVENT_ZOOM, { animate: true });
+          } else {
+            map.panTo([targetEv.latitude, targetEv.longitude]);
+          }
+          targetEv._marker.openPopup();
+        });
+      }
+    };
+
     function renderDataset(items) {
+      if (!markers) return;
       markers.clearLayers();
+
+      const sortedItems = [...items].sort((a, b) => {
+        if (a.year !== b.year) return (a.year || 0) - (b.year || 0);
+        return String(a.date || '').localeCompare(String(b.date || ''));
+      });
+
+      currentActiveEvents = sortedItems;
+      const totalCount = sortedItems.length;
+
+      sortedItems.forEach((ev, i) => {
+        ev._chronoIndex = i;
+      });
+
       const markerList = [];
       const PROXIMITY_DEG = 0.025;
       const groups = [];
 
-      items.forEach(ev => {
+      sortedItems.forEach(ev => {
         let found = null;
         for (const grp of groups) {
           if (Math.abs(grp.lat - ev.latitude) < PROXIMITY_DEG && Math.abs(grp.lng - ev.longitude) < PROXIMITY_DEG) {
@@ -932,10 +1096,20 @@
             </div>
           `;
 
+          const itemIndex = ev._chronoIndex;
+          const isFirst = itemIndex === 0;
+          const isLast = itemIndex === totalCount - 1;
+
           const popupHTML = `
             <div class="history-card">
               ${popupImageBlock}
               <div class="history-card-body">
+                <div class="history-card-stepper">
+                  <button type="button" class="btn-step-nav" onclick="window.stepHistory(-1); event.stopPropagation();" ${isFirst ? 'disabled' : ''} title="Previous event (earlier)">◀</button>
+                  <span class="step-index-label">Item <strong>#${itemIndex + 1}</strong> of <strong>${totalCount}</strong></span>
+                  <button type="button" class="btn-step-nav" onclick="window.stepHistory(1); event.stopPropagation();" ${isLast ? 'disabled' : ''} title="Next event (later)">▶</button>
+                </div>
+
                 <h3>${safeHeadline}</h3>
                 <div class="history-card-meta">
                   <span>📍</span>
@@ -957,13 +1131,19 @@
           `;
 
           const marker = L.marker([ev.latitude, ev.longitude], { icon: customIcon });
+          ev._marker = marker;
           marker.bindPopup(popupHTML, { maxWidth: 380, autoPan: true, keepInView: true });
+
+          marker.on('popupopen', () => {
+            currentActiveIndex = ev._chronoIndex;
+          });
+
           markerList.push(marker);
         });
       });
 
       markers.addLayers(markerList);
-      document.getElementById('itemCountBadge').textContent = `${items.length} event${items.length === 1 ? '' : 's'}`;
+      document.getElementById('itemCountBadge').textContent = `${totalCount} event${totalCount === 1 ? '' : 's'}`;
     }
 
     function filterEvents() {
@@ -987,8 +1167,10 @@
       const left = ((minVal - globalMinYear) / span) * 100;
       const right = ((maxVal - globalMinYear) / span) * 100;
 
-      fill.style.left = left + '%';
-      fill.style.width = (right - left) + '%';
+      if (fill) {
+        fill.style.left = left + '%';
+        fill.style.width = (right - left) + '%';
+      }
 
       document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
 
@@ -1082,7 +1264,7 @@
     }
 
     function parseCSVData(csvString) {
-      if (!csvString || csvString.trim().length === 0) return;
+      if (!csvString || csvString.trim().length === 0) return false;
       const parsed = Papa.parse(csvString, { header: true, skipEmptyLines: true });
 
       allEvents = (parsed.data || []).map(row => {
@@ -1114,7 +1296,11 @@
         };
       }).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude) && e.latitude !== 0 && e.longitude !== 0);
 
-      initSliders();
+      if (allEvents.length > 0) {
+        initSliders();
+        return true;
+      }
+      return false;
     }
 
     async function fetchFirstValidCsv(candidates) {
@@ -1134,6 +1320,9 @@
     }
 
     async function loadDataset() {
+      if (window.OFFLINE_CSV && parseCSVData(window.OFFLINE_CSV)) return;
+      if (window.bMMC_OFFLINE_DATA && parseCSVData(window.bMMC_OFFLINE_DATA)) return;
+
       try {
         const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
         if (cachedText && cachedText.trim().length > 50) {
@@ -1156,24 +1345,26 @@
 
       const csvText = await fetchFirstValidCsv(candidateUrls);
 
-      if (csvText) {
+      if (csvText && parseCSVData(csvText)) {
         try { localStorage.setItem(CACHE_STORAGE_KEY, csvText); } catch (e) {}
-        parseCSVData(csvText);
         return;
       }
 
-      document.getElementById('itemCountBadge').textContent = 'Offline';
-      document.getElementById('yearRangeText').textContent = 'Data Offline';
-    }
+      if (allEvents.length === 0) {
+        document.getElementById('itemCountBadge').textContent = 'Offline';
+        document.getElementById('yearRangeText').textContent = 'Data Offline';
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+
       document.getElementById('minYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('maxYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
 
       document.getElementById('btnFitNZ')?.addEventListener('click', () => {
-        if (markers.getLayers().length > 0) {
+        if (markers && markers.getLayers().length > 0) {
           map.fitBounds(markers.getBounds(), { padding: [50, 50] });
         } else {
           map.setView(NZ_CENTER, NZ_ZOOM);
@@ -1232,6 +1423,15 @@
           document.getElementById('maxYearSlider').value = this.dataset.max;
           filterEvents();
         });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        if (e.key === 'ArrowLeft') {
+          window.stepHistory(-1);
+        } else if (e.key === 'ArrowRight') {
+          window.stepHistory(1);
+        }
       });
 
       loadDataset();
