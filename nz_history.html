@@ -37,7 +37,7 @@
       background: #aad3df;
     }
 
-    /* --- MAP ITEM MARKERS & VERTICAL LADDERING --- */
+    /* --- MAP ITEM MARKERS & VERTICAL LADDERING (NO VERTICAL OVERLAP) --- */
     .history-div-icon {
       background: none !important;
       border: none !important;
@@ -71,7 +71,7 @@
     }
     .nz-history-marker:hover .marker-pill {
       border-color: #0284c7;
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
     }
 
     .marker-date-tag {
@@ -114,7 +114,7 @@
     .cat-rights .marker-pin-tail { border-top-color: var(--color-rights); }
     .cat-general .marker-pin-tail { border-top-color: var(--color-general); }
 
-    /* Vertical stem connector for offset/laddered items */
+    /* Vertical stem connector for laddered items */
     .marker-stem {
       width: 2px;
       background: rgba(71, 85, 105, 0.75);
@@ -126,7 +126,7 @@
       width: 3px;
     }
 
-    /* --- CLUSTERS --- */
+    /* --- CLUSTER BADGES --- */
     .cluster-number-badge {
       width: 44px;
       height: 44px;
@@ -148,7 +148,7 @@
       border-color: #38bdf8;
     }
 
-    /* --- POP-UP MODAL / CARD --- */
+    /* --- POP-UP MODAL CARD --- */
     .leaflet-popup-content-wrapper {
       padding: 0;
       border-radius: 16px;
@@ -209,7 +209,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* Fallback banner when no image is present in CSV */
+    /* Inline header shown ONLY when image is missing from CSV */
     .history-card-no-img-header {
       padding: 14px 16px 0;
       display: flex;
@@ -310,24 +310,34 @@
       color: #0f172a;
     }
 
-    /* --- TOP BAR CONTROLS --- */
-    .top-controls-bar {
+    /* --- TOP CONTROLS & NAVIGATION HEADER --- */
+    .top-controls-wrapper {
       position: absolute;
       top: 12px;
       left: 60px;
-      right: 12px;
+      right: 14px;
       z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .top-controls-bar {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      width: 100%;
       pointer-events: none;
     }
-    .map-search-box {
+    .top-controls-bar > * {
       pointer-events: auto;
+    }
+
+    .map-search-box {
       position: relative;
       width: 240px;
-      max-width: 42vw;
+      max-width: 36vw;
     }
     .map-search-box input {
       width: 100%;
@@ -367,7 +377,6 @@
     }
 
     .top-action-btn {
-      pointer-events: auto;
       background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -382,6 +391,7 @@
       cursor: pointer;
       text-decoration: none;
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
     .top-action-btn:hover {
       background: rgba(30, 41, 59, 0.98);
@@ -393,14 +403,21 @@
       border-color: #38bdf8;
     }
 
-    /* Museum Home Link Styling */
-    .museum-btn {
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.92), rgba(15, 23, 42, 0.92));
-      border-color: #38bdf8;
+    /* --- MUSEUM PILL: BLUE & MOVED TO FAR RIGHT --- */
+    .museum-pill-btn {
+      margin-left: auto !important; /* Forces the pill all the way to the far right */
+      background: #0284c7 !important;
+      border: 1.5px solid #38bdf8 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5);
+      font-weight: 800;
+      padding: 7px 14px;
     }
-    .museum-btn:hover {
-      background: #0284c7;
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
+    .museum-pill-btn:hover {
+      background: #0369a1 !important;
+      border-color: #bae6fd !important;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.75);
+      transform: translateY(-1px);
     }
 
     /* --- ERA QUICK-JUMP FILTER CHIPS --- */
@@ -577,9 +594,8 @@
     }
 
     @media (max-width: 768px) {
-      .top-controls-bar { left: 50px; right: 10px; top: 8px; gap: 6px; }
-      .map-search-box { width: 120px; }
-      .era-bar { order: 3; width: 100%; margin-top: 4px; }
+      .top-controls-wrapper { left: 50px; right: 10px; top: 8px; }
+      .map-search-box { width: 110px; }
       .year-slider-container {
         left: 50% !important;
         transform: translateX(-50%) !important;
@@ -591,50 +607,53 @@
 </head>
 <body>
 
-  <!-- Top Action & Search Bar -->
-  <div class="top-controls-bar">
-    <!-- Museum Home Link -->
-    <a href="index.html" class="top-action-btn museum-btn" title="Back to Museum Gallery">
-      <span>🏛️</span> <span>Museum</span>
-    </a>
-
-    <div class="map-search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="mapSearchInput" placeholder="Search events, ships..." aria-label="Search NZ History">
-      <button id="clearMapSearch" class="clear-search-btn">✕</button>
-    </div>
-
-    <!-- Heatmap Toggle -->
-    <button id="btnToggleHeatmap" class="top-action-btn" title="Toggle Historical Density Heatmap">
-      <span>🔥</span> <span>Heatmap</span>
-    </button>
-
-    <!-- Layer Switcher -->
-    <div class="layer-switcher-container">
-      <button id="btnLayersToggle" class="top-action-btn" title="Change Basemap">
-        <span>🗺️</span> <span>Basemap</span>
-      </button>
-      <div id="layerDropdownCard" class="layer-dropdown-card">
-        <button id="btnLayerNatGeo" class="layer-option-btn active"><span>📜</span><span>Historical</span></button>
-        <button id="btnLayerTopo" class="layer-option-btn"><span>⛰️</span><span>Topo</span></button>
-        <button id="btnLayerSat" class="layer-option-btn"><span>🛰️</span><span>Satellite</span></button>
-        <button id="btnLayerStreet" class="layer-option-btn"><span>📍</span><span>Street</span></button>
+  <!-- Top Controls & Navigation Header -->
+  <div class="top-controls-wrapper">
+    <div class="top-controls-bar">
+      <!-- Search Input -->
+      <div class="map-search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="mapSearchInput" placeholder="Search events, ships..." aria-label="Search NZ History">
+        <button id="clearMapSearch" class="clear-search-btn">✕</button>
       </div>
+
+      <!-- Heatmap Toggle -->
+      <button id="btnToggleHeatmap" class="top-action-btn" title="Toggle Historical Density Heatmap">
+        <span>🔥</span> <span>Heatmap</span>
+      </button>
+
+      <!-- Basemap Switcher -->
+      <div class="layer-switcher-container">
+        <button id="btnLayersToggle" class="top-action-btn" title="Change Basemap">
+          <span>🗺️</span> <span>Basemap</span>
+        </button>
+        <div id="layerDropdownCard" class="layer-dropdown-card">
+          <button id="btnLayerNatGeo" class="layer-option-btn active"><span>📜</span><span>Historical</span></button>
+          <button id="btnLayerTopo" class="layer-option-btn"><span>⛰️</span><span>Topo</span></button>
+          <button id="btnLayerSat" class="layer-option-btn"><span>🛰️</span><span>Satellite</span></button>
+          <button id="btnLayerStreet" class="layer-option-btn"><span>📍</span><span>Street</span></button>
+        </div>
+      </div>
+
+      <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
+        <span>🇳🇿</span> <span>Fit NZ</span>
+      </button>
+      <button id="btnResetView" class="top-action-btn" title="Reset View & Timeline">
+        <span>↺</span> <span>Reset</span>
+      </button>
+
+      <!-- Museum Pill: Stays on the far right and is styled blue -->
+      <a href="index.html" class="top-action-btn museum-pill-btn" title="Back to Museum Gallery">
+        <span>🏛️</span> <span>Museum</span>
+      </a>
     </div>
 
-    <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
-      <span>🇳🇿</span> <span>Fit NZ</span>
-    </button>
-    <button id="btnResetView" class="top-action-btn" title="Reset View & Timeline">
-      <span>↺</span> <span>Reset</span>
-    </button>
-
-    <!-- Era Filter Chips -->
+    <!-- Era Quick-Jump Filter Row -->
     <div class="era-bar">
       <button class="era-chip active" data-min="1280" data-max="2026">All</button>
-      <button class="era-chip" data-min="1280" data-max="1839">Early Contact (<1840)</button>
+      <button class="era-chip" data-min="1280" data-max="1839">Early Contact (&lt;1840)</button>
       <button class="era-chip" data-min="1840" data-max="1855">Pioneer Ships (1840–1855)</button>
-      <button class="era-chip" data-min="1855" data-max="1890">Wars & Gold (1855–1890)</button>
+      <button class="era-chip" data-min="1855" data-max="1890">Wars &amp; Gold (1855–1890)</button>
       <button class="era-chip" data-min="1890" data-max="1945">Troops to Wars (1899–1945)</button>
       <button class="era-chip" data-min="1945" data-max="2026">Modern NZ (1945–Now)</button>
     </div>
@@ -642,7 +661,7 @@
 
   <div id="map"></div>
 
-  <!-- Bottom Timeline & Year Slider -->
+  <!-- Bottom Timeline & Dual Slider -->
   <div class="year-slider-container">
     <div class="year-slider-header">
       <div class="timeline-title-group">
@@ -660,14 +679,17 @@
     </div>
   </div>
 
-  <!-- Leaflet & CDN Libraries -->
+  <!-- External Leaflet & Parsing Libraries -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <script>
-    const CSV_URL = './nz_history.csv';
+    // Live Google Sheet CSV Endpoint
+    const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1659493611&single=true&output=csv';
+    const CACHE_STORAGE_KEY = 'bMMC_nz_history_csv_cache';
+
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
 
@@ -735,7 +757,7 @@
       }[m]));
     }
 
-    // Enforce 500px standard thumbnail width to prevent https://w.wiki/GHai 400/429 errors
+    // Enforce 500px standard thumbnail width to prevent https://w.wiki/GHai errors
     function getSafeThumbnail(url) {
       if (!url) return '';
       if (url.includes('upload.wikimedia.org') && url.includes('/thumb/')) {
@@ -770,7 +792,7 @@
       const heatPoints = [];
 
       // Proximity group items to prevent vertical stacking overlap
-      const PROXIMITY_DEG = 0.025; // ~2.5km bucket radius
+      const PROXIMITY_DEG = 0.025; // ~2.5km bucket
       const groups = [];
 
       items.forEach(ev => {
@@ -789,7 +811,7 @@
       });
 
       groups.forEach(grp => {
-        // Sort chronologically within the bucket
+        // Chronological order for stacking
         grp.items.sort((a, b) => (a.year || 0) - (b.year || 0));
 
         grp.items.forEach((ev, idx) => {
@@ -802,7 +824,7 @@
           const safeCategory = escapeHTML(ev.category || 'History');
           const safeDetails = escapeHTML(ev.details || '');
           
-          // Image handling: strict check
+          // Only show image if URL exists
           const rawImg = (ev.image_url || '').trim();
           const hasImage = rawImg.length > 0 && rawImg !== '#';
           const safeImg = hasImage ? getSafeThumbnail(rawImg) : '';
@@ -810,14 +832,14 @@
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
 
-          // Calculate vertical ladder offset (38px step per item above ground)
+          // Vertical ladder offset: each item is elevated by 38px
           const stemHeight = idx * 38;
           const totalIconHeight = 34 + stemHeight;
 
-          // Google AI Overview Search Link
+          // Google AI Overview Search query
           const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand history')}`;
 
-          // ON-MAP MARKER: Date + Headline + Vertical stem if offset
+          // ON-MAP MARKER: Date + Headline + Vertical stem
           const markerHTML = `
             <div class="nz-history-marker ${catClass}">
               <div class="marker-pill">
@@ -833,10 +855,10 @@
             html: markerHTML,
             className: 'history-div-icon',
             iconSize: [210, totalIconHeight],
-            iconAnchor: [105, totalIconHeight] // Pins exact bottom of stem to ground coordinate
+            iconAnchor: [105, totalIconHeight] // Pins base of stem directly to ground coordinates
           });
 
-          // POP-UP: Everything included, no image block if image_url is missing
+          // POP-UP: Omits image wrapper completely if no image URL
           const popupImageBlock = hasImage ? `
             <div class="history-card-img-wrap">
               <img src="${safeImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
@@ -955,7 +977,7 @@
       renderDataset(filtered);
     }
 
-    // Timeline Playback: Starts at 1800 with previous items already visible
+    // Timeline Playback: Starts at 1800 with earlier items (1280-1799) already shown
     function toggleTimelinePlayback() {
       const btn = document.getElementById('btnPlayTimeline');
       const minSlider = document.getElementById('minYearSlider');
@@ -970,10 +992,10 @@
         btn.textContent = '⏸';
         btn.classList.add('playing');
 
-        // Keep earliest year so previous items (1280-1799) already show on map
+        // Retain minSlider at earliest year so previous history stays visible
         minSlider.value = globalMinYear;
 
-        // Start playback advancing forward from 1800
+        // Start playback stepping forward from 1800
         let currentMax = parseInt(maxSlider.value, 10);
         if (currentMax >= globalMaxYear || currentMax < 1800) {
           maxSlider.value = 1800;
@@ -1009,6 +1031,8 @@
 
     function initSliders() {
       const years = allEvents.map(e => e.year).filter(y => !isNaN(y));
+      if (years.length === 0) return;
+
       globalMinYear = Math.min(...years);
       globalMaxYear = Math.max(...years);
 
@@ -1026,35 +1050,102 @@
       filterEvents();
     }
 
+    // Flexible column locator to guarantee parsing across any CSV format
+    function getCol(row, aliases) {
+      for (const key of Object.keys(row)) {
+        const clean = key.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (const alias of aliases) {
+          if (clean === alias) return String(row[key] || '').trim();
+        }
+      }
+      return '';
+    }
+
     function parseCSVData(csvString) {
+      if (!csvString || csvString.trim().length === 0) return;
       const parsed = Papa.parse(csvString, { header: true, skipEmptyLines: true });
-      allEvents = parsed.data.map(row => ({
-        id: row.id || '',
-        year: parseInt(row.year, 10) || 0,
-        date: row.date || row.year || '',
-        headline: row.headline || '',
-        category: row.category || 'General',
-        location: row.location || '',
-        latitude: parseFloat(row.latitude),
-        longitude: parseFloat(row.longitude),
-        details: row.details || '',
-        image_url: row.image_url || '',
-        source_url: row.source_url || '#'
-      })).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude));
+
+      allEvents = parsed.data.map(row => {
+        let latStr = getCol(row, ['latitude', 'lat', 'latdeg', 'y']);
+        let lngStr = getCol(row, ['longitude', 'lng', 'lon', 'long', 'x']);
+        let yearStr = getCol(row, ['year', 'yr']);
+        let dateStr = getCol(row, ['date', 'when', 'time']);
+
+        let lat = parseFloat(latStr.replace(',', '.'));
+        let lng = parseFloat(lngStr.replace(',', '.'));
+
+        let parsedYear = parseInt(yearStr.replace(/[^\d]/g, ''), 10);
+        if (isNaN(parsedYear) && dateStr) {
+          const match = dateStr.match(/\b(1\d{3}|20\d{2})\b/);
+          if (match) parsedYear = parseInt(match[1], 10);
+        }
+
+        return {
+          id: getCol(row, ['id', 'no', 'item']),
+          year: isNaN(parsedYear) ? 0 : parsedYear,
+          date: dateStr || String(parsedYear || ''),
+          headline: getCol(row, ['headline', 'title', 'event', 'name']),
+          category: getCol(row, ['category', 'type', 'era']) || 'General',
+          location: getCol(row, ['location', 'place', 'city']),
+          latitude: lat,
+          longitude: lng,
+          details: getCol(row, ['details', 'description', 'notes', 'summary']),
+          image_url: getCol(row, ['imageurl', 'image', 'img', 'photo']),
+          source_url: getCol(row, ['sourceurl', 'source', 'url', 'link']) || '#'
+        };
+      }).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude) && e.latitude !== 0);
 
       initSliders();
     }
 
+    // Load Dataset from Live Google Sheet with Cache Fallback
     async function loadDataset() {
+      let csvText = null;
+      let usedCache = false;
+
+      // 1. Attempt to fetch live Google Sheet CSV
       try {
-        const res = await fetch(CSV_URL);
+        const res = await fetch(LIVE_CSV_URL, { cache: 'no-cache' });
         if (res.ok) {
-          const text = await res.text();
-          parseCSVData(text);
-          return;
+          const fetchedText = await res.text();
+          if (fetchedText && fetchedText.trim().length > 50) {
+            csvText = fetchedText;
+            // Update localStorage cache with latest data
+            try {
+              localStorage.setItem(CACHE_STORAGE_KEY, fetchedText);
+            } catch (storageErr) {
+              console.warn('LocalStorage caching failed:', storageErr);
+            }
+          }
         }
-      } catch (e) {
-        console.warn('Could not load local nz_history.csv file over fetch:', e);
+      } catch (networkErr) {
+        console.warn('Live Google Sheet fetch failed, switching to cache:', networkErr);
+      }
+
+      // 2. Fallback to localStorage cache if live fetch failed
+      if (!csvText || csvText.trim().length < 50) {
+        try {
+          const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
+          if (cachedText && cachedText.trim().length > 50) {
+            csvText = cachedText;
+            usedCache = true;
+            console.log('Successfully loaded NZ History data from browser cache.');
+          }
+        } catch (cacheErr) {
+          console.warn('LocalStorage cache retrieval failed:', cacheErr);
+        }
+      }
+
+      // 3. Render or display offline status
+      if (csvText && csvText.trim().length > 50) {
+        parseCSVData(csvText);
+        if (usedCache) {
+          const badge = document.getElementById('itemCountBadge');
+          if (badge) badge.title = 'Running on offline cache';
+        }
+      } else {
+        document.getElementById('itemCountBadge').textContent = 'No Data';
+        document.getElementById('yearRangeText').textContent = 'Connection Error';
       }
     }
 
@@ -1083,7 +1174,7 @@
         filterEvents();
       });
 
-      // Layer Menu
+      // Basemap Dropdown
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
       btnLayersToggle.addEventListener('click', (e) => {

@@ -7,7 +7,7 @@
   <meta name="referrer" content="no-referrer-when-downgrade" />
   <title>New Zealand Currency &amp; Minting Database — BMMC</title>
 
-  <!-- Instant Theme Sync -->
+  <!-- Instant Theme Sync (Defaults cleanly to Day mode unless 'dark' was chosen) -->
   <script>
     (function() {
       try {
@@ -29,53 +29,78 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
 
-  <!-- Resilient Dynamic Script Loader (Works offline and online on GitHub Pages) -->
+  <!-- Tailwind CSS Engine with Synchronous Class-Based Dark Mode -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    window.tailwind = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              500: '#2563eb',
-              600: '#1d4ed8',
-              700: '#1e40af',
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f0f7ff',
+                100: '#e0effe',
+                500: '#2563eb',
+                600: '#1d4ed8',
+                700: '#1e40af',
+              }
             }
           }
         }
-      }
-    };
-
-    function loadScriptChain(sources, onComplete) {
-      let idx = 0;
-      function next() {
-        if (idx >= sources.length) {
-          if (onComplete) onComplete(false);
-          return;
-        }
-        const src = sources[idx++];
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = () => { if (onComplete) onComplete(true); };
-        s.onerror = () => { s.remove(); next(); };
-        document.head.appendChild(s);
-      }
-      next();
+      };
     }
+  </script>
 
-    // Load Tailwind CSS (local root -> parent -> CDN)
-    loadScriptChain(['vendor/tailwind.js', '../vendor/tailwind.js', 'https://cdn.tailwindcss.com']);
-    // Load PapaParse
-    loadScriptChain(['vendor/papaparse.min.js', '../vendor/papaparse.min.js', 'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js']);
-    // Load Chart.js
-    loadScriptChain(['vendor/chart.umd.min.js', '../vendor/chart.umd.min.js', 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js']);
+  <!-- Fallback Local Tailwind for Offline Environments -->
+  <script>
+    if (!window.tailwind) {
+      document.write('<script src="vendor/tailwind.js"><\/script><script src="../vendor/tailwind.js"><\/script>');
+    }
+  </script>
+
+  <!-- PapaParse for CSV Parsing (CDN + Local Fallbacks) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="vendor/papaparse.min.js"><\/script><script src="../vendor/papaparse.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Chart.js for Analytics Visualisations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    if (!window.Chart) {
+      document.write('<script src="vendor/chart.umd.min.js"><\/script><script src="../vendor/chart.umd.min.js"><\/script>');
+    }
   </script>
 
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
 
   <style>
+    /* CSS Variables for 100% Reliable Day and Night Theme Switching */
+    :root {
+      --bg-page-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+      --text-main: #0f172a;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --img-container-bg: #ffffff;
+    }
+    html.dark {
+      --bg-page-gradient: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%);
+      --text-main: #f8fafc;
+      --card-bg: #0f172a;
+      --card-border: #1e293b;
+      --img-container-bg: #020617;
+    }
+
+    body {
+      background: var(--bg-page-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
     .coin-badge {
       display: inline-flex;
       align-items: center;
@@ -153,11 +178,13 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50/30 via-slate-100/30 to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+<body class="flex flex-col antialiased relative overflow-x-hidden">
 
   <!-- Header -->
-  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90 dark:bg-slate-900/90">
+  <header id="mainHeader" class="solid-header border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/95 dark:bg-slate-900/95 transition-colors">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5">
+      
+      <!-- Top Bar -->
       <div class="flex items-center justify-between gap-2">
         <a href="index.html" class="group flex items-center gap-2 shrink-0">
           <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow">🪙</span>
@@ -165,12 +192,12 @@
             <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 dark:from-amber-400 dark:via-yellow-300 dark:to-amber-200 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
               New Zealand Currency &amp; Minting Database
             </h1>
-            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Complete numismatic records (1933–2026)</p>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-500 dark:text-slate-400 hidden sm:block">Complete numismatic records (1933–2026)</p>
           </div>
         </a>
         
         <div class="flex items-center gap-1.5 flex-nowrap">
-          <!-- View Mode Switcher -->
+          <!-- View Switcher -->
           <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
             <button id="viewTabCatalogue" onclick="switchViewMode('catalogue')" class="px-2.5 sm:px-3 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer">
               🏛️ Specimen
@@ -191,9 +218,9 @@
             <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
           </a>
 
-          <!-- Utility Controls -->
-          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm divide-x divide-slate-200 dark:divide-slate-700 shrink-0">
-            <button id="btnThemeToggle" title="Toggle Theme" aria-label="Toggle Mode" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
+          <!-- Day/Night Mode & Controls Toggle -->
+          <div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 shadow-sm divide-x divide-slate-200 dark:divide-slate-700 shrink-0">
+            <button id="btnThemeToggle" title="Toggle Day/Night Mode" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
             </button>
             <button id="toggleControlsBtn" title="Toggle Controls" class="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
@@ -206,10 +233,8 @@
         </div>
       </div>
 
-      <!-- Collapsible Controls Bar -->
+      <!-- Collapsible Filters & Search -->
       <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
-        
-        <!-- Filter Tabs -->
         <div id="catalogueFilterBar" class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar py-0.5" role="tablist">
           <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer shrink-0">
             🌐 Show All
@@ -261,41 +286,31 @@
         </div>
 
         <!-- Search Bar -->
-        <div id="catalogueSearchBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+        <div id="catalogueSearchBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
           <div class="flex items-center gap-2 flex-1 max-w-md relative">
             <span class="text-sm absolute left-2.5 text-slate-400">🔍</span>
-            <input type="text" id="currencySearchInput" placeholder="Search denominations, flora, fauna, monarchs, designers..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100 shadow-inner" />
+            <input type="text" id="currencySearchInput" placeholder="Search denominations, flora, fauna, monarchs, designers..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100 shadow-inner" />
           </div>
-          <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0">
-            <span id="currencyStatsCounter">Loading database...</span>
+          <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 shrink-0">
+            <span id="currencyStatsCounter">Connecting to database...</span>
           </div>
         </div>
 
-        <!-- Analytics Mode Quick Navigation Bar -->
+        <!-- Analytics Mode Quick Jump Bar -->
         <div id="analyticsFilterBar" class="hidden flex items-center justify-between gap-2 flex-wrap pt-1">
           <div class="flex items-center gap-2 flex-wrap text-xs">
             <span class="font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1 text-[11px]">
               <span>📊</span> Analytics Quick Jump:
             </span>
-            <a href="#sectionHistoricalNotes" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
-              📜 Key Notes &amp; Reforms
-            </a>
             <a href="#sectionMintageBreakdown" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
               📅 Annual Coin Mintages
             </a>
-            <a href="#sectionF3CirculationExplorer" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
-              💵 Public Notes (Table F3)
-            </a>
-            <a href="#sectionCharts" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
-              📈 Charts &amp; Trends
-            </a>
-            <a href="#sectionRarities" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
-              🏆 Key Dates &amp; Rarities
+            <a href="#sectionHistoricalNotes" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
+              📜 Key Milestones
             </a>
           </div>
           <span class="text-[11px] font-mono font-bold text-slate-400">RBNZ Data Engine</span>
         </div>
-
       </div>
     </div>
   </header>
@@ -306,7 +321,6 @@
     <!-- Hero Banner -->
     <div class="w-full bg-gradient-to-r from-amber-950 via-stone-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-amber-500/30 relative overflow-hidden">
       <div class="absolute -right-10 -top-10 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -left-10 -bottom-10 w-64 h-64 bg-yellow-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div class="relative z-10 w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
@@ -317,7 +331,6 @@
           </p>
         </div>
 
-        <!-- Collection Progress Pill -->
         <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-xs shrink-0 self-stretch md:self-auto flex flex-col justify-center">
           <div class="flex items-center justify-between gap-3 mb-1">
             <span class="font-black text-amber-300">🎒 Collector Inventory</span>
@@ -330,82 +343,9 @@
       </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- SECTION A: SPECIMEN CATALOGUE VIEW                                       -->
-    <!-- ========================================================================= -->
+    <!-- SECTION A: SPECIMEN CATALOGUE VIEW -->
     <div id="catalogueViewContainer" class="space-y-8">
       
-      <!-- Historical Context & 1967 Decimal Converter -->
-      <section id="history-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        <div class="lg:col-span-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-2.5 mb-3">
-              <span class="p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-xl text-lg border border-amber-200 dark:border-amber-900/60">📜</span>
-              <div>
-                <h3 class="text-base font-black text-slate-900 dark:text-white">Evolution of New Zealand Currency</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">From Imperial British coins to independent decimal money</p>
-              </div>
-            </div>
-            
-            <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
-              <p>
-                <strong>Prior to Official NZ Coinage (1897–1933):</strong> Imperial British coins and Australian-minted sovereigns circulated as legal tender under the <em>Imperial Coinage Act 1870</em>.
-              </p>
-              <p>
-                <strong>Coinage Act 1933:</strong> Introduced New Zealand's first distinct national coinage (Halfpenny to Crown). British coinage ceased being legal tender on <strong>1 February 1935</strong>.
-              </p>
-              <p>
-                <strong>Decimal Currency Day (10 July 1967):</strong> Conversion from £sd to dollars and cents (£1 = $2.00, 10/- = $1.00, 1/- = 10c, 1d = 5/6c).
-              </p>
-            </div>
-          </div>
-
-          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-            <span>Authority: <strong>Reserve Bank of New Zealand (RBNZ)</strong></span>
-            <span>Key Designers: <strong>Percy Metcalfe, George Kruger Gray, Leonard Mitchell, Robert Conly</strong></span>
-          </div>
-        </div>
-
-        <!-- 1967 Decimal Calculator -->
-        <div class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-slate-900/10 dark:from-amber-950/40 dark:to-slate-900/40 border border-amber-500/30 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-xl">🧮</span>
-              <h3 class="text-base font-black text-slate-900 dark:text-white">1967 Decimal Converter</h3>
-            </div>
-            <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
-              Convert historical pre-decimal pounds, shillings, and pence (£sd) into 1967 Decimal Dollars &amp; Cents.
-            </p>
-
-            <div class="space-y-3">
-              <div class="grid grid-cols-3 gap-2">
-                <div>
-                  <label for="calcPounds" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pounds (£)</label>
-                  <input type="number" id="calcPounds" min="0" value="1" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
-                </div>
-                <div>
-                  <label for="calcShillings" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Shillings (s)</label>
-                  <input type="number" id="calcShillings" min="0" max="19" value="2" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
-                </div>
-                <div>
-                  <label for="calcPence" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pence (d)</label>
-                  <input type="number" id="calcPence" min="0" max="11" value="6" step="0.5" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
-                </div>
-              </div>
-
-              <div class="p-3.5 bg-white/90 dark:bg-slate-900/90 rounded-2xl border border-amber-500/40 text-center shadow-inner">
-                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Decimal Value (1967 Rate)</span>
-                <span id="calcResultDecimal" class="text-2xl font-black text-amber-600 dark:text-amber-400">$2.25 NZD</span>
-                <span id="calcResultCents" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mt-0.5">225.0 cents</span>
-              </div>
-            </div>
-          </div>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-3 border-t border-amber-500/20">
-            Conversion: £1 = $2.00 | 1s = 10c | 1d = 5/6c
-          </div>
-        </div>
-      </section>
-
       <!-- Pre-Decimal Coins Section -->
       <section id="pre-decimal-coins-section" class="currency-group-section space-y-4">
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -451,7 +391,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" id="currentCoinGrid"></div>
       </section>
 
-      <!-- Banknote Sections (Series 1–7) -->
+      <!-- Banknotes Series 1 to 7 -->
       <section id="banknotes-s1-section" class="currency-group-section space-y-4">
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div>
@@ -510,7 +450,7 @@
             <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>💎</span> Series 5 &amp; 6 Banknotes (1992–2014)
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders (Hillary, Sheppard, Ngata, Rutherford) &amp; polymer introduction</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Notable New Zealanders &amp; polymer substrate revolution</p>
           </div>
           <span class="coin-badge badge-polymer text-[10px]">$5, $10, $20, $50, $100</span>
         </div>
@@ -536,7 +476,7 @@
             <h3 class="text-base sm:text-lg font-black text-purple-900 dark:text-purple-300 flex items-center gap-2">
               <span>🎖️</span> Special, Commemorative &amp; Future Issues
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Coloured commemorative circulating coins (ANZAC, Armistice) and King Charles III issues</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Coloured commemorative circulating coins and King Charles III effigies</p>
           </div>
           <span class="coin-badge badge-special text-[10px]">Commemorative &amp; Future</span>
         </div>
@@ -545,9 +485,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- SECTION B: VISUAL GALLERY VIEW (COINS 6-COLS, NOTES 4-COLS)               -->
-    <!-- ========================================================================= -->
+    <!-- SECTION B: VISUAL GALLERY VIEW -->
     <div id="galleryViewContainer" class="hidden space-y-8">
       
       <!-- Coins Gallery Section (6 Columns) -->
@@ -582,29 +520,25 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- SECTION C: STATISTICAL ANALYTICS DASHBOARD VIEW                          -->
-    <!-- ========================================================================= -->
+    <!-- SECTION C: STATISTICAL ANALYTICS DASHBOARD VIEW -->
     <div id="statsViewContainer" class="hidden space-y-8">
-      
-      <!-- Key KPI Stat Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="p-5 bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <span class="text-[10px] uppercase font-extrabold text-slate-400 block mb-1">Pre-Decimal Coins Minted</span>
           <span id="statPreDecimalTotal" class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">--</span>
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">1933–1965 (8 Denominations)</span>
         </div>
-        <div class="p-5 bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <span class="text-[10px] uppercase font-extrabold text-slate-400 block mb-1">Decimal Coins Minted</span>
           <span id="statDecimalTotal" class="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 font-mono">--</span>
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">1967–2026 (1c to $2)</span>
         </div>
-        <div class="p-5 bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <span class="text-[10px] uppercase font-extrabold text-slate-400 block mb-1">Polymer Notes Produced</span>
           <span id="statPolymerNotesTotal" class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">--</span>
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">Series 6 &amp; 7 Batch Runs</span>
         </div>
-        <div class="p-5 bg-white/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div class="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <span class="text-[10px] uppercase font-extrabold text-slate-400 block mb-1">Active Notes in Public</span>
           <span id="statPublicCirculationTotal" class="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400 font-mono">--</span>
           <span class="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">Table F3 Total Volume</span>
@@ -683,8 +617,8 @@
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3">
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3">
     <span id="toastIcon">✨</span>
     <span id="toastMsg">Notification</span>
   </div>
@@ -746,7 +680,7 @@
   <!-- Application Logic -->
   <script>
     const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v10';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v11';
     const USER_COLLECTION_KEY = 'bMMC_user_currency_collection_v1';
 
     let currencyItems = [];
@@ -855,6 +789,26 @@
       setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3'), 2500);
     }
 
+    // Theme Switcher: Flips Day Mode (clean white) and Night Mode (pure dark)
+    function setTheme(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('bMMC_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        localStorage.setItem('bMMC_theme', 'light');
+      }
+      const icon = document.getElementById('themeToggleIcon');
+      if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    function toggleDayNightTheme() {
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      setTheme(!isCurrentlyDark);
+    }
+
     function switchViewMode(mode) {
       currentViewMode = mode;
       const tabCat = document.getElementById('viewTabCatalogue');
@@ -907,7 +861,7 @@
       else if (currentViewMode === 'gallery') renderGalleryView();
     }
 
-    // Google image sizing with s200 (cards/gallery) & s1000 (modals/zoom)
+    // Google image sizing: s200 (card & gallery) and s1000 (modal & zoom)
     function formatImageUrl(url, size = 's200') {
       if (!url) return '';
       let clean = String(url).trim();
@@ -917,7 +871,7 @@
         return clean;
       }
 
-      // Convert Google Drive share link into high-speed Google UserContent image
+      // Convert Google Drive view links to direct image thumbnails
       const driveMatch = clean.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/);
       if (driveMatch && driveMatch[1]) {
         return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=${size}`;
@@ -1021,7 +975,7 @@
       }
     };
 
-    // Item card with s200 sizing and Day mode white / Night mode black backgrounds
+    // Card Renderer: Day mode white background, Night mode black background
     function renderCard(item, isBanknote = false) {
       const icon = getIcon(item);
       const badgeClass = getBadgeClass(item.Composition, item.Category);
@@ -1038,17 +992,17 @@
       const displayRear = rawRear ? resolveMediaUrl(rawRear, 's200') : fallbackRear;
 
       const safeDenom = item.Denomination || item.ID || 'Currency Item';
-      const safeEq = item.Decimal_Equivalent ? `<span class="bg-slate-900/80 dark:bg-slate-900/90 backdrop-blur-md text-amber-300 dark:text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">${item.Decimal_Equivalent}</span>` : '';
+      const safeEq = item.Decimal_Equivalent ? `<span class="bg-slate-900/80 text-amber-300 dark:bg-slate-800/90 dark:text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">${item.Decimal_Equivalent}</span>` : '';
 
       const userEntry = userCollectorData[item._uid] || {};
       const isOwned = Boolean(userEntry.owned);
       const isWishlist = Boolean(userEntry.wishlist);
 
       return `
-        <div class="bg-white/95 dark:bg-slate-900/90 border ${isOwned ? 'border-emerald-500/80 ring-2 ring-emerald-500/20' : isWishlist ? 'border-pink-500/80 ring-2 ring-pink-500/20' : 'border-slate-200/80 dark:border-slate-800'} rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer relative" onclick="openDetailModal('${item._uid}')">
+        <div class="bg-white dark:bg-slate-900 border ${isOwned ? 'border-emerald-500 ring-2 ring-emerald-500/20' : isWishlist ? 'border-pink-500 ring-2 ring-pink-500/20' : 'border-slate-200 dark:border-slate-800'} rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer relative" onclick="openDetailModal('${item._uid}')">
           <div>
-            <!-- Day mode white background, Night mode black background -->
-            <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-48' : 'h-44'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200/80 dark:border-slate-800 select-none">
+            <!-- Day mode white background, Night mode deep black background -->
+            <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-48' : 'h-44'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800 select-none">
               <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayFront}', '${safeDenom} — Front (Obverse)', event)" onerror="this.onerror=null;this.src='${fallbackFront}';" />
               ${hasRear ? `
               <img src="${displayRear}" alt="${safeDenom} Rear" class="img-reverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300 hidden" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayRear}', '${safeDenom} — Rear (Reverse)', event)" onerror="this.onerror=null;this.src='${fallbackRear}';" />
@@ -1058,8 +1012,8 @@
               <span class="absolute top-2.5 right-2.5">${safeEq}</span>
 
               ${hasRear ? `
-              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="Previous Side" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 dark:bg-slate-900/80 hover:bg-amber-500 hover:text-white dark:hover:text-slate-950 text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700/60 z-10 cursor-pointer">‹</button>
-              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="Next Side" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 dark:bg-slate-900/80 hover:bg-amber-500 hover:text-white dark:hover:text-slate-950 text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700/60 z-10 cursor-pointer">›</button>
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="Previous Side" class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-amber-500 hover:text-white text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700 z-10 cursor-pointer">‹</button>
+              <button type="button" onclick="toggleItemSide('${boxId}', event)" title="Next Side" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-amber-500 hover:text-white text-slate-700 dark:text-white text-xs font-black flex items-center justify-center backdrop-blur-md transition shadow border border-slate-200 dark:border-slate-700 z-10 cursor-pointer">›</button>
               <div class="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 pointer-events-none">
                 <span class="side-label text-[9px] font-bold uppercase tracking-wider bg-slate-900/80 text-slate-200 dark:bg-slate-900/90 dark:text-slate-300 px-2 py-0.5 rounded-full border border-slate-700/60 shadow">Front (Obverse)</span>
                 <div class="flex items-center gap-1">
@@ -1069,7 +1023,7 @@
               </div>
               ` : `
               <div class="absolute bottom-2 inset-x-0 flex items-center justify-center pointer-events-none">
-                <span class="text-[9px] font-bold uppercase tracking-wider bg-white/90 dark:bg-slate-900/80 px-2 py-0.5 rounded-full text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/40 shadow-sm">Front Specimen (🔍 Click to zoom)</span>
+                <span class="text-[9px] font-bold uppercase tracking-wider bg-slate-100/90 dark:bg-slate-900/80 px-2 py-0.5 rounded-full text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700/60 shadow-sm">Front Specimen (🔍 Zoom)</span>
               </div>
               `}
             </div>
@@ -1117,8 +1071,8 @@
       const fullImg = imgUrl ? resolveMediaUrl(imgUrl, 's1000') : fallback;
 
       return `
-        <div class="bg-white/95 dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/60 transition-all flex flex-col justify-between group">
-          <div class="${isNote ? 'h-36 sm:h-40' : 'h-32 sm:h-36'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200/80 dark:border-slate-800">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500 transition-all flex flex-col justify-between group">
+          <div class="${isNote ? 'h-36 sm:h-40' : 'h-32 sm:h-36'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800">
             <img src="${displayImg}" alt="${safeDenom} ${sideLabel}" class="img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${fullImg}', '${safeDenom} — ${sideLabel}', event)" onerror="this.onerror=null;this.src='${fallback}';" />
             <span class="absolute bottom-1.5 left-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-slate-900/80 text-white dark:bg-slate-800/90 dark:text-slate-300 backdrop-blur-sm">
               ${side === 'obverse' ? 'Front' : 'Back'}
@@ -1131,7 +1085,7 @@
                 <span class="text-xs font-black text-slate-900 dark:text-white truncate block group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   ${safeDenom}
                 </span>
-                <span class="text-[10px] text-slate-400 shrink-0 font-mono">${item.Years_Issued ? item.Years_Issued.split('-')[0].trim() : ''}</span>
+                <span class="text-[10px] text-slate-400 shrink-0 font-mono">${item.Years_Issued ? item.Years_Issued.split('–')[0].split('-')[0].trim() : ''}</span>
               </div>
               <p class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
                 ${side === 'obverse' ? (item.Obverse_Description || item.Category || '') : (item.Reverse_Description || item.Category || '')}
@@ -1189,8 +1143,8 @@
 
       const coinsGrid = document.getElementById('galleryCoinsGrid');
       const notesGrid = document.getElementById('galleryNotesGrid');
-      if (coinsGrid) coinsGrid.innerHTML = coinCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No coin images match current filter.</div>';
-      if (notesGrid) notesGrid.innerHTML = noteCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No banknote images match current filter.</div>';
+      if (coinsGrid) coinsGrid.innerHTML = coinCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No coin images match filter.</div>';
+      if (notesGrid) notesGrid.innerHTML = noteCardsHtml.join('') || '<div class="col-span-full py-6 text-center text-xs text-slate-400">No banknote images match filter.</div>';
 
       const statsEl = document.getElementById('currencyStatsCounter');
       if (statsEl) statsEl.textContent = `Gallery: ${coinCardsHtml.length + noteCardsHtml.length} photos from ${filtered.length} specimens`;
@@ -1255,7 +1209,6 @@
       }
     }
 
-    // Flexible Category Classifier (Handles spaces, naming variations, etc.)
     function getNormalizedCategoryType(item) {
       const cat = (item.Category || '').toLowerCase().replace(/[-_]/g, ' ');
       const id = (item.ID || '').toLowerCase();
@@ -1372,7 +1325,6 @@
         const frontImg = rawFront ? resolveMediaUrl(rawFront, 's1000') : fallbackFront;
         const rearImg = rawRear ? resolveMediaUrl(rawRear, 's1000') : fallbackRear;
         const safeDenom = item.Denomination || item.ID || 'Item';
-        const userEntry = userCollectorData[item._uid] || { owned: false, grade: 'UNC', qty: 1, notes: '', wishlist: false };
 
         content.innerHTML = `
           ${hasRear ? `
@@ -1395,7 +1347,7 @@
 
           <div class="space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
             ${item.Historical_Notes ? `
-            <div class="p-4 bg-amber-50/60 dark:bg-amber-950/40 rounded-2xl border border-amber-200/60 dark:border-amber-900/60">
+            <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-900/60">
               <span class="font-extrabold text-amber-900 dark:text-amber-300 block mb-1 text-xs uppercase tracking-wider">Curator &amp; Historical Notes</span>
               <p class="leading-relaxed whitespace-pre-line">${item.Historical_Notes}</p>
             </div>` : ''}
@@ -1418,7 +1370,6 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    // Normalizes row keys (strips UTF-8 BOM, removes spaces, handles aliases)
     function normalizeRow(row) {
       const norm = {};
       for (const [rawKey, rawVal] of Object.entries(row)) {
@@ -1461,7 +1412,6 @@
       };
     }
 
-    // Safe extraction of sections without breaking quoted newlines
     function extractSections(text) {
       const sectionKeys = [
         { key: 'metadata', marker: '[SECTION_CATALOGUE_METADATA]' },
@@ -1547,7 +1497,7 @@
           const val = row && row[d.key] ? Number(row[d.key]) : 0;
           sum += val;
           return `
-            <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700">
+            <div class="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
               <span class="text-slate-400 text-[10px] block font-bold">${d.name}</span>
               <span class="font-mono font-black text-amber-300 text-sm block mt-1">${val > 0 ? val.toLocaleString() : '--'}</span>
             </div>
@@ -1566,7 +1516,7 @@
           const val = row && row[d.key] ? Number(row[d.key]) : 0;
           sum += val;
           return `
-            <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700">
+            <div class="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
               <span class="text-slate-400 text-[10px] block font-bold">${d.name}</span>
               <span class="font-mono font-black text-blue-300 text-sm block mt-1">${val > 0 ? val.toLocaleString() : '--'}</span>
             </div>
@@ -1598,62 +1548,103 @@
       updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
     }
 
+    // Multi-Strategy Online Loader to bypass Google Sheets CORS Redirects
+    async function fetchOnlineSheetData() {
+      // 1. Direct fetch
+      try {
+        const res = await fetch(GOOGLE_CSV_URL, { cache: 'no-cache' });
+        if (res.ok) {
+          const t = await res.text();
+          if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('ID'))) return t;
+        }
+      } catch (e) {}
+
+      // 2. AllOrigins JSON API (Always works around CORS in browsers)
+      try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(GOOGLE_CSV_URL)}`;
+        const res = await fetch(proxyUrl);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.contents && (json.contents.includes('[SECTION_') || json.contents.includes('Denomination'))) {
+            return json.contents;
+          }
+        }
+      } catch (e) {}
+
+      // 3. CodeTabs CORS Proxy
+      try {
+        const proxyUrl2 = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(GOOGLE_CSV_URL)}`;
+        const res = await fetch(proxyUrl2);
+        if (res.ok) {
+          const t = await res.text();
+          if (t && (t.includes('[SECTION_') || t.includes('Denomination'))) return t;
+        }
+      } catch (e) {}
+
+      return null;
+    }
+
     async function loadCurrencyData(forceRefresh = false) {
       const statsCounter = document.getElementById('currencyStatsCounter');
-      if (statsCounter) statsCounter.textContent = 'Loading database...';
+      if (statsCounter) statsCounter.textContent = 'Loading online database...';
 
       let text = '';
-      const candidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
-      for (const p of candidates) {
+
+      // Check localStorage cache first
+      if (!forceRefresh) {
         try {
-          const res = await fetch(p);
-          if (res.ok) {
-            const t = await res.text();
-            if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('ID'))) {
-              text = t; break;
-            }
+          const cached = localStorage.getItem(CACHE_KEY_RAW);
+          if (cached && (cached.includes('[SECTION_') || cached.includes('Denomination'))) {
+            text = cached;
           }
         } catch (e) {}
       }
 
-      if (!text) {
-        try {
-          const res = await fetch(GOOGLE_CSV_URL);
-          if (res.ok) text = await res.text();
-        } catch (e1) {
+      // Fetch live data from the online Google Sheet
+      if (!text || forceRefresh) {
+        const onlineText = await fetchOnlineSheetData();
+        if (onlineText) {
+          text = onlineText;
           try {
-            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_CSV_URL)}`;
-            const res2 = await fetch(proxy);
-            if (res2.ok) text = await res2.text();
-          } catch (e2) {}
+            localStorage.setItem(CACHE_KEY_RAW, text);
+          } catch (e) {}
+        }
+      }
+
+      // Fallback: Check local files in repository
+      if (!text) {
+        const candidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
+        for (const p of candidates) {
+          try {
+            const res = await fetch(p);
+            if (res.ok) {
+              const t = await res.text();
+              if (t && (t.includes('[SECTION_') || t.includes('Denomination'))) {
+                text = t; break;
+              }
+            }
+          } catch (e) {}
         }
       }
 
       if (text) {
         parseUnifiedCsv(text);
         renderCurrentView();
+        if (statsCounter) statsCounter.textContent = `Online data synced (${currencyItems.length} records)`;
       } else {
         if (statsCounter) {
-          statsCounter.innerHTML = `<span class="text-rose-500">⚠️ Database load error.</span> <button onclick="loadCurrencyData(true)" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry</button>`;
+          statsCounter.innerHTML = `<span class="text-rose-500 font-bold">⚠️ Connection error.</span> <button onclick="loadCurrencyData(true)" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry Online Sync</button>`;
         }
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const themeToggleBtn = document.getElementById('btnThemeToggle');
+      // Sync theme icon on load
+      const isDark = document.documentElement.classList.contains('dark');
       const themeIcon = document.getElementById('themeToggleIcon');
+      if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
 
-      function updateThemeUI(isDark) {
-        if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
-        if (currentViewMode === 'stats') renderStatisticalDashboard();
-      }
-      updateThemeUI(document.documentElement.classList.contains('dark'));
-
-      themeToggleBtn?.addEventListener('click', () => {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        updateThemeUI(isDark);
-      });
+      document.getElementById('btnThemeToggle')?.addEventListener('click', toggleDayNightTheme);
 
       document.getElementById('toggleControlsBtn')?.addEventListener('click', () => {
         document.getElementById('collapsibleControls')?.classList.toggle('hidden');
