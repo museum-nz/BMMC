@@ -288,7 +288,6 @@ function printCuratorPocketPassport() {
   document.title = `BMMC-Curator-Passport-Booklet-${new Date().toISOString().slice(0, 10)}`;
 
   let pagesHTML = `
-    <!-- Passport Cover Page -->
     <div class="passport-cover">
       <div style="font-size: 36px; margin-bottom: 8px;">🏛️ 📘</div>
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #1e40af; font-weight: 900;">Bonniefields Museum Collection</div>
@@ -674,6 +673,26 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
       const localRes = await fetch(localUrl);
       if (localRes.ok) {
         const text = await localRes.text();
+        if (typeof Papa !== 'undefined') {
+          const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
+          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+              localStorage.setItem(`${cacheKey}_raw`, text);
+              localStorage.setItem(`${cacheKey}_time`, Date.now());
+            } catch (e) {}
+            return parsed.data;
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  try {
+    const res = await fetch(remoteUrl);
+    if (res.ok) {
+      const text = await res.text();
+      if (typeof Papa !== 'undefined') {
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
         if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
           try {
@@ -684,22 +703,6 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
           return parsed.data;
         }
       }
-    } catch (e) {}
-  }
-
-  try {
-    const res = await fetch(remoteUrl);
-    if (res.ok) {
-      const text = await res.text();
-      const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
-          localStorage.setItem(`${cacheKey}_raw`, text);
-          localStorage.setItem(`${cacheKey}_time`, Date.now());
-        } catch (e) {}
-        return parsed.data;
-      }
     }
   } catch (e) {}
 
@@ -707,9 +710,11 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
     const fallbackRes = await fetch(localUrl);
     if (fallbackRes.ok) {
       const text = await fallbackRes.text();
-      const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-      if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-        return parsed.data;
+      if (typeof Papa !== 'undefined') {
+        const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
+        if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
+          return parsed.data;
+        }
       }
     }
   } catch (e) {}
@@ -1037,7 +1042,7 @@ function renderEmptyState(container) {
     <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
       <span class="text-3xl mb-2 block">🔍</span>
       <p class="text-slate-700 dark:text-slate-300 font-bold text-sm">No exhibits match your current filter selections.</p>
-      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Reset Filters & Show All Exhibits</button>
+      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">Reset Filters & Show All Exhibits</button>
     </div>
   `;
 }
@@ -1256,13 +1261,13 @@ function openCompareModal() {
 
         return `
           <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-5 border-2 flex flex-col justify-between shadow-md relative" style="border-color: ${theme.hex}80;">
-            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold">✕</button>
+            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold cursor-pointer">✕</button>
             
             <div class="space-y-3.5">
               <div class="h-48 rounded-2xl overflow-hidden bg-slate-950 p-2 flex items-center justify-center relative">
                 <img src="${thumbImg1}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" />
                 ${thumbImg2 ? `<span class="absolute top-2 left-2 bg-slate-900/80 text-white text-[9px] font-black px-2 py-0.5 rounded-md border border-slate-700 shadow">Dual Angle</span>` : ''}
-                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">📱 3D / AR</button>` : ''}
+                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1 cursor-pointer">📱 3D / AR</button>` : ''}
               </div>
 
               <div>
@@ -2078,7 +2083,7 @@ function renderActiveFilterPills() {
     filters.forEach(f => {
       const pill = document.createElement('span');
       pill.className = 'inline-flex items-center gap-1 text-[10px] font-semibold bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 px-2 py-0.5 rounded-full shadow-sm';
-      pill.innerHTML = `${f.label} <button class="hover:text-red-500 font-bold ml-0.5">✕</button>`;
+      pill.innerHTML = `${f.label} <button class="hover:text-red-500 font-bold ml-0.5 cursor-pointer">✕</button>`;
       pill.querySelector('button').addEventListener('click', () => { f.clear(); updateDynamicDropdowns(); filterCatalog(true); });
       container.appendChild(pill);
     });
@@ -2529,7 +2534,7 @@ function renderGramophoneGrid() {
       <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
         <span class="text-3xl mb-2 block">🎵</span>
         <p class="text-slate-600 dark:text-slate-300 font-bold text-sm">No gramophone records match your selected filters.</p>
-        <button onclick="browseAllExhibits()" class="mt-3 text-xs text-amber-600 dark:text-amber-400 font-bold hover:underline">Return to Main Museum Exhibits</button>
+        <button onclick="browseAllExhibits()" class="mt-3 text-xs text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">Return to Main Museum Exhibits</button>
       </div>`;
     return;
   }
@@ -3041,6 +3046,7 @@ function close3DLightbox() {
     document.body.classList.remove('overflow-hidden');
   }
 }
+
 // ==========================================================================
 // 11. Exhibit Detail Modal Manager
 // ==========================================================================
@@ -3246,7 +3252,7 @@ function openModal(row, originalIndex) {
                   <h4 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Museum Notes</h4>
                   <div class="flex items-center gap-1">
                     <button id="btnAudioGuide" data-row="${originalIndex}" onclick="speakAudioGuide(${originalIndex})" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black transition shadow cursor-pointer">🔊 Listen</button>
-                    <select id="voiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 font-medium max-w-[100px] truncate outline-none"></select>
+                    <select id="voiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 font-medium max-w-[100px] truncate outline-none cursor-pointer"></select>
                   </div>
                 </div>
                 <div class="text-sm text-amber-900 dark:text-amber-200 leading-relaxed whitespace-pre-line bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-500/40 p-4 sm:p-5 rounded-2xl shadow-inner">${notes}</div>
@@ -3494,7 +3500,7 @@ window.stopAudioGuide = stopAudioGuide;
 window.toggleModal3DSkybox = toggleModal3DSkybox;
 window.togglePoppyMotion = togglePoppyMotion;
 
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   document.getElementById('brandLogoLink')?.addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader')?.addEventListener('click', browseAllExhibits);
   document.getElementById('btnBrowseAllPrompt')?.addEventListener('click', browseAllExhibits);
@@ -3687,23 +3693,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   loadCatalogData();
-});
-Step 4: Ensure Guaranteed CDN Fallbacks (No 404s for Missing vendor/)
-To guarantee data parsing and styling work under any folder structure, verify the <head> of each file loads PapaParse and Tailwind with CDN fallbacks:
-code
-Html
-<!-- Robust PapaParse with CDN Fallback -->
-<script src="../vendor/papaparse.min.js" onerror="this.onerror=null;this.src='vendor/papaparse.min.js';"></script>
-<script>
-  if (!window.Papa) {
-    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
-  }
-</script>
+}
 
-<!-- Robust Tailwind with CDN Fallback -->
-<script src="../vendor/tailwind.js" onerror="this.onerror=null;this.src='vendor/tailwind.js';"></script>
-<script>
-  if (!window.tailwind) {
-    document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
-  }
-</script>
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
