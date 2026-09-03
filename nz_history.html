@@ -1,365 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="offline-adapter.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aotearoa NZ History & Colonization Map</title>
+  <title>Aotearoa NZ History &amp; Colonization Map — BMMC</title>
 
-  <!-- Leaflet & Plugins CSS -->
-  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" />
+  <!-- Instant Theme Sync -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Preconnect for Tile & CDN Performance -->
+  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📜</text></svg>">
+
+  <!-- Leaflet & Plugins CSS with CDN Fallbacks -->
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';" />
+
+  <!-- Master Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <style>
-    :root {
-      --primary: #0284c7;
-      --primary-dark: #0369a1;
-      --accent: #38bdf8;
-      --bg-dark: #0f172a;
-      --color-vessel: #0284c7;
-      --color-war: #dc2626;
-      --color-disaster: #d97706;
-      --color-rights: #7c3aed;
-      --color-general: #059669;
-    }
-
-    * { box-sizing: border-box; }
-    body {
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-dark);
+      background: #0f172a;
       overflow: hidden;
     }
     #map {
+      position: absolute;
+      inset: 0;
       width: 100vw;
       height: 100vh;
       background: #aad3df;
+      z-index: 1;
     }
 
-    /* --- MAP ITEM MARKERS & VERTICAL LADDERING (NO VERTICAL OVERLAP) --- */
-    .history-div-icon {
-      background: none !important;
-      border: none !important;
-    }
-
-    .nz-history-marker {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      pointer-events: auto;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
-    }
-    .nz-history-marker:hover {
-      transform: scale(1.12);
-      z-index: 100000 !important;
-    }
-
-    .marker-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(8px);
-      border-radius: 20px;
-      padding: 3px 10px 3px 4px;
-      white-space: nowrap;
-      border: 1.5px solid #cbd5e1;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-    .nz-history-marker:hover .marker-pill {
-      border-color: #0284c7;
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
-    }
-
-    .marker-date-tag {
-      font-size: 11px;
-      font-weight: 800;
-      color: #ffffff;
-      padding: 2px 7px;
-      border-radius: 12px;
-      letter-spacing: 0.2px;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .cat-vessel .marker-date-tag { background: var(--color-vessel); }
-    .cat-war .marker-date-tag { background: var(--color-war); }
-    .cat-disaster .marker-date-tag { background: var(--color-disaster); }
-    .cat-rights .marker-date-tag { background: var(--color-rights); }
-    .cat-general .marker-date-tag { background: var(--color-general); }
-
-    .marker-headline-text {
-      color: #0f172a;
-      font-size: 11px;
-      font-weight: 700;
-      max-width: 175px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .marker-pin-tail {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 6px solid #475569;
-      margin-top: -1px;
-    }
-    .cat-vessel .marker-pin-tail { border-top-color: var(--color-vessel); }
-    .cat-war .marker-pin-tail { border-top-color: var(--color-war); }
-    .cat-disaster .marker-pin-tail { border-top-color: var(--color-disaster); }
-    .cat-rights .marker-pin-tail { border-top-color: var(--color-rights); }
-    .cat-general .marker-pin-tail { border-top-color: var(--color-general); }
-
-    /* Vertical stem connector for laddered items */
-    .marker-stem {
-      width: 2px;
-      background: rgba(71, 85, 105, 0.75);
-      margin: 0 auto;
-      transition: background 0.15s, width 0.15s;
-    }
-    .nz-history-marker:hover .marker-stem {
-      background: #0284c7;
-      width: 3px;
-    }
-
-    /* --- CLUSTER BADGES --- */
-    .cluster-number-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0284c7, #0f172a);
-      color: #ffffff;
-      border: 2.5px solid #ffffff;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-    .cluster-number-badge:hover {
-      transform: scale(1.15);
-      border-color: #38bdf8;
-    }
-
-    /* --- POP-UP MODAL CARD --- */
-    .leaflet-popup-content-wrapper {
-      padding: 0;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .leaflet-popup-content {
-      margin: 0 !important;
-      width: 390px !important;
-      max-width: 86vw !important;
-    }
-    .history-card {
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-    }
-    .history-card-img-wrap {
-      display: block;
-      width: 100%;
-      height: 200px;
-      background: #0f172a;
-      position: relative;
-      overflow: hidden;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .history-card-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.25s ease;
-    }
-    .history-card-img-wrap:hover img {
-      transform: scale(1.05);
-    }
-    .history-card-badge-row {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: none;
-    }
-    .enlarge-overlay-badge {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(6px);
-      color: #ffffff;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .category-pill {
-      background: rgba(15, 23, 42, 0.9);
-      backdrop-filter: blur(6px);
-      color: #38bdf8;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      text-transform: uppercase;
-    }
-    .date-pill {
-      background: var(--primary);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 9px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
-    /* Inline header shown ONLY when image is missing from CSV */
-    .history-card-no-img-header {
-      padding: 14px 16px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .category-pill-inline {
-      background: rgba(2, 132, 199, 0.12);
-      color: #0369a1;
-      border: 1px solid #bae6fd;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-    }
-    .date-pill-inline {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-    }
-
-    .history-card-body {
-      padding: 16px;
-    }
-    .history-card-body h3 {
-      margin: 0 0 4px 0;
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      line-height: 1.3;
-    }
-    .history-card-meta {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #64748b;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-    .history-card-meta .loc-icon { color: #ef4444; }
-    .history-card-desc {
-      margin: 0 0 16px 0;
-      font-size: 13px;
-      line-height: 1.55;
-      color: #334155;
-    }
-    .history-card-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 12px;
-    }
-    .btn-enlarge-img {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      background: #f0f9ff;
-      color: #0369a1;
-      border: 1px solid #bae6fd;
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-    .btn-enlarge-img:hover {
-      background: #e0f2fe;
-      border-color: #7dd3fc;
-      color: #0284c7;
-    }
-    .btn-google-ai {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      color: #38bdf8;
-      border: 1px solid #38bdf8;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-    .btn-google-ai:hover {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
-    }
-    .btn-source-archive {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      background: #f8fafc;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-    .btn-source-archive:hover {
-      background: #f1f5f9;
-      color: #0f172a;
-    }
-
-    /* --- TOP CONTROLS & NAVIGATION HEADER --- */
+    /* Top Floating Controls Wrapper */
     .top-controls-wrapper {
       position: absolute;
-      top: 12px;
-      left: 60px;
+      top: 14px;
+      left: 14px;
       right: 14px;
       z-index: 1000;
       display: flex;
@@ -367,105 +69,160 @@
       gap: 8px;
       pointer-events: none;
     }
-
     .top-controls-bar {
       display: flex;
       align-items: center;
       gap: 8px;
-      width: 100%;
-      pointer-events: none;
-    }
-    .top-controls-bar > * {
+      flex-wrap: wrap;
       pointer-events: auto;
     }
-
-    .map-search-box {
-      position: relative;
-      width: 240px;
-      max-width: 36vw;
-    }
-    .map-search-box input {
-      width: 100%;
-      padding: 8px 30px 8px 32px;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.94);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
-      outline: none;
-    }
-    .map-search-box input:focus { border-color: #38bdf8; }
-    .map-search-box .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 12px;
-      color: #94a3b8;
-    }
-    .clear-search-btn {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      color: #ffffff;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      font-size: 10px;
-      display: none;
-      cursor: pointer;
-    }
-
     .top-action-btn {
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      border-radius: 12px;
-      padding: 7px 12px;
-      font-size: 11px;
-      font-weight: 700;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 800;
       cursor: pointer;
-      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
       transition: all 0.15s ease;
-      white-space: nowrap;
+      text-decoration: none;
+      user-select: none;
     }
     .top-action-btn:hover {
-      background: rgba(30, 41, 59, 0.98);
-      border-color: #38bdf8;
-      color: #ffffff;
+      background: #ffffff;
+      border-color: #0284c7;
+      color: #0284c7;
+      transform: translateY(-1px);
     }
-    .top-action-btn.active {
-      background: #0284c7;
-      border-color: #38bdf8;
+    .dark .top-action-btn {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      color: #f8fafc;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.45);
     }
-
-    /* --- MUSEUM PILL: BLUE & MOVED TO FAR RIGHT --- */
+    .dark .top-action-btn:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
     .museum-pill-btn {
       margin-left: auto !important;
       background: #0284c7 !important;
-      border: 1.5px solid #38bdf8 !important;
+      border-color: #38bdf8 !important;
       color: #ffffff !important;
-      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5);
-      font-weight: 800;
-      padding: 7px 14px;
     }
     .museum-pill-btn:hover {
       background: #0369a1 !important;
-      border-color: #bae6fd !important;
-      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.75);
-      transform: translateY(-1px);
+      color: #ffffff !important;
     }
 
-    /* --- ERA QUICK-JUMP FILTER CHIPS --- */
+    /* Search Box */
+    .map-search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 38px;
+      min-width: 170px;
+      max-width: 260px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      padding: 0 10px;
+    }
+    .dark .map-search-box {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+    }
+    .map-search-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      padding-left: 6px;
+    }
+    .dark .map-search-box input { color: #f8fafc; }
+    .search-icon { font-size: 13px; color: #64748b; flex-shrink: 0; }
+    .clear-search-btn {
+      display: none;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      font-weight: bold;
+      color: #475569;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .dark .clear-search-btn { background: #334155; color: #cbd5e1; }
+
+    /* Layers Switcher */
+    .layer-switcher-container { position: relative; display: inline-block; }
+    .layer-dropdown-card {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 270px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+      padding: 8px;
+      z-index: 2000;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+    .layer-dropdown-card.show { display: grid; }
+    .dark .layer-dropdown-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-color: #334155;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    }
+    .layer-option-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .dark .layer-option-btn { background: #1e293b; color: #cbd5e1; }
+    .layer-option-btn.active {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+    .dark .layer-option-btn.active {
+      background: #082f49;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    /* Era Bar */
     .era-bar {
       pointer-events: auto;
       display: flex;
@@ -480,11 +237,11 @@
     .era-chip {
       background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: #cbd5e1;
-      padding: 5px 10px;
+      padding: 5px 11px;
       border-radius: 10px;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       white-space: nowrap;
       cursor: pointer;
@@ -494,71 +251,89 @@
       background: #0284c7;
       color: #ffffff;
       border-color: #38bdf8;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
     }
 
-    /* --- BOTTOM TIMELINE PANEL --- */
+    /* Floating Timeline Slider at Bottom */
     .year-slider-container {
       position: absolute;
-      bottom: 22px;
-      left: 22px;
-      z-index: 1000;
-      background: rgba(15, 23, 42, 0.94);
-      backdrop-filter: blur(14px);
-      padding: 12px 18px;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
       border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #f8fafc;
-      width: 350px;
-      box-sizing: border-box;
+      padding: 10px 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      z-index: 1000;
+      pointer-events: auto;
+    }
+    .dark .year-slider-container {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
     }
     .year-slider-header {
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 8px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
     }
     .timeline-title-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #0f172a;
     }
+    .dark .timeline-title-group { color: #f8fafc; }
     .btn-timeline-play {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
       width: 26px;
       height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: #0284c7;
+      color: #ffffff;
       font-size: 11px;
-      cursor: pointer;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(2,132,199,0.4);
     }
-    .btn-timeline-play.playing { background: #e11d48; }
+    .btn-timeline-play.playing { background: #ef4444; }
     .item-counter-badge {
       font-size: 10px;
       font-weight: 800;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.35);
       padding: 2px 7px;
-      border-radius: 6px;
+      border-radius: 9999px;
+      background: rgba(2,132,199,0.12);
+      color: #0284c7;
+      border: 1px solid rgba(2,132,199,0.25);
+    }
+    .dark .item-counter-badge {
+      background: rgba(56,189,248,0.15);
+      color: #38bdf8;
+      border-color: rgba(56,189,248,0.3);
     }
     .range-text {
-      color: #38bdf8;
-      font-weight: 800;
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #0284c7;
+      font-family: monospace;
     }
+    .dark .range-text { color: #38bdf8; }
 
     .dual-slider-track-wrapper {
       position: relative;
       width: 100%;
-      height: 22px;
+      height: 20px;
       display: flex;
       align-items: center;
     }
@@ -566,17 +341,18 @@
       position: absolute;
       width: 100%;
       height: 6px;
-      background: #334155;
+      background: #cbd5e1;
       border-radius: 3px;
     }
+    .dark .slider-track-bg { background: #334155; }
     .slider-track-fill {
       position: absolute;
       height: 6px;
       background: #0284c7;
       border-radius: 3px;
-      left: 0%;
-      width: 100%;
+      pointer-events: none;
     }
+    .dark .slider-track-fill { background: #38bdf8; }
     .dual-slider-track-wrapper input[type="range"] {
       position: absolute;
       width: 100%;
@@ -586,80 +362,241 @@
       -webkit-appearance: none;
       appearance: none;
       margin: 0;
+      z-index: 10;
     }
     .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
+      pointer-events: auto;
+      -webkit-appearance: none;
       height: 18px;
       width: 18px;
       border-radius: 50%;
       background: #ffffff;
-      border: 2px solid #0284c7;
-      pointer-events: auto;
-      -webkit-appearance: none;
+      border: 2.5px solid #0284c7;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* --- LAYER DROPDOWN --- */
-    .layer-switcher-container { position: relative; pointer-events: auto; }
-    .layer-dropdown-card {
-      position: absolute;
-      top: 42px;
-      right: 0;
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 14px;
-      padding: 10px;
-      display: none;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      width: 220px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
-      z-index: 1100;
-    }
-    .layer-dropdown-card.show { display: grid; }
-    .layer-option-btn {
+    /* History Pin Laddering & Cards */
+    .history-div-icon { background: none !important; border: none !important; }
+    .nz-history-marker {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid transparent;
-      border-radius: 8px;
-      padding: 7px;
-      color: #f8fafc;
-      font-size: 10px;
-      font-weight: 700;
       cursor: pointer;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+      transition: transform 0.15s ease;
     }
-    .layer-option-btn.active {
-      border-color: #0284c7;
-      background: rgba(2, 132, 199, 0.35);
-      color: #38bdf8;
+    .nz-history-marker:hover {
+      transform: scale(1.08);
+      z-index: 100000 !important;
+    }
+    .marker-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      max-width: 210px;
+      border: 1.5px solid #38bdf8;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .marker-date-tag {
+      background: #0284c7;
+      color: #ffffff;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .marker-headline-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .marker-pin-tail {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #0f172a;
+      margin-top: -1px;
+    }
+    .marker-stem {
+      width: 2px;
+      background: #0284c7;
+      margin-top: -1px;
     }
 
+    .cat-vessel .marker-pill { border-color: #38bdf8; }
+    .cat-vessel .marker-date-tag { background: #0284c7; }
+    .cat-war .marker-pill { border-color: #f87171; }
+    .cat-war .marker-date-tag { background: #dc2626; }
+    .cat-disaster .marker-pill { border-color: #fb923c; }
+    .cat-disaster .marker-date-tag { background: #ea580c; }
+    .cat-rights .marker-pill { border-color: #c084fc; }
+    .cat-rights .marker-date-tag { background: #9333ea; }
+    .cat-general .marker-pill { border-color: #4ade80; }
+    .cat-general .marker-date-tag { background: #16a34a; }
+
+    .cluster-number-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #1e3a8a);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
+      border: 3px solid #ffffff;
+    }
+
+    .history-card {
+      width: 280px;
+      text-align: left;
+    }
+    .history-card-img-wrap {
+      display: block;
+      width: 100%;
+      height: 160px;
+      background: #0f172a;
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px 10px 0 0;
+    }
+    .history-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .history-card-badge-row {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .category-pill {
+      background: rgba(15, 23, 42, 0.9);
+      color: #38bdf8;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .date-pill {
+      background: #0284c7;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .history-card-body {
+      padding: 12px;
+    }
+    .history-card-body h3 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+    .history-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .history-card-desc {
+      margin: 0 0 12px 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #334155;
+    }
+    .history-card-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 10px;
+    }
+    .btn-google-ai {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #38bdf8;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-google-ai:hover { background: #0284c7; color: #ffffff; }
+    .btn-source-archive {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-source-archive:hover { background: #e2e8f0; color: #0f172a; }
+
     @media (max-width: 768px) {
-      .top-controls-wrapper { left: 50px; right: 10px; top: 8px; }
-      .map-search-box { width: 110px; }
+      .top-controls-wrapper {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+      }
+      .map-search-box { min-width: 130px; }
       .year-slider-container {
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 15px !important;
-        width: 92vw !important;
+        bottom: 15px;
+        width: calc(100vw - 24px);
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Controls & Navigation Header -->
+  <!-- Top Floating Controls Wrapper -->
   <div class="top-controls-wrapper">
     <div class="top-controls-bar">
-      <!-- Search Input -->
+      <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
+        <span style="font-size: 14px;">☰</span>
+        <span>Wings</span>
+      </button>
+
       <div class="map-search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="mapSearchInput" placeholder="Search events, ships..." aria-label="Search NZ History">
-        <button id="clearMapSearch" class="clear-search-btn">✕</button>
+        <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
       </div>
 
       <!-- Basemap Switcher -->
@@ -678,19 +615,24 @@
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
-      <button id="btnResetView" class="top-action-btn" title="Reset View & Timeline">
+      
+      <button id="btnResetView" class="top-action-btn" title="Reset View &amp; Timeline">
         <span>↺</span> <span>Reset</span>
       </button>
 
-      <!-- Museum Pill: Stays on the far right and is styled blue -->
-      <a href="index.html" class="top-action-btn museum-pill-btn" title="Back to Museum Gallery">
+      <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
+        <span id="fullscreenIcon">⛶</span>
+      </button>
+
+      <!-- Return to Museum Showcase -->
+      <a href="index.html" class="top-action-btn museum-pill-btn" title="Back to Museum Showcase">
         <span>🏛️</span> <span>Museum</span>
       </a>
     </div>
 
-    <!-- Era Quick-Jump Filter Row -->
+    <!-- Historical Era Filter Chips -->
     <div class="era-bar">
-      <button class="era-chip active" data-min="1280" data-max="2026">All</button>
+      <button class="era-chip active" data-min="1280" data-max="2026">All History</button>
       <button class="era-chip" data-min="1280" data-max="1839">Early Contact (&lt;1840)</button>
       <button class="era-chip" data-min="1840" data-max="1855">Pioneer Ships (1840–1855)</button>
       <button class="era-chip" data-min="1855" data-max="1890">Wars &amp; Gold (1855–1890)</button>
@@ -705,7 +647,7 @@
   <div class="year-slider-container">
     <div class="year-slider-header">
       <div class="timeline-title-group">
-        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play timeline starting from 1800">▶</button>
+        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play timeline" aria-label="Play timeline">▶</button>
         <span>Timeline</span>
         <span id="itemCountBadge" class="item-counter-badge">Loading...</span>
       </div>
@@ -714,25 +656,50 @@
     <div class="dual-slider-track-wrapper">
       <div class="slider-track-bg"></div>
       <div class="slider-track-fill" id="sliderTrackFill"></div>
-      <input type="range" id="minYearSlider" min="1280" max="2026" value="1280" step="1">
-      <input type="range" id="maxYearSlider" min="1280" max="2026" value="2026" step="1">
+      <input type="range" id="minYearSlider" min="1280" max="2026" value="1280" step="1" aria-label="Minimum Year Filter">
+      <input type="range" id="maxYearSlider" min="1280" max="2026" value="2026" step="1" aria-label="Maximum Year Filter">
     </div>
   </div>
 
-  <!-- External Leaflet & Parsing Libraries -->
-  <script src="../vendor/leaflet/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="../vendor/leaflet/markercluster.js"></script>
+  <!-- Universal Navigation Drawer Script -->
+  <script src="shared-nav.js"></script>
+
+  <!-- Leaflet, MarkerCluster & PapaParse with CDN Fallbacks -->
+  <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.L) {
+      document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+    }
+  </script>
+
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+    }
+  </script>
+
+  <script src="../vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.L || !window.L.markerClusterGroup) {
+      document.write('<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"><\/script>');
+    }
+  </script>
 
   <script>
-    // Live Google Sheet CSV Endpoint
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1659493611&single=true&output=csv';
+    const LOCAL_CSV_CANDIDATES = [
+      './data/nz_history.csv',
+      'data/nz_history.csv',
+      '../data/nz_history.csv',
+      './nz_history.csv',
+      'nz_history.csv'
+    ];
     const CACHE_STORAGE_KEY = 'bMMC_nz_history_csv_cache';
 
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
 
-    // Leaflet Map Initialization
     const map = L.map('map', {
       center: NZ_CENTER,
       zoom: NZ_ZOOM,
@@ -741,20 +708,11 @@
       closePopupOnClick: true
     });
 
-    // Basemaps
     const basemaps = {
-      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; National Geographic Society', maxZoom: 16
-      }),
-      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Topographic Survey', maxZoom: 18
-      }),
-      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Earthstar Geographics', maxZoom: 18
-      }),
-      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
-      })
+      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy; National Geographic Society', maxZoom: 16 }),
+      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy; Topographic Survey', maxZoom: 18 }),
+      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy; Earthstar Geographics', maxZoom: 18 }),
+      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 })
     };
     basemaps.natgeo.addTo(map);
 
@@ -764,10 +722,9 @@
       document.querySelectorAll('.layer-option-btn').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
       if (activeBtn) activeBtn.classList.add('active');
-      document.getElementById('layerDropdownCard').classList.remove('show');
+      document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
-    // Clusters Layer
     const markers = L.markerClusterGroup({
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
@@ -794,73 +751,46 @@
       }[m]));
     }
 
-    // --- OPTIMIZED IMAGE RESOLVERS ---
+    function parseYearNum(val) {
+      if (!val) return NaN;
+      const m = String(val).match(/-?\d{3,4}/);
+      return m ? parseInt(m[0], 10) : NaN;
+    }
 
-    // Forces s200 thumbnail download from Google/Wikimedia CDNs
+    function parseCoord(val) {
+      if (val === null || val === undefined || val === '') return NaN;
+      const clean = String(val).trim().replace(',', '.');
+      const m = clean.match(/-?\d+(?:\.\d+)?/);
+      if (!m) return NaN;
+      const num = parseFloat(m[0]);
+      return (isNaN(num) || num === 0) ? NaN : num;
+    }
+
     function getThumbnailUrl(url) {
       if (!url) return '';
       url = url.trim();
-
-      // Google UserContent / Google Photos / Blogger
       if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
-        if (/=s\d+/i.test(url)) {
-          return url.replace(/=s\d+[^?]*/i, '=s200');
-        } else if (/=w\d+/i.test(url)) {
-          return url.replace(/=w\d+[^?]*/i, '=s200');
-        } else if (url.includes('?')) {
-          return url + '&sz=s200';
-        } else {
-          return url + '=s200';
-        }
+        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s200');
+        return url.includes('?') ? url + '&sz=s200' : url + '=s200';
       }
-
-      // Google Drive shared links
       if (url.includes('drive.google.com')) {
         const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) {
-          return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s200`;
-        }
+        if (idMatch && idMatch[1]) return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s200`;
       }
-
-      // Wikimedia / Wikipedia thumbnails
-      if (url.includes('upload.wikimedia.org') && url.includes('/thumb/')) {
-        return url.replace(/\/\d+px-/g, '/200px-');
-      }
-
       return url;
     }
 
-    // Resolves full-size/original image URL for the enlarge link & new tab
     function getFullImageUrl(url) {
       if (!url) return '';
       url = url.trim();
-
-      // Google UserContent: =s0 requests unconstrained full resolution
       if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
-        if (/=[sw]\d+/i.test(url)) {
-          return url.replace(/=[sw]\d+[^?]*/i, '=s0');
-        }
+        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s0');
         return url;
       }
-
-      // Google Drive: direct view link
       if (url.includes('drive.google.com')) {
         const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) {
-          return `https://drive.google.com/uc?id=${idMatch[1]}&export=view`;
-        }
+        if (idMatch && idMatch[1]) return `https://drive.google.com/uc?id=${idMatch[1]}&export=view`;
       }
-
-      // Wikimedia: extract full original image from /thumb/.../.../NNNpx-...
-      if (url.includes('upload.wikimedia.org/wikipedia/') && url.includes('/thumb/')) {
-        const parts = url.split('/thumb/');
-        if (parts.length === 2) {
-          const pathParts = parts[1].split('/');
-          pathParts.pop(); // removes the generated /NNNpx-filename thumbnail segment
-          return parts[0] + '/' + pathParts.join('/');
-        }
-      }
-
       return url;
     }
 
@@ -883,12 +813,9 @@
       return '📍';
     }
 
-    // Render Markers with Vertical Laddering & Hover-to-Front
     function renderDataset(items) {
       markers.clearLayers();
       const markerList = [];
-
-      // Proximity group items to prevent vertical stacking overlap (~2.5km bucket)
       const PROXIMITY_DEG = 0.025;
       const groups = [];
 
@@ -900,15 +827,11 @@
             break;
           }
         }
-        if (found) {
-          found.items.push(ev);
-        } else {
-          groups.push({ lat: ev.latitude, lng: ev.longitude, items: [ev] });
-        }
+        if (found) found.items.push(ev);
+        else groups.push({ lat: ev.latitude, lng: ev.longitude, items: [ev] });
       });
 
       groups.forEach(grp => {
-        // Chronological order for stacking
         grp.items.sort((a, b) => (a.year || 0) - (b.year || 0));
 
         grp.items.forEach((ev, idx) => {
@@ -919,7 +842,6 @@
           const safeCategory = escapeHTML(ev.category || 'History');
           const safeDetails = escapeHTML(ev.details || '');
           
-          // Image handling: s200 for download & full-res for enlargement
           const rawImg = (ev.image_url || '').trim();
           const hasImage = rawImg.length > 0 && rawImg !== '#';
           const safeThumbImg = hasImage ? escapeHTML(getThumbnailUrl(rawImg)) : '';
@@ -928,14 +850,11 @@
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
 
-          // Vertical ladder offset: each item is elevated by 38px
-          const stemHeight = idx * 38;
+          const stemHeight = idx * 36;
           const totalIconHeight = 34 + stemHeight;
 
-          // Google AI Overview Search query
           const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand history')}`;
 
-          // ON-MAP MARKER: Date + Headline + Vertical stem
           const markerHTML = `
             <div class="nz-history-marker ${catClass}">
               <div class="marker-pill">
@@ -954,22 +873,18 @@
             iconAnchor: [105, totalIconHeight]
           });
 
-          // POP-UP: Image wrap links directly to full size + dedicated Enlarge link button
           const popupImageBlock = hasImage ? `
-            <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to open full-size image in new window">
+            <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to view full image">
               <img src="${safeThumbImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
               <div class="history-card-badge-row">
                 <span class="category-pill">${safeCategory}</span>
                 <span class="date-pill">${safeDate}</span>
               </div>
-              <div class="enlarge-overlay-badge">
-                <span>🔍 Full Size</span>
-              </div>
             </a>
           ` : `
-            <div class="history-card-no-img-header">
-              <span class="category-pill-inline">${safeCategory}</span>
-              <span class="date-pill-inline">${safeDate}</span>
+            <div style="padding: 10px 12px 0; display: flex; gap: 6px;">
+              <span class="category-pill">${safeCategory}</span>
+              <span class="date-pill">${safeDate}</span>
             </div>
           `;
 
@@ -979,22 +894,17 @@
               <div class="history-card-body">
                 <h3>${safeHeadline}</h3>
                 <div class="history-card-meta">
-                  <span class="loc-icon">📍</span>
+                  <span>📍</span>
                   <span>${safeLocation}</span>
                 </div>
                 <p class="history-card-desc">${safeDetails}</p>
                 <div class="history-card-footer">
-                  ${hasImage ? `
-                    <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="btn-enlarge-img">
-                      <span>🔍</span> Enlarge Full-Size Image ↗
-                    </a>
-                  ` : ''}
                   <a href="${googleAiSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai">
                     <span>✨</span> Ask Google AI Overview ↗
                   </a>
                   ${ev.source_url && ev.source_url !== '#' ? `
                     <a href="${ev.source_url}" target="_blank" rel="noopener noreferrer" class="btn-source-archive">
-                      <span>📖</span> Historical Archive Reference (NZHistory / Te Ara) ↗
+                      <span>📖</span> Historical Reference ↗
                     </a>
                   ` : ''}
                 </div>
@@ -1003,21 +913,7 @@
           `;
 
           const marker = L.marker([ev.latitude, ev.longitude], { icon: customIcon });
-          marker.bindPopup(popupHTML, {
-            maxWidth: 410,
-            autoPan: true,
-            keepInView: true,
-            closeButton: true
-          });
-
-          // Hover brings marker to the front
-          marker.on('mouseover', function () {
-            this.setZIndexOffset(100000);
-          });
-          marker.on('mouseout', function () {
-            this.setZIndexOffset(0);
-          });
-
+          marker.bindPopup(popupHTML, { maxWidth: 380, autoPan: true, keepInView: true });
           markerList.push(marker);
         });
       });
@@ -1026,12 +922,11 @@
       document.getElementById('itemCountBadge').textContent = `${items.length} event${items.length === 1 ? '' : 's'}`;
     }
 
-    // Filter Events by Sliders & Search
     function filterEvents() {
       const minSlider = document.getElementById('minYearSlider');
       const maxSlider = document.getElementById('maxYearSlider');
       const fill = document.getElementById('sliderTrackFill');
-      const search = (document.getElementById('mapSearchInput').value || '').trim().toLowerCase();
+      const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
 
       let minVal = parseInt(minSlider.value, 10);
       let maxVal = parseInt(maxSlider.value, 10);
@@ -1067,7 +962,6 @@
       renderDataset(filtered);
     }
 
-    // Timeline Playback: Starts at 1800 with earlier items (1280-1799) already shown
     function toggleTimelinePlayback() {
       const btn = document.getElementById('btnPlayTimeline');
       const minSlider = document.getElementById('minYearSlider');
@@ -1102,8 +996,18 @@
       }
     }
 
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fullscreenIcon').textContent = '🗗';
+      } else {
+        document.exitFullscreen().catch(() => {});
+        document.getElementById('fullscreenIcon').textContent = '⛶';
+      }
+    }
+
     function initSliders() {
-      const years = allEvents.map(e => e.year).filter(y => !isNaN(y));
+      const years = allEvents.map(e => e.year).filter(y => !isNaN(y) && y > 0);
       if (years.length === 0) return;
 
       globalMinYear = Math.min(...years);
@@ -1137,19 +1041,18 @@
       if (!csvString || csvString.trim().length === 0) return;
       const parsed = Papa.parse(csvString, { header: true, skipEmptyLines: true });
 
-      allEvents = parsed.data.map(row => {
+      allEvents = (parsed.data || []).map(row => {
         let latStr = getCol(row, ['latitude', 'lat', 'latdeg', 'y']);
         let lngStr = getCol(row, ['longitude', 'lng', 'lon', 'long', 'x']);
         let yearStr = getCol(row, ['year', 'yr']);
         let dateStr = getCol(row, ['date', 'when', 'time']);
 
-        let lat = parseFloat(latStr.replace(',', '.'));
-        let lng = parseFloat(lngStr.replace(',', '.'));
+        let lat = parseCoord(latStr);
+        let lng = parseCoord(lngStr);
 
-        let parsedYear = parseInt(yearStr.replace(/[^\d]/g, ''), 10);
+        let parsedYear = parseYearNum(yearStr);
         if (isNaN(parsedYear) && dateStr) {
-          const match = dateStr.match(/\b(1\d{3}|20\d{2})\b/);
-          if (match) parsedYear = parseInt(match[1], 10);
+          parsedYear = parseYearNum(dateStr);
         }
 
         return {
@@ -1165,64 +1068,71 @@
           image_url: getCol(row, ['imageurl', 'image', 'img', 'photo']),
           source_url: getCol(row, ['sourceurl', 'source', 'url', 'link']) || '#'
         };
-      }).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude) && e.latitude !== 0);
+      }).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude) && e.latitude !== 0 && e.longitude !== 0);
 
       initSliders();
     }
 
-    // Load Dataset from Live Google Sheet with Cache Fallback
     async function loadDataset() {
       let csvText = null;
       let usedCache = false;
 
+      // 1. Try Cache
       try {
-        const res = await fetch(LIVE_CSV_URL, { cache: 'no-cache' });
+        const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
+        if (cachedText && cachedText.trim().length > 50) {
+          csvText = cachedText;
+          usedCache = true;
+          parseCSVData(csvText);
+        }
+      } catch (cacheErr) {}
+
+      // 2. Try Local Candidate Paths
+      if (!csvText) {
+        for (const path of LOCAL_CSV_CANDIDATES) {
+          try {
+            const resLocal = await fetch(path);
+            if (resLocal.ok) {
+              const text = await resLocal.text();
+              if (text && text.trim().length > 50) {
+                csvText = text;
+                parseCSVData(csvText);
+                try { localStorage.setItem(CACHE_STORAGE_KEY, csvText); } catch (e) {}
+                break;
+              }
+            }
+          } catch (e) {}
+        }
+      }
+
+      // 3. Try Remote Google Sheet
+      try {
+        const res = await fetch(LIVE_CSV_URL);
         if (res.ok) {
           const fetchedText = await res.text();
           if (fetchedText && fetchedText.trim().length > 50) {
             csvText = fetchedText;
-            try {
-              localStorage.setItem(CACHE_STORAGE_KEY, fetchedText);
-            } catch (storageErr) {
-              console.warn('LocalStorage caching failed:', storageErr);
-            }
+            try { localStorage.setItem(CACHE_STORAGE_KEY, fetchedText); } catch (e) {}
+            parseCSVData(csvText);
+            return;
           }
         }
       } catch (networkErr) {
-        console.warn('Live Google Sheet fetch failed, switching to cache:', networkErr);
+        console.warn('Live Google Sheet fetch failed:', networkErr);
       }
 
       if (!csvText || csvText.trim().length < 50) {
-        try {
-          const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
-          if (cachedText && cachedText.trim().length > 50) {
-            csvText = cachedText;
-            usedCache = true;
-            console.log('Successfully loaded NZ History data from browser cache.');
-          }
-        } catch (cacheErr) {
-          console.warn('LocalStorage cache retrieval failed:', cacheErr);
-        }
-      }
-
-      if (csvText && csvText.trim().length > 50) {
-        parseCSVData(csvText);
-        if (usedCache) {
-          const badge = document.getElementById('itemCountBadge');
-          if (badge) badge.title = 'Running on offline cache';
-        }
-      } else {
-        document.getElementById('itemCountBadge').textContent = 'No Data';
-        document.getElementById('yearRangeText').textContent = 'Connection Error';
+        document.getElementById('itemCountBadge').textContent = 'Offline';
+        document.getElementById('yearRangeText').textContent = 'Data Offline';
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('minYearSlider').addEventListener('input', filterEvents);
-      document.getElementById('maxYearSlider').addEventListener('input', filterEvents);
-      document.getElementById('btnPlayTimeline').addEventListener('click', toggleTimelinePlayback);
+      document.getElementById('minYearSlider')?.addEventListener('input', filterEvents);
+      document.getElementById('maxYearSlider')?.addEventListener('input', filterEvents);
+      document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
 
-      document.getElementById('btnFitNZ').addEventListener('click', () => {
+      document.getElementById('btnFitNZ')?.addEventListener('click', () => {
         if (markers.getLayers().length > 0) {
           map.fitBounds(markers.getBounds(), { padding: [50, 50] });
         } else {
@@ -1230,10 +1140,11 @@
         }
       });
 
-      document.getElementById('btnResetView').addEventListener('click', () => {
+      document.getElementById('btnResetView')?.addEventListener('click', () => {
         document.getElementById('minYearSlider').value = globalMinYear;
         document.getElementById('maxYearSlider').value = globalMaxYear;
-        document.getElementById('mapSearchInput').value = '';
+        const searchInput = document.getElementById('mapSearchInput');
+        if (searchInput) searchInput.value = '';
         document.getElementById('clearMapSearch').style.display = 'none';
         document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.min == globalMinYear));
         if (timelineTimer) toggleTimelinePlayback();
@@ -1241,35 +1152,38 @@
         filterEvents();
       });
 
-      // Basemap Dropdown
+      document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
+
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
-      btnLayersToggle.addEventListener('click', (e) => {
+      btnLayersToggle?.addEventListener('click', (e) => {
         e.stopPropagation();
-        layerDropdownCard.classList.toggle('show');
+        layerDropdownCard?.classList.toggle('show');
       });
-      document.addEventListener('click', () => layerDropdownCard.classList.remove('show'));
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.layer-switcher-container')) {
+          layerDropdownCard?.classList.remove('show');
+        }
+      });
 
-      document.getElementById('btnLayerNatGeo').addEventListener('click', () => setBasemap('natgeo'));
-      document.getElementById('btnLayerTopo').addEventListener('click', () => setBasemap('topo'));
-      document.getElementById('btnLayerSat').addEventListener('click', () => setBasemap('sat'));
-      document.getElementById('btnLayerStreet').addEventListener('click', () => setBasemap('street'));
+      document.getElementById('btnLayerNatGeo')?.addEventListener('click', () => setBasemap('natgeo'));
+      document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
+      document.getElementById('btnLayerSat')?.addEventListener('click', () => setBasemap('sat'));
+      document.getElementById('btnLayerStreet')?.addEventListener('click', () => setBasemap('street'));
 
-      // Search Box
       const searchInput = document.getElementById('mapSearchInput');
       const clearSearchBtn = document.getElementById('clearMapSearch');
-      searchInput.addEventListener('input', (e) => {
+      searchInput?.addEventListener('input', (e) => {
         clearSearchBtn.style.display = e.target.value ? 'block' : 'none';
         filterEvents();
       });
-      clearSearchBtn.addEventListener('click', () => {
+      clearSearchBtn?.addEventListener('click', () => {
         searchInput.value = '';
         clearSearchBtn.style.display = 'none';
         filterEvents();
         searchInput.focus();
       });
 
-      // Era Quick-Jump Chips
       document.querySelectorAll('.era-chip').forEach(chip => {
         chip.addEventListener('click', function () {
           document.querySelectorAll('.era-chip').forEach(c => c.classList.remove('active'));

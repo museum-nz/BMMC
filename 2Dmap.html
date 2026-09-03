@@ -5,17 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Photo Map with Dual Year Slider — BMMC</title>
 
-  <!-- Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
-    style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
-    img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.cartocdn.com https://*.dropboxusercontent.com https://*.dropbox.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org;
-    connect-src 'self' https://docs.google.com https://*.cartocdn.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.google.com;
-    font-src 'self' https://fonts.gstatic.com;
-  ">
+  <!-- Instant Theme Sync -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
 
-  <!-- Preconnect for Tile & Image Performance -->
+  <!-- Preconnect for Tile & CDN Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
   <link rel="preconnect" href="https://mt0.google.com" crossorigin>
@@ -23,360 +27,270 @@
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-  <!-- Leaflet CSS & Plugins -->
-  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" />
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+
+  <!-- Leaflet CSS & MarkerCluster with CDN Fallbacks -->
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';" />
+
+  <!-- Master Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 
   <style>
-    body { 
-      margin: 0; 
-      padding: 0; 
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
-      background: #0f172a; 
-      overflow: hidden;
-    }
-    #map { 
-      width: 100vw; 
-      height: 100vh; 
-      background: #aad3df; 
-    }
-
-    /* --- Custom Markers & Badges --- */
-    .single-photo-wrapper {
-      width: 75px;
-      height: 75px;
-      border-radius: 10px;
-      border: 2px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      overflow: hidden;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
-      cursor: pointer;
-    }
-    .single-photo-wrapper:hover {
-      transform: scale(1.15);
-      z-index: 1000 !important;
-      border-color: #0284c7;
-    }
-    .single-photo-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-    }
-
-    .cluster-number-badge {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0284c7, #0369a1);
-      color: #ffffff;
-      border: 3px solid #ffffff;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .cluster-number-badge:hover {
-      transform: scale(1.15);
-      background: linear-gradient(135deg, #0369a1, #075985);
-      border-color: #38bdf8;
-    }
-
-    /* --- Large Detail Popups --- */
-    .leaflet-popup-content-wrapper {
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
       padding: 0;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
-    }
-    .leaflet-popup-content {
-      margin: 0 !important;
-      width: 440px !important;
-      max-width: 82vw !important;
-    }
-    .photo-card-large {
-      padding: 16px;
-      background: #ffffff;
-      text-align: center;
-    }
-    .photo-card-large h3 {
-      margin: 0 0 4px 0;
-      font-size: 16px;
-      font-weight: 800;
-      color: #0f172a;
-      line-height: 1.3;
-    }
-    .photo-card-large p {
-      margin: 0 0 10px 0;
-      font-size: 12px;
-      color: #0284c7;
-      font-weight: 600;
-    }
-    .photo-card-large .img-container {
-      width: 100%;
-      height: 270px;
-      border-radius: 10px;
-      background: #f8fafc;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-    }
-    .photo-card-large .img-container img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      display: block;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      overflow: hidden;
+    }
+    #map {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #aad3df;
+      z-index: 1;
     }
 
-    .card-footer {
-      margin-top: 12px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-    }
-    .view-item-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 800;
-      color: #0369a1;
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
-      padding: 7px 12px;
-      border-radius: 10px;
-      text-decoration: none;
-      transition: all 0.15s ease-in-out;
-      cursor: pointer;
-    }
-    .view-item-btn:hover {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
-      text-decoration: none;
-    }
-
-    /* --- Top Controls Navigation Bar --- */
+    /* Floating Header & Action Bar */
     .top-controls-bar {
       position: absolute;
-      top: 15px;
-      left: 60px;
-      right: 15px;
+      top: 14px;
+      left: 14px;
+      right: 14px;
       z-index: 1000;
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
       pointer-events: none;
     }
-    .map-search-box {
+    .top-controls-bar > * {
       pointer-events: auto;
+    }
+    .top-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: all 0.15s ease-in-out;
+      text-decoration: none;
+      user-select: none;
+    }
+    .top-action-btn:hover {
+      background: #ffffff;
+      border-color: #0284c7;
+      color: #0284c7;
+      transform: translateY(-1px);
+    }
+    .dark .top-action-btn {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      color: #f8fafc;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+    }
+    .dark .top-action-btn:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    /* Search Box */
+    .map-search-box {
       position: relative;
-      width: 280px;
-      max-width: 48vw;
+      display: flex;
+      align-items: center;
+      height: 38px;
+      min-width: 170px;
+      max-width: 260px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      padding: 0 10px;
+      transition: all 0.15s ease;
+    }
+    .dark .map-search-box {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.45);
     }
     .map-search-box input {
       width: 100%;
-      padding: 8px 30px 8px 32px;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
-      outline: none;
-      box-sizing: border-box;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .map-search-box input:focus {
-      border-color: #38bdf8;
-      background: rgba(15, 23, 42, 0.98);
-    }
-    .map-search-box .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 12px;
-      color: #94a3b8;
-      pointer-events: none;
-    }
-    .map-search-box .clear-search-btn {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.15);
       border: none;
-      color: #ffffff;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      padding-left: 6px;
+    }
+    .dark .map-search-box input { color: #f8fafc; }
+    .search-icon { font-size: 13px; color: #64748b; flex-shrink: 0; }
+    .clear-search-btn {
+      display: none;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 50%;
       width: 18px;
       height: 18px;
-      border-radius: 50%;
       font-size: 10px;
-      display: none;
+      font-weight: bold;
+      color: #475569;
+      cursor: pointer;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      flex-shrink: 0;
     }
+    .dark .clear-search-btn { background: #334155; color: #cbd5e1; }
 
-    .top-action-btn {
-      pointer-events: auto;
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      border-radius: 12px;
-      padding: 7px 12px;
-      font-size: 11px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-      transition: all 0.15s ease;
-    }
-    .top-action-btn:hover {
-      background: rgba(30, 41, 59, 0.98);
-      border-color: #38bdf8;
-      transform: translateY(-1px);
-    }
-
-    /* --- Extended Layer Switcher Card --- */
-    .layer-switcher-container {
-      position: relative;
-      pointer-events: auto;
-    }
+    /* Layers Switcher */
+    .layer-switcher-container { position: relative; display: inline-block; }
     .layer-dropdown-card {
-      position: absolute;
-      top: 42px;
-      right: 0;
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      padding: 10px;
       display: none;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
-      z-index: 1100;
-      width: 310px;
-      box-sizing: border-box;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 270px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+      padding: 8px;
+      z-index: 2000;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
     }
-    .layer-dropdown-card.show { 
-      display: grid; 
+    .layer-dropdown-card.show { display: grid; }
+    .dark .layer-dropdown-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-color: #334155;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
     }
     .layer-option-btn {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 4px;
-      background: rgba(255,255,255,0.06);
-      border: 2px solid transparent;
+      gap: 6px;
+      padding: 7px 9px;
       border-radius: 10px;
-      padding: 8px 6px;
-      color: #f8fafc;
-      font-size: 10px;
+      border: 1px solid transparent;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      text-align: center;
       transition: all 0.15s ease;
     }
-    .layer-option-btn:hover {
-      background: rgba(255,255,255,0.14);
-      border-color: #38bdf8;
-    }
+    .dark .layer-option-btn { background: #1e293b; color: #cbd5e1; }
     .layer-option-btn.active {
+      background: #e0f2fe;
       border-color: #0284c7;
-      background: rgba(2, 132, 199, 0.35);
+      color: #0284c7;
+    }
+    .dark .layer-option-btn.active {
+      background: #082f49;
+      border-color: #38bdf8;
       color: #38bdf8;
     }
-    .layer-option-btn span.icon { 
-      font-size: 18px; 
-    }
 
-    /* --- Bottom Year Slider Bar --- */
+    /* Floating Timeline Slider at Bottom */
     .year-slider-container {
       position: absolute;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1000;
-      background: rgba(15, 23, 42, 0.92);
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(12px);
-      padding: 12px 18px;
+      border: 1px solid rgba(203, 213, 225, 0.9);
       border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #f8fafc;
-      width: 320px;
-      box-sizing: border-box;
+      padding: 10px 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      z-index: 1000;
+      pointer-events: auto;
     }
-
+    .dark .year-slider-container {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
     .year-slider-header {
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 8px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 4px;
+      justify-content: space-between;
+      margin-bottom: 6px;
     }
     .timeline-title-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #0f172a;
     }
+    .dark .timeline-title-group { color: #f8fafc; }
     .btn-timeline-play {
-      background: #0284c7;
-      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
       border: none;
-      border-radius: 8px;
-      width: 24px;
-      height: 24px;
+      background: #0284c7;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.1s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(2,132,199,0.4);
     }
-    .btn-timeline-play:hover { background: #0369a1; transform: scale(1.08); }
-    .btn-timeline-play.playing { background: #e11d48; }
-
+    .btn-timeline-play.playing { background: #ef4444; }
     .item-counter-badge {
       font-size: 10px;
       font-weight: 800;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.35);
       padding: 2px 7px;
-      border-radius: 6px;
+      border-radius: 9999px;
+      background: rgba(2,132,199,0.12);
+      color: #0284c7;
+      border: 1px solid rgba(2,132,199,0.25);
     }
-
-    .year-slider-header span.range-text {
+    .dark .item-counter-badge {
+      background: rgba(56,189,248,0.15);
       color: #38bdf8;
-      font-weight: 700;
-      font-size: 13px;
+      border-color: rgba(56,189,248,0.3);
     }
+    .range-text {
+      font-size: 12px;
+      font-weight: 900;
+      color: #0284c7;
+      font-family: monospace;
+    }
+    .dark .range-text { color: #38bdf8; }
 
     .dual-slider-track-wrapper {
       position: relative;
       width: 100%;
-      height: 22px;
+      height: 20px;
       display: flex;
       align-items: center;
     }
@@ -384,167 +298,216 @@
       position: absolute;
       width: 100%;
       height: 6px;
-      background: #334155;
+      background: #cbd5e1;
       border-radius: 3px;
-      top: 50%;
-      transform: translateY(-50%);
     }
+    .dark .slider-track-bg { background: #334155; }
     .slider-track-fill {
       position: absolute;
       height: 6px;
       background: #0284c7;
       border-radius: 3px;
-      top: 50%;
-      transform: translateY(-50%);
-      left: 0%;
-      width: 100%;
+      pointer-events: none;
     }
+    .dark .slider-track-fill { background: #38bdf8; }
     .dual-slider-track-wrapper input[type="range"] {
       position: absolute;
       width: 100%;
       height: 6px;
-      top: 50%;
-      transform: translateY(-50%);
       background: none;
       pointer-events: none;
       -webkit-appearance: none;
       appearance: none;
       margin: 0;
+      z-index: 10;
     }
     .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb {
-      height: 18px;
-      width: 18px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 2px solid #0284c7;
       pointer-events: auto;
       -webkit-appearance: none;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      transition: transform 0.1s ease;
-    }
-    .dual-slider-track-wrapper input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-    .dual-slider-track-wrapper input[type="range"]::-moz-range-thumb {
       height: 18px;
       width: 18px;
       border-radius: 50%;
       background: #ffffff;
-      border: 2px solid #0284c7;
-      pointer-events: auto;
+      border: 2.5px solid #0284c7;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    /* Custom Leaflet Markers & Clusters */
+    .single-photo-wrapper {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #ffffff;
+      border: 3px solid #0284c7;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .single-photo-wrapper:hover {
+      transform: scale(1.15);
+      border-color: #38bdf8;
+      z-index: 10000;
+    }
+    .single-photo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .cluster-number-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #1d4ed8);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
+      border: 3px solid #ffffff;
+    }
+
+    /* Popup Styling */
+    .photo-card-large {
+      width: 250px;
+      text-align: left;
+      padding: 2px;
+    }
+    .photo-card-large h3 {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.25;
+    }
+    .photo-card-large p {
+      margin: 0 0 8px 0;
+      font-size: 11px;
+      color: #0284c7;
+      font-weight: 700;
+    }
+    .photo-card-large .img-container {
+      width: 100%;
+      height: 170px;
+      border-radius: 10px;
+      background: #f8fafc;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .photo-card-large .img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .card-footer {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .view-item-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      background: #0284c7;
+      border: 1px solid #0369a1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .view-item-btn:hover {
+      background: #0369a1;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
     }
 
     @media (max-width: 768px) {
       .top-controls-bar {
-        left: 50px;
-        right: 10px;
         top: 10px;
+        left: 10px;
+        right: 10px;
       }
-      .map-search-box { width: 130px; }
-      .layer-dropdown-card {
-        width: 260px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .map-search-box { min-width: 130px; }
       .year-slider-container {
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 15px !important;
-        width: 90vw !important;
-        max-width: 330px !important;
-      }
-      .leaflet-popup {
-        position: fixed !important;
-        bottom: 95px !important;
-        left: 10px !important;
-        top: auto !important;
-        transform: none !important;
-        margin: 0 !important;
-        z-index: 1500 !important;
-      }
-      .leaflet-popup-content-wrapper {
-        max-width: 84vw !important;
-        border-radius: 12px;
-      }
-      .leaflet-popup-tip-container { display: none !important; }
-      .leaflet-control-container .leaflet-control-attribution {
-        font-size: 8px !important;
-        transform: scale(0.8);
-        transform-origin: bottom right;
-      }
-      .leaflet-control-zoom {
-        transform: scale(0.8);
-        transform-origin: top left;
+        bottom: 15px;
+        width: calc(100vw - 24px);
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Search & Layer Controls -->
+  <!-- Floating Controls Bar -->
   <div class="top-controls-bar">
+    <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
+      <span style="font-size: 14px;">☰</span>
+      <span>Wings</span>
+    </button>
+
     <div class="map-search-box">
       <span class="search-icon">🔍</span>
       <input type="text" id="mapSearchInput" placeholder="Search map items..." aria-label="Search map artifacts">
       <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
     </div>
 
-    <!-- Extended Layer Switcher Button -->
+    <!-- Base Layer Switcher -->
     <div class="layer-switcher-container">
       <button id="btnLayersToggle" class="top-action-btn" title="Change Map Basemap">
-        <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-          <polyline points="2 17 12 22 22 17"></polyline>
-          <polyline points="2 12 12 17 22 12"></polyline>
-        </svg>
-        <span>Layers</span>
+        <span>🗺️</span> <span>Layers</span>
       </button>
 
       <div id="layerDropdownCard" class="layer-dropdown-card">
-        <!-- 1. Google (Default) -->
-        <button id="btnLayerGoogle" class="layer-option-btn active" title="Google Maps (Streets)">
-          <span class="icon">📍</span>
-          <span>Google</span>
+        <button id="btnLayerGoogle" class="layer-option-btn active" title="Google Maps">
+          <span>📍</span> <span>Google</span>
         </button>
-        <!-- 2. Google Hybrid -->
         <button id="btnLayerHybrid" class="layer-option-btn" title="Google Satellite (Hybrid)">
-          <span class="icon">🛰️</span>
-          <span>Satellite</span>
+          <span>🛰️</span> <span>Satellite</span>
         </button>
-        <!-- 3. ESRI Satellite -->
         <button id="btnLayerSatellite" class="layer-option-btn" title="Esri Satellite Imagery">
-          <span class="icon">🌍</span>
-          <span>Esri Sat</span>
+          <span>🌍</span> <span>Esri Sat</span>
         </button>
-        <!-- 4. ESRI Topo Survey (Historical & Modern Topography) -->
         <button id="btnLayerTopo" class="layer-option-btn" title="ESRI World Topographic Survey">
-          <span class="icon">⛰️</span>
-          <span>ESRI Topo</span>
+          <span>⛰️</span> <span>ESRI Topo</span>
         </button>
-        <!-- 5. National Geographic Historical Survey Archive -->
-        <button id="btnLayerNatGeo" class="layer-option-btn" title="National Geographic Historical Survey Archive">
-          <span class="icon">📜</span>
-          <span>NatGeo Hist</span>
+        <button id="btnLayerNatGeo" class="layer-option-btn" title="National Geographic Archive">
+          <span>📜</span> <span>NatGeo</span>
         </button>
-        <!-- 6. CARTO Voyager -->
         <button id="btnLayerVoyager" class="layer-option-btn" title="CARTO Voyager Basemap">
-          <span class="icon">🗺️</span>
-          <span>Voyager</span>
+          <span>🗺️</span> <span>Voyager</span>
         </button>
       </div>
     </div>
 
     <button id="btnFitBounds" class="top-action-btn" title="Fit all visible items in view">
-      <span>🧭</span> <span class="hidden-xs">Fit All</span>
+      <span>🧭</span> <span>Fit All</span>
     </button>
 
-    <button id="btnResetView" class="top-action-btn" title="Reset map position & timeline">
-      <span>↺</span> <span class="hidden-xs">Reset</span>
+    <button id="btnResetView" class="top-action-btn" title="Reset map position &amp; timeline">
+      <span>↺</span> <span>Reset</span>
     </button>
 
     <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
       <span id="fullscreenIcon">⛶</span>
     </button>
+
+    <a href="index.html" class="top-action-btn" title="Return to Main Museum Showcase">
+      <span>🏛️</span> <span>Museum</span>
+    </a>
   </div>
 
   <div id="map"></div>
@@ -567,18 +530,36 @@
     </div>
   </div>
 
-  <!-- Leaflet & PapaParse CDN Libraries -->
-  <script src="../vendor/leaflet/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="../vendor/leaflet/markercluster.js"></script>
+  <!-- Universal BMMC Navigation Drawer -->
+  <script src="shared-nav.js"></script>
+
+  <!-- Leaflet, MarkerCluster, PapaParse & Heatmap with CDN Fallbacks -->
+  <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.L) {
+      document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+    }
+  </script>
+
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+    }
+  </script>
+
+  <script src="../vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.L || !window.L.markerClusterGroup) {
+      document.write('<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"><\/script>');
+    }
+  </script>
+
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <script>
-    // ==========================================
-    // CARTO API Key
-    const CARTO_API_KEY = 'cb1_28sh_1_689e4b671faa6f5947798385'; 
-    // ==========================================
+    const CARTO_API_KEY = 'cb1_28sh_1_689e4b671faa6f5947798385';
 
     function escapeHTML(str) {
       if (str === null || str === undefined) return '';
@@ -600,7 +581,21 @@
       return '';
     }
 
-    // --- State Persistence: Remember Basemap, Position & Zoom Level ---
+    function parseYearNum(val) {
+      if (!val) return NaN;
+      const m = String(val).match(/-?\d{3,4}/);
+      return m ? parseInt(m[0], 10) : NaN;
+    }
+
+    function parseCoord(val) {
+      if (val === null || val === undefined || val === '') return NaN;
+      const clean = String(val).trim().replace(',', '.');
+      const m = clean.match(/-?\d+(?:\.\d+)?/);
+      if (!m) return NaN;
+      const num = parseFloat(m[0]);
+      return (isNaN(num) || num === 0) ? NaN : num;
+    }
+
     let savedState = null;
     try {
       const rawState = sessionStorage.getItem('bMMC_map_view_state');
@@ -646,7 +641,8 @@
                          window.location.hostname === '127.0.0.1';
 
     const REMOTE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/export?format=csv&gid=1146027655';
-    const LOCAL_CSV_URL = './data/exhibits.csv';
+    const REMOTE_GVIZ_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1146027655';
+    const LOCAL_CSV_CANDIDATES = ['./data/exhibits.csv', 'data/exhibits.csv', '../data/exhibits.csv', './exhibits.csv'];
     const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
     const SVG_NO_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%2364748b%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E';
 
@@ -654,7 +650,6 @@
     const defaultZoom = isMobile ? 2 : 3;
     const defaultCenter = [-10, 135];
     const worldBounds = [[-89, -180], [89, 180]];
-    const TIMELINE_DEFAULT_START_YEAR = 1830;
 
     const initialCenter = (savedState && !isNaN(savedState.lat) && !isNaN(savedState.lng))
       ? [savedState.lat, savedState.lng]
@@ -672,51 +667,16 @@
       worldCopyJump: false
     }).setView(initialCenter, initialZoom);
 
-    // ==========================================
-    // Extended Base Tile Layers (Google Default + Topo & NatGeo History)
-    // ==========================================
-    const layerGoogle = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-      attribution: '&copy; Google Maps',
-      maxZoom: 20,
-      subdomains: ['0', '1', '2', '3'],
-      noWrap: true
-    });
-
-    const layerHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-      attribution: '&copy; Google Maps',
-      maxZoom: 20,
-      subdomains: ['0', '1', '2', '3'],
-      noWrap: true
-    });
-
-    const layerEsriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Maxar, Earthstar, GIS Community',
-      maxZoom: 18,
-      noWrap: true
-    });
-
-    const layerEsriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Topographic Survey & GIS Community',
-      maxZoom: 19,
-      noWrap: true
-    });
-
-    const layerNatGeoHistory = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; National Geographic Historical Cartography',
-      maxZoom: 16,
-      noWrap: true
-    });
-
+    // Basemaps
+    const layerGoogle = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'], noWrap: true });
+    const layerHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'], noWrap: true });
+    const layerEsriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri &mdash; Maxar', maxZoom: 18, noWrap: true });
+    const layerEsriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri &mdash; Topo', maxZoom: 19, noWrap: true });
+    const layerNatGeoHistory = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri &mdash; NatGeo', maxZoom: 16, noWrap: true });
     const cartoUrl = CARTO_API_KEY 
       ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`
       : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-
-    const layerVoyager = L.tileLayer(cartoUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>',
-      maxZoom: 19,
-      subdomains: 'abcd',
-      noWrap: true
-    });
+    const layerVoyager = L.tileLayer(cartoUrl, { attribution: '&copy; CARTO', maxZoom: 19, subdomains: 'abcd', noWrap: true });
 
     const baseLayers = {
       google: layerGoogle,
@@ -727,29 +687,24 @@
       voyager: layerVoyager
     };
 
-    // Default Basemap is Google Maps (or Restored State)
     let currentBasemapKey = (savedState && savedState.basemap && baseLayers[savedState.basemap]) ? savedState.basemap : 'google';
     baseLayers[currentBasemapKey].addTo(map);
 
     function setBasemap(type) {
       if (!baseLayers[type]) return;
-
       Object.values(baseLayers).forEach(layer => {
         if (map.hasLayer(layer)) map.removeLayer(layer);
       });
-
       baseLayers[type].addTo(map);
       currentBasemapKey = type;
 
       document.querySelectorAll('.layer-option-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
       });
-
       document.getElementById('layerDropdownCard')?.classList.remove('show');
       saveMapViewState();
     }
 
-    // Set initial button active state
     document.querySelectorAll('.layer-option-btn').forEach(btn => {
       btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${currentBasemapKey.toLowerCase()}`);
     });
@@ -762,13 +717,13 @@
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
       spiderfyDistanceMultiplier: isMobile ? 2.8 : 2.2,
-      maxClusterRadius: isMobile ? 38 : 55,
+      maxClusterRadius: isMobile ? 38 : 50,
       iconCreateFunction: function(cluster) {
         return L.divIcon({
           html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
           className: 'custom-cluster-number-icon',
-          iconSize: [48, 48],
-          iconAnchor: [24, 24]
+          iconSize: [44, 44],
+          iconAnchor: [22, 22]
         });
       }
     });
@@ -791,33 +746,21 @@
     function formatImgUrl(url) {
       if (!url) return '';
       const clean = String(url).trim();
-      
       if (window.resolveOfflineMedia) {
         const local = window.resolveOfflineMedia(clean);
         if (local && (local.startsWith('./media/') || local.startsWith('media/'))) return sanitizeUrl(local);
       }
-
       if (clean.startsWith('data:image/') || clean.startsWith('./media/') || clean.startsWith('media/')) {
         return sanitizeUrl(clean);
       }
-
       if (clean.includes('dropbox.com')) {
         let dropboxUrl = clean.replace('dl=0', 'raw=1').replace('dl=1', 'raw=1');
         if (!dropboxUrl.includes('raw=1')) dropboxUrl += (dropboxUrl.includes('?') ? '&raw=1' : '?raw=1');
         return sanitizeUrl(dropboxUrl);
       }
-
       const fileId = extractDriveId(clean);
-      if (fileId) return sanitizeUrl(`https://lh3.googleusercontent.com/d/${fileId}=s150`);
+      if (fileId) return sanitizeUrl(`https://lh3.googleusercontent.com/d/${fileId}=s180`);
       return sanitizeUrl(clean);
-    }
-
-    function parseCoord(val) {
-      if (val === null || val === undefined || val === '') return NaN;
-      const clean = String(val).trim().replace(',', '.');
-      if (!/^-?\d+(\.\d+)?$/.test(clean)) return NaN;
-      const num = parseFloat(clean);
-      return isNaN(num) ? NaN : num;
     }
 
     function renderDataset(records) {
@@ -834,15 +777,15 @@
         const safeImgUrl = sanitizeUrl(item.imgUrl) || SVG_NO_IMG;
         const safeTitle = escapeHTML(item.title);
         const safeLocation = escapeHTML(item.location);
-        const safeYear = escapeHTML(item.year && item.year !== '0' ? item.year : 'Prehistory');
+        const safeYear = escapeHTML(item.year && item.year !== '0' ? item.year : 'Heritage');
 
         const customIconHTML = `<div class="single-photo-wrapper"><img src="${safeImgUrl}" loading="lazy" alt="${safeTitle || 'Photo'}" onerror="this.onerror=null; this.src='${SVG_NO_IMG}';"/></div>`;
 
         const photoIcon = L.divIcon({
           html: customIconHTML,
           className: 'custom-single-photo-icon',
-          iconSize: [75, 75],
-          iconAnchor: [37.5, 37.5]
+          iconSize: [66, 66],
+          iconAnchor: [33, 33]
         });
 
         const locationYearText = safeLocation 
@@ -892,7 +835,7 @@
           radius: isMobile ? 22 : 30,
           blur: 16,
           maxZoom: 6,
-          gradient: { 0.4: 'blue', 0.65: 'yellow', 1: 'red' }
+          gradient: { 0.4: '#0284c7', 0.65: '#eab308', 1: '#ef4444' }
         }).addTo(map);
 
         map.on('zoomend', function() {
@@ -914,8 +857,8 @@
 
     function initYearSliderUI() {
       const years = allPhotoRecords
-        .map(r => parseInt(r.year, 10))
-        .filter(y => !isNaN(y) && y > 1500 && y <= 2026);
+        .map(r => parseYearNum(r.year))
+        .filter(y => !isNaN(y) && y >= 1600 && y <= 2030);
 
       if (years.length > 0) {
         globalMinYear = Math.min(...years);
@@ -930,7 +873,6 @@
 
       minSlider.min = globalMinYear;
       minSlider.max = globalMaxYear;
-
       maxSlider.min = globalMinYear;
       maxSlider.max = globalMaxYear;
 
@@ -942,10 +884,6 @@
         const sMax = parseInt(savedState.maxYear, 10);
         if (!isNaN(sMin) && sMin >= globalMinYear && sMin <= globalMaxYear) restoredMin = sMin;
         if (!isNaN(sMax) && sMax >= globalMinYear && sMax <= globalMaxYear) restoredMax = sMax;
-        if (restoredMin > restoredMax) {
-          restoredMin = globalMinYear;
-          restoredMax = globalMaxYear;
-        }
       }
 
       minSlider.value = restoredMin;
@@ -960,16 +898,13 @@
       }
 
       isMapDataReady = true;
-
       updateYearFilter();
       handleInitialDeepLinks();
 
       if (pendingExhibitToFocus !== null) {
         const target = pendingExhibitToFocus;
         pendingExhibitToFocus = null;
-        setTimeout(() => {
-          focusExhibitMarker(target);
-        }, 100);
+        setTimeout(() => { focusExhibitMarker(target); }, 150);
       }
 
       try {
@@ -1011,7 +946,7 @@
       document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
 
       const filtered = allPhotoRecords.filter(item => {
-        const y = parseInt(item.year, 10);
+        const y = parseYearNum(item.year);
         const matchesYear = isNaN(y) || y <= 0 || (y >= minVal && y <= maxVal);
         if (!matchesYear) return false;
 
@@ -1041,7 +976,7 @@
         playBtn.classList.add('playing');
         playBtn.title = 'Pause Timeline';
 
-        let startYear = Math.max(TIMELINE_DEFAULT_START_YEAR, globalMinYear);
+        let startYear = Math.max(1830, globalMinYear);
         if (parseInt(maxSlider.value, 10) >= globalMaxYear || parseInt(maxSlider.value, 10) <= startYear) {
           maxSlider.value = startYear;
           updateYearFilter();
@@ -1080,7 +1015,7 @@
       );
 
       if (record && record.year) {
-        const yr = parseInt(record.year, 10);
+        const yr = parseYearNum(record.year);
         if (!isNaN(yr) && yr > 0) {
           const minSlider = document.getElementById('minYearSlider');
           const maxSlider = document.getElementById('maxYearSlider');
@@ -1190,7 +1125,7 @@
           if (c === 'img1' || c === 'image 1' || (c.includes('image') && !c.includes('2nd') && !c.includes('2'))) imgIdx = idx;
           if (c === 'title' || c === 'title details' || c === 'content') titleIdx = idx;
           if (c === 'made' || c.includes('origin') || c.includes('location')) madeIdx = idx;
-          if (c === 'year' || c === 'date') yearIdx = idx;
+          if (c === 'year' || c === 'date' || c === 'era') yearIdx = idx;
         });
       }
 
@@ -1277,9 +1212,10 @@
         }
       } catch (e) {}
 
-      if (IS_LOCAL_ENV) {
+      // Try local files
+      for (const p of LOCAL_CSV_CANDIDATES) {
         try {
-          const localRes = await fetch(LOCAL_CSV_URL);
+          const localRes = await fetch(p);
           if (localRes.ok) {
             const csvText = await localRes.text();
             const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
@@ -1291,34 +1227,25 @@
         } catch (e) {}
       }
 
-      try {
-        const res = await fetch(REMOTE_CSV_URL);
-        if (res.ok) {
-          const csvText = await res.text();
-          const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-            try {
-              localStorage.setItem('bMMC_cached_exhibits_raw', csvText);
-              localStorage.setItem('bMMC_cached_exhibits', JSON.stringify(parsed.data));
-              localStorage.setItem('bMMC_cached_exhibits_time', Date.now());
-            } catch (e) {}
-            parseAndProcessDataset(parsed.data);
-            return;
+      // Try remote Google Sheets (export + gviz fallback)
+      for (const remoteUrl of [REMOTE_GVIZ_URL, REMOTE_CSV_URL]) {
+        try {
+          const res = await fetch(remoteUrl);
+          if (res.ok) {
+            const csvText = await res.text();
+            const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+            if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
+              try {
+                localStorage.setItem('bMMC_cached_exhibits_raw', csvText);
+                localStorage.setItem('bMMC_cached_exhibits', JSON.stringify(parsed.data));
+                localStorage.setItem('bMMC_cached_exhibits_time', Date.now());
+              } catch (e) {}
+              parseAndProcessDataset(parsed.data);
+              return;
+            }
           }
-        }
-      } catch (e) {}
-
-      try {
-        const fallbackRes = await fetch(LOCAL_CSV_URL);
-        if (fallbackRes.ok) {
-          const csvText = await fallbackRes.text();
-          const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-            parseAndProcessDataset(parsed.data);
-            return;
-          }
-        }
-      } catch (e) {}
+        } catch (e) {}
+      }
 
       document.getElementById('yearRangeText').textContent = 'Data offline';
       document.getElementById('itemCountBadge').textContent = 'Offline';
@@ -1327,7 +1254,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
       document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
-
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
       document.getElementById('btnFitBounds')?.addEventListener('click', fitAllMarkers);
       document.getElementById('btnResetView')?.addEventListener('click', resetEntireMapView);
@@ -1341,7 +1267,6 @@
         layerDropdownCard?.classList.toggle('show');
       });
 
-      // Layer selection buttons
       document.getElementById('btnLayerGoogle')?.addEventListener('click', () => setBasemap('google'));
       document.getElementById('btnLayerHybrid')?.addEventListener('click', () => setBasemap('hybrid'));
       document.getElementById('btnLayerSatellite')?.addEventListener('click', () => setBasemap('satellite'));
@@ -1378,7 +1303,6 @@
           }
           return;
         }
-
         if (e.key === ' ') {
           e.preventDefault();
           toggleTimelinePlayback();
