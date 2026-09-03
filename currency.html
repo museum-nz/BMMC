@@ -7,7 +7,7 @@
   <meta name="referrer" content="no-referrer-when-downgrade" />
   <title>New Zealand Currency &amp; Minting Database — BMMC</title>
 
-  <!-- Instant Theme Sync -->
+  <!-- Instant Theme Sync (Defaults to Day mode unless 'dark' was chosen) -->
   <script>
     (function() {
       try {
@@ -29,7 +29,7 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
 
-  <!-- Tailwind CSS Engine with Synchronous Class-Based Dark Mode -->
+  <!-- Tailwind CSS Engine with Class-Based Dark Mode -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     if (window.tailwind) {
@@ -78,7 +78,7 @@
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
 
   <style>
-    /* CSS Variables for 100% Guaranteed Day and Night Theme Switching */
+    /* CSS Variables for Day and Night Theme Switching */
     :root {
       --bg-page-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
       --text-main: #0f172a;
@@ -208,11 +208,6 @@
             </button>
           </div>
 
-          <!-- Live Online Google Sheet Sync Button -->
-          <button id="btnSyncSheet" onclick="syncFromGoogleSheet(true)" title="Force sync latest records from Google Sheet" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
-            <span>🔄</span> <span class="hidden sm:inline">Sync Sheet</span>
-          </button>
-
           <button id="btnSurprise" title="Surprise Me" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
             <span>✨</span> <span class="hidden sm:inline">Surprise</span>
           </button>
@@ -296,7 +291,6 @@
           </div>
           <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 shrink-0">
             <span id="currencyStatsCounter">Connecting to database...</span>
-            <button onclick="syncFromGoogleSheet(true)" class="underline text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 cursor-pointer">Sync Now</button>
           </div>
         </div>
 
@@ -683,8 +677,8 @@
 
   <!-- Application Logic -->
   <script>
-    const GOOGLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
-    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v12';
+    const CURRENCY_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=158483759&single=true&output=csv';
+    const CACHE_KEY_RAW = 'bMMC_cached_currency_unified_v14';
     const USER_COLLECTION_KEY = 'bMMC_user_currency_collection_v1';
 
     let currencyItems = [];
@@ -1414,8 +1408,20 @@
       };
     }
 
+    // Clean multi-line chunk and skip comma-only placeholder rows
+    function cleanCsvChunk(str) {
+      if (!str) return '';
+      const lines = str.split(/\r?\n/);
+      let startIdx = 0;
+      while (startIdx < lines.length && !/[a-zA-Z0-9]/.test(lines[startIdx])) {
+        startIdx++;
+      }
+      return lines.slice(startIdx).join('\n').trim();
+    }
+
+    // Safe extraction of sections without breaking on trailing row commas
     function extractSections(text) {
-      const sectionKeys = [
+      const sectionDefs = [
         { key: 'metadata', marker: '[SECTION_CATALOGUE_METADATA]' },
         { key: 'predecimal', marker: '[SECTION_MINTAGES_PREDECIMAL]' },
         { key: 'decimal', marker: '[SECTION_MINTAGES_DECIMAL]' },
@@ -1426,20 +1432,30 @@
 
       const sections = { metadata: '', predecimal: '', decimal: '', banknoteRuns: '', f3Lsd: '', f3Decimal: '' };
       const found = [];
-      sectionKeys.forEach(s => {
-        const idx = text.indexOf(s.marker);
-        if (idx !== -1) found.push({ key: s.key, rawIdx: idx, start: idx + s.marker.length });
+      sectionDefs.forEach(def => {
+        const idx = text.indexOf(def.marker);
+        if (idx !== -1) found.push({ key: def.key, marker: def.marker, idx });
       });
 
       if (found.length === 0) {
-        sections.metadata = text;
+        sections.metadata = cleanCsvChunk(text);
         return sections;
       }
 
-      found.sort((a, b) => a.rawIdx - b.rawIdx);
+      found.sort((a, b) => a.idx - b.idx);
       for (let i = 0; i < found.length; i++) {
-        const end = (i + 1 < found.length) ? found[i + 1].rawIdx : text.length;
-        sections[found[i].key] = text.slice(found[i].start, end).trim();
+        const current = found[i];
+        const nextIdx = (i + 1 < found.length) ? found[i + 1].idx : text.length;
+
+        let chunk = text.slice(current.idx, nextIdx);
+        const firstNewline = chunk.search(/\r?\n/);
+        if (firstNewline !== -1) {
+          chunk = chunk.slice(firstNewline);
+        } else {
+          chunk = '';
+        }
+
+        sections[current.key] = cleanCsvChunk(chunk);
       }
       return sections;
     }
@@ -1550,125 +1566,112 @@
       updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
     }
 
-    // 4-Tier Online Fetch Engine: Guaranteed to bypass Google CORS restrictions
-    async function fetchGoogleSheetCsv(customUrl) {
-      const targetUrl = customUrl || GOOGLE_CSV_URL;
+    // 4-Tier Online Fetch Engine (Guaranteed bypass for Google CORS redirect issues)
+    async function fetchPublishedSheet(url) {
+      const targetUrl = url || CURRENCY_CSV_URL;
 
-      // Tier 1: Direct browser fetch
+      // Tier 1: Direct fetch
       try {
         const res = await fetch(targetUrl);
         if (res.ok) {
-          const text = await res.text();
-          if (text && text.trim().length > 50) return { success: true, text, source: 'Direct Google Sheet' };
-        }
-      } catch (e) {}
-
-      // Tier 2: AllOrigins JSON API (Bypasses browser CORS restrictions by returning JSON payload)
-      try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&timestamp=${Date.now()}`;
-        const res = await fetch(proxyUrl);
-        if (res.ok) {
-          const json = await res.json();
-          if (json && json.contents && json.contents.trim().length > 50) {
-            return { success: true, text: json.contents, source: 'AllOrigins CORS Gateway' };
+          const txt = await res.text();
+          if (txt && txt.length > 50 && (txt.includes('SECTION_') || txt.includes('Denomination') || txt.includes('pre_halfpenny'))) {
+            return { success: true, text: txt, source: 'Direct Google Sheet' };
           }
         }
       } catch (e) {}
 
-      // Tier 3: CodeTabs CORS Proxy
+      // Tier 2: AllOrigins JSON API (Bypasses browser CORS redirects)
       try {
-        const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
-        const res = await fetch(proxyUrl);
+        const pUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&t=${Date.now()}`;
+        const res = await fetch(pUrl);
         if (res.ok) {
-          const text = await res.text();
-          if (text && text.trim().length > 50) return { success: true, text, source: 'CodeTabs Proxy' };
+          const json = await res.json();
+          if (json && json.contents && json.contents.length > 50 && (json.contents.includes('SECTION_') || json.contents.includes('Denomination') || json.contents.includes('pre_halfpenny'))) {
+            return { success: true, text: json.contents, source: 'AllOrigins Gateway' };
+          }
+        }
+      } catch (e) {}
+
+      // Tier 3: CodeTabs Proxy
+      try {
+        const pUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
+        const res = await fetch(pUrl);
+        if (res.ok) {
+          const txt = await res.text();
+          if (txt && txt.length > 50 && (txt.includes('SECTION_') || txt.includes('Denomination') || txt.includes('pre_halfpenny'))) {
+            return { success: true, text: txt, source: 'CodeTabs Proxy' };
+          }
         }
       } catch (e) {}
 
       // Tier 4: CorsProxy.io
       try {
-        const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
-        const res = await fetch(proxyUrl);
+        const pUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
+        const res = await fetch(pUrl);
         if (res.ok) {
-          const text = await res.text();
-          if (text && text.trim().length > 50) return { success: true, text, source: 'CorsProxy.io' };
+          const txt = await res.text();
+          if (txt && txt.length > 50 && (txt.includes('SECTION_') || txt.includes('Denomination') || txt.includes('pre_halfpenny'))) {
+            return { success: true, text: txt, source: 'CorsProxy.io' };
+          }
         }
       } catch (e) {}
 
       return { success: false, text: null };
     }
 
-    // Live Synchronisation with Google Sheet
-    async function syncFromGoogleSheet(isManual = false) {
-      const statsCounter = document.getElementById('currencyStatsCounter');
-      if (isManual) showToast('Connecting to Google Sheet...', '⏳');
-
-      const result = await fetchGoogleSheetCsv();
-      if (result.success && result.text) {
-        try {
-          localStorage.setItem(CACHE_KEY_RAW, result.text);
-        } catch (e) {}
-
-        parseUnifiedCsv(result.text);
-        renderCurrentView();
-
-        if (statsCounter) {
-          statsCounter.textContent = `🟢 Live Sheet Synced (${currencyItems.length} records)`;
-        }
-        if (isManual) {
-          showToast(`Synced ${currencyItems.length} specimens from Google Sheet!`, '✅');
-        }
-        return true;
-      } else {
-        if (isManual) {
-          showToast('Could not reach Google Sheet. Check network connection.', '⚠️');
-        }
-        return false;
-      }
-    }
-
     async function loadCurrencyData() {
       const statsCounter = document.getElementById('currencyStatsCounter');
-      if (statsCounter) statsCounter.textContent = 'Loading database...';
+      if (statsCounter) statsCounter.textContent = 'Connecting to database...';
 
       let text = '';
 
-      // 1. Check cached copy first to render instantly
+      // 1. Instant Cache Load
       try {
         const cached = localStorage.getItem(CACHE_KEY_RAW);
-        if (cached && (cached.includes('[SECTION_') || cached.includes('Denomination') || cached.includes('ID'))) {
+        if (cached && (cached.includes('SECTION_') || cached.includes('Denomination') || cached.includes('pre_halfpenny'))) {
           text = cached;
+          parseUnifiedCsv(text);
+          renderCurrentView();
         }
       } catch (e) {}
 
-      // 2. Check local repo candidate paths (for offline use)
+      // 2. Try Local Files in Repo
       if (!text) {
-        const candidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
-        for (const p of candidates) {
+        const localCandidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
+        for (const p of localCandidates) {
           try {
             const res = await fetch(p);
             if (res.ok) {
               const t = await res.text();
-              if (t && (t.includes('[SECTION_') || t.includes('Denomination') || t.includes('ID'))) {
-                text = t; break;
+              if (t && (t.includes('SECTION_') || t.includes('Denomination') || t.includes('pre_halfpenny'))) {
+                text = t;
+                parseUnifiedCsv(text);
+                renderCurrentView();
+                break;
               }
             }
           } catch (e) {}
         }
       }
 
-      // If local data exists, render immediately
-      if (text) {
+      // 3. Connect to live Google Sheet in background
+      const onlineResult = await fetchPublishedSheet(CURRENCY_CSV_URL);
+      if (onlineResult.success && onlineResult.text) {
+        text = onlineResult.text;
+        try {
+          localStorage.setItem(CACHE_KEY_RAW, text);
+        } catch (e) {}
         parseUnifiedCsv(text);
         renderCurrentView();
-        if (statsCounter) statsCounter.textContent = `Loaded ${currencyItems.length} items (checking live sheet...)`;
-      }
-
-      // 3. Connect to live Google Sheet in background to update
-      const onlineSuccess = await syncFromGoogleSheet(false);
-      if (!onlineSuccess && !text) {
-        if (statsCounter) {
-          statsCounter.innerHTML = `<span class="text-rose-500 font-bold">⚠️ Connection offline.</span> <button onclick="syncFromGoogleSheet(true)" class="underline text-emerald-500 font-bold ml-1 cursor-pointer">Retry Sheet Sync</button>`;
+        if (statsCounter) statsCounter.textContent = `🟢 Live Sheet Synced (${currencyItems.length} records)`;
+      } else {
+        if (text) {
+          if (statsCounter) statsCounter.textContent = `📁 Cached/Local Data (${currencyItems.length} records)`;
+        } else {
+          if (statsCounter) {
+            statsCounter.innerHTML = `<span class="text-rose-500 font-bold">⚠️ Connection error.</span> <button onclick="loadCurrencyData()" class="underline text-amber-500 font-bold ml-1 cursor-pointer">Retry</button>`;
+          }
         }
       }
     }
