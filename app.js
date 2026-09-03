@@ -15,7 +15,7 @@ const LOCAL_EXHIBITS_CSV_URL = './data/exhibits.csv';
 const LOCAL_GRAMOPHONE_CSV_URL = './data/gramophone.csv';
 const LOCAL_GALLERY_CSV_URL = './data/gallery.csv';
 
-const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%20%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+const NO_IMAGE_SVG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23f1f5f9%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fsvg%3E';
 
 const MAIN_HUB_CATEGORIES = ["War", "Photography", "Survey", "General", "Documentation", "Household", "Collections"];
 
@@ -288,6 +288,7 @@ function printCuratorPocketPassport() {
   document.title = `BMMC-Curator-Passport-Booklet-${new Date().toISOString().slice(0, 10)}`;
 
   let pagesHTML = `
+    <!-- Passport Cover Page -->
     <div class="passport-cover">
       <div style="font-size: 36px; margin-bottom: 8px;">🏛️ 📘</div>
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #1e40af; font-weight: 900;">Bonniefields Museum Collection</div>
@@ -311,6 +312,7 @@ function printCuratorPocketPassport() {
     </div>
   `;
 
+  // Individual Artifact Passport Leaves
   items.forEach(({ originalIndex, row }, pageIdx) => {
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
     const { title, details } = parseTitleAndDetails(rawContent);
@@ -335,6 +337,8 @@ function printCuratorPocketPassport() {
 
     pagesHTML += `
       <div class="passport-leaf">
+        
+        <!-- Passport Leaf Header -->
         <div style="border-bottom: 2px solid #0f172a; padding-bottom: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
             <div style="font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">
@@ -351,6 +355,7 @@ function printCuratorPocketPassport() {
           </div>
         </div>
 
+        <!-- Dual Slot Media Section -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
           ${fullImg1 ? `
             <div class="passport-img-box" style="flex: 1; position: relative;">
@@ -364,6 +369,7 @@ function printCuratorPocketPassport() {
             </div>` : ''}
         </div>
 
+        <!-- Archival Specs Grid -->
         <div class="passport-specs-grid">
           <div><strong>Historical Era:</strong><br>${escapeHTML(eraDisplay || '—')}</div>
           <div><strong>Date / Period:</strong><br>${escapeHTML(year || '—')}</div>
@@ -373,6 +379,7 @@ function printCuratorPocketPassport() {
           <div><strong>Subcategory:</strong><br>${escapeHTML(subcategory || '—')}</div>
         </div>
 
+        <!-- Curator Provenance Notes -->
         ${notes ? `
           <div class="passport-notes-box">
             <div style="font-weight: 900; text-transform: uppercase; font-size: 8px; color: #b45309; margin-bottom: 2px;">Curator Provenance Notes:</div>
@@ -380,6 +387,7 @@ function printCuratorPocketPassport() {
           </div>
         ` : ''}
 
+        <!-- Physical Description -->
         ${details ? `
           <div style="margin-bottom: 8px; font-size: 9.5px; color: #334155; line-height: 1.4;">
             <div style="font-weight: 800; text-transform: uppercase; font-size: 8px; color: #64748b; margin-bottom: 2px;">Physical Description & Specs:</div>
@@ -387,6 +395,7 @@ function printCuratorPocketPassport() {
           </div>
         ` : ''}
 
+        <!-- Deep Link & Documentation Footer -->
         <div style="border-top: 1px dashed #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 8px; color: #475569;">
           <div>
             ${ddoc ? `<span>📄 Doc: ${escapeHTML(ddoc)}</span> &bull; ` : ''}
@@ -398,6 +407,7 @@ function printCuratorPocketPassport() {
             ${directUrl}
           </div>
         </div>
+
       </div>
     `;
   });
@@ -673,26 +683,6 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
       const localRes = await fetch(localUrl);
       if (localRes.ok) {
         const text = await localRes.text();
-        if (typeof Papa !== 'undefined') {
-          const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-            try {
-              localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
-              localStorage.setItem(`${cacheKey}_raw`, text);
-              localStorage.setItem(`${cacheKey}_time`, Date.now());
-            } catch (e) {}
-            return parsed.data;
-          }
-        }
-      }
-    } catch (e) {}
-  }
-
-  try {
-    const res = await fetch(remoteUrl);
-    if (res.ok) {
-      const text = await res.text();
-      if (typeof Papa !== 'undefined') {
         const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
         if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
           try {
@@ -703,6 +693,22 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
           return parsed.data;
         }
       }
+    } catch (e) {}
+  }
+
+  try {
+    const res = await fetch(remoteUrl);
+    if (res.ok) {
+      const text = await res.text();
+      const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
+      if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(parsed.data));
+          localStorage.setItem(`${cacheKey}_raw`, text);
+          localStorage.setItem(`${cacheKey}_time`, Date.now());
+        } catch (e) {}
+        return parsed.data;
+      }
     }
   } catch (e) {}
 
@@ -710,11 +716,9 @@ async function fetchDualModeCSV(remoteUrl, localUrl, cacheKey) {
     const fallbackRes = await fetch(localUrl);
     if (fallbackRes.ok) {
       const text = await fallbackRes.text();
-      if (typeof Papa !== 'undefined') {
-        const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
-        if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
-          return parsed.data;
-        }
+      const parsed = Papa.parse(text, { header: false, skipEmptyLines: true });
+      if (parsed.data && parsed.data.length > 1 && Array.isArray(parsed.data[0])) {
+        return parsed.data;
       }
     }
   } catch (e) {}
@@ -791,10 +795,6 @@ function parseYearForSort(val) {
 }
 
 function showToast(msg, icon = '✨') {
-  if (typeof window.showBMMCToast === 'function') {
-    window.showBMMCToast(msg, icon);
-    return;
-  }
   const toast = document.getElementById('toast');
   if (!toast) return;
   document.getElementById('toastMsg').textContent = msg;
@@ -1042,7 +1042,7 @@ function renderEmptyState(container) {
     <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
       <span class="text-3xl mb-2 block">🔍</span>
       <p class="text-slate-700 dark:text-slate-300 font-bold text-sm">No exhibits match your current filter selections.</p>
-      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">Reset Filters & Show All Exhibits</button>
+      <button onclick="browseAllExhibits()" class="mt-3 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline">Reset Filters & Show All Exhibits</button>
     </div>
   `;
 }
@@ -1166,7 +1166,7 @@ function toggleCompareItem(originalIndex, event) {
     showToast('Removed from comparison', '⚖️');
   } else {
     if (compareItemIndices.size >= 8) {
-      showToast('Maximum 8 items can be compared at once', '⚠️');
+      showToast('Maximum 8 items can be compared / passport generated at once', '⚠️');
       return;
     }
     compareItemIndices.add(originalIndex);
@@ -1213,8 +1213,6 @@ function openCompareModal() {
     return;
   }
 
-  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
-
   const items = Array.from(compareItemIndices).map(idx => ({
     originalIndex: idx,
     row: rawExhibitsRows[idx]
@@ -1227,6 +1225,7 @@ function openCompareModal() {
   else if (colsCount >= 4) gridColsClass = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
 
   let html = `
+    <!-- Top Action Bar inside Comparison Modal -->
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
       <div class="flex items-center gap-2">
         <span class="text-base">📘</span>
@@ -1261,13 +1260,13 @@ function openCompareModal() {
 
         return `
           <div class="bg-white/90 dark:bg-slate-900/90 rounded-3xl p-4 sm:p-5 border-2 flex flex-col justify-between shadow-md relative" style="border-color: ${theme.hex}80;">
-            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold cursor-pointer">✕</button>
+            <button onclick="window.toggleCompareItem(${originalIndex})" title="Remove from comparison" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white text-xs transition z-10 font-bold">✕</button>
             
             <div class="space-y-3.5">
               <div class="h-48 rounded-2xl overflow-hidden bg-slate-950 p-2 flex items-center justify-center relative">
                 <img src="${thumbImg1}" class="max-w-full max-h-full object-contain" alt="${escapeHTML(displayTitle)}" />
                 ${thumbImg2 ? `<span class="absolute top-2 left-2 bg-slate-900/80 text-white text-[9px] font-black px-2 py-0.5 rounded-md border border-slate-700 shadow">Dual Angle</span>` : ''}
-                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1 cursor-pointer">📱 3D / AR</button>` : ''}
+                ${d3d ? `<button onclick="window.open3DLightbox('${encodeURIComponent(d3d)}', '${encodeURIComponent(displayTitle)}')" class="absolute bottom-2 left-2 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">📱 3D / AR</button>` : ''}
               </div>
 
               <div>
@@ -1574,7 +1573,6 @@ window.showExhibitOnMap = function(originalIndex) {
   closeEnlargeModal();
   close3DLightbox();
   closeCompareModal();
-  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
   document.body.classList.remove('overflow-hidden');
 
   setTab('stats');
@@ -1628,7 +1626,7 @@ function clearAllFilters(shouldScroll = true) {
 
 function browseAllExhibits() {
   hideLoadingSpinner();
-  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
+  if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
   document.body.classList.remove('overflow-hidden');
   if (currentTab !== 'exhibits') setTab('exhibits');
   clearAllFilters(false);
@@ -1641,7 +1639,7 @@ function setTab(tabName) {
   currentTab = tabName;
   stopAudioGuide();
   hideLoadingSpinner();
-  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
+  if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
   document.body.classList.remove('overflow-hidden');
   saveCatalogSessionState();
 
@@ -2083,7 +2081,7 @@ function renderActiveFilterPills() {
     filters.forEach(f => {
       const pill = document.createElement('span');
       pill.className = 'inline-flex items-center gap-1 text-[10px] font-semibold bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 px-2 py-0.5 rounded-full shadow-sm';
-      pill.innerHTML = `${f.label} <button class="hover:text-red-500 font-bold ml-0.5 cursor-pointer">✕</button>`;
+      pill.innerHTML = `${f.label} <button class="hover:text-red-500 font-bold ml-0.5">✕</button>`;
       pill.querySelector('button').addEventListener('click', () => { f.clear(); updateDynamicDropdowns(); filterCatalog(true); });
       container.appendChild(pill);
     });
@@ -2534,7 +2532,7 @@ function renderGramophoneGrid() {
       <div class="col-span-full text-center py-16 bg-white/80 dark:bg-slate-900/80 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 backdrop-blur-sm">
         <span class="text-3xl mb-2 block">🎵</span>
         <p class="text-slate-600 dark:text-slate-300 font-bold text-sm">No gramophone records match your selected filters.</p>
-        <button onclick="browseAllExhibits()" class="mt-3 text-xs text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">Return to Main Museum Exhibits</button>
+        <button onclick="browseAllExhibits()" class="mt-3 text-xs text-amber-600 dark:text-amber-400 font-bold hover:underline">Return to Main Museum Exhibits</button>
       </div>`;
     return;
   }
@@ -2580,7 +2578,7 @@ function renderGramophoneGrid() {
         </span>
         <div class="flex items-center gap-1.5 flex-wrap justify-end">
           ${hasDiscogsRecording ? `<a href="${discogsUrl || '#'}" target="_blank" rel="noopener noreferrer" class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-emerald-600 flex items-center gap-1">🎙️ Discogs Recording</a>` : ''}
-          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-sky-700 flex items-center gap-1">📻 Archives 78s Recording ↗</a>` : ''}
+          ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm transition hover:bg-sky-700 flex items-center gap-1">📻 Archives 78s Recording</a>` : ''}
           ${discogsUrl && !hasDiscogsRecording ? `<a href="${discogsUrl}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-black text-white px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">📀 Discogs ↗</a>` : ''}
         </div>
       </div>
@@ -2962,8 +2960,6 @@ function open3DLightbox(rawUrl, rawTitle) {
 
   if (!modal || !viewer || !rawUrl) return;
 
-  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
-
   let url = rawUrl;
   let title = rawTitle || 'Interactive 3D Model';
   try { url = decodeURIComponent(rawUrl); } catch(e) {}
@@ -3078,18 +3074,17 @@ function openModalByFilteredIndex(filteredIndex) {
   openModal(row, originalIndex);
 }
 
-function getRelatedExhibits(currentRow, currentOriginalIndex, limit) {
-  limit = limit || 4;
+function getRelatedExhibits(currentRow, currentOriginalIndex, limit = 4) {
   if (!rawExhibitsRows || rawExhibitsRows.length === 0) return [];
   const currentCat = getVal(currentRow, colIdx.category).toLowerCase();
   const currentEra = getEraByRow(currentRow);
   const currentEraKey = currentEra ? currentEra.short : '';
 
   const candidates = rawExhibitsRows
-    .map(function(r, idx) { return { row: r, originalIndex: idx }; })
-    .filter(function(item) { return item.originalIndex !== currentOriginalIndex; });
+    .map((r, idx) => ({ row: r, originalIndex: idx }))
+    .filter(item => item.originalIndex !== currentOriginalIndex);
 
-  candidates.forEach(function(item) {
+  candidates.forEach(item => {
     let score = 0;
     const cat = getVal(item.row, colIdx.category).toLowerCase();
     const era = getEraByRow(item.row);
@@ -3101,15 +3096,13 @@ function getRelatedExhibits(currentRow, currentOriginalIndex, limit) {
   });
 
   return candidates
-    .filter(function(item) { return item.score > 0; })
-    .sort(function(a, b) { return b.score - a.score; })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 }
 
 function openModal(row, originalIndex) {
   stopAudioGuide();
-  if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
-
   const modalContainer = document.getElementById('modalContainer');
   const modalContent = document.getElementById('modalContent');
   const counterElem = document.getElementById('modalCounter');
@@ -3123,8 +3116,8 @@ function openModal(row, originalIndex) {
   if (currentTab === 'exhibits') {
     safeReplaceState(`${window.location.pathname}#exhibit-${originalIndex}`);
     const rawContent = getVal(row, colIdx.title) || getVal(row, colIdx.id);
-    const parsed = parseTitleAndDetails(rawContent);
-    const displayTitle = parsed.title || `Exhibit Item Details`;
+    const { title, details } = parseTitleAndDetails(rawContent);
+    const displayTitle = title || `Exhibit Item Details`;
 
     const notes = getVal(row, colIdx.notes);
     const age = getVal(row, colIdx.age);
@@ -3137,12 +3130,10 @@ function openModal(row, originalIndex) {
     const ddoc = getVal(row, colIdx.doc);
     const dweb = getVal(row, colIdx.web);
     const d3d = get3DUrlForItem(row);
-    const images = getImagesForItem(row);
-    const img1 = images.img1;
-    const img2 = images.img2;
+    const { img1, img2 } = getImagesForItem(row);
     const isHot = isItemHot(row);
     const ageBadgeClass = getAgeBadgeStyle(eraDisplay);
-    const cleanedDetails = cleanDetailsForModal(parsed.details);
+    const cleanedDetails = cleanDetailsForModal(details);
     const theme = getCategoryTheme(category || type || subcategory);
 
     let latRaw = getVal(row, colIdx.lat);
@@ -3170,16 +3161,16 @@ function openModal(row, originalIndex) {
       <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800">
         <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
           <span>🏛️ Related Artifacts (${category || eraDisplay})</span>
-          <span class="text-[10px] font-normal text-slate-400">Click to explore</span>
+          <span class="text-[10px] font-normal text-slate-400">Swipe or Click to explore</span>
         </h4>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          ${relatedExhibits.map(function(rel) {
+          ${relatedExhibits.map(rel => {
             const relTitle = parseTitleAndDetails(getVal(rel.row, colIdx.title) || getVal(rel.row, colIdx.id)).title;
             const relImg = formatGoogleLh3Url(getImagesForItem(rel.row).img1, 's200') || NO_IMAGE_SVG;
             return `
-              <div onclick="window.openModalByOriginalIndex(${rel.originalIndex})" class="bg-slate-50 dark:bg-slate-900/90 rounded-xl p-2 border border-slate-200 dark:border-slate-800 hover:border-blue-500 cursor-pointer transition flex flex-col shadow-sm">
+              <div onclick="window.openModalByOriginalIndex(${rel.originalIndex})" class="bg-slate-50 dark:bg-slate-900/90 rounded-xl p-2 border border-slate-200 dark:border-slate-800 hover:border-blue-500 cursor-pointer transition flex flex-col group/rel shadow-sm">
                 <div class="h-20 w-full rounded-lg overflow-hidden bg-slate-200/80 dark:bg-slate-950 flex items-center justify-center mb-1.5">
-                  <img src="${relImg}" class="max-w-full max-h-full object-contain" onError="this.src='${NO_IMAGE_SVG}'" alt="${escapeHTML(relTitle)}" />
+                  <img src="${relImg}" class="max-w-full max-h-full object-contain group-hover/rel:scale-105 transition-transform duration-200" onError="this.src='${NO_IMAGE_SVG}'" alt="${escapeHTML(relTitle)}" />
                 </div>
                 <p class="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1 leading-tight">${escapeHTML(relTitle)}</p>
                 <span class="text-[9px] text-blue-600 dark:text-blue-400 font-extrabold mt-0.5">Explore →</span>
@@ -3191,8 +3182,7 @@ function openModal(row, originalIndex) {
     ` : '';
 
     if (modalContainer) {
-      modalContainer.style.borderColor = theme.hex;
-      modalContainer.style.borderWidth = '3px';
+      modalContainer.style.borderColor = theme.hex; modalContainer.style.borderWidth = '3px';
       modalContainer.style.backgroundColor = getSolidTint(theme.hex, isDark);
     }
 
@@ -3206,16 +3196,12 @@ function openModal(row, originalIndex) {
         nextBtn.disabled = currentModalIndex === currentFilteredRows.length - 1;
         nextBtn.classList.toggle('opacity-40', currentModalIndex === currentFilteredRows.length - 1);
       }
-    } else {
-      if (counterElem) counterElem.textContent = '';
-    }
+    } else { if (counterElem) counterElem.textContent = ''; }
 
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
-      shareBtn.onclick = function() {
-        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`).then(function() {
-          showToast('Link copied to clipboard!', '🔗');
-        });
+      shareBtn.onclick = () => {
+        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#exhibit-${originalIndex}`).then(() => showToast('Link copied to clipboard!', '🔗'));
       };
     }
 
@@ -3252,7 +3238,7 @@ function openModal(row, originalIndex) {
                   <h4 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Museum Notes</h4>
                   <div class="flex items-center gap-1">
                     <button id="btnAudioGuide" data-row="${originalIndex}" onclick="speakAudioGuide(${originalIndex})" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black transition shadow cursor-pointer">🔊 Listen</button>
-                    <select id="voiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 font-medium max-w-[100px] truncate outline-none cursor-pointer"></select>
+                    <select id="voiceSelect" class="text-[10px] bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 font-medium max-w-[100px] truncate outline-none"></select>
                   </div>
                 </div>
                 <div class="text-sm text-amber-900 dark:text-amber-200 leading-relaxed whitespace-pre-line bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-500/40 p-4 sm:p-5 rounded-2xl shadow-inner">${notes}</div>
@@ -3276,7 +3262,7 @@ function openModal(row, originalIndex) {
               <div class="relative group/model w-full">
                 <div class="flex items-center justify-between mb-2">
                   <p class="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest flex items-center gap-1">
-                    <span>👓</span> Interactive 3D Model &amp; AR
+                    <span>👓</span> Interactive 3D Model & AR
                   </p>
                   <div class="flex items-center gap-2">
                     <button id="btnToggleModalSkybox" onclick="toggleModal3DSkybox(event)" class="text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-300 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md transition border border-slate-300 dark:border-slate-700 cursor-pointer">${is3DSkyboxLight ? '🌙 Dark Sky' : '☀️ Light Sky'}</button>
@@ -3336,13 +3322,13 @@ function openModal(row, originalIndex) {
     }
 
     const btnMain = document.getElementById('btnGoogleSearchMain');
-    if (btnMain) btnMain.onclick = function() { googleItemSearch(displayTitle, category, parsed.details); };
+    if (btnMain) btnMain.onclick = () => googleItemSearch(displayTitle, category, details);
     populateVoiceDropdown();
 
     const modalViewer = document.getElementById('modal3DViewer');
     const modalScaleText = document.getElementById('modal3DScaleText');
     if (modalViewer) {
-      const updateModalDims = function() {
+      const updateModalDims = () => {
         try {
           const dims = modalViewer.getDimensions();
           if (dims && dims.x != null) {
@@ -3373,13 +3359,13 @@ function openModal(row, originalIndex) {
     const discogsUrl = getDiscogsUrl(row);
     const hasDiscogsRecording = checkIfHasRecording(row);
     const hasArchiveRecording = (getVal(row, 11) || '').toLowerCase().includes('yes');
+    const hasAnyRecording = hasDiscogsRecording || hasArchiveRecording;
     const archiveUrl = buildArchiveSearchUrl(rawTitle, catalogNum);
     const ytQuery = encodeURIComponent(`${unescapeHTML(artist)} ${unescapeHTML(rawTitle)}`.replace(/^[AB][\s\.:-]+/gi, '').trim()).replace(/%20/g, '+');
     const gramTheme = CATEGORY_PALETTE.gramophones;
 
     if (modalContainer) {
-      modalContainer.style.borderColor = gramTheme.hex;
-      modalContainer.style.borderWidth = '3px';
+      modalContainer.style.borderColor = gramTheme.hex; modalContainer.style.borderWidth = '3px';
       modalContainer.style.backgroundColor = getSolidTint(gramTheme.hex, isDark);
     }
 
@@ -3393,16 +3379,12 @@ function openModal(row, originalIndex) {
         nextBtn.disabled = currentModalIndex === currentFilteredRows.length - 1;
         nextBtn.classList.toggle('opacity-40', currentModalIndex === currentFilteredRows.length - 1);
       }
-    } else {
-      if (counterElem) counterElem.textContent = '';
-    }
+    } else { if (counterElem) counterElem.textContent = ''; }
 
     const shareBtn = document.getElementById('btnShareExhibit');
     if (shareBtn) {
-      shareBtn.onclick = function() {
-        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#gramophone-${originalIndex}`).then(function() {
-          showToast('Record link copied to clipboard!', '🔗');
-        });
+      shareBtn.onclick = () => {
+        navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#gramophone-${originalIndex}`).then(() => showToast('Record link copied to clipboard!', '🔗'));
       };
     }
 
@@ -3449,7 +3431,7 @@ function openModal(row, originalIndex) {
 
           ${hasArchiveRecording ? `<a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-2"><span>📻 Archives 78s Recording ↗</span></a>` : ''}
 
-          ${!hasDiscogsRecording && !hasArchiveRecording ? `
+          ${!hasAnyRecording ? `
             <a href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener noreferrer" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5"><span>🎵 Search YouTube ↗</span></a>
             <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer" class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5" title="Search the 78 RPM Collection on Internet Archive"><span>📻 Search Archive 78s ↗</span></a>` : ''}
         </div>`;
@@ -3500,7 +3482,7 @@ window.stopAudioGuide = stopAudioGuide;
 window.toggleModal3DSkybox = toggleModal3DSkybox;
 window.togglePoppyMotion = togglePoppyMotion;
 
-function initApp() {
+document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('brandLogoLink')?.addEventListener('click', (e) => { e.preventDefault(); browseAllExhibits(); });
   document.getElementById('btnBrowseAllHeader')?.addEventListener('click', browseAllExhibits);
   document.getElementById('btnBrowseAllPrompt')?.addEventListener('click', browseAllExhibits);
@@ -3652,7 +3634,7 @@ function initApp() {
 
     if (e.key === 'Escape') {
       hideSearchSuggestions();
-      if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
+      if (typeof window.closeExploreDropdown === 'function') window.closeExploreDropdown();
       if (compareModal && !compareModal.classList.contains('hidden')) { closeCompareModal(); return; }
       if (enlargeModal && !enlargeModal.classList.contains('hidden')) { closeEnlargeModal(); return; }
       if (lightbox && !lightbox.classList.contains('hidden')) { close3DLightbox(); return; }
@@ -3685,7 +3667,6 @@ function initApp() {
       if (typeof closeEnlargeModal === 'function') closeEnlargeModal();
       if (typeof close3DLightbox === 'function') close3DLightbox();
       if (typeof closeCompareModal === 'function') closeCompareModal();
-      if (typeof window.closeBMMCDrawer === 'function') window.closeBMMCDrawer();
       if (exhibitNum !== undefined && exhibitNum !== null) {
         openModalByOriginalIndex(Number(exhibitNum));
       }
@@ -3693,10 +3674,4 @@ function initApp() {
   });
 
   loadCatalogData();
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}
+});
