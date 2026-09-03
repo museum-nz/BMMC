@@ -31,9 +31,9 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>">
 
   <!-- Leaflet CSS & MarkerCluster with CDN Fallbacks -->
-  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='../vendor/leaflet/leaflet.css';" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='../vendor/leaflet/MarkerCluster.css';" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='../vendor/leaflet/MarkerCluster.Default.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';" />
 
   <!-- Master Stylesheet -->
   <link rel="stylesheet" href="styles.css">
@@ -633,7 +633,7 @@
   <script src="../vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.L || !window.L.markerClusterGroup) {
-      document.write('<script src="../vendor/leaflet/markercluster.js"><\/script>');
+      document.write('<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"><\/script>');
     }
   </script>
 
