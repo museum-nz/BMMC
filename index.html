@@ -33,6 +33,11 @@
   <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
   <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
   <script>
+    if (!window.tailwind) {
+      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    }
+  </script>
+  <script>
     if (window.tailwind) {
       tailwind.config = {
         darkMode: 'class',
@@ -56,14 +61,36 @@
   <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Core Libraries -->
+  <!-- Core Libraries with Local & CDN Fallbacks -->
   <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
   <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+    }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+
   <script defer src="../vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
   <script defer src="vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.Chart) {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        document.head.appendChild(s);
+      }
+    });
+  </script>
+
   <script type="module" src="../vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
   <script type="module" src="vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
+  <script type="module">
+    if (!customElements.get('model-viewer')) {
+      import('https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js');
+    }
+  </script>
 
   <!-- Offline Media Adapter -->
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
