@@ -1117,58 +1117,54 @@
       initSliders();
     }
 
-    async function loadDataset() {
-      let csvText = null;
-      let usedCache = false;
+    async function fetchFirstValidCsv(candidates) {
+      for (const url of candidates) {
+        if (!url) continue;
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const text = await res.text();
+            if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+              return text;
+            }
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
 
-      // 1. Try Cache
+    async function loadDataset() {
       try {
         const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
         if (cachedText && cachedText.trim().length > 50) {
-          csvText = cachedText;
-          usedCache = true;
-          parseCSVData(csvText);
+          parseCSVData(cachedText);
         }
       } catch (cacheErr) {}
 
-      // 2. Try Local Candidate Paths
-      if (!csvText) {
-        for (const path of LOCAL_CSV_CANDIDATES) {
-          try {
-            const resLocal = await fetch(path);
-            if (resLocal.ok) {
-              const text = await resLocal.text();
-              if (text && text.trim().length > 50) {
-                csvText = text;
-                parseCSVData(csvText);
-                try { localStorage.setItem(CACHE_STORAGE_KEY, csvText); } catch (e) {}
-                break;
-              }
-            }
-          } catch (e) {}
-        }
+      const candidateUrls = [
+        './data/nz_history.csv',
+        'data/nz_history.csv',
+        '../data/nz_history.csv',
+        './nz_history.csv',
+        'nz_history.csv',
+        'https://raw.githubusercontent.com/museum-nz/BMMC/main/data/nz_history.csv',
+        'https://raw.githubusercontent.com/museum-nz/BMMC/master/data/nz_history.csv',
+        LIVE_CSV_URL,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`
+      ];
+
+      const csvText = await fetchFirstValidCsv(candidateUrls);
+
+      if (csvText) {
+        try { localStorage.setItem(CACHE_STORAGE_KEY, csvText); } catch (e) {}
+        parseCSVData(csvText);
+        return;
       }
 
-      // 3. Try Remote Google Sheet
-      try {
-        const res = await fetch(LIVE_CSV_URL);
-        if (res.ok) {
-          const fetchedText = await res.text();
-          if (fetchedText && fetchedText.trim().length > 50) {
-            csvText = fetchedText;
-            try { localStorage.setItem(CACHE_STORAGE_KEY, fetchedText); } catch (e) {}
-            parseCSVData(csvText);
-            return;
-          }
-        }
-      } catch (networkErr) {
-        console.warn('Live Google Sheet fetch failed:', networkErr);
-      }
-
-      if (!csvText || csvText.trim().length < 50) {
-        document.getElementById('itemCountBadge').textContent = 'Offline';
-        document.getElementById('yearRangeText').textContent = 'Data Offline';
-      }
+      document.getElementById('itemCountBadge').textContent = 'Offline';
+      document.getElementById('yearRangeText').textContent = 'Data Offline';
+    }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

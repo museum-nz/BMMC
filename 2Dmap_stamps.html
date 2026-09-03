@@ -1077,6 +1077,22 @@
       }
     }
 
+    async function fetchFirstValidCsv(candidates) {
+      for (const url of candidates) {
+        if (!url) continue;
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const text = await res.text();
+            if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+              return text;
+            }
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
     async function loadData() {
       try {
         const cachedRaw = localStorage.getItem('bMMC_cached_stamps');
@@ -1089,34 +1105,29 @@
         }
       } catch (e) {}
 
-      // Try local candidate paths
-      for (const path of LOCAL_CSV_CANDIDATES) {
-        try {
-          const resLocal = await fetch(path);
-          if (resLocal.ok) {
-            const csvText = await resLocal.text();
-            const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-            if (parsed.data && parsed.data.length > 0) {
-              processStampData(parsed.data);
-              return;
-            }
-          }
-        } catch (e) {}
-      }
+      const candidateUrls = [
+        './data/stamps-data.csv',
+        'data/stamps-data.csv',
+        '../data/stamps-data.csv',
+        './stamps-data.csv',
+        'stamps-data.csv',
+        'https://raw.githubusercontent.com/museum-nz/BMMC/main/data/stamps-data.csv',
+        'https://raw.githubusercontent.com/museum-nz/BMMC/master/data/stamps-data.csv',
+        REMOTE_STAMPS_CSV_URL,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(REMOTE_STAMPS_CSV_URL)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(REMOTE_STAMPS_CSV_URL)}`
+      ];
 
-      // Try remote Google Sheet
-      try {
-        const res = await fetch(REMOTE_STAMPS_CSV_URL);
-        if (res.ok) {
-          const csvText = await res.text();
-          const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-          if (parsed.data && parsed.data.length > 0) {
-            try { localStorage.setItem('bMMC_cached_stamps', JSON.stringify(parsed.data)); } catch (e) {}
-            processStampData(parsed.data);
-            return;
-          }
+      const csvText = await fetchFirstValidCsv(candidateUrls);
+
+      if (csvText) {
+        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+        if (parsed.data && parsed.data.length > 0) {
+          try { localStorage.setItem('bMMC_cached_stamps', JSON.stringify(parsed.data)); } catch (e) {}
+          processStampData(parsed.data);
+          return;
         }
-      } catch (e) {}
+      }
 
       document.getElementById('itemCountBadge').textContent = 'Offline';
     }
