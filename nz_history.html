@@ -1,18 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="offline-adapter.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aotearoa NZ History &amp; Colonization Map — BMMC</title>
 
-  <!-- Leaflet & Plugins CSS -->
-  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" />
+  <!-- Instant Theme Sync -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('theme') || localStorage.getItem('bMMC_theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Preconnect for Tile & CDN Performance -->
+  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+  <!-- Inline Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📜</text></svg>">
+
+  <!-- Leaflet & Plugins CSS with CDN Fallbacks -->
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';" />
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';" />
 
   <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Offline Media Adapter -->
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <style>
     body {
@@ -288,14 +313,14 @@
       <!-- Universal Navigation Drawer Trigger (Hamburger) -->
       <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
         <span class="text-sm leading-none">☰</span>
-        <span>Wings</span>
+        <span class="hidden-xs">Wings</span>
       </button>
 
       <!-- Search Input -->
       <div class="map-search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="mapSearchInput" placeholder="Search events, ships..." aria-label="Search NZ History">
-        <button id="clearMapSearch" class="clear-search-btn">✕</button>
+        <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
       </div>
 
       <!-- Basemap Switcher -->
@@ -312,15 +337,20 @@
       </div>
 
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
-        <span>🇳🇿</span> <span>Fit NZ</span>
+        <span>🇳🇿</span> <span class="hidden-xs">Fit NZ</span>
       </button>
+      
       <button id="btnResetView" class="top-action-btn" title="Reset View &amp; Timeline">
-        <span>↺</span> <span>Reset</span>
+        <span>↺</span> <span class="hidden-xs">Reset</span>
+      </button>
+
+      <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
+        <span id="fullscreenIcon">⛶</span>
       </button>
 
       <!-- Museum Pill Link -->
-      <a href="index.html" class="top-action-btn museum-pill-btn" title="Back to Museum Gallery">
-        <span>🏛️</span> <span>Museum</span>
+      <a href="index.html" class="top-action-btn museum-pill-btn" title="Back to Museum Showcase">
+        <span>🏛️</span> <span class="hidden-xs">Museum</span>
       </a>
     </div>
 
@@ -341,7 +371,7 @@
   <div class="year-slider-container">
     <div class="year-slider-header">
       <div class="timeline-title-group">
-        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play timeline starting from 1800">▶</button>
+        <button id="btnPlayTimeline" class="btn-timeline-play" title="Play timeline starting from 1800" aria-label="Play timeline">▶</button>
         <span>Timeline</span>
         <span id="itemCountBadge" class="item-counter-badge">Loading...</span>
       </div>
@@ -350,18 +380,30 @@
     <div class="dual-slider-track-wrapper">
       <div class="slider-track-bg"></div>
       <div class="slider-track-fill" id="sliderTrackFill"></div>
-      <input type="range" id="minYearSlider" min="1280" max="2026" value="1280" step="1">
-      <input type="range" id="maxYearSlider" min="1280" max="2026" value="2026" step="1">
+      <input type="range" id="minYearSlider" min="1280" max="2026" value="1280" step="1" aria-label="Minimum Year Filter">
+      <input type="range" id="maxYearSlider" min="1280" max="2026" value="2026" step="1" aria-label="Maximum Year Filter">
     </div>
   </div>
 
   <!-- Universal Navigation Drawer Script -->
   <script src="shared-nav.js"></script>
 
-  <!-- External Leaflet & Parsing Libraries -->
-  <script src="../vendor/leaflet/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Leaflet, MarkerCluster & PapaParse with Guaranteed CDN Fallbacks -->
+  <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.L) {
+      document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+    }
+  </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="../vendor/leaflet/markercluster.js"></script>
+
+  <script src="../vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.L || !window.L.markerClusterGroup) {
+      document.write('<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"><\/script>');
+    }
+  </script>
 
   <script>
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1659493611&single=true&output=csv';
@@ -716,6 +758,16 @@
       }
     }
 
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fullscreenIcon').textContent = '🗗';
+      } else {
+        document.exitFullscreen().catch(() => {});
+        document.getElementById('fullscreenIcon').textContent = '⛶';
+      }
+    }
+
     function initSliders() {
       const years = allEvents.map(e => e.year).filter(y => !isNaN(y));
       if (years.length === 0) return;
@@ -852,6 +904,8 @@
         map.setView(NZ_CENTER, NZ_ZOOM);
         filterEvents();
       });
+
+      document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
 
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');

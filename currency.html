@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
   <meta name="referrer" content="no-referrer-when-downgrade" />
@@ -21,16 +20,24 @@
     })();
   </script>
 
-  <!-- Preconnects -->
+  <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="../vendor/tailwind.js" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
 
-  <!-- Tailwind CSS Play CDN with Class-Based Dark Mode -->
-  <script src="../vendor/tailwind.js"></script>
+  <!-- Tailwind CSS Engine with Local & CDN Fallbacks -->
+  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.tailwind) {
+      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    }
+  </script>
   <script>
     if (window.tailwind) {
       tailwind.config = {
@@ -52,84 +59,91 @@
     }
   </script>
 
-  <!-- Fallback Local Tailwind -->
-  <script>
-    if (!window.tailwind) {
-      document.write('<script src="vendor/tailwind.js"><\/script><script src="../vendor/tailwind.js"><\/script>');
-    }
-  </script>
+  <!-- Master Unified Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 
-  <!-- PapaParse for CSV Parsing -->
-  <script src="../vendor/papaparse.min.js"></script>
+  <!-- Core Libraries with Local & CDN Fallbacks -->
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.Papa) {
-      document.write('<script src="vendor/papaparse.min.js"><\/script><script src="../vendor/papaparse.min.js"><\/script>');
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
     }
   </script>
 
-  <!-- Chart.js for Analytics Visualisations -->
-  <script src="../vendor/chart.umd.min.js"></script>
+  <script defer src="../vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
+  <script defer src="vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
   <script>
-    if (!window.Chart) {
-      document.write('<script src="vendor/chart.umd.min.js"><\/script><script src="../vendor/chart.umd.min.js"><\/script>');
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.Chart) {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        document.head.appendChild(s);
+      }
+    });
   </script>
 
-  <!-- Master Unified Stylesheet (Replaces redundant inline CSS) -->
-  <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
+  <!-- Offline Media Adapter -->
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 </head>
-<body class="flex flex-col antialiased relative overflow-x-hidden">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
-  <!-- Header -->
-  <header id="mainHeader" class="solid-header border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5">
+  <!-- Ambient Sky Background -->
+  <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
+    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
+  </div>
+
+  <!-- Header Section with Universal Navigation -->
+  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       
       <!-- Top Bar -->
       <div class="flex items-center justify-between gap-2">
-        <a href="index.html" class="group flex items-center gap-2 shrink-0">
-          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow">🪙</span>
+        <a href="index.html" id="brandLogoLink" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0">
+          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🪙</span>
           <div class="leading-none">
-            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 dark:from-amber-400 dark:via-yellow-300 dark:to-amber-200 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
-              New Zealand Currency &amp; Minting Database
+            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 dark:from-amber-400 dark:via-yellow-300 dark:to-amber-200 bg-clip-text text-transparent tracking-tight whitespace-nowrap" id="headerTitleText">
+              NZ Currency Database
             </h1>
-            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-500 dark:text-slate-400 hidden sm:block">Complete numismatic records (1933–2026)</p>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-500 dark:text-slate-400 hidden sm:block">Numismatic Records (1933–2026)</p>
           </div>
         </a>
         
-        <div class="flex items-center gap-1.5 flex-nowrap">
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           <!-- Universal Navigation Drawer Trigger (Hamburger) -->
-          <button class="btn-bmmc-menu-trigger flex items-center gap-1 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
+          <button class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
             <span class="text-sm leading-none">☰</span>
             <span class="hidden sm:inline">Wings</span>
           </button>
 
           <!-- View Switcher -->
           <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button id="viewTabCatalogue" onclick="switchViewMode('catalogue')" class="px-2.5 sm:px-3 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer">
-              🏛️ Specimen
+            <button id="viewTabCatalogue" onclick="switchViewMode('catalogue')" class="px-2 sm:px-2.5 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer">
+              🏛️ <span class="hidden sm:inline">Specimen</span>
             </button>
-            <button id="viewTabGallery" onclick="switchViewMode('gallery')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
-              🖼️ Gallery
+            <button id="viewTabGallery" onclick="switchViewMode('gallery')" class="px-2 sm:px-2.5 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+              🖼️ <span class="hidden sm:inline">Gallery</span>
             </button>
-            <button id="viewTabStats" onclick="switchViewMode('stats')" class="px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
-              📊 Analytics
+            <button id="viewTabStats" onclick="switchViewMode('stats')" class="px-2 sm:px-2.5 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+              📊 <span class="hidden sm:inline">Analytics</span>
             </button>
           </div>
 
-          <button id="btnSurprise" title="Surprise Me" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
-            <span>✨</span> <span class="hidden sm:inline">Surprise</span>
+          <button id="btnSurprise" title="Surprise Me (Random Coin or Note)" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
+            <span>✨</span> <span class="hidden lg:inline">Surprise</span>
           </button>
 
-          <a href="index.html" title="Back to Main Museum" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
+          <a href="index.html" title="Back to Main Museum" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
             <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
           </a>
 
-          <!-- Day/Night Mode & Controls Toggle -->
-          <div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 shadow-sm divide-x divide-slate-200 dark:divide-slate-700 shrink-0">
-            <button id="btnThemeToggle" title="Toggle Day/Night Mode" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1 rounded-lg transition cursor-pointer">
+          <!-- Utility Pill Cluster -->
+          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
+            <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
+              <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
-            <button id="toggleControlsBtn" title="Toggle Controls" class="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
+            <button id="toggleControlsBtn" title="Toggle Controls" aria-label="Toggle Controls" class="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
               </svg>
@@ -258,9 +272,7 @@
       </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- SECTION A: SPECIMEN CATALOGUE VIEW                                       -->
-    <!-- ========================================================================= -->
+    <!-- SECTION A: SPECIMEN CATALOGUE VIEW -->
     <div id="catalogueViewContainer" class="space-y-8">
       
       <!-- Historical Context & 1967 Decimal Converter Calculator -->
@@ -609,9 +621,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- SECTION B: VISUAL GALLERY VIEW                                            -->
-    <!-- ========================================================================= -->
+    <!-- SECTION B: VISUAL GALLERY VIEW -->
     <div id="galleryViewContainer" class="hidden space-y-8">
       
       <!-- Coins Gallery Section (6 Columns) -->
@@ -646,9 +656,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- SECTION C: STATISTICAL ANALYTICS DASHBOARD VIEW                          -->
-    <!-- ========================================================================= -->
+    <!-- SECTION C: STATISTICAL ANALYTICS DASHBOARD VIEW -->
     <div id="statsViewContainer" class="hidden space-y-8">
       
       <!-- Key KPI Stat Cards -->
@@ -759,13 +767,13 @@
             </div>
             
             <div class="flex items-center gap-1">
-              <button onclick="setMintageExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1935</button>
-              <button onclick="setMintageExplorerYear(1940)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1940</button>
-              <button onclick="setMintageExplorerYear(1966)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1966</button>
-              <button onclick="setMintageExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1967</button>
-              <button onclick="setMintageExplorerYear(1977)" class="px-2 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-black transition">1977</button>
-              <button onclick="setMintageExplorerYear(1990)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1990</button>
-              <button onclick="setMintageExplorerYear(2006)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">2006</button>
+              <button onclick="setMintageExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1935</button>
+              <button onclick="setMintageExplorerYear(1940)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1940</button>
+              <button onclick="setMintageExplorerYear(1966)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1966</button>
+              <button onclick="setMintageExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1967</button>
+              <button onclick="setMintageExplorerYear(1977)" class="px-2 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-black transition cursor-pointer">1977</button>
+              <button onclick="setMintageExplorerYear(1990)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1990</button>
+              <button onclick="setMintageExplorerYear(2006)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2006</button>
             </div>
           </div>
         </div>
@@ -801,14 +809,14 @@
             </div>
             
             <div class="flex items-center gap-1">
-              <button onclick="setF3ExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1935</button>
-              <button onclick="setF3ExplorerYear(1945)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1945</button>
-              <button onclick="setF3ExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1967</button>
-              <button onclick="setF3ExplorerYear(1968)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1968</button>
-              <button onclick="setF3ExplorerYear(1977)" class="px-2 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black transition">1977</button>
-              <button onclick="setF3ExplorerYear(1990)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">1990</button>
-              <button onclick="setF3ExplorerYear(2000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">2000</button>
-              <button onclick="setF3ExplorerYear(2026)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition">2026</button>
+              <button onclick="setF3ExplorerYear(1935)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1935</button>
+              <button onclick="setF3ExplorerYear(1945)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1945</button>
+              <button onclick="setF3ExplorerYear(1967)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1967</button>
+              <button onclick="setF3ExplorerYear(1968)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1968</button>
+              <button onclick="setF3ExplorerYear(1977)" class="px-2 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black transition cursor-pointer">1977</button>
+              <button onclick="setF3ExplorerYear(1990)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">1990</button>
+              <button onclick="setF3ExplorerYear(2000)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2000</button>
+              <button onclick="setF3ExplorerYear(2026)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition cursor-pointer">2026</button>
             </div>
           </div>
         </div>
@@ -1472,7 +1480,7 @@
           if (rawRear && rawRear.length > 5) noteCardsHtml.push(renderGalleryItemCard(item, 'reverse', rawRear, true));
         } else {
           if (rawFront) coinCardsHtml.push(renderGalleryItemCard(item, 'obverse', rawFront, false));
-          if (rawRear && rawRear.length > 5) coinCardsHtml.push(renderGalleryItemCard(item, 'reverse', rawRear, false));
+          if (rawRear && rawRear.length > 5) noteCardsHtml.push(renderGalleryItemCard(item, 'reverse', rawRear, false));
         }
       });
 
@@ -2097,7 +2105,6 @@
       const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
 
       if (window.Chart) {
-        // Chart 1: Pre-Decimal
         const ctxPre = document.getElementById('chartPreDecimalDenoms')?.getContext('2d');
         if (ctxPre) {
           if (chartPreDecInst) chartPreDecInst.destroy();
@@ -2124,7 +2131,6 @@
           });
         }
 
-        // Chart 2: Decimal
         const ctxDec = document.getElementById('chartDecimalDenoms')?.getContext('2d');
         if (ctxDec) {
           if (chartDecInst) chartDecInst.destroy();
@@ -2151,7 +2157,6 @@
           });
         }
 
-        // Chart 3: Banknote Governor Runs
         const ctxGov = document.getElementById('chartGovernorRuns')?.getContext('2d');
         if (ctxGov) {
           if (chartGovInst) chartGovInst.destroy();
@@ -2175,7 +2180,6 @@
           });
         }
 
-        // Chart 4: Circulation Trend
         const ctxCirc = document.getElementById('chartCirculationTrend')?.getContext('2d');
         if (ctxCirc) {
           if (chartCircInst) chartCircInst.destroy();
@@ -2258,7 +2262,6 @@
       }
     }
 
-    // Multi-Tier Fetch Engine
     async function fetchPublishedSheet(url) {
       const targetUrl = url || CURRENCY_CSV_URL;
 
@@ -2314,7 +2317,6 @@
 
       let text = '';
 
-      // 1. Instant Cache Load
       try {
         const cached = localStorage.getItem(CACHE_KEY_RAW);
         if (cached && (cached.includes('SECTION_') || cached.includes('Denomination') || cached.includes('pre_halfpenny'))) {
@@ -2324,7 +2326,6 @@
         }
       } catch (e) {}
 
-      // 2. Try Local Files in Repo
       if (!text) {
         const localCandidates = ['currency.csv', './currency.csv', 'data/currency.csv', './data/currency.csv', '../data/currency.csv', '../currency.csv'];
         for (const p of localCandidates) {
@@ -2343,7 +2344,6 @@
         }
       }
 
-      // 3. Connect to live Google Sheet in background
       const onlineResult = await fetchPublishedSheet(CURRENCY_CSV_URL);
       if (onlineResult.success && onlineResult.text) {
         text = onlineResult.text;

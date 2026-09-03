@@ -19,10 +19,10 @@
     })();
   </script>
 
-  <!-- Clean Content Security Policy -->
+  <!-- Content Security Policy with CDN Support -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self' 'unsafe-inline';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.dropboxusercontent.com https://*.dropbox.com;
     media-src 'self' blob: https://www.dropbox.com https://*.dropbox.com https://*.dropboxusercontent.com;
@@ -30,25 +30,26 @@
     font-src 'self' https://fonts.gstatic.com data:;
   ">
 
-  <!-- Preconnect for Image & Media CDN -->
+  <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://drive.google.com" crossorigin>
   <link rel="preconnect" href="https://www.dropbox.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 
-  <!-- Offline Media Adapter -->
-  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
-
-  <!-- PapaParse -->
-  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;this.src='../vendor/papaparse.min.js';"></script>
-
-  <!-- Tailwind CSS Engine -->
-  <script src="../vendor/tailwind.js" onerror="this.onerror=null;this.src='../vendor/tailwind.js';"></script>
+  <!-- Tailwind CSS Engine with Local & CDN Fallbacks -->
+  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.tailwind) {
+      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    }
+  </script>
   <script>
     if (window.tailwind) {
       tailwind.config = {
@@ -72,6 +73,18 @@
 
   <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Core Libraries with Local & CDN Fallbacks -->
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Offline Media Adapter -->
+  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 </head>
 
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
@@ -81,7 +94,7 @@
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
 
-  <!-- Header Section -->
+  <!-- Header Section with Universal Navigation -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       
@@ -89,21 +102,21 @@
       <div class="flex items-center justify-between gap-2">
         
         <!-- Branding -->
-        <a href="index.html" title="Return to Main Museum Showcase" class="group flex items-center gap-2 shrink-0">
-          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow">📷</span>
+        <a href="index.html" id="brandLogoLink" title="Return to Main Museum Showcase" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0">
+          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">📷</span>
           <div class="leading-none">
-            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap" id="headerTitleText">
               BMMC Photo Archives
             </h1>
-            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Gallery Wing</p>
+            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Historical Photographic Gallery</p>
           </div>
         </a>
         
-        <!-- Action Buttons Bar -->
+        <!-- Action Buttons Cluster -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
           
           <!-- Universal Navigation Drawer Trigger (Hamburger) -->
-          <button class="btn-bmmc-menu-trigger flex items-center gap-1 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
+          <button class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
             <span class="text-sm leading-none">☰</span>
             <span class="hidden sm:inline">Wings</span>
           </button>
@@ -113,23 +126,27 @@
             <span>✨</span> <span class="hidden lg:inline">Surprise</span>
           </button>
 
-          <!-- Museum Link -->
+          <!-- Main Museum Link -->
           <a href="index.html" title="Browse Museum Main Showcase" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span>🏛️</span> <span class="hidden sm:inline">Museum</span>
           </a>
 
           <!-- Utility Pill Cluster -->
           <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
+            
+            <!-- Saved Favorites -->
             <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="favHeartIcon">🤍</span>
               <span id="favCountText" class="text-[10px] sm:text-[11px]">0</span>
             </button>
 
+            <!-- Theme Toggle -->
             <button id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme" class="flex items-center justify-center text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <span id="themeToggleIcon">☀️</span>
               <span id="themeToggleText" class="sr-only">Mode</span>
             </button>
 
+            <!-- Filter Controls Toggle -->
             <button id="toggleControlsBtn" title="Toggle Search &amp; Filters" aria-label="Toggle Search &amp; Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
               <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -567,7 +584,7 @@
   <!-- Universal BMMC Navigation Drawer Script -->
   <script src="shared-nav.js"></script>
 
-  <!-- Main JavaScript Engine -->
+  <!-- Main Gallery Logic -->
   <script>
     const GALLERY_CSV_URL = 'https://docs.google.com/spreadsheets/d/1U3V1JIatKpTOyAHEMnscs0mdZ4vDNf4C7eX_fuUbj_s/gviz/tq?tqx=out:csv&headers=0&gid=1741478537';
     const CACHE_KEY_GALLERY = 'bMMC_cached_gallery_raw';
@@ -615,19 +632,13 @@
       if (clean.startsWith('./') || clean.startsWith('../') || clean.startsWith('media/') || clean.startsWith('data:image/') || clean.startsWith('index.html')) {
         return clean;
       }
-      if (/^https?:\/\//i.test(clean)) {
-        return clean;
-      }
-      if (!clean.includes(':')) {
-        return `https://${clean}`;
-      }
+      if (/^https?:\/\//i.test(clean)) return clean;
+      if (!clean.includes(':')) return `https://${clean}`;
       return clean;
     }
 
     function safeReplaceState(urlStr) {
-      try {
-        window.history.replaceState(null, '', urlStr);
-      } catch (e) {}
+      try { window.history.replaceState(null, '', urlStr); } catch (e) {}
     }
 
     function toggleCollapsibleControls(show) {
@@ -1267,7 +1278,7 @@
           
           const labelText = document.createTextNode(p.label + ' ');
           const btn = document.createElement('button');
-          btn.className = 'hover:text-red-500 font-bold ml-0.5';
+          btn.className = 'hover:text-red-500 font-bold ml-0.5 cursor-pointer';
           btn.setAttribute('aria-label', 'Remove filter');
           btn.textContent = '✕';
           btn.addEventListener('click', p.clear);
