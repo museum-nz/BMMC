@@ -19,7 +19,7 @@
       items: [
         { href: 'currency.html', icon: '🪙', label: 'NZ Currency & Minting', desc: '1933–2026 coins, banknotes & RBNZ Table F3 metrics' },
         { href: 'stamps.html', icon: '📮', label: 'NZ Stamp Archive (StampsNZ)', desc: 'Comprehensive philatelic catalog & valuations' },
-        { href: '2Dmap_stamps.html', icon: '🗺️', label: 'Philatelic Photo Map', desc: 'Geographic 2D map of NZ stamps by issue location' }
+        { href: '2Dmap_stamps.html', icon: '🗺️', label: 'Philatelic Photo Map', desc: 'Geographic 2D map of NZ stamps by issue location' },
         { href: 'nz_history.html', icon: '📜', label: 'Aotearoa NZ History Map', desc: 'Interactive colonial timeline, ships & battles' },
         { href: 'gallery.html', icon: '📷', label: 'Historical Photo Archives', desc: 'Historic photography & Alan Starling WWII oral history' }
       ]
