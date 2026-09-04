@@ -1,40 +1,95 @@
-// shared-nav.js — BMMC Universal Navigation Drawer (Safe & Non-Intrusive)
+// shared-nav.js — BMMC Universal Navigation Drawer (Safe, Resilient & Hierarchical)
 (function() {
   'use strict';
 
-  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-
+  // 1. Navigation Directory Definition
   const BMMC_BRANCHES = [
     {
       group: "Primary Museum Wings",
       items: [
-        { href: 'index.html', icon: '🏛️', label: 'Museum Showcase & Catalog', desc: 'Main artifact exhibition, 3D models & gramophones' },
-        { href: 'index.html#stats', icon: '📊', label: 'Museum Insights & Analytics', desc: 'Chronological charts & artifact distribution' },
-        { href: '2Dmap.html', icon: '🌍', label: 'Museum Artifact Origin Map', desc: 'Global manufacturing locations & timeline' },
-        { href: 'restoration-guide.html', icon: '🛠️', label: 'Artifact Care & Restoration', desc: 'Workshop guide for metals, timber, leather & finishes' }
+        { 
+          href: 'index.html', 
+          icon: '🏛️', 
+          label: 'Museum Showcase & Catalog', 
+          desc: 'Main artifact exhibition, 3D models & gramophones' 
+        },
+        { 
+          href: 'index.html#stats', 
+          icon: '📊', 
+          label: 'Museum Insights & Analytics', 
+          desc: 'Chronological charts & artifact distribution' 
+        },
+        { 
+          href: '2Dmap.html', 
+          icon: '🌍', 
+          label: 'Museum Artifact Origin Map', 
+          desc: 'Global manufacturing locations & timeline' 
+        },
+        { 
+          href: 'restoration-guide.html', 
+          icon: '🛠️', 
+          label: 'Artifact Care & Restoration', 
+          desc: 'Workshop guide for metals, timber, leather & finishes' 
+        }
       ]
     },
     {
       group: "Specialist Databases & Archives",
       items: [
-        { href: 'currency.html', icon: '🪙', label: 'NZ Currency & Minting', desc: '1933–2026 coins, banknotes & RBNZ Table F3 metrics' },
-        { href: 'stamps.html', icon: '📮', label: 'NZ Stamp Archive (StampsNZ)', desc: 'Comprehensive philatelic catalog & valuations' },
-        { href: '2Dmap_stamps.html', icon: '🗺️', label: 'Philatelic Photo Map', desc: 'Geographic 2D map of NZ stamps by issue location' },
-        { href: 'nz_history.html', icon: '📜', label: 'Aotearoa NZ History Map', desc: 'Interactive colonial timeline, ships & battles' },
-        { href: 'gallery.html', icon: '📷', label: 'Historical Photo Archives', desc: 'Historic photography & Alan Starling WWII oral history' }
+        { 
+          href: 'currency.html', 
+          icon: '🪙', 
+          label: 'NZ Currency & Minting', 
+          desc: '1933–2026 coins, banknotes & RBNZ Table F3 metrics' 
+        },
+        { 
+          href: 'stamps.html', 
+          icon: '📮', 
+          label: 'NZ Stamp Archive (StampsNZ)', 
+          desc: 'Comprehensive philatelic catalog & valuations',
+          // Nested child section (indented under stamps)
+          children: [
+            { 
+              href: '2Dmap_stamps.html', 
+              icon: '🗺️', 
+              label: 'Philatelic Photo Map', 
+              desc: 'Geographic 2D map of NZ stamps by issue location' 
+            }
+          ]
+        },
+        { 
+          href: 'nz_history.html', 
+          icon: '📜', 
+          label: 'Aotearoa NZ History Map', 
+          desc: 'Interactive colonial timeline, ships & battles' 
+        },
+        { 
+          href: 'gallery.html', 
+          icon: '📷', 
+          label: 'Historical Photo Archives', 
+          desc: 'Historic photography & Alan Starling WWII oral history' 
+        }
       ]
     }
   ];
 
-  function isLinkActive(href) {
-    const cleanHref = href.split('#')[0];
-    const cleanCurrent = currentPath.split('#')[0] || 'index.html';
-    if (href.includes('#')) {
-      return (cleanCurrent === cleanHref || (cleanCurrent === '' && cleanHref === 'index.html')) && window.location.hash === '#' + href.split('#')[1];
-    }
-    return (cleanCurrent === cleanHref || (cleanCurrent === '' && cleanHref === 'index.html')) && !window.location.hash;
+  // 2. Active Link Matching
+  function getCleanCurrentPath() {
+    return (window.location.pathname.split('/').pop() || 'index.html').split('#')[0];
   }
 
+  function isLinkActive(href) {
+    if (!href) return false;
+    const currentPath = getCleanCurrentPath();
+    const cleanHref = href.split('#')[0];
+    if (href.includes('#')) {
+      return (currentPath === cleanHref || (!currentPath && cleanHref === 'index.html')) &&
+             window.location.hash === '#' + href.split('#')[1];
+    }
+    return (currentPath === cleanHref || (!currentPath && cleanHref === 'index.html')) && !window.location.hash;
+  }
+
+  // 3. Universal Notification Toast
   function showToast(msg, icon) {
     icon = icon || '✨';
     try {
@@ -54,8 +109,65 @@
   }
   window.showBMMCToast = showToast;
 
+  // 4. Recursive Item Renderer (Supports infinite nesting and indentation)
+  function renderMenuItem(item, depth) {
+    depth = depth || 0;
+    const isChild = depth > 0;
+    const href = item.href || '#';
+    const active = isLinkActive(href);
+
+    // Dynamic tree-indentation styling
+    const indentStyles = isChild
+      ? `margin-left:${16 * depth}px; padding-left:10px; border-left:2px solid #e2e8f0;`
+      : '';
+
+    let html = `
+      <a href="${href}" class="bmmc-drawer-link ${active ? 'active' : ''}" style="display:flex;align-items:center;gap:10px;padding:${isChild ? '7px 10px' : '9px 12px'};border-radius:8px;text-decoration:none;margin-bottom:2px;${indentStyles}${active ? 'background:rgba(2,132,199,0.12);border-left:3px solid #0284c7;' : ''}">
+        <span style="font-size:${isChild ? '16px' : '20px'};line-height:1;flex-shrink:0;">${item.icon || '📁'}</span>
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:${isChild ? '11.5px' : '12px'};font-weight:800;color:${active ? '#0284c7' : '#1e293b'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" class="dark:text-white">
+            ${item.label || 'Link'}
+          </div>
+          ${item.desc ? `<div style="font-size:9.5px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${item.desc}</div>` : ''}
+        </div>
+      </a>
+    `;
+
+    // Process nested children recursively
+    if (Array.isArray(item.children) && item.children.length > 0) {
+      html += `<div class="bmmc-drawer-subgroup" style="margin-top:2px;margin-bottom:4px;">`;
+      html += item.children.map(child => renderMenuItem(child, depth + 1)).join('');
+      html += `</div>`;
+    }
+
+    return html;
+  }
+
+  // 5. Menu HTML Generator with Safety Guard
+  function generateMenuItemsHTML() {
+    try {
+      if (!Array.isArray(BMMC_BRANCHES)) throw new Error('BMMC_BRANCHES is not an array');
+      return BMMC_BRANCHES.map(section => {
+        const groupTitle = section.group || 'Menu';
+        const items = Array.isArray(section.items) ? section.items : [];
+        return `
+          <div style="margin-bottom:16px;">
+            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;padding:4px 8px 6px;">${groupTitle}</div>
+            ${items.map(item => renderMenuItem(item, 0)).join('')}
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error('BMMC Nav render error:', err);
+      return `<div style="padding:16px;color:#ef4444;font-size:12px;">Failed to load navigation items. <a href="index.html" style="text-decoration:underline;">Return Home</a></div>`;
+    }
+  }
+
+  // 6. Build Drawer Shell in DOM
   function buildDrawerDOM() {
     if (document.getElementById('bmmc-nav-portal')) return;
+    if (!document.body) return; // Prevent failure if script runs before <body> is parsed
+
     const portal = document.createElement('div');
     portal.id = 'bmmc-nav-portal';
     portal.innerHTML = `
@@ -73,23 +185,7 @@
         </div>
 
         <div style="flex:1;overflow-y:auto;padding:12px;" class="custom-scrollbar dark:bg-slate-900">
-          ${BMMC_BRANCHES.map(section => `
-            <div style="margin-bottom:16px;">
-              <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;padding:4px 8px 6px;">${section.group}</div>
-              ${section.items.map(item => {
-                const active = isLinkActive(item.href);
-                return `
-                  <a href="${item.href}" class="bmmc-drawer-link ${active ? 'active' : ''}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;text-decoration:none;margin-bottom:3px;${active ? 'background:rgba(2,132,199,0.12);border-left:3px solid #0284c7;' : ''}">
-                    <span style="font-size:20px;line-height:1;flex-shrink:0;">${item.icon}</span>
-                    <div style="min-width:0;flex:1;">
-                      <div style="font-size:12px;font-weight:800;color:${active ? '#0284c7' : '#1e293b'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" class="dark:text-white">${item.label}</div>
-                      <div style="font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${item.desc}</div>
-                    </div>
-                  </a>
-                `;
-              }).join('')}
-            </div>
-          `).join('')}
+          ${generateMenuItemsHTML()}
         </div>
 
         <div style="padding:14px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;" class="dark:border-slate-800 dark:bg-slate-900">
@@ -103,48 +199,55 @@
     document.body.appendChild(portal);
   }
 
-  function init() {
-    try {
+  // 7. Fail-safe Drawer Controls
+  function openDrawer() {
+    let drawer = document.getElementById('bmmcDrawer');
+    let backdrop = document.getElementById('bmmcBackdrop');
+
+    // On-demand DOM assembly if not yet initialized
+    if (!drawer || !backdrop) {
       buildDrawerDOM();
-    } catch (e) {
-      console.warn('BMMC Drawer build error:', e);
-      return;
+      drawer = document.getElementById('bmmcDrawer');
+      backdrop = document.getElementById('bmmcBackdrop');
     }
 
-    const drawer = document.getElementById('bmmcDrawer');
-    const backdrop = document.getElementById('bmmcBackdrop');
-    const closeBtn = document.getElementById('btnCloseDrawer');
-    const themeBtn = document.getElementById('btnDrawerThemeToggle');
-
-    function openDrawer() {
-      if (!drawer || !backdrop) return;
+    if (drawer && backdrop) {
       drawer.style.transform = 'translateX(0)';
       backdrop.style.opacity = '1';
       backdrop.style.pointerEvents = 'auto';
     }
+  }
 
-    function closeDrawer() {
-      if (!drawer || !backdrop) return;
+  function closeDrawer() {
+    const drawer = document.getElementById('bmmcDrawer');
+    const backdrop = document.getElementById('bmmcBackdrop');
+    if (drawer && backdrop) {
       drawer.style.transform = 'translateX(-100%)';
       backdrop.style.opacity = '0';
       backdrop.style.pointerEvents = 'none';
     }
+  }
 
-    window.openBMMCDrawer = openDrawer;
-    window.closeBMMCDrawer = closeDrawer;
+  window.openBMMCDrawer = openDrawer;
+  window.closeBMMCDrawer = closeDrawer;
 
-    backdrop?.addEventListener('click', closeDrawer);
-    closeBtn?.addEventListener('click', closeDrawer);
+  // 8. Event Delegation (Works for all triggers, even dynamically rendered ones)
+  document.addEventListener('click', function(e) {
+    const openBtn = e.target.closest('.btn-bmmc-menu-trigger, [data-bmmc-menu], #btnMenuToggle');
+    if (openBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      openDrawer();
+      return;
+    }
 
-    document.querySelectorAll('.btn-bmmc-menu-trigger, [data-bmmc-menu], #btnMenuToggle').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openDrawer();
-      });
-    });
+    if (e.target.closest('#btnCloseDrawer') || e.target.id === 'bmmcBackdrop') {
+      e.preventDefault();
+      closeDrawer();
+      return;
+    }
 
-    themeBtn?.addEventListener('click', function() {
+    if (e.target.closest('#btnDrawerThemeToggle')) {
       try {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
@@ -152,17 +255,18 @@
         const icon = document.getElementById('drawerThemeIcon');
         if (icon) icon.textContent = isDark ? '🌙' : '☀️';
         showToast(isDark ? 'Night Mode Activated' : 'Day Mode Activated', isDark ? '🌙' : '☀️');
-      } catch (e) {}
-    });
+      } catch (err) {}
+    }
+  });
 
-    window.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeDrawer();
-    });
-  }
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDrawer();
+  });
 
+  // 9. Initialize
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', buildDrawerDOM);
   } else {
-    init();
+    buildDrawerDOM();
   }
 })();
