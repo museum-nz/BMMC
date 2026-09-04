@@ -1338,8 +1338,8 @@
       const fallbackFront = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
       const fallbackRear = getFallbackSvg(icon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
 
-      const displayFront = rawFront ? resolveMediaUrl(rawFront, 's200') : fallbackFront;
-      const displayRear = rawRear ? resolveMediaUrl(rawRear, 's200') : fallbackRear;
+      const displayFront = rawFront ? resolveMediaUrl(rawFront, isBanknote ? 's800' : 's400') : fallbackFront;
+      const displayRear = rawRear ? resolveMediaUrl(rawRear, isBanknote ? 's800' : 's400') : fallbackRear;
 
       const safeDenom = item.Denomination || item.ID || 'Currency Item';
       const safeEq = item.Decimal_Equivalent ? `<span class="bg-slate-900/80 text-amber-300 dark:bg-slate-800/90 dark:text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">${item.Decimal_Equivalent}</span>` : '';
@@ -1351,10 +1351,10 @@
       return `
         <div class="bg-white dark:bg-slate-900 border ${isOwned ? 'border-emerald-500 ring-2 ring-emerald-500/20' : isWishlist ? 'border-pink-500 ring-2 ring-pink-500/20' : 'border-slate-200 dark:border-slate-800'} rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500/50 transition-all flex flex-col justify-between group cursor-pointer relative" onclick="openDetailModal('${item._uid}')">
           <div>
-            <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-48' : 'h-44'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800 select-none">
-              <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayFront}', '${safeDenom} — Front (Obverse)', event)" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+            <div id="${boxId}" data-side="0" class="${isBanknote ? 'h-52 sm:h-56 p-2 sm:p-3' : 'h-44 p-2'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center border-b border-slate-200 dark:border-slate-800 select-none">
+              <img src="${displayFront}" alt="${safeDenom} Front" class="img-obverse img-zoom-cursor w-full h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayFront}', '${safeDenom} — Front (Obverse)', event)" onerror="this.onerror=null;this.src='${fallbackFront}';" />
               ${hasRear ? `
-              <img src="${displayRear}" alt="${safeDenom} Rear" class="img-reverse img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300 hidden" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayRear}', '${safeDenom} — Rear (Reverse)', event)" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              <img src="${displayRear}" alt="${safeDenom} Rear" class="img-reverse img-zoom-cursor w-full h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300 hidden" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${displayRear}', '${safeDenom} — Rear (Reverse)', event)" onerror="this.onerror=null;this.src='${fallbackRear}';" />
               ` : ''}
               
               <span class="absolute top-2.5 left-2.5 coin-badge ${badgeClass} shadow-md">${(item.Composition || item.Category || 'Issued').split('(')[0].trim()}</span>
@@ -1415,13 +1415,13 @@
       const icon = getIcon(item);
 
       const fallback = getFallbackSvg(icon, `${safeDenom} (${sideLabel})`, isNote);
-      const displayImg = imgUrl ? resolveMediaUrl(imgUrl, 's200') : fallback;
-      const fullImg = imgUrl ? resolveMediaUrl(imgUrl, 's1000') : fallback;
+      const displayImg = imgUrl ? resolveMediaUrl(imgUrl, isNote ? 's600' : 's300') : fallback;
+      const fullImg = imgUrl ? resolveMediaUrl(imgUrl, 's1200') : fallback;
 
       return `
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-500 transition-all flex flex-col justify-between group">
-          <div class="${isNote ? 'h-36 sm:h-40' : 'h-32 sm:h-36'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800">
-            <img src="${displayImg}" alt="${safeDenom} ${sideLabel}" class="img-zoom-cursor max-w-full max-h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${fullImg}', '${safeDenom} — ${sideLabel}', event)" onerror="this.onerror=null;this.src='${fallback}';" />
+          <div class="${isNote ? 'h-40 sm:h-48' : 'h-32 sm:h-36'} bg-white dark:bg-slate-950 relative overflow-hidden flex items-center justify-center p-2 border-b border-slate-200 dark:border-slate-800">
+            <img src="${displayImg}" alt="${safeDenom} ${sideLabel}" class="img-zoom-cursor w-full h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300" loading="lazy" referrerpolicy="no-referrer" onclick="enlargeImage('${fullImg}', '${safeDenom} — ${sideLabel}', event)" onerror="this.onerror=null;this.src='${fallback}';" />
             <span class="absolute bottom-1.5 left-1.5 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-slate-900/80 text-white dark:bg-slate-800/90 dark:text-slate-300 backdrop-blur-sm">
               ${side === 'obverse' ? 'Front' : 'Back'}
             </span>
@@ -1771,26 +1771,32 @@
         const fallbackFront = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Front)`, isBanknote);
         const fallbackRear = getFallbackSvg(itemIcon, `${item.Denomination || 'Item'} (Rear)`, isBanknote);
 
-        const frontImg = rawFront ? resolveMediaUrl(rawFront, 's1000') : fallbackFront;
-        const rearImg = rawRear ? resolveMediaUrl(rawRear, 's1000') : fallbackRear;
+        const frontImg = rawFront ? resolveMediaUrl(rawFront, 's1200') : fallbackFront;
+        const rearImg = rawRear ? resolveMediaUrl(rawRear, 's1200') : fallbackRear;
         const safeDenom = item.Denomination || item.ID || 'Item';
 
         content.innerHTML = `
           ${hasRear ? `
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-200 dark:border-slate-800 shadow-inner group">
-              <img src="${frontImg}" alt="${safeDenom} Front" class="img-zoom-cursor max-w-full max-h-36 object-contain drop-shadow-md hover:scale-105 transition-transform" onclick="enlargeImage('${frontImg}', '${safeDenom} — Front (Obverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2">Front (Obverse) • 🔍 Click to enlarge</span>
+          <div class="grid grid-cols-1 ${isBanknote ? 'gap-5' : 'sm:grid-cols-2 gap-4'}">
+            <div class="${isBanknote ? 'w-full h-64 sm:h-80 md:h-96 p-3 sm:p-4' : 'h-52 sm:h-60 p-3'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center border border-slate-200 dark:border-slate-800 shadow-inner group relative">
+              <div class="w-full flex-1 flex items-center justify-center overflow-hidden">
+                <img src="${frontImg}" alt="${safeDenom} Front" class="img-zoom-cursor w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-300" onclick="enlargeImage('${frontImg}', '${safeDenom} — Front (Obverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+              </div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2 shrink-0">Front (Obverse) • 🔍 Click to enlarge</span>
             </div>
-            <div class="${isBanknote ? 'h-52' : 'h-48'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-3 border border-slate-200 dark:border-slate-800 shadow-inner group">
-              <img src="${rearImg}" alt="${safeDenom} Rear" class="img-zoom-cursor max-w-full max-h-36 object-contain drop-shadow-md hover:scale-105 transition-transform" onclick="enlargeImage('${rearImg}', '${safeDenom} — Rear (Reverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackRear}';" />
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2">Rear (Reverse) • 🔍 Click to enlarge</span>
+            <div class="${isBanknote ? 'w-full h-64 sm:h-80 md:h-96 p-3 sm:p-4' : 'h-52 sm:h-60 p-3'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center border border-slate-200 dark:border-slate-800 shadow-inner group relative">
+              <div class="w-full flex-1 flex items-center justify-center overflow-hidden">
+                <img src="${rearImg}" alt="${safeDenom} Rear" class="img-zoom-cursor w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-300" onclick="enlargeImage('${rearImg}', '${safeDenom} — Rear (Reverse)', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackRear}';" />
+              </div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2 shrink-0">Rear (Reverse) • 🔍 Click to enlarge</span>
             </div>
           </div>
           ` : `
-          <div class="w-full ${isBanknote ? 'h-64' : 'h-56'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 shadow-inner group">
-            <img src="${frontImg}" alt="${safeDenom} Specimen" class="img-zoom-cursor max-w-full max-h-44 object-contain drop-shadow-md hover:scale-105 transition-transform" onclick="enlargeImage('${frontImg}', '${safeDenom} — Specimen View', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
-            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2">Front Specimen View • 🔍 Click to enlarge</span>
+          <div class="w-full ${isBanknote ? 'h-72 sm:h-96 md:h-[420px]' : 'h-64 sm:h-72'} bg-white dark:bg-slate-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 shadow-inner group relative">
+            <div class="w-full flex-1 flex items-center justify-center overflow-hidden">
+              <img src="${frontImg}" alt="${safeDenom} Specimen" class="img-zoom-cursor w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-300" onclick="enlargeImage('${frontImg}', '${safeDenom} — Specimen View', event)" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackFront}';" />
+            </div>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mt-2 shrink-0">Front Specimen View • 🔍 Click to enlarge</span>
           </div>
           `}
 
