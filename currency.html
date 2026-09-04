@@ -1562,6 +1562,9 @@
         const s5vs6 = document.getElementById('sectionSeries5vs6Comparison');
         if (s5vs6) s5vs6.style.display = (filterKey === 'all' || filterKey === 'banknotes-s56' || isColl) ? 'block' : 'none';
 
+        const historySec = document.getElementById('history-overview');
+        if (historySec) historySec.style.display = (filterKey === 'all') ? '' : 'none';
+
         renderAllGrids();
       } else if (currentViewMode === 'gallery') {
         renderGalleryView();
@@ -1677,6 +1680,11 @@
 
     function renderAllGrids() {
       const q = (document.getElementById('currencySearchInput')?.value || '').toLowerCase().trim();
+
+      const historySec = document.getElementById('history-overview');
+      if (historySec) {
+        historySec.style.display = (currentCategoryFilter === 'all' && !q) ? '' : 'none';
+      }
 
       const filterFn = (item) => {
         if (currentCategoryFilter === 'my-collection' && !userCollectorData[item._uid]?.owned) return false;
