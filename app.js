@@ -2611,7 +2611,7 @@ function closeEnlargeModal() {
 }
 
 // ==========================================================================
-// 9. Statistics & Charts Visualizer
+// 9. Statistics & Charts Visualizer (Decoupled & Asynchronous Fallback)
 // ==========================================================================
 function renderMuseumStatistics() {
   const mapIframe = document.getElementById('statMapIframe');
@@ -2622,7 +2622,9 @@ function renderMuseumStatistics() {
     }
   }
 
-  if (typeof Chart === 'undefined' || !rawExhibitsRows || rawExhibitsRows.length === 0) return;
+  // Guard against missing data only; DO NOT abort text/date stats if Chart.js is still loading
+  if (!rawExhibitsRows || rawExhibitsRows.length === 0) return;
+
   const isDark = document.documentElement.classList.contains('dark');
   const textColor = isDark ? '#cbd5e1' : '#334155';
   const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
@@ -2639,8 +2641,12 @@ function renderMuseumStatistics() {
     const introText = unescapeHTML(getVal(targetRow2, colIdx.notes) || getVal(targetRow2, colIdx.title));
     const introCard = document.getElementById('statIntroCard');
     const introTextElem = document.getElementById('statIntroText');
-    if (introText && introTextElem && introCard) { introTextElem.textContent = introText; introCard.classList.remove('hidden'); }
-    else if (introCard) introCard.classList.add('hidden');
+    if (introText && introTextElem && introCard) { 
+      introTextElem.textContent = introText; 
+      introCard.classList.remove('hidden'); 
+    } else if (introCard) {
+      introCard.classList.add('hidden');
+    }
 
     const docUrl = getVal(targetRow2, colIdx.doc);
     const webUrl = getVal(targetRow2, colIdx.web);
@@ -2648,12 +2654,20 @@ function renderMuseumStatistics() {
     const webElem = document.getElementById('statWebLink');
 
     if (docElem) {
-      if (docUrl) { docElem.href = formatDocLink(docUrl); docElem.classList.remove('hidden'); }
-      else { docElem.classList.add('hidden'); }
+      if (docUrl) { 
+        docElem.href = formatDocLink(docUrl); 
+        docElem.classList.remove('hidden'); 
+      } else { 
+        docElem.classList.add('hidden'); 
+      }
     }
     if (webElem) {
-      if (webUrl && (webUrl.startsWith('http') || webUrl.length > 5)) { webElem.href = webUrl.startsWith('http') ? webUrl : `https://${webUrl}`; webElem.classList.remove('hidden'); }
-      else { webElem.classList.add('hidden'); }
+      if (webUrl && (webUrl.startsWith('http') || webUrl.length > 5)) { 
+        webElem.href = webUrl.startsWith('http') ? webUrl : `https://${webUrl}`; 
+        webElem.classList.remove('hidden'); 
+      } else { 
+        webElem.classList.add('hidden'); 
+      }
     }
 
     const titleDetailsCard = document.getElementById('statTitleDetailsCard');
@@ -2718,7 +2732,7 @@ function renderMuseumStatistics() {
 
     let yearNum = null;
     if (yearMatch) yearNum = parseInt(yearMatch[0], 10);
-    if (yearNum) validYears.push(yearNum);
+    if (yearNum && !isNaN(yearNum)) validYears.push(yearNum);
 
     if (yearNum && yearNum >= 1800) {
       const rawType = getVal(row, colIdx.type);
@@ -2746,6 +2760,7 @@ function renderMuseumStatistics() {
     }
   });
 
+  // Render Timeline Era Grid Cards
   const timelineEraGrid = document.getElementById('timelineEraGrid');
   if (timelineEraGrid) {
     timelineEraGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5";
@@ -2836,14 +2851,19 @@ function renderMuseumStatistics() {
     timelineEraGrid.appendChild(interestCard);
   }
 
+  // Populate Total Items & Date Range (Day/Year Span)
   const statTotal = document.getElementById('statTotalItems');
   const statDate = document.getElementById('statDateRange');
   if (statTotal) statTotal.textContent = itemsSumQty > 0 ? itemsSumQty.toLocaleString() : '1,193';
   if (statDate) {
-    if (validYears.length > 0) statDate.textContent = `${Math.min(...validYears)} – ${Math.max(...validYears)}`;
-    else statDate.textContent = 'N/A';
+    if (validYears.length > 0) {
+      statDate.textContent = `${Math.min(...validYears)} – ${Math.max(...validYears)}`;
+    } else {
+      statDate.textContent = 'N/A';
+    }
   }
 
+  // Pre / Post 1950 distribution
   const totalAgeItems = colPreCount + colPostCount;
   const preElem = document.getElementById('statPre1950');
   const postElem = document.getElementById('statPost1950');
@@ -2854,11 +2874,21 @@ function renderMuseumStatistics() {
     if (postElem) postElem.innerHTML = `Post 1950: <span class="text-pink-600 dark:text-pink-400 font-black">${postPct}% (${colPostCount})</span>`;
   }
 
-  if (chartStackedInstance) chartStackedInstance.destroy();
-  if (chartLocationsInstance) chartLocationsInstance.destroy();
-  if (chartSubcatCategoryInstance) chartSubcatCategoryInstance.destroy();
+  // Asynchronous Chart Loader with Retry Mechanism
+  let chartRetryAttempts = 0;
+  function renderChartsWithRetry() {
+    if (typeof Chart === 'undefined') {
+      if (chartRetryAttempts < 25) { // Retry up to 5 seconds
+        chartRetryAttempts++;
+        setTimeout(renderChartsWithRetry, 200);
+      }
+      return;
+    }
 
-  setTimeout(() => {
+    if (chartStackedInstance) chartStackedInstance.destroy();
+    if (chartLocationsInstance) chartLocationsInstance.destroy();
+    if (chartSubcatCategoryInstance) chartSubcatCategoryInstance.destroy();
+
     const periodsSorted = Object.keys(dateTypeMap).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
     const typesArray = Array.from(allTypesSet);
     const stackedDatasets = typesArray.map((type, idx) => ({
@@ -2947,9 +2977,11 @@ function renderMuseumStatistics() {
         }
       });
     }
-  }, 50);
-}
+  }
 
+  // Kick off chart rendering with automatic retry
+  renderChartsWithRetry();
+}
 // ==========================================================================
 // 10. 3D Model Lightbox & WebAR Modal
 // ==========================================================================
