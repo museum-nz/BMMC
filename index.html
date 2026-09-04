@@ -61,6 +61,44 @@
   <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 
+  <!-- Hide 3D, Hot, Surprise Pills on #stats view -->
+  <style>
+    body:has(#statsSection:not(.hidden)) #btn3DOnly,
+    body:has(#statsSection:not(.hidden)) #btnHotOnly,
+    body:has(#statsSection:not(.hidden)) #btnSurprise,
+    .stats-hidden-pill {
+      display: none !important;
+    }
+  </style>
+  <script>
+    (function() {
+      function syncStatsHeaderPills() {
+        const statsEl = document.getElementById('statsSection');
+        const isStats = window.location.hash.toLowerCase().startsWith('#stats') ||
+                        (statsEl && !statsEl.classList.contains('hidden'));
+        ['btn3DOnly', 'btnHotOnly', 'btnSurprise'].forEach(function(id) {
+          const btn = document.getElementById(id);
+          if (btn) {
+            btn.classList.toggle('stats-hidden-pill', isStats);
+          }
+        });
+      }
+
+      window.addEventListener('hashchange', syncStatsHeaderPills);
+      document.addEventListener('DOMContentLoaded', function() {
+        syncStatsHeaderPills();
+        const statsEl = document.getElementById('statsSection');
+        if (statsEl) {
+          new MutationObserver(syncStatsHeaderPills).observe(statsEl, {
+            attributes: true,
+            attributeFilter: ['class', 'style']
+          });
+        }
+      });
+    })();
+  </script>
+
+
   <!-- Core Libraries with Local & CDN Fallbacks -->
   <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
   <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>

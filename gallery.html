@@ -139,19 +139,19 @@
         </div>
       </div>
 
-      <!-- Collapsible Controls Container -->
-      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
-        <p id="subheadingText" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+      <!-- Collapsible Controls Container (Vertically Compressed) -->
+      <div id="collapsibleControls" class="mt-2 flex flex-col gap-1.5 sm:gap-2 transition-all duration-300">
+        <p id="subheadingText" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-snug">
           Historical photographic collections with speech narration, dating tags, and archival notes.
         </p>
 
         <!-- Search and Sort Bar -->
-        <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
-          <div class="flex items-center justify-between sm:justify-start gap-3 shrink-0">
+        <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1.5 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="flex items-center justify-between sm:justify-start gap-2.5 shrink-0">
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="galleryCountText"></p>
-            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
               <label for="gallerySortSelect" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
-              <select id="gallerySortSelect" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+              <select id="gallerySortSelect" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer py-0.5">
                 <option value="default" class="dark:bg-slate-900">Default (Date &amp; Title)</option>
                 <option value="date-asc" class="dark:bg-slate-900">Date (Oldest First)</option>
                 <option value="date-desc" class="dark:bg-slate-900">Date (Newest First)</option>
@@ -171,95 +171,88 @@
           
           <!-- Search Input -->
           <div class="w-full sm:w-72 relative shrink-0">
-            <input type="text" id="gallerySearchInput" placeholder="Search photo title, details, date..." aria-label="Search photos" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
-            <svg class="w-4 h-4 text-emerald-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <input type="text" id="gallerySearchInput" placeholder="Search photo title, details, date..." aria-label="Search photos" class="w-full pl-8 pr-8 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <svg class="w-3.5 h-3.5 text-emerald-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer">✕</button>
+            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2 top-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer">✕</button>
           </div>
         </div>
 
-        <!-- Filter Dropdowns Grid -->
-        <div id="galleryFilterGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
-          <div>
-            <label for="galleryCategoryFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Tag / Category Filter (Main Collections)</label>
-            <select id="galleryCategoryFilter" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
-              <option value="">All Main Collections</option>
-            </select>
-          </div>
-          <div>
-            <label for="galleryDateFilter" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Historical Era / Age Filter</label>
-            <select id="galleryDateFilter" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
-              <option value="">All Historical Eras</option>
-            </select>
-          </div>
+        <!-- Filter Dropdowns Grid (Labels Removed & Height Compressed) -->
+        <div id="galleryFilterGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <select id="galleryCategoryFilter" aria-label="Filter by Tag or Category" class="w-full py-1.5 px-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
+            <option value="">All Main Collections</option>
+          </select>
+          <select id="galleryDateFilter" aria-label="Filter by Historical Era" class="w-full py-1.5 px-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
+            <option value="">All Historical Eras</option>
+          </select>
         </div>
 
-        <!-- Collection Hubs Filter Cards Section -->
-        <div id="collectionHubsSection" class="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+        <!-- Collection Hubs Filter Cards Section (Vertically Compressed) -->
+        <div id="collectionHubsSection" class="pt-1.5 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
             
             <!-- All Collections -->
-            <div id="tabBtnAll" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-600 ring-2 ring-emerald-500/40">
-              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #05966925;">
-                <span class="text-3xl drop-shadow group-hover:scale-110 transition-transform duration-300">🌐</span>
-                <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
-                  <span id="hubCountAll" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-emerald-600 text-white">0</span>
+            <div id="tabBtnAll" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-600 ring-2 ring-emerald-500/40">
+              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1" style="background-color: #05966925;">
+                <span class="text-2xl drop-shadow group-hover:scale-110 transition-transform duration-300">🌐</span>
+                <div class="absolute top-1 right-1 flex flex-col items-end gap-0.5 z-10">
+                  <span id="hubCountAll" class="text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md bg-emerald-600 text-white">0</span>
                 </div>
               </div>
-              <div class="p-2.5 flex-1 flex flex-col justify-between">
+              <div class="p-2 flex-1 flex flex-col justify-between">
                 <h3 class="font-black text-xs line-clamp-1 text-emerald-600 dark:text-emerald-400">All Collections</h3>
-                <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">Explore Archive →</span>
+                <span class="text-[10px] font-extrabold mt-0.5 flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">Explore Archive →</span>
               </div>
             </div>
 
             <!-- Alan War -->
-            <div id="tabBtnWW2" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-amber-500/40">
-              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #d9770625;">
+            <div id="tabBtnWW2" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col group relative border-amber-500/40">
+              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1" style="background-color: #d9770625;">
                 <img id="hubImgWW2" src="https://lh3.googleusercontent.com/d/1PRxkv12yXVBbG9_HRn-ZxqMrB6Zru8fo=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🪖%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Alan War" />
-                <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
-                  <span id="hubCountWW2" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-amber-500 text-slate-950">0</span>
+                <div class="absolute top-1 right-1 flex flex-col items-end gap-0.5 z-10">
+                  <span id="hubCountWW2" class="text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md bg-amber-500 text-slate-950">0</span>
                 </div>
               </div>
-              <div class="p-2.5 flex-1 flex flex-col justify-between">
+              <div class="p-2 flex-1 flex flex-col justify-between">
                 <h3 class="font-black text-xs line-clamp-1 text-amber-600 dark:text-amber-400">Alan War</h3>
-                <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-amber-600 dark:text-amber-400">1939–1945 →</span>
+                <span class="text-[10px] font-extrabold mt-0.5 flex items-center gap-0.5 text-amber-600 dark:text-amber-400">1939–1945 →</span>
               </div>
             </div>
 
             <!-- Dun & Bonniefields -->
-            <div id="tabBtnBNF" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
-              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #10b98125;">
+            <div id="tabBtnBNF" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col group relative border-emerald-500/40">
+              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1" style="background-color: #10b98125;">
                 <img id="hubImgBNF" src="https://lh3.googleusercontent.com/d/1mTPEBUTQJ8ywuhJW0mVqIfUQiMh8gsHZ=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🌾%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Dun &amp; Bonniefields" />
-                <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
-                  <span id="hubCountBNF" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-emerald-500 text-slate-950">0</span>
+                <div class="absolute top-1 right-1 flex flex-col items-end gap-0.5 z-10">
+                  <span id="hubCountBNF" class="text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md bg-emerald-500 text-slate-950">0</span>
                 </div>
               </div>
-              <div class="p-2.5 flex-1 flex flex-col justify-between">
+              <div class="p-2 flex-1 flex flex-col justify-between">
                 <h3 class="font-black text-xs line-clamp-1 text-emerald-600 dark:text-emerald-400">Dun &amp; Bonniefields</h3>
-                <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">1920s Farm →</span>
+                <span class="text-[10px] font-extrabold mt-0.5 flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">1920s Farm →</span>
               </div>
             </div>
 
             <!-- Maitland East Chatton -->
-            <div id="tabBtnMTL" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative border-blue-500/40">
-              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1.5" style="background-color: #2563eb25;">
+            <div id="tabBtnMTL" class="bg-white dark:bg-slate-900 rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col group relative border-blue-500/40">
+              <div class="h-20 bg-slate-200/90 dark:bg-slate-950 border-b border-slate-300/80 dark:border-slate-800 relative overflow-hidden flex items-center justify-center p-1" style="background-color: #2563eb25;">
                 <img id="hubImgMTL" src="https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200" class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2270%22%3E🏫%3C%2Ftext%3E%3C%2Fsvg%3E';" alt="Maitland East Chatton" />
-                <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-0.5 z-10">
-                  <span id="hubCountMTL" class="text-[9px] font-black px-2 py-0.5 rounded-full shadow-md bg-blue-600 text-white">0</span>
+                <div class="absolute top-1 right-1 flex flex-col items-end gap-0.5 z-10">
+                  <span id="hubCountMTL" class="text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md bg-blue-600 text-white">0</span>
                 </div>
               </div>
-              <div class="p-2.5 flex-1 flex flex-col justify-between">
+              <div class="p-2 flex-1 flex flex-col justify-between">
                 <h3 class="font-black text-xs line-clamp-1 text-blue-600 dark:text-blue-400">Maitland East Chatton</h3>
-                <span class="text-[10px] font-extrabold mt-1 flex items-center gap-0.5 text-blue-600 dark:text-blue-400">School &amp; Village →</span>
+                <span class="text-[10px] font-extrabold mt-0.5 flex items-center gap-0.5 text-blue-600 dark:text-blue-400">School &amp; Village →</span>
               </div>
             </div>
 
           </div>
         </div>
-
       </div>
-    </div>
+</div>
   </header>
 
   <!-- Main Container -->

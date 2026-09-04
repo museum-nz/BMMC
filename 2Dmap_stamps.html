@@ -919,26 +919,45 @@
 
     function toggleTimelinePlayback() {
       const playBtn = document.getElementById('btnPlayTimeline');
+      const minSlider = document.getElementById('minYearSlider');
       const maxSlider = document.getElementById('maxYearSlider');
+      if (!playBtn || !maxSlider || !minSlider) return;
 
       if (timelinePlayTimer) {
         clearInterval(timelinePlayTimer);
         timelinePlayTimer = null;
         playBtn.textContent = '▶';
         playBtn.classList.remove('playing');
+        playBtn.title = 'Play Timeline Time-Lapse';
       } else {
+        let curr = parseInt(maxSlider.value, 10);
+        // If already at the end of the timeline, restart from the start
+        if (isNaN(curr) || curr >= globalMaxYear) {
+          if (parseInt(minSlider.value, 10) >= globalMaxYear) {
+            minSlider.value = globalMinYear;
+          }
+          maxSlider.value = minSlider.value;
+          updateYearFilter();
+        }
+
         playBtn.textContent = '⏸';
         playBtn.classList.add('playing');
+        playBtn.title = 'Pause Timeline Time-Lapse';
+
+        const step = (globalMaxYear - globalMinYear > 100) ? 2 : 1;
 
         timelinePlayTimer = setInterval(() => {
-          let curr = parseInt(maxSlider.value, 10);
-          if (curr >= globalMaxYear) {
+          let currentMax = parseInt(maxSlider.value, 10);
+          if (currentMax >= globalMaxYear) {
             toggleTimelinePlayback();
           } else {
-            maxSlider.value = Math.min(globalMaxYear, curr + 2);
+            maxSlider.value = Math.min(globalMaxYear, currentMax + step);
             updateYearFilter();
+            if (parseInt(maxSlider.value, 10) >= globalMaxYear) {
+              toggleTimelinePlayback();
+            }
           }
-        }, 350);
+        }, 300);
       }
     }
 
@@ -1122,8 +1141,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
-      document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
+      document.getElementById('minYearSlider')?.addEventListener('input', () => {
+        if (timelinePlayTimer) toggleTimelinePlayback();
+        updateYearFilter();
+      });
+      document.getElementById('maxYearSlider')?.addEventListener('input', () => {
+        if (timelinePlayTimer) toggleTimelinePlayback();
+        updateYearFilter();
+      });
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
       document.getElementById('btnFitBounds')?.addEventListener('click', () => {
         if (markers.getLayers().length > 0) map.fitBounds(markers.getBounds(), { padding: [50, 50] });

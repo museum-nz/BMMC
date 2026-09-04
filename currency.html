@@ -93,14 +93,14 @@
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
 
-  <!-- Header Section with Universal Navigation -->
+    <!-- Header Section with Universal Navigation -->
   <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
       
-      <!-- Top Bar -->
+      <!-- Top Bar: Wings, Random, My Collection, Wishlist, Hide filter -->
       <div class="flex items-center justify-between gap-2">
-        <a href="index.html" id="brandLogoLink" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0">
-          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🪙</span>
+        <a href="index.html" id="brandLogoLink" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0" aria-label="NZ Currency Database">
+          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon" aria-hidden="true">🪙</span>
           <div class="leading-none">
             <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 dark:from-amber-400 dark:via-yellow-300 dark:to-amber-200 bg-clip-text text-transparent tracking-tight whitespace-nowrap" id="headerTitleText">
               NZ Currency Database
@@ -109,129 +109,141 @@
           </div>
         </a>
         
+        <!-- Top Action Cluster -->
         <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
-          <!-- Universal Navigation Drawer Trigger (Hamburger) -->
+          <!-- 1. Wings -->
           <button class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
             <span class="text-sm leading-none">☰</span>
             <span class="hidden sm:inline">Wings</span>
           </button>
 
-          <!-- View Switcher -->
-          <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button id="viewTabCatalogue" onclick="switchViewMode('catalogue')" class="px-2 sm:px-2.5 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer">
-              🏛️ <span class="hidden sm:inline">Specimen</span>
-            </button>
-            <button id="viewTabGallery" onclick="switchViewMode('gallery')" class="px-2 sm:px-2.5 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
-              🖼️ <span class="hidden sm:inline">Gallery</span>
-            </button>
-            <button id="viewTabStats" onclick="switchViewMode('stats')" class="px-2 sm:px-2.5 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
-              📊 <span class="hidden sm:inline">Analytics</span>
-            </button>
-          </div>
-
-          <button id="btnSurprise" title="Surprise Me (Random Coin or Note)" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0">
-            <span>✨</span> <span class="hidden lg:inline">Surprise</span>
+          <!-- 2. Random -->
+          <button id="btnSurprise" onclick="surpriseMe()" title="Surprise Me (Random Coin or Note)" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
+            <span aria-hidden="true">✨</span> <span class="hidden sm:inline">Random</span>
           </button>
 
-          <!-- Utility Pill Cluster -->
-          <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm shrink-0">
-            <button id="toggleControlsBtn" title="Toggle Controls" aria-label="Toggle Controls" class="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
-              <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-              </svg>
-              <span id="toggleChevron" class="text-[8px] text-slate-400">▼</span>
-            </button>
-          </div>
+          <!-- 3. My Collection -->
+          <button id="filterBtnCollection" onclick="setCategoryFilter(currentCategoryFilter === 'my-collection' ? 'all' : 'my-collection')" title="View My Collection" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800">
+            <span aria-hidden="true">🎒</span> <span class="hidden sm:inline">My Collection</span> (<span id="collectionCountBadge">0</span>)
+          </button>
+
+          <!-- 4. Wishlist -->
+          <button id="filterBtnWishlist" onclick="setCategoryFilter(currentCategoryFilter === 'my-wishlist' ? 'all' : 'my-wishlist')" title="View Wishlist" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0 bg-pink-100 dark:bg-pink-950/80 text-pink-800 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900 border border-pink-300 dark:border-pink-800">
+            <span aria-hidden="true">⭐</span> <span class="hidden sm:inline">Wishlist</span> (<span id="wishlistCountBadge">0</span>)
+          </button>
+
+          <!-- 5. Hide filter Toggle -->
+          <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle filter controls" class="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white/95 dark:bg-slate-800/95 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 cursor-pointer shrink-0">
+            <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+            <span class="hidden md:inline text-[11px] font-semibold">Filter</span>
+            <span id="toggleChevron" class="text-[8px] text-slate-400">▼</span>
+          </button>
         </div>
       </div>
 
-      <!-- Collapsible Filters & Search -->
-      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
-        <div id="catalogueFilterBar" class="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar py-0.5" role="tablist">
-          <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer shrink-0">
-            🌐 Show All
-          </button>
-          <button id="filterBtnPreCoins" onclick="setCategoryFilter('pre-decimal-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            🪙 Pre-Decimal Coins
-          </button>
-          <button id="filterBtnDecCoins" onclick="setCategoryFilter('decimal-1967-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            💵 Decimal Coins (1967–2006)
-          </button>
-          <button id="filterBtnCurrCoins" onclick="setCategoryFilter('current-coins')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            ✨ Current Coins
-          </button>
+      <!-- Controls Suite (Reduced from 3 rows to 2 rows) -->
+      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2 transition-all duration-300">
+        
+        <!-- Row 1: Counts & Switcher + Active Filters (before search) + Search Bar -->
+        <div class="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2 flex-wrap shrink-0">
+            <p class="text-xs text-slate-600 dark:text-slate-300 font-extrabold tracking-wide shrink-0" id="currencyStatsCounter">Connecting to database...</p>
+            
+            <!-- Catalog View Switcher Buttons -->
+            <div class="flex items-center gap-0.5 bg-slate-100/90 dark:bg-slate-800/90 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold" role="group" aria-label="View Switcher">
+              <button id="viewTabCatalogue" onclick="switchViewMode('catalogue')" class="px-2.5 py-1 rounded-lg transition bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm cursor-pointer font-black">
+                <span>🏛️</span> <span>Specimen</span>
+              </button>
+              <button id="viewTabGallery" onclick="switchViewMode('gallery')" class="px-2.5 py-1 rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer font-bold">
+                <span>🖼️</span> <span>Gallery</span>
+              </button>
+              <button id="viewTabStats" onclick="switchViewMode('stats')" class="px-2.5 py-1 rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer font-bold">
+                <span>📊</span> <span>Analytics</span>
+              </button>
+            </div>
+          </div>
 
-          <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+          <!-- Active Filter Chips (Placed directly before search) -->
+          <div id="activeFiltersBar" class="flex items-center gap-1.5 flex-wrap min-w-0 flex-1 lg:justify-end">
+            <span class="text-[10px] text-slate-400 font-black uppercase tracking-wider shrink-0">Active:</span>
+            <div id="activeChipsContainer" class="flex flex-wrap items-center gap-1">
+              <span class="text-[11px] text-slate-400 italic">None</span>
+            </div>
+            <button onclick="clearAllCurrencyFilters()" id="btnClearAllFilters" class="hidden text-xs font-black text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-600 dark:hover:bg-rose-600 transition px-2 py-0.5 bg-rose-50 dark:bg-rose-950/60 rounded-md border border-rose-200 dark:border-rose-900 items-center gap-1 shadow-sm cursor-pointer active:scale-95 shrink-0">
+              <span>✕</span> <span>Clear</span>
+            </button>
+          </div>
 
-          <button id="filterBtnS1Notes" onclick="setCategoryFilter('banknotes-s1')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            📜 Series 1 (1934)
-          </button>
-          <button id="filterBtnS2Notes" onclick="setCategoryFilter('banknotes-s2')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            📜 Series 2 (1940)
-          </button>
-          <button id="filterBtnS3Notes" onclick="setCategoryFilter('banknotes-s3')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            🦜 Series 3 (1967)
-          </button>
-          <button id="filterBtnS4Notes" onclick="setCategoryFilter('banknotes-s4')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            🦜 Series 4 (1981)
-          </button>
-          <button id="filterBtnS56Notes" onclick="setCategoryFilter('banknotes-s56')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            💎 Series 5 &amp; 6 (1992–2014)
-          </button>
-          <button id="filterBtnS7Notes" onclick="setCategoryFilter('banknotes-s7')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0">
-            🌟 Series 7 (2015+)
-          </button>
-          <button id="filterBtnSpecial" onclick="setCategoryFilter('special-issues')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900 cursor-pointer shrink-0">
-            🎖️ Commemorative
-          </button>
-
-          <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
-          <button id="filterBtnCollection" onclick="setCategoryFilter('my-collection')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 cursor-pointer shrink-0 flex items-center gap-1">
-            <span>🎒</span> My Collection (<span id="collectionCountBadge">0</span>)
-          </button>
-          <button id="filterBtnWishlist" onclick="setCategoryFilter('my-wishlist')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition bg-pink-100 dark:bg-pink-950/80 text-pink-800 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900 cursor-pointer shrink-0 flex items-center gap-1">
-            <span>⭐</span> Wishlist (<span id="wishlistCountBadge">0</span>)
-          </button>
-          <button id="btnExportCollection" onclick="exportUserCollectionCsv()" title="Export Owned & Wishlist Items to CSV" class="hidden px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm cursor-pointer shrink-0 flex items-center gap-1">
-            <span>📥</span> Export Collection
-          </button>
+          <!-- Search Input with Clear Button -->
+          <div class="relative w-full lg:w-72 shrink-0">
+            <input type="text" id="currencySearchInput" placeholder="Search denominations, flora, fauna, monarchs..." autocomplete="off" aria-label="Search currency" class="w-full pl-8 pr-7 py-1.5 bg-white/95 dark:bg-slate-900/95 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
+            <span class="absolute left-2.5 top-1.5 text-amber-600 dark:text-amber-400 text-xs" aria-hidden="true">🔍</span>
+            <button id="clearCurrencySearchBtn" onclick="clearCurrencySearch()" title="Clear Search" aria-label="Clear Search Input" class="hidden absolute right-2 top-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer">✕</button>
+          </div>
         </div>
 
-        <!-- Search Bar -->
-        <div id="catalogueSearchBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
-          <div class="flex items-center gap-2 flex-1 max-w-md relative">
-            <span class="text-sm absolute left-2.5 text-slate-400">🔍</span>
-            <input type="text" id="currencySearchInput" placeholder="Search denominations, flora, fauna, monarchs, designers..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-slate-800 dark:text-slate-100 shadow-inner" />
-          </div>
-          <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 shrink-0">
-            <span id="currencyStatsCounter">Connecting to database...</span>
-          </div>
+        <!-- Row 2: Coinage & Banknote Eras / Series Filter Pills -->
+        <div id="catalogueFilterBar" class="pt-1.5 border-t border-slate-200/50 dark:border-slate-800/60 flex items-center gap-1.5 flex-wrap text-xs" role="tablist">
+          <button id="filterBtnAll" onclick="setCategoryFilter('all')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-amber-600 text-white shadow-sm cursor-pointer transition">
+            🌐 All Currency
+          </button>
+          <button id="filterBtnPreCoins" onclick="setCategoryFilter('pre-decimal-coins')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            🪙 Pre-Decimal Coins
+          </button>
+          <button id="filterBtnDecCoins" onclick="setCategoryFilter('decimal-1967-coins')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            💵 Decimal Coins (1967–2006)
+          </button>
+          <button id="filterBtnCurrCoins" onclick="setCategoryFilter('current-coins')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            ✨ Current Coins
+          </button>
+          <button id="filterBtnS1Notes" onclick="setCategoryFilter('banknotes-s1')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            📜 Series 1 (1934)
+          </button>
+          <button id="filterBtnS2Notes" onclick="setCategoryFilter('banknotes-s2')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            📜 Series 2 (1940)
+          </button>
+          <button id="filterBtnS3Notes" onclick="setCategoryFilter('banknotes-s3')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            🦜 Series 3 (1967)
+          </button>
+          <button id="filterBtnS4Notes" onclick="setCategoryFilter('banknotes-s4')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            🦜 Series 4 (1981)
+          </button>
+          <button id="filterBtnS56Notes" onclick="setCategoryFilter('banknotes-s56')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            💎 Series 5 &amp; 6 (1992–2014)
+          </button>
+          <button id="filterBtnS7Notes" onclick="setCategoryFilter('banknotes-s7')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            🌟 Series 7 (2015+)
+          </button>
+          <button id="filterBtnSpecial" onclick="setCategoryFilter('special-issues')" class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition">
+            🎖️ Commemorative
+          </button>
         </div>
 
         <!-- Analytics Mode Quick Jump Bar -->
-        <div id="analyticsFilterBar" class="hidden flex items-center justify-between gap-2 flex-wrap pt-1">
-          <div class="flex items-center gap-2 flex-wrap text-xs">
+        <div id="analyticsFilterBar" class="hidden flex items-center justify-between gap-2 flex-wrap pt-1.5 border-t border-slate-200/60 dark:border-slate-800/80">
+          <div class="flex items-center gap-1.5 flex-wrap text-xs">
             <span class="font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1 text-[11px]">
               <span>📊</span> Analytics Quick Jump:
             </span>
-            <a href="#sectionHistoricalNotes" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
+            <a href="#sectionHistoricalNotes" class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition text-xs border border-slate-200 dark:border-slate-700">
               📜 Key Milestones
             </a>
-            <a href="#sectionMintageBreakdown" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
+            <a href="#sectionMintageBreakdown" class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition text-xs border border-slate-200 dark:border-slate-700">
               📅 Annual Coin Mintages
             </a>
-            <a href="#sectionF3CirculationExplorer" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
+            <a href="#sectionF3CirculationExplorer" class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition text-xs border border-slate-200 dark:border-slate-700">
               💵 Notes in Circulation (Table F3)
             </a>
-            <a href="#sectionCharts" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
+            <a href="#sectionCharts" class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition text-xs border border-slate-200 dark:border-slate-700">
               📈 Visual Charts
             </a>
-            <a href="#sectionRarities" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition">
+            <a href="#sectionRarities" class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 rounded-lg font-bold text-slate-700 dark:text-slate-300 transition text-xs border border-slate-200 dark:border-slate-700">
               🏆 Key Dates &amp; Rarities
             </a>
           </div>
           <span class="text-[11px] font-mono font-bold text-slate-400">RBNZ Data Engine</span>
         </div>
+
       </div>
     </div>
   </header>
@@ -252,14 +264,20 @@
           </p>
         </div>
 
-        <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-xs shrink-0 self-stretch md:self-auto flex flex-col justify-center">
-          <div class="flex items-center justify-between gap-3 mb-1">
-            <span class="font-black text-amber-300">🎒 Collector Inventory</span>
-            <span id="collectionProgressText" class="font-mono font-bold text-slate-200">0 / 0 (0%)</span>
+                <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-xs shrink-0 self-stretch md:self-auto flex flex-col justify-center gap-2">
+          <div>
+            <div class="flex items-center justify-between gap-3 mb-1">
+              <span class="font-black text-amber-300">🎒 Collector Inventory</span>
+              <span id="collectionProgressText" class="font-mono font-bold text-slate-200">0 / 0 (0%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-950/60 rounded-full overflow-hidden">
+              <div id="collectionProgressBar" class="h-full bg-gradient-to-r from-amber-400 to-emerald-400 w-0 transition-all duration-500"></div>
+            </div>
           </div>
-          <div class="w-full h-2 bg-slate-950/60 rounded-full overflow-hidden">
-            <div id="collectionProgressBar" class="h-full bg-gradient-to-r from-amber-400 to-emerald-400 w-0 transition-all duration-500"></div>
-          </div>
+          <button id="btnExportCollection" onclick="exportUserCollectionCsv()" title="Export Owned &amp; Wishlist Items to CSV" class="hidden px-2.5 py-1.5 rounded-xl text-xs font-black transition bg-emerald-600 hover:bg-emerald-500 text-white shadow-md cursor-pointer shrink-0 flex items-center justify-center gap-1.5 active:scale-95">
+            <span>📥</span> <span>Export Collection (CSV)</span>
+          </button>
+        </div>
         </div>
       </div>
     </div>
@@ -1064,10 +1082,12 @@
       const total = currencyItems.length;
       const pct = total > 0 ? Math.round((ownedCount / total) * 100) : 0;
       const countBadge = document.getElementById('collectionCountBadge');
+      const countBadge2 = document.getElementById('collectionCountBadge2');
       const wishlistBadge = document.getElementById('wishlistCountBadge');
       const progText = document.getElementById('collectionProgressText');
       const progBar = document.getElementById('collectionProgressBar');
       if (countBadge) countBadge.textContent = ownedCount;
+      if (countBadge2) countBadge2.textContent = ownedCount;
       if (wishlistBadge) wishlistBadge.textContent = wishlistCount;
       if (progText) progText.textContent = `${ownedCount} / ${total} (${pct}%)`;
       if (progBar) progBar.style.width = `${pct}%`;
@@ -1158,43 +1178,36 @@
       const catCont = document.getElementById('catalogueViewContainer');
       const galCont = document.getElementById('galleryViewContainer');
       const statsCont = document.getElementById('statsViewContainer');
-      const catFilterBar = document.getElementById('catalogueFilterBar');
-      const catSearchBar = document.getElementById('catalogueSearchBar');
       const analyticsBar = document.getElementById('analyticsFilterBar');
 
-      const inactiveClass = 'px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
-      const activeClass = 'px-2.5 sm:px-3 py-1 text-xs font-black rounded-lg transition bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white cursor-pointer';
+      const inactiveClass = 'px-2.5 py-1 rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer font-bold';
+      const activeClass = 'px-2.5 py-1 rounded-lg transition bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm cursor-pointer font-black';
 
-      tabCat.className = inactiveClass;
-      tabGal.className = inactiveClass;
-      tabStats.className = inactiveClass;
+      if (tabCat) tabCat.className = inactiveClass;
+      if (tabGal) tabGal.className = inactiveClass;
+      if (tabStats) tabStats.className = inactiveClass;
 
-      catCont.classList.add('hidden');
-      galCont.classList.add('hidden');
-      statsCont.classList.add('hidden');
+      if (catCont) catCont.classList.add('hidden');
+      if (galCont) galCont.classList.add('hidden');
+      if (statsCont) statsCont.classList.add('hidden');
 
       if (mode === 'catalogue') {
-        tabCat.className = activeClass;
-        catCont.classList.remove('hidden');
-        if (catFilterBar) catFilterBar.classList.remove('hidden');
-        if (catSearchBar) catSearchBar.classList.remove('hidden');
+        if (tabCat) tabCat.className = activeClass;
+        if (catCont) catCont.classList.remove('hidden');
         if (analyticsBar) analyticsBar.classList.add('hidden');
         renderAllGrids();
       } else if (mode === 'gallery') {
-        tabGal.className = activeClass;
-        galCont.classList.remove('hidden');
-        if (catFilterBar) catFilterBar.classList.remove('hidden');
-        if (catSearchBar) catSearchBar.classList.remove('hidden');
+        if (tabGal) tabGal.className = activeClass;
+        if (galCont) galCont.classList.remove('hidden');
         if (analyticsBar) analyticsBar.classList.add('hidden');
         renderGalleryView();
       } else {
-        tabStats.className = activeClass;
-        statsCont.classList.remove('hidden');
-        if (catFilterBar) catFilterBar.classList.add('hidden');
-        if (catSearchBar) catSearchBar.classList.add('hidden');
+        if (tabStats) tabStats.className = activeClass;
+        if (statsCont) statsCont.classList.remove('hidden');
         if (analyticsBar) analyticsBar.classList.remove('hidden');
         renderStatisticalDashboard();
       }
+      renderActiveChips();
     }
 
     function renderCurrentView() {
@@ -1506,13 +1519,22 @@
       Object.entries(filterIds).forEach(([k, id]) => {
         const btn = document.getElementById(id);
         if (!btn) return;
-        if (k === filterKey) {
-          btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition shadow-sm bg-amber-600 text-white cursor-pointer shrink-0';
+        if (k === 'my-collection') {
+          btn.className = (k === filterKey)
+            ? 'flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0 bg-emerald-600 text-white border border-emerald-500'
+            : 'flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-800';
+        } else if (k === 'my-wishlist') {
+          btn.className = (k === filterKey)
+            ? 'flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0 bg-pink-600 text-white border border-pink-500'
+            : 'flex items-center gap-1 text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0 bg-pink-100 dark:bg-pink-950/80 text-pink-800 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900 border border-pink-300 dark:border-pink-800';
+        } else if (k === filterKey) {
+          btn.className = 'px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-amber-600 text-white shadow-sm cursor-pointer transition';
         } else {
-          btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-950/60 cursor-pointer shrink-0';
+          btn.className = 'px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer transition';
         }
       });
 
+      // Show Export button in the hero card when collection or wishlist is selected
       const btnExport = document.getElementById('btnExportCollection');
       if (btnExport) {
         btnExport.classList.toggle('hidden', !(filterKey === 'my-collection' || filterKey === 'my-wishlist'));
@@ -1545,6 +1567,78 @@
       } else if (currentViewMode === 'gallery') {
         renderGalleryView();
       }
+
+      renderActiveChips();
+    }
+
+    function renderActiveChips() {
+      const box = document.getElementById('activeChipsContainer');
+      const clearBtn = document.getElementById('btnClearAllFilters');
+      if (!box) return;
+      box.innerHTML = '';
+      let hasFilters = false;
+
+      const q = (document.getElementById('currencySearchInput')?.value || '').trim();
+      if (q) {
+        hasFilters = true;
+        box.innerHTML += `
+          <span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-200 rounded-md text-[11px] font-extrabold flex items-center gap-1 shadow-sm border border-amber-300 dark:border-amber-800">
+            <span>🔍 "${q}"</span>
+            <button onclick="clearCurrencySearch()" title="Clear Search" class="hover:text-rose-600 font-black cursor-pointer ml-0.5">✕</button>
+          </span>
+        `;
+      }
+
+      const labelMap = {
+        'pre-decimal-coins': '🪙 Pre-Decimal',
+        'decimal-1967-coins': '💵 Decimal (1967–2006)',
+        'current-coins': '✨ Current Coins',
+        'banknotes-s1': '📜 Series 1',
+        'banknotes-s2': '📜 Series 2',
+        'banknotes-s3': '🦜 Series 3',
+        'banknotes-s4': '🦜 Series 4',
+        'banknotes-s56': '💎 Series 5 & 6',
+        'banknotes-s7': '🌟 Series 7',
+        'special-issues': '🎖️ Commemorative',
+        'my-collection': '🎒 My Collection',
+        'my-wishlist': '⭐ Wishlist'
+      };
+
+      if (currentCategoryFilter !== 'all' && labelMap[currentCategoryFilter]) {
+        hasFilters = true;
+        box.innerHTML += `
+          <span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-200 rounded-md text-[11px] font-bold flex items-center gap-1 border border-amber-300 dark:border-amber-800">
+            <span>${labelMap[currentCategoryFilter]}</span>
+            <button onclick="setCategoryFilter('all')" class="hover:text-rose-600 font-black cursor-pointer">✕</button>
+          </span>
+        `;
+      }
+
+      if (!hasFilters) {
+        box.innerHTML = `<span class="text-[11px] text-slate-400 italic">None</span>`;
+        if (clearBtn) clearBtn.classList.add('hidden');
+      } else {
+        if (clearBtn) clearBtn.classList.remove('hidden');
+      }
+    }
+
+    function clearCurrencySearch() {
+      const input = document.getElementById('currencySearchInput');
+      if (input) input.value = '';
+      document.getElementById('clearCurrencySearchBtn')?.classList.add('hidden');
+      renderCurrentView();
+      renderActiveChips();
+    }
+
+    function clearAllCurrencyFilters() {
+      const input = document.getElementById('currencySearchInput');
+      if (input) input.value = '';
+      document.getElementById('clearCurrencySearchBtn')?.classList.add('hidden');
+      setCategoryFilter('all');
+      if (currentViewMode !== 'catalogue') switchViewMode('catalogue');
+      renderCurrentView();
+      renderActiveChips();
+      showToast('All filters reset', '🌐');
     }
 
     function getNormalizedCategoryType(item) {
@@ -2379,7 +2473,18 @@
       document.getElementById('btnThemeToggle')?.addEventListener('click', toggleDayNightTheme);
 
       document.getElementById('toggleControlsBtn')?.addEventListener('click', () => {
-        document.getElementById('collapsibleControls')?.classList.toggle('hidden');
+        const panel = document.getElementById('collapsibleControls');
+        const chev = document.getElementById('toggleChevron');
+        panel?.classList.toggle('hidden');
+        if (chev) chev.innerText = panel?.classList.contains('hidden') ? '▲' : '▼';
+      });
+
+      const currencySearchInput = document.getElementById('currencySearchInput');
+      const clearSearchBtn = document.getElementById('clearCurrencySearchBtn');
+      currencySearchInput?.addEventListener('input', (e) => {
+        clearSearchBtn?.classList.toggle('hidden', !e.target.value);
+        renderCurrentView();
+        renderActiveChips();
       });
 
       document.getElementById('btnSurprise')?.addEventListener('click', surpriseMe);
