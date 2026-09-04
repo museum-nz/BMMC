@@ -575,13 +575,6 @@
       <span>🧭</span> <span>Fit All</span>
     </button>
 
-    <button id="btnResetView" class="top-action-btn" title="Reset map position &amp; timeline">
-      <span>↺</span> <span>Reset</span>
-    </button>
-
-    <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
-      <span id="fullscreenIcon">⛶</span>
-    </button>
 
     <a href="stamps.html" class="top-action-btn" title="Return to Stamp Catalog">
       <span>📮</span> <span>Catalog</span>
@@ -1135,10 +1128,7 @@
       document.getElementById('btnFitBounds')?.addEventListener('click', () => {
         if (markers.getLayers().length > 0) map.fitBounds(markers.getBounds(), { padding: [50, 50] });
       });
-      document.getElementById('btnResetView')?.addEventListener('click', resetEntireMapView);
-      document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
-
-      const btnLayers = document.getElementById('btnLayersToggle');
+const btnLayers = document.getElementById('btnLayersToggle');
       const layerCard = document.getElementById('layerDropdownCard');
       btnLayers?.addEventListener('click', (e) => {
         e.stopPropagation();

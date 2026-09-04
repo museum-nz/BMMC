@@ -536,13 +536,6 @@
       <span>🧭</span> <span>Fit All</span>
     </button>
 
-    <button id="btnResetView" class="top-action-btn" title="Reset map position &amp; timeline">
-      <span>↺</span> <span>Reset</span>
-    </button>
-
-    <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
-      <span id="fullscreenIcon">⛶</span>
-    </button>
   </div>
 
   <div id="map"></div>
@@ -1297,10 +1290,7 @@
       document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
       document.getElementById('btnFitBounds')?.addEventListener('click', fitAllMarkers);
-      document.getElementById('btnResetView')?.addEventListener('click', resetEntireMapView);
-      document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
-
-      const btnLayersToggle = document.getElementById('btnLayersToggle');
+const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
 
       btnLayersToggle?.addEventListener('click', (e) => {

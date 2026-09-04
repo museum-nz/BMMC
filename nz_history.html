@@ -59,7 +59,7 @@
 
     /* Top-Right Zoom Controls */
     .leaflet-top.leaflet-right .leaflet-control-zoom {
-      margin-top: 96px;
+      margin-top: 62px;
       margin-right: 16px;
       border: 1px solid rgba(203, 213, 225, 0.9);
       border-radius: 12px;
@@ -255,15 +255,17 @@
       color: #38bdf8;
     }
 
-    /* Era Bar */
+    /* Era Bar (Vertical Stack) */
     .era-bar {
       pointer-events: auto;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
       gap: 6px;
-      overflow-x: auto;
       padding: 2px 0;
-      max-width: 100%;
+      max-width: max-content;
+      max-height: calc(100vh - 180px);
+      overflow-y: auto;
       scrollbar-width: none;
     }
     .era-bar::-webkit-scrollbar { display: none; }
@@ -676,7 +678,7 @@
         right: 10px;
       }
       .leaflet-top.leaflet-right .leaflet-control-zoom {
-        margin-top: 100px;
+        margin-top: 66px;
         margin-right: 10px;
       }
       .map-search-box { min-width: 130px; }
@@ -721,14 +723,7 @@
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
-      
-      <button id="btnResetView" class="top-action-btn" title="Reset View &amp; Timeline">
-        <span>↺</span> <span>Reset</span>
-      </button>
 
-      <button id="btnToggleFullscreen" class="top-action-btn" title="Toggle Fullscreen Mode">
-        <span id="fullscreenIcon">⛶</span>
-      </button>
     </div>
 
     <!-- Historical Era Filter Chips -->
@@ -1366,21 +1361,7 @@
         }
       });
 
-      document.getElementById('btnResetView')?.addEventListener('click', () => {
-        document.getElementById('minYearSlider').value = globalMinYear;
-        document.getElementById('maxYearSlider').value = globalMaxYear;
-        const searchInput = document.getElementById('mapSearchInput');
-        if (searchInput) searchInput.value = '';
-        document.getElementById('clearMapSearch').style.display = 'none';
-        document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.min == globalMinYear));
-        if (timelineTimer) toggleTimelinePlayback();
-        map.setView(NZ_CENTER, NZ_ZOOM);
-        filterEvents();
-      });
-
-      document.getElementById('btnToggleFullscreen')?.addEventListener('click', toggleFullscreen);
-
-      const btnLayersToggle = document.getElementById('btnLayersToggle');
+const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
       btnLayersToggle?.addEventListener('click', (e) => {
         e.stopPropagation();
