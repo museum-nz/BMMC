@@ -33,12 +33,15 @@
   <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';" />
   <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';" />
 
-  <!-- Master Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Master Stylesheet & Offline Adapter -->
+  <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --pill-zoom-factor: 1;
+    }
     html, body {
       margin: 0;
       padding: 0;
@@ -90,7 +93,7 @@
       color: #38bdf8 !important;
     }
 
-    /* Top Floating Controls Wrapper */
+    /* Top Floating Controls Bar */
     .top-controls-wrapper {
       position: absolute;
       top: 14px;
@@ -145,16 +148,6 @@
       border-color: #38bdf8;
       color: #38bdf8;
     }
-    .museum-pill-btn {
-      margin-left: auto !important;
-      background: #0284c7 !important;
-      border-color: #38bdf8 !important;
-      color: #ffffff !important;
-    }
-    .museum-pill-btn:hover {
-      background: #0369a1 !important;
-      color: #ffffff !important;
-    }
 
     /* Search Box */
     .map-search-box {
@@ -205,7 +198,7 @@
     }
     .dark .clear-search-btn { background: #334155; color: #cbd5e1; }
 
-    /* Layers Switcher */
+    /* Basemap Switcher */
     .layer-switcher-container { position: relative; display: inline-block; }
     .layer-dropdown-card {
       display: none;
@@ -255,7 +248,7 @@
       color: #38bdf8;
     }
 
-    /* Era Bar (Vertical Stack) */
+    /* Era Bar */
     .era-bar {
       pointer-events: auto;
       display: flex;
@@ -294,7 +287,6 @@
       position: absolute;
       bottom: 24px;
       left: 20px;
-      transform: none;
       width: calc(100% - 40px);
       max-width: 440px;
       background: rgba(255, 255, 255, 0.94);
@@ -411,7 +403,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* History Pin Laddering & Cards */
+    /* 50% Translucent Frosted Glass Marker Pills & 5% Dynamic Zoom Scaling */
     .history-div-icon { background: none !important; border: none !important; }
     .nz-history-marker {
       position: relative;
@@ -419,85 +411,157 @@
       flex-direction: column;
       align-items: center;
       cursor: pointer;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
       transition: transform 0.15s ease;
     }
     .nz-history-marker:hover {
-      transform: scale(1.08);
+      transform: scale(1.06);
       z-index: 100000 !important;
     }
+
     .marker-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #0f172a;
-      color: #ffffff;
-      padding: 4px 9px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-      max-width: 210px;
-      border: 1.5px solid #38bdf8;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: calc(7px * var(--pill-zoom-factor, 1)) !important;
+      background: rgba(255, 255, 255, 0.50) !important;       /* Exactly 50% transparent */
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      color: #0f172a !important;
+      padding: calc(4px * var(--pill-zoom-factor, 1)) calc(8px * var(--pill-zoom-factor, 1)) !important;
+      border-radius: calc(12px * var(--pill-zoom-factor, 1)) !important;
+      width: auto !important;
+      max-width: calc(260px * var(--pill-zoom-factor, 1)) !important;
+      min-height: calc(38px * var(--pill-zoom-factor, 1)) !important;
+      border: 1.5px solid rgba(2, 132, 199, 0.75) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+      overflow: hidden !important;
+      user-select: none !important;
+      transition: max-width 0.12s ease-out, min-height 0.12s ease-out, gap 0.12s ease-out !important;
     }
+    .dark .marker-pill {
+      background: rgba(15, 23, 42, 0.50) !important;         /* 50% transparent dark */
+      border-color: rgba(56, 189, 248, 0.75) !important;
+    }
+
+    .marker-thumb-box {
+      width: calc(34px * var(--pill-zoom-factor, 1)) !important;
+      height: calc(32px * var(--pill-zoom-factor, 1)) !important;
+      border-radius: calc(6px * var(--pill-zoom-factor, 1)) !important;
+      overflow: hidden !important;
+      flex-shrink: 0 !important;
+      background: rgba(226, 232, 240, 0.50) !important;
+      border: 1px solid rgba(15, 23, 42, 0.15) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: width 0.12s ease-out, height 0.12s ease-out !important;
+    }
+    .dark .marker-thumb-box {
+      background: rgba(30, 41, 59, 0.50) !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+    .marker-thumb-img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+    }
+
+    .marker-text-block {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      min-width: 0 !important;
+      flex: 1 !important;
+      text-align: left !important;
+      line-height: 1.25 !important;
+    }
+    .marker-header-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      margin-bottom: 2px !important;
+    }
+
     .marker-date-tag {
-      background: #0284c7;
-      color: #ffffff;
-      padding: 1px 6px;
-      border-radius: 10px;
-      font-size: 10px;
-      font-weight: 900;
+      background: rgba(224, 242, 254, 0.85) !important;
+      color: #0369a1 !important;
+      border: 1px solid rgba(186, 230, 253, 0.8) !important;
+      padding: calc(1px * var(--pill-zoom-factor, 1)) calc(5px * var(--pill-zoom-factor, 1)) !important;
+      border-radius: calc(5px * var(--pill-zoom-factor, 1)) !important;
+      font-size: calc(9.5px * var(--pill-zoom-factor, 1)) !important;
+      font-weight: 900 !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+      transition: font-size 0.12s ease-out, padding 0.12s ease-out !important;
     }
+    .dark .marker-date-tag {
+      background: rgba(3, 105, 161, 0.85) !important;
+      color: #e0f2fe !important;
+      border-color: rgba(56, 189, 248, 0.8) !important;
+    }
+
     .marker-headline-text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      font-size: calc(11px * var(--pill-zoom-factor, 1)) !important;
+      font-weight: 850 !important;
+      color: #0f172a !important;       /* High-contrast non-white dark text */
+      letter-spacing: -0.1px !important;
+      line-height: 1.25 !important;
+      transition: font-size 0.12s ease-out !important;
     }
+    .dark .marker-headline-text { color: #f1f5f9 !important; }
+
     .marker-pin-tail {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 8px solid #0f172a;
-      margin-top: -1px;
+      width: 0 !important;
+      height: 0 !important;
+      border-left: 6px solid transparent !important;
+      border-right: 6px solid transparent !important;
+      border-top: 8px solid rgba(255, 255, 255, 0.50) !important; /* 50% transparent tail */
+      margin-top: -1px !important;
     }
-    .marker-stem {
-      width: 2px;
-      background: #0284c7;
-      margin-top: -1px;
-    }
+    .dark .marker-pin-tail { border-top-color: rgba(15, 23, 42, 0.50) !important; }
+    .marker-stem { width: 2px; background: #0284c7; margin-top: -1px; }
 
-    .cat-vessel .marker-pill { border-color: #38bdf8; }
-    .cat-vessel .marker-date-tag { background: #0284c7; }
-    .cat-war .marker-pill { border-color: #f87171; }
-    .cat-war .marker-date-tag { background: #dc2626; }
-    .cat-disaster .marker-pill { border-color: #fb923c; }
-    .cat-disaster .marker-date-tag { background: #ea580c; }
-    .cat-rights .marker-pill { border-color: #c084fc; }
-    .cat-rights .marker-date-tag { background: #9333ea; }
-    .cat-general .marker-pill { border-color: #4ade80; }
-    .cat-general .marker-date-tag { background: #16a34a; }
+    /* Category Distinct Border Colors */
+    .cat-vessel .marker-pill { border-color: rgba(2, 132, 199, 0.85) !important; }
+    .cat-war .marker-pill { border-color: rgba(220, 38, 38, 0.85) !important; }
+    .cat-disaster .marker-pill { border-color: rgba(234, 88, 12, 0.85) !important; }
+    .cat-rights .marker-pill { border-color: rgba(147, 51, 234, 0.85) !important; }
+    .cat-general .marker-pill { border-color: rgba(22, 163, 74, 0.85) !important; }
 
-    .cluster-number-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0284c7, #1e3a8a);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 900;
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
-      border: 3px solid #ffffff;
+    /* Standard Leaflet MarkerCluster Halo Icons (Green, Amber, Orange) */
+    .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6) !important; }
+    .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.9) !important; }
+    .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6) !important; }
+    .marker-cluster-medium div { background-color: rgba(240, 194, 12, 0.9) !important; }
+    .marker-cluster-large { background-color: rgba(253, 156, 115, 0.6) !important; }
+    .marker-cluster-large div { background-color: rgba(241, 128, 23, 0.9) !important; }
+    .marker-cluster {
+      background-clip: padding-box;
+      border-radius: 50% !important;
+      transition: transform 0.15s ease;
     }
+    .marker-cluster:hover { transform: scale(1.1); }
+    .marker-cluster div {
+      width: 30px !important;
+      height: 30px !important;
+      margin-left: 5px !important;
+      margin-top: 5px !important;
+      text-align: center !important;
+      border-radius: 50% !important;
+      font: 12px/30px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      font-weight: 900 !important;
+      color: #0f172a !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    }
+    .dark .marker-cluster div { color: #ffffff !important; }
+    .marker-cluster span { line-height: 30px !important; display: inline-block !important; }
 
-    .history-card {
-      width: 280px;
-      text-align: left;
-    }
+    /* Pop-up Card Styling */
+    .history-card { width: 280px; text-align: left; }
     .history-card-img-wrap {
       display: block;
       width: 100%;
@@ -507,20 +571,11 @@
       overflow: hidden;
       border-radius: 10px 10px 0 0;
     }
-    .history-card-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .history-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .history-card-badge-row {
       position: absolute;
-      top: 8px;
-      left: 8px;
-      right: 8px;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: none;
+      top: 8px; left: 8px; right: 8px;
+      display: flex; justify-content: space-between; pointer-events: none;
     }
     .category-pill {
       background: rgba(15, 23, 42, 0.9);
@@ -539,8 +594,6 @@
       padding: 3px 8px;
       border-radius: 6px;
     }
-
-    /* Chronological Popup Stepper Bar */
     .history-card-stepper {
       display: flex;
       align-items: center;
@@ -551,10 +604,7 @@
       margin-bottom: 8px;
       border: 1px solid #e2e8f0;
     }
-    .dark .history-card-stepper {
-      background: #0f172a;
-      border-color: #334155;
-    }
+    .dark .history-card-stepper { background: #0f172a; border-color: #334155; }
     .btn-step-nav {
       display: inline-flex;
       align-items: center;
@@ -578,66 +628,18 @@
       border-color: #0284c7;
       transform: scale(1.08);
     }
-    .btn-step-nav:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      border-color: transparent;
-    }
-    .dark .btn-step-nav {
-      background: #1e293b;
-      color: #f8fafc;
-      border-color: #475569;
-    }
-    .dark .btn-step-nav:hover:not(:disabled) {
-      background: #38bdf8;
-      color: #0f172a;
-      border-color: #38bdf8;
-    }
-    .step-index-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #475569;
-      letter-spacing: 0.2px;
-    }
+    .btn-step-nav:disabled { opacity: 0.35; cursor: not-allowed; border-color: transparent; }
+    .dark .btn-step-nav { background: #1e293b; color: #f8fafc; border-color: #475569; }
+    .dark .btn-step-nav:hover:not(:disabled) { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+    .step-index-label { font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.2px; }
     .dark .step-index-label { color: #94a3b8; }
-    .step-index-label strong {
-      color: #0284c7;
-      font-weight: 900;
-    }
+    .step-index-label strong { color: #0284c7; font-weight: 900; }
     .dark .step-index-label strong { color: #38bdf8; }
-
-    .history-card-body {
-      padding: 10px 12px 12px;
-    }
-    .history-card-body h3 {
-      margin: 0 0 4px 0;
-      font-size: 14px;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1.3;
-    }
-    .history-card-meta {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #64748b;
-      font-size: 11px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .history-card-desc {
-      margin: 0 0 10px 0;
-      font-size: 12px;
-      line-height: 1.45;
-      color: #334155;
-    }
-    .history-card-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 8px;
-    }
+    .history-card-body { padding: 10px 12px 12px; }
+    .history-card-body h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 900; color: #0f172a; line-height: 1.3; }
+    .history-card-meta { display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .history-card-desc { margin: 0 0 10px 0; font-size: 12px; line-height: 1.45; color: #334155; }
+    .history-card-footer { display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #f1f5f9; padding-top: 8px; }
     .btn-google-ai {
       display: flex;
       align-items: center;
@@ -672,22 +674,10 @@
     .btn-source-archive:hover { background: #e2e8f0; color: #0f172a; }
 
     @media (max-width: 768px) {
-      .top-controls-wrapper {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-      }
-      .leaflet-top.leaflet-right .leaflet-control-zoom {
-        margin-top: 66px;
-        margin-right: 10px;
-      }
+      .top-controls-wrapper { top: 10px; left: 10px; right: 10px; }
+      .leaflet-top.leaflet-right .leaflet-control-zoom { margin-top: 66px; margin-right: 10px; }
       .map-search-box { min-width: 130px; }
-      .year-slider-container {
-        left: 12px;
-        bottom: 15px;
-        width: calc(100vw - 24px);
-        max-width: calc(100vw - 24px);
-      }
+      .year-slider-container { left: 12px; bottom: 15px; width: calc(100vw - 24px); max-width: calc(100vw - 24px); }
     }
   </style>
 </head>
@@ -723,7 +713,6 @@
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
-
     </div>
 
     <!-- Historical Era Filter Chips -->
@@ -758,7 +747,7 @@
   </div>
 
   <!-- Universal Navigation Drawer Script -->
-  <script src="shared-nav.js"></script>
+  <script src="shared-nav.js" onerror="this.onerror=null;"></script>
 
   <!-- Leaflet, MarkerCluster & PapaParse with CDN Fallbacks -->
   <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
@@ -788,7 +777,7 @@
 
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
-    const CONSISTENT_EVENT_ZOOM = 14; // Standardized zoom level for tour inspection
+    const CONSISTENT_EVENT_ZOOM = 14;
 
     let map;
     let markers;
@@ -865,6 +854,16 @@
       document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
+    // Dynamic 5% Text Scaling Per Zoom Step (1.05^delta)
+    function updatePillZoomScale() {
+      if (!map) return;
+      const currentZoom = map.getZoom();
+      const baseZoom = (typeof NZ_ZOOM !== 'undefined') ? NZ_ZOOM : 6;
+      const delta = currentZoom - baseZoom;
+      const factor = Math.pow(1.05, Math.max(-2, Math.min(10, delta)));
+      document.documentElement.style.setProperty('--pill-zoom-factor', factor.toFixed(3));
+    }
+
     function initMap() {
       map = L.map('map', {
         center: NZ_CENTER,
@@ -872,26 +871,27 @@
         minZoom: 4,
         maxZoom: 19,
         maxBounds: [[-50, 160], [-30, 185]],
-        closePopupOnClick: false,
+        closePopupOnClick: true,    // Clicking outside closes open pop-up
         zoomControl: false
       });
 
       L.control.zoom({ position: 'topright' }).addTo(map);
       basemaps.natgeo.addTo(map);
-      map.on('zoomend', checkBasemapAutoSwitch);
 
+      // Map event listeners
+      map.on('click', () => { map.closePopup(); });
+      map.on('zoom', updatePillZoomScale);
+      map.on('zoomend', updatePillZoomScale);
+      map.on('zoomend', checkBasemapAutoSwitch);
+      updatePillZoomScale();
+
+      // Standard Leaflet MarkerCluster Group (Clean halos, bold count numbers)
       markers = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
+        showCoverageOnHover: true,
         zoomToBoundsOnClick: true,
         maxClusterRadius: 35,
-        disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM, // Unclusters markers at level 14 so it never zooms past it!
-        iconCreateFunction: (cluster) => L.divIcon({
-          html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
-          className: 'custom-cluster-icon',
-          iconSize: [44, 44],
-          iconAnchor: [22, 22]
-        })
+        disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM
       });
       map.addLayer(markers);
     }
@@ -929,12 +929,12 @@
       if (!url) return '';
       url = url.trim();
       if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
-        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s200');
-        return url.includes('?') ? url + '&sz=s200' : url + '=s200';
+        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s240');
+        return url.includes('?') ? url + '&sz=s240' : url + '=s240';
       }
       if (url.includes('drive.google.com')) {
         const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s200`;
+        if (idMatch && idMatch[1]) return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s240`;
       }
       return url;
     }
@@ -972,7 +972,6 @@
       return '📍';
     }
 
-    // Stepping function with consistent zoom level 14
     window.stepHistory = function(delta) {
       if (!currentActiveEvents || currentActiveEvents.length === 0) return;
       let nextIdx = currentActiveIndex + delta;
@@ -983,10 +982,8 @@
       currentActiveIndex = nextIdx;
       const targetEv = currentActiveEvents[nextIdx];
       if (targetEv && targetEv._marker) {
-        // Uncluster if needed, but guarantee we stay at the comfortable zoom level 14
         markers.zoomToShowLayer(targetEv._marker, () => {
           const curZoom = map.getZoom();
-          // If zoom went deeper than 14 or was zoomed way out, snap smoothly to 14
           if (curZoom > CONSISTENT_EVENT_ZOOM || curZoom < 12) {
             map.setView([targetEv.latitude, targetEv.longitude], CONSISTENT_EVENT_ZOOM, { animate: true });
           } else {
@@ -1041,23 +1038,47 @@
           const safeDetails = escapeHTML(ev.details || '');
           
           const rawImg = (ev.image_url || '').trim();
-          const hasImage = rawImg.length > 0 && rawImg !== '#';
-          const safeThumbImg = hasImage ? escapeHTML(getThumbnailUrl(rawImg)) : '';
-          const safeFullImg = hasImage ? escapeHTML(getFullImageUrl(rawImg)) : '';
+          const hasImageLink = rawImg.length > 0 && rawImg !== '#';
+          const safeThumbImg = hasImageLink ? escapeHTML(getThumbnailUrl(rawImg)) : '';
+          const safeFullImg = hasImageLink ? escapeHTML(getFullImageUrl(rawImg)) : '';
 
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
 
           const stemHeight = idx * 36;
-          const totalIconHeight = 34 + stemHeight;
+          const totalIconHeight = 48 + stemHeight;
 
-          const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand history')}`;
+          const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand')}`;
 
+          let markerImgSrc = '';
+          if (hasImageLink) {
+            if (typeof window.resolveOfflineMedia === 'function') {
+              markerImgSrc = window.resolveOfflineMedia(rawImg) || window.resolveOfflineMedia(ev.id) || '';
+            }
+            if (!markerImgSrc) {
+              markerImgSrc = safeThumbImg;
+            }
+          }
+
+          // ONLY display thumbnail box if an explicit image link exists in the data
           const markerHTML = `
             <div class="nz-history-marker ${catClass}">
               <div class="marker-pill">
-                <span class="marker-date-tag">${catIcon} ${safeYear}</span>
-                <span class="marker-headline-text">${safeHeadline}</span>
+                ${markerImgSrc ? `
+                  <div class="marker-thumb-box">
+                    <img class="marker-thumb-img" 
+                         src="${markerImgSrc}" 
+                         alt="" 
+                         loading="lazy" 
+                         onerror="this.parentElement.style.display='none';" />
+                  </div>
+                ` : ''}
+                <div class="marker-text-block">
+                  <div class="marker-header-row">
+                    <span class="marker-date-tag">${catIcon} ${safeYear}</span>
+                  </div>
+                  <div class="marker-headline-text" title="${safeHeadline}">${safeHeadline}</div>
+                </div>
               </div>
               <div class="marker-pin-tail"></div>
               ${stemHeight > 0 ? `<div class="marker-stem" style="height: ${stemHeight}px;"></div>` : ''}
@@ -1067,11 +1088,11 @@
           const customIcon = L.divIcon({
             html: markerHTML,
             className: 'history-div-icon',
-            iconSize: [210, totalIconHeight],
-            iconAnchor: [105, totalIconHeight]
+            iconSize: [240, totalIconHeight],
+            iconAnchor: [120, totalIconHeight]
           });
 
-          const popupImageBlock = hasImage ? `
+          const popupImageBlock = hasImageLink ? `
             <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to view full image">
               <img src="${safeThumbImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
               <div class="history-card-badge-row">
@@ -1122,7 +1143,7 @@
 
           const marker = L.marker([ev.latitude, ev.longitude], { icon: customIcon });
           ev._marker = marker;
-          marker.bindPopup(popupHTML, { maxWidth: 380, autoPan: true, keepInView: true });
+          marker.bindPopup(popupHTML, { maxWidth: 390, autoPan: true, keepInView: true, closeOnClick: true });
 
           marker.on('popupopen', () => {
             currentActiveIndex = ev._chronoIndex;
@@ -1209,16 +1230,6 @@
             filterEvents();
           }
         }, 260);
-      }
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-        document.getElementById('fullscreenIcon').textContent = '🗗';
-      } else {
-        document.exitFullscreen().catch(() => {});
-        document.getElementById('fullscreenIcon').textContent = '⛶';
       }
     }
 
@@ -1310,24 +1321,21 @@
     }
 
     async function loadDataset() {
-      if (window.OFFLINE_CSV && parseCSVData(window.OFFLINE_CSV)) return;
-      if (window.bMMC_OFFLINE_DATA && parseCSVData(window.bMMC_OFFLINE_DATA)) return;
-
+      // 1. Instant Cache Check for instantaneous display
       try {
-        const cachedText = localStorage.getItem(CACHE_STORAGE_KEY);
-        if (cachedText && cachedText.trim().length > 50) {
-          parseCSVData(cachedText);
+        const cached = localStorage.getItem(CACHE_STORAGE_KEY);
+        if (cached && parseCSVData(cached)) {
+          // Continue in background to refresh from disk or online
         }
-      } catch (cacheErr) {}
+      } catch (e) {}
 
+      // 2. Comprehensive local offline & live online CSV candidates
       const candidateUrls = [
+        '../data/nz_history.csv',
         './data/nz_history.csv',
         'data/nz_history.csv',
-        '../data/nz_history.csv',
         './nz_history.csv',
         'nz_history.csv',
-        'https://raw.githubusercontent.com/museum-nz/BMMC/main/data/nz_history.csv',
-        'https://raw.githubusercontent.com/museum-nz/BMMC/master/data/nz_history.csv',
         LIVE_CSV_URL,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
         `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`
@@ -1361,7 +1369,7 @@
         }
       });
 
-const btnLayersToggle = document.getElementById('btnLayersToggle');
+      const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
       btnLayersToggle?.addEventListener('click', (e) => {
         e.stopPropagation();

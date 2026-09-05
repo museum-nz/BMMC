@@ -39,6 +39,9 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --pill-zoom-factor: 1;
+    }
     html, body {
       margin: 0;
       padding: 0;
@@ -195,7 +198,7 @@
     }
     .dark .clear-search-btn { background: #334155; color: #cbd5e1; }
 
-    /* Basemap Switcher Dropdown */
+    /* Basemap Switcher */
     .layer-switcher-container { position: relative; display: inline-block; }
     .layer-dropdown-card {
       display: none;
@@ -245,7 +248,7 @@
       color: #38bdf8;
     }
 
-    /* Era Filters Bar */
+    /* Era Bar */
     .era-bar {
       pointer-events: auto;
       display: flex;
@@ -400,7 +403,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* Markers & Custom Pin Laddering */
+    /* 50% Translucent Frosted Glass Marker Pills & 5% Dynamic Zoom Scaling */
     .history-div-icon { background: none !important; border: none !important; }
     .nz-train-marker {
       position: relative;
@@ -408,95 +411,161 @@
       flex-direction: column;
       align-items: center;
       cursor: pointer;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
       transition: transform 0.15s ease;
     }
     .nz-train-marker:hover {
-      transform: scale(1.08);
+      transform: scale(1.06);
       z-index: 100000 !important;
     }
+
     .marker-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #0f172a;
-      color: #ffffff;
-      padding: 4px 9px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-      max-width: 220px;
-      border: 1.5px solid #38bdf8;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: calc(7px * var(--pill-zoom-factor, 1)) !important;
+      background: rgba(255, 255, 255, 0.50) !important;       /* Exactly 50% transparent */
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      color: #0f172a !important;
+      padding: calc(4px * var(--pill-zoom-factor, 1)) calc(8px * var(--pill-zoom-factor, 1)) !important;
+      border-radius: calc(12px * var(--pill-zoom-factor, 1)) !important;
+      width: auto !important;
+      max-width: calc(260px * var(--pill-zoom-factor, 1)) !important;
+      min-height: calc(38px * var(--pill-zoom-factor, 1)) !important;
+      border: 1.5px solid rgba(2, 132, 199, 0.75) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+      overflow: hidden !important;
+      user-select: none !important;
+      transition: max-width 0.12s ease-out, min-height 0.12s ease-out, gap 0.12s ease-out !important;
     }
+    .dark .marker-pill {
+      background: rgba(15, 23, 42, 0.50) !important;         /* 50% transparent dark */
+      border-color: rgba(56, 189, 248, 0.75) !important;
+    }
+
+    .marker-thumb-box {
+      width: calc(34px * var(--pill-zoom-factor, 1)) !important;
+      height: calc(32px * var(--pill-zoom-factor, 1)) !important;
+      border-radius: calc(6px * var(--pill-zoom-factor, 1)) !important;
+      overflow: hidden !important;
+      flex-shrink: 0 !important;
+      background: rgba(226, 232, 240, 0.50) !important;
+      border: 1px solid rgba(15, 23, 42, 0.15) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: width 0.12s ease-out, height 0.12s ease-out !important;
+    }
+    .dark .marker-thumb-box {
+      background: rgba(30, 41, 59, 0.50) !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+    .marker-thumb-img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+    }
+
+    .marker-text-block {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      min-width: 0 !important;
+      flex: 1 !important;
+      text-align: left !important;
+      line-height: 1.25 !important;
+    }
+    .marker-header-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      margin-bottom: 2px !important;
+    }
+
     .marker-date-tag {
-      background: #0284c7;
-      color: #ffffff;
-      padding: 1px 6px;
-      border-radius: 10px;
-      font-size: 10px;
-      font-weight: 900;
+      background: rgba(224, 242, 254, 0.85) !important;
+      color: #0369a1 !important;
+      border: 1px solid rgba(186, 230, 253, 0.8) !important;
+      padding: calc(1px * var(--pill-zoom-factor, 1)) calc(5px * var(--pill-zoom-factor, 1)) !important;
+      border-radius: calc(5px * var(--pill-zoom-factor, 1)) !important;
+      font-size: calc(9.5px * var(--pill-zoom-factor, 1)) !important;
+      font-weight: 900 !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+      transition: font-size 0.12s ease-out, padding 0.12s ease-out !important;
     }
+    .dark .marker-date-tag {
+      background: rgba(3, 105, 161, 0.85) !important;
+      color: #e0f2fe !important;
+      border-color: rgba(56, 189, 248, 0.8) !important;
+    }
+
     .marker-headline-text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      font-size: calc(11px * var(--pill-zoom-factor, 1)) !important;
+      font-weight: 850 !important;
+      color: #0f172a !important;       /* High-contrast non-white dark text */
+      letter-spacing: -0.1px !important;
+      line-height: 1.25 !important;
+      transition: font-size 0.12s ease-out !important;
     }
+    .dark .marker-headline-text { color: #f1f5f9 !important; }
+
     .marker-pin-tail {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 8px solid #0f172a;
-      margin-top: -1px;
+      width: 0 !important;
+      height: 0 !important;
+      border-left: 6px solid transparent !important;
+      border-right: 6px solid transparent !important;
+      border-top: 8px solid rgba(255, 255, 255, 0.50) !important; /* 50% transparent tail */
+      margin-top: -1px !important;
     }
-    .marker-stem {
-      width: 2px;
-      background: #0284c7;
-      margin-top: -1px;
-    }
+    .dark .marker-pin-tail { border-top-color: rgba(15, 23, 42, 0.50) !important; }
+    .marker-stem { width: 2px; background: #0284c7; margin-top: -1px; }
 
-    /* Category Specific Color Schemes */
-    .cat-firsts .marker-pill { border-color: #f59e0b; }
-    .cat-firsts .marker-date-tag { background: #d97706; }
-    .cat-feats .marker-pill { border-color: #38bdf8; }
-    .cat-feats .marker-date-tag { background: #0284c7; }
-    .cat-loco .marker-pill { border-color: #818cf8; }
-    .cat-loco .marker-date-tag { background: #4f46e5; }
-    .cat-lines .marker-pill { border-color: #34d399; }
-    .cat-lines .marker-date-tag { background: #059669; }
-    .cat-towns .marker-pill { border-color: #c084fc; }
-    .cat-towns .marker-date-tag { background: #9333ea; }
-    .cat-disasters .marker-pill { border-color: #f87171; }
-    .cat-disasters .marker-date-tag { background: #dc2626; }
-    .cat-decline .marker-pill { border-color: #fb923c; }
-    .cat-decline .marker-date-tag { background: #ea580c; }
-    .cat-scenic .marker-pill { border-color: #f472b6; }
-    .cat-scenic .marker-date-tag { background: #db2777; }
-    .cat-commuter .marker-pill { border-color: #22d3ee; }
-    .cat-commuter .marker-date-tag { background: #0891b2; }
+    /* Category Distinct Border Colors */
+    .cat-firsts .marker-pill { border-color: rgba(217, 119, 6, 0.85) !important; }
+    .cat-feats .marker-pill { border-color: rgba(2, 132, 199, 0.85) !important; }
+    .cat-loco .marker-pill { border-color: rgba(79, 70, 229, 0.85) !important; }
+    .cat-towns .marker-pill { border-color: rgba(124, 58, 237, 0.85) !important; }
+    .cat-disasters .marker-pill { border-color: rgba(234, 88, 12, 0.85) !important; }
+    .cat-decline .marker-pill { border-color: rgba(234, 88, 12, 0.85) !important; }
+    .cat-scenic .marker-pill { border-color: rgba(219, 39, 119, 0.85) !important; }
+    .cat-commuter .marker-pill { border-color: rgba(8, 145, 178, 0.85) !important; }
+    .cat-lines .marker-pill { border-color: rgba(5, 150, 105, 0.85) !important; }
 
-    .cluster-number-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0284c7, #1e3a8a);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 900;
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
-      border: 3px solid #ffffff;
+    /* Standard Leaflet MarkerCluster Halo Icons (Green, Amber, Orange) */
+    .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6) !important; }
+    .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.9) !important; }
+    .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6) !important; }
+    .marker-cluster-medium div { background-color: rgba(240, 194, 12, 0.9) !important; }
+    .marker-cluster-large { background-color: rgba(253, 156, 115, 0.6) !important; }
+    .marker-cluster-large div { background-color: rgba(241, 128, 23, 0.9) !important; }
+    .marker-cluster {
+      background-clip: padding-box;
+      border-radius: 50% !important;
+      transition: transform 0.15s ease;
     }
+    .marker-cluster:hover { transform: scale(1.1); }
+    .marker-cluster div {
+      width: 30px !important;
+      height: 30px !important;
+      margin-left: 5px !important;
+      margin-top: 5px !important;
+      text-align: center !important;
+      border-radius: 50% !important;
+      font: 12px/30px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      font-weight: 900 !important;
+      color: #0f172a !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    }
+    .dark .marker-cluster div { color: #ffffff !important; }
+    .marker-cluster span { line-height: 30px !important; display: inline-block !important; }
 
-    /* Detail Popup Card */
-    .history-card {
-      width: 290px;
-      text-align: left;
-    }
+    /* Pop-up Card Styling */
+    .history-card { width: 290px; text-align: left; }
     .history-card-img-wrap {
       display: block;
       width: 100%;
@@ -506,20 +575,11 @@
       overflow: hidden;
       border-radius: 10px 10px 0 0;
     }
-    .history-card-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .history-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .history-card-badge-row {
       position: absolute;
-      top: 8px;
-      left: 8px;
-      right: 8px;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: none;
+      top: 8px; left: 8px; right: 8px;
+      display: flex; justify-content: space-between; pointer-events: none;
     }
     .category-pill {
       background: rgba(15, 23, 42, 0.9);
@@ -538,7 +598,6 @@
       padding: 3px 8px;
       border-radius: 6px;
     }
-
     .history-card-stepper {
       display: flex;
       align-items: center;
@@ -549,10 +608,7 @@
       margin-bottom: 8px;
       border: 1px solid #e2e8f0;
     }
-    .dark .history-card-stepper {
-      background: #0f172a;
-      border-color: #334155;
-    }
+    .dark .history-card-stepper { background: #0f172a; border-color: #334155; }
     .btn-step-nav {
       display: inline-flex;
       align-items: center;
@@ -576,66 +632,18 @@
       border-color: #0284c7;
       transform: scale(1.08);
     }
-    .btn-step-nav:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      border-color: transparent;
-    }
-    .dark .btn-step-nav {
-      background: #1e293b;
-      color: #f8fafc;
-      border-color: #475569;
-    }
-    .dark .btn-step-nav:hover:not(:disabled) {
-      background: #38bdf8;
-      color: #0f172a;
-      border-color: #38bdf8;
-    }
-    .step-index-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #475569;
-      letter-spacing: 0.2px;
-    }
+    .btn-step-nav:disabled { opacity: 0.35; cursor: not-allowed; border-color: transparent; }
+    .dark .btn-step-nav { background: #1e293b; color: #f8fafc; border-color: #475569; }
+    .dark .btn-step-nav:hover:not(:disabled) { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+    .step-index-label { font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.2px; }
     .dark .step-index-label { color: #94a3b8; }
-    .step-index-label strong {
-      color: #0284c7;
-      font-weight: 900;
-    }
+    .step-index-label strong { color: #0284c7; font-weight: 900; }
     .dark .step-index-label strong { color: #38bdf8; }
-
-    .history-card-body {
-      padding: 10px 12px 12px;
-    }
-    .history-card-body h3 {
-      margin: 0 0 4px 0;
-      font-size: 14px;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1.3;
-    }
-    .history-card-meta {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #64748b;
-      font-size: 11px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .history-card-desc {
-      margin: 0 0 10px 0;
-      font-size: 12px;
-      line-height: 1.45;
-      color: #334155;
-    }
-    .history-card-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 8px;
-    }
+    .history-card-body { padding: 10px 12px 12px; }
+    .history-card-body h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 900; color: #0f172a; line-height: 1.3; }
+    .history-card-meta { display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .history-card-desc { margin: 0 0 10px 0; font-size: 12px; line-height: 1.45; color: #334155; }
+    .history-card-footer { display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #f1f5f9; padding-top: 8px; }
     .btn-google-ai {
       display: flex;
       align-items: center;
@@ -670,22 +678,10 @@
     .btn-source-archive:hover { background: #e2e8f0; color: #0f172a; }
 
     @media (max-width: 768px) {
-      .top-controls-wrapper {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-      }
-      .leaflet-top.leaflet-right .leaflet-control-zoom {
-        margin-top: 66px;
-        margin-right: 10px;
-      }
+      .top-controls-wrapper { top: 10px; left: 10px; right: 10px; }
+      .leaflet-top.leaflet-right .leaflet-control-zoom { margin-top: 66px; margin-right: 10px; }
       .map-search-box { min-width: 140px; }
-      .year-slider-container {
-        left: 10px;
-        bottom: 12px;
-        width: calc(100vw - 20px);
-        max-width: calc(100vw - 20px);
-      }
+      .year-slider-container { left: 10px; bottom: 12px; width: calc(100vw - 20px); max-width: calc(100vw - 20px); }
     }
   </style>
 </head>
@@ -780,117 +776,8 @@
   </script>
 
   <script>
-    // Primary CSV Endpoints
-    const EXTERNAL_CSV_URL = 'trains.csv';
+    const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1351464718&single=true&output=csv';
     const CACHE_STORAGE_KEY = 'bMMC_nz_trains_csv_cache';
-
-    // Embedded Complete Dataset (Instant Local Drop-in Fallback)
-    const EMBEDDED_TRAINS_CSV = `id,year,date,headline,category,location,latitude,longitude,details,image_url,source_url
-NZR001,1862,7 May 1862,Dun Mountain Railway Opens (NZ's First Railway),Railway Firsts,Nelson,-41.2711,173.2842,"New Zealand's first operational railway opened in Nelson to haul chromite and copper from Dun Mountain to Nelson Port. It was a 3 ft (914 mm) narrow-gauge mineral line operated with horse-drawn wagons.",https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Dun_Mountain_Railway.jpg/640px-Dun_Mountain_Railway.jpg,https://teara.govt.nz/en/railways/page-1
-NZR002,1863,1 Dec 1863,First Public Steam Railway Opens,Railway Firsts,Ferrymead (Christchurch),-43.5558,172.7051,"The Canterbury Provincial Railways opened New Zealand's first steam-powered public railway line between Christchurch and the river port of Ferrymead. Built to a broad gauge of 5 ft 3 in (1600 mm), it was hauled by the locomotive 'Pilgrim'.",https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Ferrymead_Railway_Opening_1863.jpg/640px-Ferrymead_Railway_Opening_1863.jpg,https://nzhistory.govt.nz/first-public-railway-opens
-NZR003,1864,18 Jan 1864,First Locomotive Assembled in NZ ('Lady Barkly'),Locomotives & Works,Invercargill,-46.4132,168.3538,"The Southland Provincial Railway inaugurated operations between Invercargill and Makarewa using the 'Lady Barkly', a locomotive imported from Australia and adapted for the province's initial standard-gauge wooden-rail network.",,https://teara.govt.nz/en/southland-places/page-12
-NZR004,1867,9 Dec 1867,Lyttelton Rail Tunnel Pierces Crater Rim,Engineering Feats,Lyttelton,-43.5997,172.7197,"Engineered by Edward Dobson, the 2.6 km Lyttelton Rail Tunnel pierced the volcanic crater wall of the Port Hills to link Christchurch directly to Lyttelton Harbour. It was the Southern Hemisphere's longest tunnel at the time and rendered Ferrymead obsolete.",,https://nzhistory.govt.nz/culture/tunnel-through-the-port-hills
-NZR005,1867,18 Jun 1867,Bluff to Invercargill Railway Opens,Lines & Corridors,Bluff Harbour,-46.6000,168.3333,"Southland opened its first permanent iron-rail line connecting Invercargill to the deep-water ocean port at Bluff. Built originally to standard gauge (4 ft 8.5 in), it was later converted during national gauge standardization.",,https://teara.govt.nz/en/southland-places/page-14
-NZR006,1870,28 Jun 1870,Vogel's Great Public Works Policy & 3'6" Gauge,Legislation & Politics,Parliament (Wellington),-41.2784,174.7767,"Colonial Treasurer Julius Vogel announced an ambitious borrowing scheme to build a unified nationwide infrastructure network. Crucially, the Railways Act 1870 standardized all future public tracks to a 3 ft 6 in (1,067 mm) 'Cape gauge' to reduce mountainous construction costs.",,https://teara.govt.nz/en/railways/page-2
-NZR007,1873,1 Jan 1873,Dunedin and Port Chalmers Railway Opens,Lines & Corridors,Port Chalmers,-45.8167,170.6167,"Constructed by private contractors Proudfoot & Chaplin, this line was the very first 3 ft 6 in gauge line to carry traffic in New Zealand, demonstrating the economic viability of the newly chosen national gauge standard.",,https://teara.govt.nz/en/railways/page-2
-NZR008,1873,20 Dec 1873,Auckland to Onehunga Railway Opens,Lines & Corridors,Onehunga (Auckland),-36.9247,174.7865,"The first railway line in Auckland Province opened between Point Britomart (central Auckland) and the bustling Manukau Harbour port at Onehunga, forming the initial suburban spur of what would become the North Island rail network.",,https://kura.aucklandlibraries.govt.nz
-NZR009,1874,14 Apr 1874,Wellington to Lower Hutt Railway Opens,Lines & Corridors,Petone / Lower Hutt,-41.2260,174.8720,"Wellington Province opened its first railway running along the scenic western harbor edge between Pipitea Point and Lower Hutt. Passengers crossed Petone beach, laying the groundwork for the Hutt Valley suburban line.",,https://teara.govt.nz/en/wellington-places/page-11
-NZR010,1875,17 Nov 1875,Picton to Blenheim Railway Opens,Lines & Corridors,Picton,-41.2900,174.0050,"Marlborough opened its rail lifeline traversing the rugged Elevation pass to link Blenheim agricultural plains with the sheltered deep-water sound at Picton, laying the northern anchor for the future Main North Line.",,https://teara.govt.nz/en/marlborough-places/page-5
-NZR011,1876,27 Apr 1876,Foxton to Palmerston North Wooden Tramway Converted,Railway Towns,Palmerston North,-40.3556,175.6117,"Originally built as a wooden horse-tramway through the dense Manawatū bush to the port of Foxton, this iron-rail conversion turned a sleepy clearing called Papaioea into Palmerston North, cementing its destiny as the lower North Island's primary rail crossroad.",,https://teara.govt.nz/en/manawatu-places/page-5
-NZR012,1877,20 Dec 1877,Canterbury Provincial Broad Gauge Converted,Engineering Feats,Christchurch,-43.5321,172.6362,"Over a single weekend, engineering gangs converted Canterbury's remaining 5 ft 3 in broad-gauge trackage to the national standard 3 ft 6 in gauge, eliminating costly break-of-gauge transshipments at Amberley and Moeraki.",,https://teara.govt.nz/en/railways/page-2
-NZR013,1878,12 Oct 1878,Rimutaka Incline Opens with Fell Mountain Engines,Engineering Feats,Cross Creek (Wairarapa),-41.1783,175.2017,"To breach the Rimutaka Range into the Wairarapa, engineers built a 1-in-15 gradient between Cross Creek and Summit using the Swedish Fell system, featuring four horizontal driving wheels clamping onto an elevated center rail.",https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Fell_Engine_Cross_Creek.jpg/640px-Fell_Engine_Cross_Creek.jpg,https://nzhistory.govt.nz/media/photo/fell-locomotive
-NZR014,1878,22 Jan 1878,Christchurch to Dunedin Rail Connection Completed,Lines & Corridors,Palmerston (Otago),-45.4833,170.7167,"The final link between Amberley and Southland was completed, establishing the South Island Main Trunk railway. A continuous 630 km journey between Christchurch and Dunedin was celebrated with public holidays and banquets.",,https://teara.govt.nz/en/railways/page-3
-NZR015,1878,10 Jul 1878,Kingston Branch Opens to Lake Wakatipu,Lines & Corridors,Kingston,-45.3333,168.7167,"The railway reached Kingston at the southern foot of Lake Wakatipu, allowing passengers and goods to transfer to steamships like the TSS Earnslaw for onward passage to Queenstown and the high-country goldfields.",,https://teara.govt.nz/en/otago-places/page-17
-NZR016,1879,1 Nov 1879,Denniston Incline Opens ('Eighth Wonder of the World'),Engineering Feats,Denniston (West Coast),-41.7333,171.7967,"A gravity-fed coal railway dropped 518 vertical meters down Mount Rochfort at grades up to 1-in-1.25. Loaded 12-ton coal wagons racing down the cliff pulled up empty wagons on steel wire ropes in an astounding feat of Victorian engineering.",https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Denniston_incline.jpg/640px-Denniston_incline.jpg,https://teara.govt.nz/en/west-coast-places/page-5
-NZR017,1880,1 Mar 1880,New Zealand Railways Department (NZR) Formed,Legislation & Politics,Wellington,-41.2784,174.7767,"The colonial government reorganized all state-owned rail operations under the New Zealand Government Railways Department (NZR), instituting centralized management of rolling stock, timetables, maintenance, and civil works.",,https://teara.govt.nz/en/railways/page-3
-NZR018,1880,18 Dec 1880,Hillside Railway Workshops Open,Locomotives & Works,South Dunedin,-45.8942,170.4958,"NZR established the Hillside Railway Workshops in South Dunedin. It grew into the South Island's foremost manufacturing center for locomotives, iron forgings, and passenger cars, employing thousands of skilled tradesmen.",,https://teara.govt.nz/en/otago-places/page-8
-NZR019,1884,15 Apr 1884,Addington Railway Workshops Established,Locomotives & Works,Christchurch,-43.5392,172.6075,"Centralized near Addington Junction, these expansive mechanical shops became famous for designing innovative passenger carriages, refrigeration wagons, and over 60 mainline steam locomotives.",,https://teara.govt.nz/en/canterbury-places/page-10
-NZR020,1885,15 Apr 1885,First Sod Turned on North Island Main Trunk,Lines & Corridors,Puniu River (Te Awamutu),-38.0333,175.3167,"Premier Robert Stout and paramount Ngāti Maniapoto chief Wahanui turned the first sod at the Puniu River border, formally commencing construction of the railway through the previously closed Rohe Pōtae (King Country).",,https://nzhistory.govt.nz/turning-first-sod-of-nimt
-NZR021,1886,3 Nov 1886,Wellington & Manawatu Railway (WMR) Opens,Private Railways,Paekākāriki,-40.9833,174.9500,"Frustrated by Crown delays, Wellington merchants formed the private WMR company. Engineered through the coastal cliffs of Paekākāriki with 13 tunnels, it connected Wellington to Longburn, outperforming government lines with fast American-built Baldwin locomotives.",,https://teara.govt.nz/en/wellington-places/page-14
-NZR022,1886,17 Jan 1886,New Zealand Midland Railway Company Formed,Private Railways,Greymouth,-42.4500,171.2000,"A private British syndicate formed to build a trans-island line connecting Canterbury to Nelson and the West Coast via Arthur's Pass in exchange for vast timber and crown land grants.",,https://teara.govt.nz/en/railways/page-3
-NZR023,1889,1 Dec 1889,First Dining Car in Australasia on WMR,Railway Firsts,Otaki,-40.7583,175.1500,"The Wellington & Manawatu Railway introduced the first railway dining car in Australasia on its express runs between Wellington and Palmerston North, complete with mahogany tables, gas lighting, and fine silver service.",,https://teara.govt.nz/en/railways/page-3
-NZR024,1889,14 Dec 1889,First Class W 2-6-4T Built at Addington,Locomotives & Works,Addington (Christchurch),-43.5392,172.6075,"NZR constructed its first wholly New Zealand-designed and built steam locomotive, W 192, at Addington Workshops, demonstrating domestic capability in heavy railway manufacturing.",,https://teara.govt.nz/en/railways/page-4
-NZR025,1891,1 Dec 1891,Otago Central Railway Reaches Middlemarch,Lines & Corridors,Middlemarch (Otago),-45.5100,170.1200,"Conceived by Vincent Pyke to open the arid interior goldfields and pastoral sheep runs, the spectacular line threaded through the rugged Taieri Gorge with towering iron viaducts and hand-hewn stone tunnels.",,https://teara.govt.nz/en/otago-places/page-16
-NZR026,1897,11 Dec 1897,Woodville Railway Station Becomes Major Junction,Railway Towns,Woodville,-40.3367,175.8667,"With the completion of the Manawatū Gorge line and the Wairarapa line, Woodville emerged as a premier junction town connecting Hawke's Bay, Manawatū, and Wellington, complete with an engine shed, turntable, and refreshment rooms.",,https://teara.govt.nz/en/manawatu-places/page-11
-NZR027,1898,1 Jun 1898,Raurimu Spiral Surveyed by Peter Ellis,Engineering Feats,Raurimu,-39.1167,175.4000,"Confronted with a 132-meter bluff between Raurimu and the volcanic plateau, surveyor Peter Ellis designed an ingenious spiral incorporating a horseshoe curve, two tunnels, and a complete circle to achieve a manageable 1-in-50 gradient without costly switchbacks.",,https://nzhistory.govt.nz/culture/raurimu-spiral
-NZR028,1899,27 Mar 1899,Rakaia Railway Collision,Disasters & Accidents,Rakaia (Canterbury),-43.7500,172.0167,"Two excursion trains returning from the Ashburton races collided in poor visibility at Rakaia station, killing four passengers. The tragedy spurred the nationwide introduction of the Westinghouse continuous air brake.",,https://nzhistory.govt.nz/rallway-accident-at-rakaia
-NZR029,1900,15 Oct 1900,Crown Confiscates Midland Railway Assets,Legislation & Politics,Arthur's Pass,-42.9400,171.5600,"Following years of financial distress and sluggish tunneling progress across the Southern Alps, the Seddon government seized the Midland Railway Company's assets, completing the trans-alpine route as a state enterprise.",,https://teara.govt.nz/en/railways/page-3
-NZR030,1903,1 Jan 1903,A & G Price Foundry Builds First Steam Locomotive,Locomotives & Works,Thames,-37.1383,175.5417,"The A & G Price foundry in Thames delivered the first of dozens of steam locomotives under government contract, proving provincial mining foundries could produce world-class heavy locomotives.",,https://teara.govt.nz/en/biographies/2p28/price-alfred
-NZR031,1904,18 Dec 1904,Frankton Junction Becomes Kingpin Hub,Railway Towns,Frankton (Hamilton),-37.7850,175.2633,"The junction of the NIMT and the Rotorua/Bay of Plenty branch made Frankton the undisputed railroad nerve center of the Waikato, featuring a massive rail yard, extensive house factories, and 24-hour tearooms.",,https://teara.govt.nz/en/waikato-places/page-6
-NZR032,1906,22 Oct 1906,Dunedin Railway Station Opens,Architecture,Dunedin,-45.8753,170.5078,"Designed by architect George Troup (nicknamed 'Gingerbread George'), this magnificent Flemish Renaissance palace of rail featured dark basalt stone, Oamaru limestone trim, and a booking hall tiled with 750,000 Royal Doulton porcelain tiles.",https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Dunedin_railway_station_2016.jpg/640px-Dunedin_railway_station_2016.jpg,https://nzhistory.govt.nz/media/photo/dunedin-railway-station
-NZR033,1908,8 Aug 1908,The 'Parliamentary Special' Traverses the NIMT,Lines & Corridors,Makatote Viaduct,-39.2617,175.4050,"Before the North Island Main Trunk was officially finished, a special train carrying Prime Minister Sir Joseph Ward and MPs steamed across temporary rails and the newly erected Makatote Viaduct to welcome the American 'Great White Fleet' in Auckland.",,https://nzhistory.govt.nz/parliamentary-special-train
-NZR034,1908,6 Nov 1908,Driving of the Last Spike on the NIMT,Lines & Corridors,Manganui-o-te-Ao (Pokaka),-39.3500,175.4167,"Prime Minister Sir Joseph Ward drove the final silver spike at Manganui-o-te-Ao, connecting Wellington and Auckland by rail after 38 years of grueling work across swamps, viaducts, and pumice plateau.",https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Driving_the_last_spike_NIMT.jpg/640px-Driving_the_last_spike_NIMT.jpg,https://nzhistory.govt.nz/driving-the-last-spike
-NZR035,1908,7 Dec 1908,Crown Buys Out Wellington & Manawatu Railway,Legislation & Politics,Thorndon (Wellington),-41.2725,174.7817,"NZR formally acquired the Wellington & Manawatu Railway for £900,000, integrating its modern coastal line into the state-owned NIMT network and abandoning the slow mountain crossing via the Rimutaka Incline for northern traffic.",,https://teara.govt.nz/en/wellington-places/page-14
-NZR036,1909,14 Feb 1909,First Scheduled Auckland-Wellington Express,Lines & Corridors,Taumarunui,-38.8833,175.2600,"Regular overnight passenger expresses commenced between Auckland and Wellington, cutting travel time from several days by sea to 18 hours by train. The midnight stop at Taumarunui station tearooms entered Kiwi folklore.",,https://nzhistory.govt.nz/main-trunk-express-inaugurated
-NZR037,1912,1 May 1912,Marton Junction Connects Taranaki and Main Trunk,Railway Towns,Marton,-40.0667,175.3833,"The junction of the NIMT and the Marton–New Plymouth line cemented Marton's role as the western lower North Island's primary agricultural and mail interchange, lined with railway worker cottages.",,https://teara.govt.nz/en/manawatu-places/page-3
-NZR038,1915,1 Nov 1915,Class Ab 'Passchendaele' Steam Engine Enters Service,Locomotives & Works,Addington (Christchurch),-43.5392,172.6075,"Chief Mechanical Engineer H.H. Jackson rolled out Ab 608, the prototype of the most successful locomotive class in NZ history. Over 140 of these versatile 4-6-2 Pacific engines were built, with Ab 608 later christened 'Passchendaele' as a WWI memorial.",https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Ab608Passchendaele.jpg/640px-Ab608Passchendaele.jpg,https://nzhistory.govt.nz/media/photo/passchendaele-locomotive
-NZR039,1917,14 Feb 1917,Ohakune Becomes High-Country Railway Depot,Railway Towns,Ohakune,-39.4167,175.4000,"Sitting beneath Mount Ruapehu, Ohakune grew rapidly as a major servicing depot, locomotive staging yard, and junction for the timber-rich Raetihi branch line.",,https://teara.govt.nz/en/whanganui-places/page-9
-NZR040,1920,1 Jul 1920,Frankton Railway House Factory Opens,Culture & Society,Frankton (Hamilton),-37.7850,175.2633,"To solve acute post-WWI housing shortages for rail staff, NZR opened a timber prefabrication factory in Frankton. Cutting native rimu, it produced complete five-room kitset bungalows erected across the country within days.",,https://teara.govt.nz/en/railways/page-4
-NZR041,1923,4 Aug 1923,Otira Tunnel Opens (NZ's First Electric Mainline),Engineering Feats,Otira (Southern Alps),-42.8300,171.5600,"At 8.5 km, the Otira Tunnel through the Southern Alps connected the West Coast to Christchurch. To avoid smoke asphyxiation on the steep 1-in-33 grade, it was electrified from opening at 1500V DC using English Electric Eo class locomotives.",https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Otira_Tunnel_opening_1923.jpg/640px-Otira_Tunnel_opening_1923.jpg,https://nzhistory.govt.nz/otira-tunnel-opened
-NZR042,1923,6 Jul 1923,Ongarue Railway Disaster,Disasters & Accidents,Ongarue (King Country),-38.7167,175.2833,"In the dead of night, the southbound Auckland-Wellington express plowed into a massive mudslide and boulder around a blind curve near Ongarue. Three carriages telescoped, killing 17 people and injuring 30 in NZ's worst derailment up to that time.",,https://nzhistory.govt.nz/railway-disaster-at-ongarue
-NZR043,1925,23 Mar 1925,Percy Burn Viaduct Built on Port Craig Tramway,Engineering Feats,Port Craig (Southland),-46.1667,167.3667,"Built for the Marlborough Timber Company's logging railway, this 125m-long, 36m-high timber trestle viaduct was constructed from Australian ironbark and remains the largest surviving wooden rail trestle in Oceania.",,https://teara.govt.nz/en/southland-places/page-16
-NZR044,1928,14 Feb 1928,Hutt Railway Workshops Open in Gracefield,Locomotives & Works,Gracefield (Lower Hutt),-41.2383,174.9167,"Replacing the obsolete Petone workshops, this expansive industrial complex became the central North Island heavy overhaul facility for steam, diesel, and electric locomotives, complete with a modern foundry.",,https://teara.govt.nz/en/wellington-places/page-11
-NZR045,1929,14 Feb 1929,Christchurch-Lyttelton Line Electrified,Suburban & Commuter,Lyttelton Tunnel,-43.5997,172.7197,"To eliminate noxious coal soot inside the Lyttelton Rail Tunnel, NZR electrified the track between Christchurch and Lyttelton Harbour at 1500V DC using English Electric Ec class locomotives.",,https://teara.govt.nz/en/railways/page-4
-NZR046,1930,10 Nov 1930,Auckland Railway Station Opens at Beach Road,Architecture,Beach Road (Auckland),-36.8483,174.7767,"Auckland opened its palatial pink granite and brick Beaux-Arts passenger terminal on Beach Road. Though visually striking, its distance from Queen Street drew criticism and eventually led to its replacement by Britomart in 2003.",,https://kura.aucklandlibraries.govt.nz
-NZR047,1931,3 Feb 1931,Hawke's Bay Earthquake Destroys Tracks,Disasters & Accidents,Napier & Hastings,-39.4928,176.9120,"The massive 7.8 earthquake severely twisted mainline tracks, buckled bridges, and destroyed Napier and Hastings railway yards. Heroic railwaymen ran rescue trains carrying the injured south and evacuating refugees to Palmerston North.",,https://nzhistory.govt.nz/hawkes-bay-earthquake
-NZR048,1936,1 Jul 1936,WMR 'Wairarapa Railcars' (The 'Bumblebees') Introduced,Rolling Stock,Wellington / Featherston,-41.1167,175.3167,"NZR introduced specialized diesel-mechanical railcars equipped with extra center-rail brake shoes to climb the Rimutaka Fell Incline without requiring heavy steam shunting engines.",,https://teara.govt.nz/en/railways/page-4
-NZR049,1937,19 Jun 1937,Wellington Railway Station Opens on Bunny Street,Architecture,Bunny Street (Wellington),-41.2789,174.7803,"A masterpiece of neoclassical interwar architecture designed by Gray Young, Morton & Young, the grand terminal centralized passenger services, housed NZR's headquarters, and featured New Zealand's first department store rail cafeteria.",,https://nzhistory.govt.nz/media/photo/wellington-railway-station
-NZR050,1937,1 Jul 1937,Mohaka Viaduct Opens on Napier-Gisborne Line,Engineering Feats,Mohaka River (Hawke's Bay),-39.1167,177.1500,"Towering 97 meters above the turbulent Mohaka River, this steel trestle viaduct was the tallest in New Zealand and the fourth tallest in the world when built, overcoming severe wind shears and deep canyon geology.",,https://teara.govt.nz/en/hawkes-bay-places/page-7
-NZR051,1938,2 Jul 1938,Johnsonville Line Electrified with English Electric Units,Suburban & Commuter,Johnsonville (Wellington),-41.2231,174.8058,"Following the opening of the Tawa Flat deviation, the original winding NIMT route through Ngaio and Khandallah was converted into an electrified suburban commuter branch utilizing modern two-car English Electric multiple units.",,https://teara.govt.nz/en/wellington-places/page-10
-NZR052,1939,1 Sep 1939,Class Ka 4-8-4 Heavy Steam Locomotives Enter Service,Locomotives & Works,Hutt Workshops,-41.2383,174.9167,"Built at Hutt Workshops to handle surging wartime freight over the central volcanic plateau, the 145-ton Ka class represented the pinnacle of New Zealand heavy steam power, featuring modern roller bearings and streamlined casings.",,https://teara.govt.nz/en/railways/page-4
-NZR053,1940,24 Jul 1940,Paekākāriki Electrification Completed,Suburban & Commuter,Paekākāriki,-40.9833,174.9500,"Wellington suburban electrification was extended north through the Pukerua Bay sea cliffs to Paekākāriki using handsome ED class locomotives, establishing the commuter line that served massive US Marine camps during WWII.",,https://teara.govt.nz/en/wellington-places/page-14
-NZR054,1943,4 Jun 1943,Hyde Railway Disaster,Disasters & Accidents,Hyde (Central Otago),-45.3000,170.2500,"The morning Cromwell-to-Dunedin passenger train derailed at high speed on a sharp curved embankment near Hyde. The locomotive and four carriages overturned, killing 21 passengers and injuring 47 in the South Island's worst rail tragedy.",,https://nzhistory.govt.nz/hyde-railway-disaster
-NZR055,1945,15 Dec 1945,South Island Main North Line Completed,Lines & Corridors,Kaikōura / Claverley,-42.4000,173.6833,"The final coastal link between Picton and Christchurch was completed through the Kaikōura rocky shores after 70 years of intermittent debate, giving South Island freight a direct path to the Cook Strait ferries.",,https://teara.govt.nz/en/marlborough-places/page-10
-NZR056,1952,1 Jan 1952,First Mainline Diesel-Electric (DE Class) Locomotives,Locomotives & Works,Auckland,-36.8483,174.7767,"Built by English Electric, fifteen DE class Bo-Bo diesel-electric locomotives entered service for heavy yard shunting and suburban passenger work in Auckland and Wellington, signaling the twilight of urban steam.",,https://teara.govt.nz/en/railways/page-5
-NZR057,1953,24 Dec 1953,Tangiwai Railway Disaster,Disasters & Accidents,Tangiwai Bridge (Ruapehu),-39.4647,175.5728,"A volcanic lahar from Mount Ruapehu's crater lake washed away the concrete bridge pier over the Whangaehu River minutes before the Wellington-Auckland night express arrived. Locomotive Ka 949 and five carriages plunged into the torrent, killing 151 people on Christmas Eve.",https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Tangiwai_disaster_locomotive.jpg/640px-Tangiwai_disaster_locomotive.jpg,https://nzhistory.govt.nz/culture/tangiwai-railway-disaster
-NZR058,1954,1 Mar 1954,Hutt Valley Suburban Electrification Completed,Suburban & Commuter,Upper Hutt,-41.1244,175.0708,"Overhead 1500V DC electric wires reached Upper Hutt, enabling high-frequency commuter services that sparked an unprecedented suburban housing boom across the Hutt Valley basin.",,https://teara.govt.nz/en/wellington-places/page-11
-NZR059,1955,22 Aug 1955,General Motors Da Class Diesel Revolution Begins,Locomotives & Works,Auckland,-36.8500,174.7667,"The arrival of the legendary 1,425-horsepower EMD G12 (Da class) locomotives revolutionized freight transit across the North Island. Numbering 146 engines, the rugged American design completely displaced mainline steam engines within a decade.",,https://teara.govt.nz/en/railways/page-5
-NZR060,1955,30 Oct 1955,Last Train on the Rimutaka Incline,Heritage & Preservation,Cross Creek,-41.1783,175.2017,"Fell engines H 199 and H 204 pushed the final official train up the 1-in-15 grade of the Rimutaka Incline, closing 77 years of heroic operations as the railway town of Cross Creek was dismantled.",,https://nzhistory.govt.nz/last-train-on-rimutaka-incline
-NZR061,1955,3 Nov 1955,Rimutaka Rail Tunnel Opens,Engineering Feats,Maymorn to Featherston,-41.1400,175.1800,"The 8.79 km Rimutaka Tunnel opened through the base of the Remutaka Range, cutting transit times between Wellington and the Wairarapa from over two hours to just 45 minutes and bypassing the tortuous Fell Incline.",,https://teara.govt.nz/en/wellington-places/page-14
-NZR062,1960,1 Mar 1960,Taumarunui Station Tearooms Immortalized in Song,Culture & Society,Taumarunui,-38.8833,175.2600,"Folk singer Peter Cape recorded his iconic song 'Taumarunui on the Main Trunk Line', cementing the railway tearoom's reputation for scalding tea, mutton pies, and quick banter into Kiwi pop culture.",,https://teara.govt.nz/en/folk-and-acoustic-music/page-2
-NZR063,1962,11 Aug 1962,Roll-on Roll-off Interisland Rail Ferry GMV Aramoana Arrives,Lines & Corridors,Wellington Harbour / Picton,-41.2780,174.7850,"The introduction of the rail ferry GMV Aramoana transformed Cook Strait into an extension of the railway tracks. Wagons rolled directly between Wellington and Picton, binding the North and South Island economies into a single seamless freight grid.",https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Aramoana_at_Picton.jpg/640px-Aramoana_at_Picton.jpg,https://nzhistory.govt.nz/cook-strait-rail-ferry-service-begins
-NZR064,1964,21 Nov 1964,Palmerston North Rail Deviation Bypasses The Square,Railway Towns,Palmerston North,-40.3400,175.6000,"After eight decades of coal trains cutting directly through the middle of The Square city park, the long-awaited northern rail deviation opened, transferring sorting yards to Milson and freeing the city center from congestion.",,https://teara.govt.nz/en/manawatu-places/page-5
-NZR065,1967,2 Mar 1967,End of Steam on the North Island Main Trunk,Locomotives & Works,Frankton Junction,-37.7850,175.2633,"Ka 944 hauled the final regular steam-powered freight into Frankton, ending 94 years of steam haulage on the North Island rail system as GM diesels took full control.",,https://teara.govt.nz/en/railways/page-5
-NZR066,1968,10 Apr 1968,TEV Wahine Storm Halts Wellington Rail Network,Disasters & Accidents,Wellington Harbour,-41.3500,174.8333,"Cyclone Giselle battered Wellington with 100-knot winds, washing out suburban sea walls between Petone and Ngauranga and snapping catenary cables while the interisland ferry Wahine foundered on Barrett Reef.",,https://nzhistory.govt.nz/sinking-of-the-wahine
-NZR067,1970,24 Feb 1970,Kaimai Tunnel Collapse Disaster,Disasters & Accidents,Kaimai Range (Waikato),-37.7200,175.8900,"During the excavation of the Kaimai Rail Tunnel, a massive cave-in of volcanic rock and mud trapped 12 workers under 30 meters of collapsed earth. Four miners were killed, triggering extensive safety inquiries and tunneling redesigns.",,https://nzhistory.govt.nz/kaimai-tunnel-collapse
-NZR068,1970,1 Dec 1970,The Southerner Luxury Express Launched,Lines & Corridors,Christchurch to Invercargill,-43.5321,172.6362,"NZR launched 'The Southerner', a refurbished blue-and-gold express running daily between Christchurch, Dunedin, and Invercargill. It featured onboard buffet cars, hostesses, and carpeted comfort.",,https://teara.govt.nz/en/railways/page-5
-NZR069,1971,26 Oct 1971,Last Regular Steam Service in New Zealand,Locomotives & Works,Kawatiri / Greymouth,-42.4500,171.2000,"Steam was finally retired from regular revenue service across the entire country when locomotive J 1211 hauled a coal train from Dobson to Greymouth on the West Coast, closing the first steam era.",,https://nzhistory.govt.nz/end-of-steam-trains
-NZR070,1971,21 Dec 1971,Kingston Flyer Heritage Steam Train Launched,Heritage & Preservation,Kingston / Fairlight,-45.3333,168.7167,"NZR inaugurated the historic 'Kingston Flyer' vintage steam train between Lumsden and Kingston using vintage Ab Pacific steam engines and wooden birdcage carriages, sparking modern rail tourism.",,https://teara.govt.nz/en/otago-places/page-17
-NZR071,1971,25 Oct 1971,Silver Star Luxury Sleeper Express Debuts,Rolling Stock,Wellington to Auckland,-36.8483,174.7767,"The ultimate in luxury overnight rail travel debuted on the NIMT: the stainless steel, air-conditioned 'Silver Star', imported from Nippon Sharyo in Japan, offering private sleeping cabins, showers, and a club lounge bar.",,https://teara.govt.nz/en/railways/page-5
-NZR072,1972,14 Dec 1972,Silver Fern Railcars Enter NIMT Daytime Service,Rolling Stock,Central Plateau,-39.3000,175.4000,"To replace conventional steam-heated carriages on daytime runs between Wellington and Auckland, NZR introduced three sleek stainless steel diesel-electric 'Silver Fern' railcars (Rm class), cutting daytime travel times.",,https://teara.govt.nz/en/railways/page-5
-NZR073,1977,25 Nov 1977,Glenbrook Vintage Railway Opens,Heritage & Preservation,Glenbrook (Waiuku),-37.2167,174.7500,"Built along an abandoned NZR branch line in South Auckland, the volunteer-operated Glenbrook Vintage Railway began public heritage operations, rescuing vintage steam locomotives and preserving early rolling stock.",,https://teara.govt.nz/en/heritage-places/page-6
-NZR074,1978,12 Sep 1978,Kaimai Rail Tunnel Opens (NZ's Longest Tunnel),Engineering Feats,Waikato to Bay of Plenty,-37.7200,175.8900,"Prime Minister Robert Muldoon opened the 8.85 km Kaimai Rail Tunnel, bypassing the winding Paeroa-Waihi gorge. It remains New Zealand's longest rail tunnel, linking Waikato freight directly with the booming export port at Tauranga.",,https://nzhistory.govt.nz/kaimai-tunnel-opened
-NZR075,1979,23 Feb 1979,Introduction of the DX Class Heavy Diesels,Locomotives & Works,Wellington,-41.2789,174.7803,"Manufactured by General Electric in Erie, Pennsylvania, the 2,750 hp Co-Co DX class locomotives arrived to handle burgeoning unit coal and container traffic, becoming the backbone of heavy mainline freight for the next 40 years.",,https://teara.govt.nz/en/railways/page-5
-NZR076,1981,1 Oct 1981,Northerner Overnight Passenger Train Replaces Silver Star,Lines & Corridors,NIMT,-38.8833,175.2600,"Due to high operating costs and falling demand for luxury sleeper cabins, the Silver Star was withdrawn and replaced by the more accessible 'Northerner', featuring economy seating, a buffet bar, and budget sleeping cars.",,https://teara.govt.nz/en/railways/page-5
-NZR077,1982,1 Apr 1982,New Zealand Railways Corporation Formed,Legislation & Politics,Wellington,-41.2784,174.7767,"The government transformed the century-old Railways Department into the state-owned New Zealand Railways Corporation (NZRC), mandating commercial accounting practices in preparation for impending market deregulation.",,https://teara.govt.nz/en/railways/page-6
-NZR078,1983,1 Nov 1983,Transport Deregulation & Repeal of the 150km Rail Limit,Deregulation & Decline,Parliament (Wellington),-41.2784,174.7767,"The Transport Amendment Act eliminated the long-standing 150 km restriction that legally protected the railways by forbidding commercial road trucks from competing against rail freight. Overnight, heavy freight began shifting onto highways.",,https://teara.govt.nz/en/railways/page-6
-NZR079,1986,22 Nov 1986,Auckland-Wellington Day Express Renamed 'The Overlander',Lines & Corridors,NIMT,-39.1167,175.4000,"The daytime service between Wellington and Auckland was relaunched as 'The Overlander', utilizing rebuilt carriages with panoramic viewing windows to target growing international and domestic tourism through the volcanic plateau.",,https://teara.govt.nz/en/railways/page-6
-NZR080,1987,22 Nov 1987,The TranzAlpine Express Launched Across Southern Alps,Scenic & Tourism,Arthur's Pass,-42.9400,171.5600,"NZR completely rebranded the Christchurch-to-Greymouth train into 'The TranzAlpine'. Featuring open-air viewing platforms, it quickly gained global acclaim as one of the world's most spectacular scenic rail journeys.",https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/TranzAlpine_train_crossing_staircase_viaduct.jpg/640px-TranzAlpine_train_crossing_staircase_viaduct.jpg,https://www.journeys.kiwirail.co.nz/tranzalpine
-NZR081,1988,27 Jun 1988,NIMT 25kV AC Main Trunk Electrification Opens,Engineering Feats,Te Kuiti to Palmerston North,-39.3000,175.4000,"In an ambitious 'Think Big' initiative, 411 km of the North Island Main Trunk between Te Rapa and Palmerston North was electrified at 25,000 volts AC. Thirty heavy British-built Class EF electric locomotives entered service.",,https://nzhistory.govt.nz/main-trunk-electrification-completed
-NZR082,1989,28 Feb 1989,Taieri Gorge Railway Saved from Demolition,Heritage & Preservation,Taieri Gorge (Otago),-45.7500,170.3333,"When NZR moved to abandon and scrap the Otago Central line, the Dunedin City Council and local rail enthusiasts purchased the magnificent 60 km mountain section through the Taieri Gorge, creating one of NZ's flagship tourist lines.",,https://teara.govt.nz/en/otago-places/page-16
-NZR083,1990,21 Dec 1990,Addington Railway Workshops Closed and Bulldozed,Deregulation & Decline,Addington (Christchurch),-43.5392,172.6075,"As part of aggressive corporate downsizing, NZR closed the historic 106-year-old Addington Workshops. The sprawling industrial complex was flattened and replaced by an entertainment and sports retail precinct.",,https://teara.govt.nz/en/canterbury-places/page-10
-NZR084,1990,28 Oct 1990,New Zealand Rail Limited Established as SOE,Legislation & Politics,Wellington,-41.2784,174.7767,"The profitable core rail and ferry assets of the Railways Corporation were transferred to a new state-owned commercial enterprise, New Zealand Rail Ltd, while rail corridor land remained held by the Crown.",,https://teara.govt.nz/en/railways/page-6
-NZR085,1993,20 Jul 1993,Privatization of New Zealand Rail Ltd,Deregulation & Decline,Wellington,-41.2784,174.7767,"Finance Minister Ruth Richardson announced the full privatization of New Zealand Rail Ltd, selling the state rail system for $328 million to a consortium comprising US railroad Wisconsin Central and merchant bankers Fay, Richwhite & Co.",,https://teara.govt.nz/en/railways/page-6
-NZR086,1995,18 Oct 1995,Rebranding as Tranz Rail & Aggressive Cost-Cutting,Deregulation & Decline,Wellington,-41.2784,174.7767,"New Zealand Rail changed its name to Tranz Rail. Under private ownership, the company implemented aggressive single-person train crewing, deferred track maintenance, closed branch lines, and sold off station buildings and workshop machinery.",,https://teara.govt.nz/en/railways/page-6
-NZR087,2000,23 Feb 2000,Otago Central Rail Trail Converted for Cycling,Heritage & Preservation,Middlemarch to Clyde,-45.1883,169.3183,"The abandoned trackbed of the Otago Central branch was transformed into New Zealand's first Great Ride. Pioneering cycle tourism, it revitalized drought-stricken railway towns including Ranfurly, Omakau, and Wedderburn.",,https://teara.govt.nz/en/otago-places/page-16
-NZR088,2001,15 Apr 2001,Mass Cuts to Provincial Passenger Services,Deregulation & Decline,Rotorua & Tauranga,-37.6833,176.1667,"Tranz Rail axed provincial passenger routes nationwide, terminating the Geyserland Express to Rotorua, the Kaimai Express to Tauranga, and the Bay Express to Napier, concentrating passenger operations solely on Auckland and Wellington suburban trains.",,https://teara.govt.nz/en/railways/page-6
-NZR089,2002,10 Feb 2002,The Southerner Passenger Train Axed,Deregulation & Decline,Invercargill,-46.4132,168.3538,"After 32 years of continuous operation through Canterbury, Otago, and Southland, the beloved Southerner made its final run from Invercargill to Christchurch, leaving the South Island without any regular intercity public passenger rail.",,https://nzhistory.govt.nz/last-run-of-the-southerner
-NZR090,2003,7 Jul 2003,Britomart Transport Centre Opens in Auckland,Suburban & Commuter,Britomart (Auckland CBD),-36.8442,174.7681,"Under Mayor Christine Fletcher, Auckland brought trains back into the heart of downtown. The Britomart Transport Centre integrated the historic 1912 Chief Post Office with a subterranean five-platform passenger station.",,https://teara.govt.nz/en/auckland-places/page-3
-NZR091,2003,9 Oct 2003,Australian Freight Giant Toll Holdings Takes Over Tranz Rail,Deregulation & Decline,Wellington,-41.2784,174.7767,"Following near-bankruptcy and plummeting share prices due to deferred infrastructure maintenance, Tranz Rail was acquired by Australian logistics conglomerate Toll Holdings, rebranding the operating wing as Toll Rail.",,https://teara.govt.nz/en/railways/page-6
-NZR092,2004,1 Jul 2004,Crown Buyback of Track Infrastructure (ONTRACK),Renationalization,Parliament (Wellington),-41.2784,174.7767,"Recognizing systemic under-investment in the tracks, the Helen Clark Labour government bought back the national rail network for a symbolic $1, establishing the state agency ONTRACK to rebuild the deteriorating network.",,https://teara.govt.nz/en/railways/page-6
-NZR093,2004,14 Dec 2004,The Northerner Overnight Train Withdrawn,Deregulation & Decline,Auckland to Wellington,-41.2789,174.7803,"After 95 years of continuous overnight passenger service linking New Zealand's two largest cities, the overnight Northerner made its final run, leaving only the daytime Overlander on the North Island Main Trunk.",,https://nzhistory.govt.nz/last-run-of-the-northerner
-NZR094,2008,1 Jul 2008,Full Renationalization: KiwiRail is Born,Renationalization,Wellington Railway Station,-41.2789,174.7803,"The New Zealand Government bought back all train, freight, and ferry operations from Toll for $665 million, uniting the tracks, locomotives, and Cook Strait ferries under the new state-owned enterprise KiwiRail.",https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/KiwiRail_logo.svg/640px-KiwiRail_logo.svg.png,https://nzhistory.govt.nz/renationalisation-of-rail-network
-NZR095,2010,20 May 2010,Chinese-Built DL Class Diesel Locomotives Arrive,Locomotives & Works,Mount Maunganui (Tauranga),-37.6400,176.1800,"KiwiRail took delivery of the first batch of 2,700 kW DL class diesel locomotives from CNR Dalian in China, initiating a major fleet renewal across the North Island freight network.",,https://teara.govt.nz/en/railways/page-6
-NZR096,2011,22 Feb 2011,Christchurch Earthquake Destroys Rail Infrastructure,Disasters & Accidents,Christchurch Station / Heathcote,-43.5321,172.6362,"The magnitude 6.2 earthquake fractured tracks, collapsed overbridges, warped rail yards, and severed the Lyttelton Tunnel corridor. Rail workers restored essential freight lines into Lyttelton Port within days to haul emergency supplies.",,https://teara.govt.nz/en/canterbury-places/page-10
-NZR097,2011,10 Oct 2011,Matangi Electric Multiple Units Enter Service in Wellington,Suburban & Commuter,Wellington,-41.2789,174.7803,"Manufactured by Hyundai Rotem in South Korea, the modern stainless steel Matangi (FT/FP class) commuter trains replaced the aging 1930s-1950s English Electric fleet across the Wellington suburban network.",,https://teara.govt.nz/en/wellington-places/page-11
-NZR098,2012,25 Jun 2012,The Northern Explorer Replaces The Overlander,Scenic & Tourism,Raurimu / National Park,-39.1833,175.4000,"KiwiRail rebranded the daytime NIMT passenger train as the 'Northern Explorer', operating modern AK-class panoramic viewing carriages with GPS audio commentary, specialized catering, and an open-air observation car.",,https://www.journeys.kiwirail.co.nz/northern-explorer
-NZR099,2014,28 Apr 2014,Auckland Suburban Rail Electrification Opens,Suburban & Commuter,Onehunga / Britomart,-36.8442,174.7681,"Auckland transformed its passenger rail network with a $500 million 25kV AC overhead electrification scheme. Sleek, quiet Spanish CAF-built AM-class three-car electric trains began commercial operation, triggering exponential patronage growth.",,https://teara.govt.nz/en/auckland-places/page-3
-NZR100,2016,14 Nov 2016,Kaikōura Earthquake Shuts Down South Island Main North Line,Disasters & Accidents,Kaikōura Coast,-42.2833,173.8000,"The 7.8 magnitude Kaikōura earthquake triggered massive landslides that buried the coastal railway under hundreds of thousands of tons of rock, pushed tracks into the Pacific Ocean, and twisted tunnels across an 80 km corridor.",https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Kaikoura_earthquake_railway_damage.jpg/640px-Kaikoura_earthquake_railway_damage.jpg,https://nzhistory.govt.nz/media/photo/kaikoura-earthquake-rail-damage
-NZR101,2017,15 Sep 2017,Heroic Reopening of the Kaikōura Main North Line,Engineering Feats,Half Moon Bay (Kaikōura),-42.3167,173.7500,"Following an extraordinary 10-month engineering restoration by the NCTIR alliance, the battered coastal line reopened to night freight traffic, reconnecting Picton ferries with Christchurch in record time.",,https://teara.govt.nz/en/marlborough-places/page-10
-NZR102,2021,6 Apr 2021,Te Huia Commuter Rail Service Launched,Suburban & Commuter,Frankton to Papakura,-37.7850,175.2633,"Marking the return of inter-regional passenger rail to the Waikato, the 'Te Huia' passenger service launched between Frankton (Hamilton) and Papakura/The Strand (Auckland), hauled by refurbished DFB locomotives.",,https://teara.govt.nz/en/waikato-places/page-6
-NZR103,2021,12 Aug 2021,Revival of Hillside Workshops,Locomotives & Works,South Dunedin,-45.8942,170.4958,"The government announced a $105 million reinvestment to rebuild Dunedin's historic Hillside Workshops into a state-of-the-art mechanical heavy engineering facility for assembling and maintaining hundreds of new freight wagons.",,https://teara.govt.nz/en/otago-places/page-8
-NZR104,2024,15 Mar 2024,Stadler DM Class Mainline Locomotives Introduced,Locomotives & Works,South Island Main Trunk,-43.5321,172.6362,"KiwiRail unveiled the first of 57 brand-new state-of-the-art low-emission Co-Co diesel locomotives custom-manufactured by Stadler Rail in Valencia, Spain, to retire the veteran 50-year-old DX fleet across the South Island.",,https://www.kiwirail.co.nz
-NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Engineering Feats,Auckland CBD,-36.8530,174.7610,"New Zealand's largest-ever transport infrastructure project completed twin 3.45 km underground tunnels from Britomart beneath Albert Street to Mount Eden, eliminating downtown rail bottlenecks and doubling Auckland's network train capacity.",,https://www.cityraillink.co.nz`;
 
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
@@ -971,6 +858,16 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
       document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
+    // Dynamic 5% Text Scaling Per Zoom Step (1.05^delta)
+    function updatePillZoomScale() {
+      if (!map) return;
+      const currentZoom = map.getZoom();
+      const baseZoom = (typeof NZ_ZOOM !== 'undefined') ? NZ_ZOOM : 6;
+      const delta = currentZoom - baseZoom;
+      const factor = Math.pow(1.05, Math.max(-2, Math.min(10, delta)));
+      document.documentElement.style.setProperty('--pill-zoom-factor', factor.toFixed(3));
+    }
+
     function initMap() {
       map = L.map('map', {
         center: NZ_CENTER,
@@ -978,26 +875,27 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
         minZoom: 4,
         maxZoom: 19,
         maxBounds: [[-50, 160], [-30, 185]],
-        closePopupOnClick: false,
+        closePopupOnClick: true,    // Clicking outside closes open pop-up
         zoomControl: false
       });
 
       L.control.zoom({ position: 'topright' }).addTo(map);
       basemaps.natgeo.addTo(map);
-      map.on('zoomend', checkBasemapAutoSwitch);
 
+      // Map event listeners
+      map.on('click', () => { map.closePopup(); });
+      map.on('zoom', updatePillZoomScale);
+      map.on('zoomend', updatePillZoomScale);
+      map.on('zoomend', checkBasemapAutoSwitch);
+      updatePillZoomScale();
+
+      // Standard Leaflet MarkerCluster Group (Clean halos, bold count numbers)
       markers = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
+        showCoverageOnHover: true,
         zoomToBoundsOnClick: true,
         maxClusterRadius: 35,
-        disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM,
-        iconCreateFunction: (cluster) => L.divIcon({
-          html: `<div class="cluster-number-badge">${cluster.getChildCount()}</div>`,
-          className: 'custom-cluster-icon',
-          iconSize: [44, 44],
-          iconAnchor: [22, 22]
-        })
+        disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM
       });
       map.addLayer(markers);
     }
@@ -1041,6 +939,20 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
       if (url.includes('drive.google.com')) {
         const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (idMatch && idMatch[1]) return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s240`;
+      }
+      return url;
+    }
+
+    function getFullImageUrl(url) {
+      if (!url) return '';
+      url = url.trim();
+      if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
+        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s0');
+        return url;
+      }
+      if (url.includes('drive.google.com')) {
+        const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (idMatch && idMatch[1]) return `https://drive.google.com/uc?id=${idMatch[1]}&export=view`;
       }
       return url;
     }
@@ -1135,27 +1047,51 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
           const safeDate = escapeHTML(ev.date || ev.year || '');
           const safeHeadline = escapeHTML(ev.headline || 'Railway Event');
           const safeLocation = escapeHTML(ev.location || '');
-          const safeCategory = escapeHTML(ev.category || 'Trains');
+          const safeCategory = escapeHTML(ev.category || 'Railways');
           const safeDetails = escapeHTML(ev.details || '');
           
           const rawImg = (ev.image_url || '').trim();
-          const hasImage = rawImg.length > 0 && rawImg !== '#';
-          const safeThumbImg = hasImage ? escapeHTML(getThumbnailUrl(rawImg)) : '';
-          const safeFullImg = hasImage ? escapeHTML(rawImg) : '';
+          const hasImageLink = rawImg.length > 0 && rawImg !== '#';
+          const safeThumbImg = hasImageLink ? escapeHTML(getThumbnailUrl(rawImg)) : '';
+          const safeFullImg = hasImageLink ? escapeHTML(getFullImageUrl(rawImg)) : '';
 
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
 
           const stemHeight = idx * 36;
-          const totalIconHeight = 34 + stemHeight;
+          const totalIconHeight = 48 + stemHeight;
 
-          const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand railway train history')}`;
+          const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand')}`;
 
+          let markerImgSrc = '';
+          if (hasImageLink) {
+            if (typeof window.resolveOfflineMedia === 'function') {
+              markerImgSrc = window.resolveOfflineMedia(rawImg) || window.resolveOfflineMedia(ev.id) || '';
+            }
+            if (!markerImgSrc) {
+              markerImgSrc = safeThumbImg;
+            }
+          }
+
+          // ONLY display thumbnail box if an explicit image link exists in the data
           const markerHTML = `
             <div class="nz-train-marker ${catClass}">
               <div class="marker-pill">
-                <span class="marker-date-tag">${catIcon} ${safeYear}</span>
-                <span class="marker-headline-text">${safeHeadline}</span>
+                ${markerImgSrc ? `
+                  <div class="marker-thumb-box">
+                    <img class="marker-thumb-img" 
+                         src="${markerImgSrc}" 
+                         alt="" 
+                         loading="lazy" 
+                         onerror="this.parentElement.style.display='none';" />
+                  </div>
+                ` : ''}
+                <div class="marker-text-block">
+                  <div class="marker-header-row">
+                    <span class="marker-date-tag">${catIcon} ${safeYear}</span>
+                  </div>
+                  <div class="marker-headline-text" title="${safeHeadline}">${safeHeadline}</div>
+                </div>
               </div>
               <div class="marker-pin-tail"></div>
               ${stemHeight > 0 ? `<div class="marker-stem" style="height: ${stemHeight}px;"></div>` : ''}
@@ -1165,11 +1101,11 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
           const customIcon = L.divIcon({
             html: markerHTML,
             className: 'history-div-icon',
-            iconSize: [220, totalIconHeight],
-            iconAnchor: [110, totalIconHeight]
+            iconSize: [240, totalIconHeight],
+            iconAnchor: [120, totalIconHeight]
           });
 
-          const popupImageBlock = hasImage ? `
+          const popupImageBlock = hasImageLink ? `
             <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to view full image">
               <img src="${safeThumbImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
               <div class="history-card-badge-row">
@@ -1210,7 +1146,7 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
                   </a>
                   ${ev.source_url && ev.source_url !== '#' ? `
                     <a href="${ev.source_url}" target="_blank" rel="noopener noreferrer" class="btn-source-archive">
-                      <span>📖</span> Railway Archive Reference ↗
+                      <span>📖</span> Reference Link ↗
                     </a>
                   ` : ''}
                 </div>
@@ -1220,7 +1156,7 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
 
           const marker = L.marker([ev.latitude, ev.longitude], { icon: customIcon });
           ev._marker = marker;
-          marker.bindPopup(popupHTML, { maxWidth: 390, autoPan: true, keepInView: true });
+          marker.bindPopup(popupHTML, { maxWidth: 390, autoPan: true, keepInView: true, closeOnClick: true });
 
           marker.on('popupopen', () => {
             currentActiveIndex = ev._chronoIndex;
@@ -1231,7 +1167,7 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
       });
 
       markers.addLayers(markerList);
-      document.getElementById('itemCountBadge').textContent = `${totalCount} event${totalCount === 1 ? '' : 's'}`;
+      document.getElementById('itemCountBadge').textContent = `${totalCount} milestone${totalCount === 1 ? '' : 's'}`;
     }
 
     function filterEvents() {
@@ -1381,43 +1317,54 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
       return false;
     }
 
-    async function loadDataset() {
-      // 1. Check local / remote candidate CSVs
-      const candidateUrls = [
-        './data/trains.csv',
-        'data/trains.csv',
-        './trains.csv',
-        'trains.csv',
-        '../data/trains.csv',
-        './data/nz_trains.csv',
-        'nz_trains.csv'
-      ];
-
-      for (const url of candidateUrls) {
+    async function fetchFirstValidCsv(candidates) {
+      for (const url of candidates) {
+        if (!url) continue;
         try {
           const res = await fetch(url);
           if (res.ok) {
             const text = await res.text();
-            if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && parseCSVData(text)) {
-              return;
+            if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+              return text;
             }
           }
         } catch (e) {}
       }
+      return null;
+    }
 
-      // 2. Check localStorage cache
+    async function loadDataset() {
+      // 1. Instant Cache Check for instantaneous display
       try {
         const cached = localStorage.getItem(CACHE_STORAGE_KEY);
-        if (cached && parseCSVData(cached)) return;
+        if (cached && parseCSVData(cached)) {
+          // Continue in background to refresh from disk or online
+        }
       } catch (e) {}
 
-      // 3. Fallback to rich embedded dataset (guarantees immediate zero-error local display)
-      if (parseCSVData(EMBEDDED_TRAINS_CSV)) {
-        try { localStorage.setItem(CACHE_STORAGE_KEY, EMBEDDED_TRAINS_CSV); } catch (e) {}
+      // 2. Comprehensive local offline & live online CSV candidates
+      const candidateUrls = [
+        '../data/trains.csv',
+        './data/trains.csv',
+        'data/trains.csv',
+        './trains.csv',
+        'trains.csv',
+        LIVE_CSV_URL,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`
+      ];
+
+      const csvText = await fetchFirstValidCsv(candidateUrls);
+
+      if (csvText && parseCSVData(csvText)) {
+        try { localStorage.setItem(CACHE_STORAGE_KEY, csvText); } catch (e) {}
         return;
       }
 
-      document.getElementById('itemCountBadge').textContent = 'Offline';
+      if (allEvents.length === 0) {
+        document.getElementById('itemCountBadge').textContent = 'Offline';
+        document.getElementById('yearRangeText').textContent = 'Data Offline';
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
