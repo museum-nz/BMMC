@@ -22,6 +22,7 @@
   <!-- Preconnect for Tile & CDN Performance -->
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://tiles.openrailwaymap.org" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
@@ -137,6 +138,11 @@
       color: #0284c7;
       transform: translateY(-1px);
     }
+    .top-action-btn.active {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
     .dark .top-action-btn {
       background: rgba(15, 23, 42, 0.94);
       border-color: rgba(51, 65, 85, 0.9);
@@ -148,6 +154,23 @@
       border-color: #38bdf8;
       color: #38bdf8;
     }
+    .dark .top-action-btn.active {
+      background: #082f49;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    /* Historic Railway Button Custom Active Colors */
+    .btn-historic-rail.active {
+      background: #ffe4e6 !important;
+      border-color: #e11d48 !important;
+      color: #be123c !important;
+    }
+    .dark .btn-historic-rail.active {
+      background: #4c0519 !important;
+      border-color: #fb7185 !important;
+      color: #fda4af !important;
+    }
 
     /* Search Box */
     .map-search-box {
@@ -155,8 +178,8 @@
       display: flex;
       align-items: center;
       height: 38px;
-      min-width: 180px;
-      max-width: 280px;
+      min-width: 170px;
+      max-width: 260px;
       background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(203, 213, 225, 0.9);
@@ -564,6 +587,30 @@
     .dark .marker-cluster div { color: #ffffff !important; }
     .marker-cluster span { line-height: 30px !important; display: inline-block !important; }
 
+    /* Historic Railway Polyline Popup */
+    .historic-rail-popup {
+      font-family: system-ui, sans-serif;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #0f172a;
+    }
+    .historic-rail-popup h4 {
+      margin: 0 0 2px 0;
+      color: #be123c;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .historic-rail-badge {
+      display: inline-block;
+      background: #ffe4e6;
+      color: #be123c;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+
     /* Pop-up Card Styling */
     .history-card { width: 290px; text-align: left; }
     .history-card-img-wrap {
@@ -714,6 +761,14 @@
         </div>
       </div>
 
+      <!-- Railways Overlays Toggle Buttons (Active & Historic) -->
+      <button id="btnToggleRailways" class="top-action-btn active" title="Toggle Modern Rail Track Infrastructure">
+        <span>🛤️</span> <span>Active Rails</span>
+      </button>
+      <button id="btnToggleHistoric" class="top-action-btn active btn-historic-rail" title="Toggle Historic &amp; Abandoned Rail Corridors">
+        <span>📜</span> <span>Historic Lines</span>
+      </button>
+
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
@@ -779,12 +834,188 @@
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1351464718&single=true&output=csv';
     const CACHE_STORAGE_KEY = 'bMMC_nz_trains_csv_cache';
 
+    // Historic & Abandoned NZ Railway Lines GeoJSON (Heritage Crimson)
+    const HISTORIC_NZ_RAILWAYS = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Rimutaka Incline (Fell Mountain Railway)",
+            "years": "1878–1955",
+            "desc": "Famous 1-in-15 mountain incline over Remutaka Range using Fell horizontal center-rail engines between Cross Creek and Summit."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [175.0708, -41.1244], [175.1200, -41.1440], [175.1850, -41.1050],
+              [175.2030, -41.1460], [175.2017, -41.1783], [175.2800, -41.1920],
+              [175.3167, -41.1167]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Dun Mountain Railway (NZ's First Railway)",
+            "years": "1862–1872",
+            "desc": "New Zealand's very first railway line. Horse-drawn mineral line hauling chromite and copper from Dun Mountain to Nelson Port."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [173.2750, -41.2610], [173.2842, -41.2711], [173.2950, -41.2950],
+              [173.3300, -41.3200], [173.3600, -41.3450]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Otago Central Railway (Now Rail Trail)",
+            "years": "1889–1990",
+            "desc": "Scenic inland route threading through Taieri Gorge and Central Otago plains to Clyde and Cromwell, now NZ's premier cycle trail."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [170.1200, -45.5100], [170.2500, -45.3000], [170.1500, -45.2400],
+              [170.1000, -45.1333], [170.0100, -45.0600], [169.8700, -45.0400],
+              [169.6900, -45.0700], [169.5900, -45.0900], [169.4500, -45.1300],
+              [169.3800, -45.2500], [169.3183, -45.1883], [169.2000, -45.0400]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Nelson Section (Nelson to Glenhope & Kawatiri)",
+            "years": "1876–1955",
+            "desc": "The isolated government line intended to cross the Southern Alps. Defiantly defended by local women in the 1955 protest before demolition."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [173.2842, -41.2711], [173.1800, -41.3400], [173.0500, -41.4000],
+              [172.9700, -41.4400], [172.9100, -41.4800], [172.6300, -41.6700],
+              [172.5800, -41.7100]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Denniston Incline ('Eighth Wonder of the World')",
+            "years": "1879–1967",
+            "desc": "Gravity-operated incline lowering 12-ton coal wagons 518 vertical meters down Mount Rochfort cliffs to Conns Creek at up to 1-in-1.25 gradient."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [171.7750, -41.7450], [171.7967, -41.7333], [171.8150, -41.7250]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Kingston Branch & Flyer Corridor",
+            "years": "1878–1979",
+            "desc": "Historical spur from Lumsden to Kingston wharf, connecting Lake Wakatipu steamers with the southern rail network."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [168.4420, -45.7380], [168.4500, -45.5800], [168.5800, -45.5100],
+              [168.6700, -45.4600], [168.7000, -45.3900], [168.7167, -45.3333]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Ferrymead Original Broad Gauge Line",
+            "years": "1863–1867",
+            "desc": "New Zealand's first steam-powered public railway (5 ft 3 in broad gauge), hauling goods from Ferrymead river port to Christchurch."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [172.6450, -43.5385], [172.6700, -43.5350], [172.7051, -43.5558]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Percy Burn / Port Craig Bush Tramway",
+            "years": "1917–1928",
+            "desc": "Heavy timber logging railway featuring the giant Australian ironbark Percy Burn Viaduct, the largest surviving timber trestle in Oceania."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [167.3667, -46.1667], [167.3400, -46.1750], [167.3200, -46.1667],
+              [167.2800, -46.1600]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Karangahake Gorge / Waihi Branch",
+            "years": "1905–1978",
+            "desc": "Historic line carving through the rugged Ohinemuri river canyon and 1.1 km Karangahake tunnel before the opening of the Kaimai Tunnel."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [175.6700, -37.3750], [175.7200, -37.4200], [175.7700, -37.4100],
+              [175.8300, -37.3900]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Catlins River Branch",
+            "years": "1879–1971",
+            "desc": "Southland pioneer timber and farming line running from Balclutha south to Owaka and Tahakopa through dense podocarp forest."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [169.7400, -46.2400], [169.6600, -46.4500], [169.3400, -46.5100]
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Raetihi Branch",
+            "years": "1917–1968",
+            "desc": "Central North Island high-country branch connecting Ohakune depot with the timber mills and market gardens of Raetihi."
+          },
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [175.4000, -39.4167], [175.3400, -39.4200], [175.2830, -39.4280]
+            ]
+          }
+        }
+      ]
+    };
+
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
     const CONSISTENT_EVENT_ZOOM = 14;
 
     let map;
     let markers;
+    let railwayOverlayLayer = null;
+    let historicRailwaysLayer = null;
+    let isRailwaysVisible = true;       // Active rails ON by default
+    let isHistoricVisible = true;       // Historic rails ON by default
 
     const basemaps = {
       natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -818,6 +1049,14 @@
         if (map && map.hasLayer(l)) map.removeLayer(l);
       });
       if (map) basemaps[type].addTo(map);
+
+      // Keep rail overlays on top
+      if (railwayOverlayLayer && isRailwaysVisible && map && !map.hasLayer(railwayOverlayLayer)) {
+        railwayOverlayLayer.addTo(map);
+      }
+      if (historicRailwaysLayer && isHistoricVisible && map && !map.hasLayer(historicRailwaysLayer)) {
+        historicRailwaysLayer.addTo(map);
+      }
     }
 
     function checkBasemapAutoSwitch() {
@@ -858,6 +1097,34 @@
       document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
+    // Toggle Active Railways Layer (OpenRailwayMap)
+    function toggleRailwayOverlay() {
+      if (!map) return;
+      isRailwaysVisible = !isRailwaysVisible;
+      const btn = document.getElementById('btnToggleRailways');
+      if (isRailwaysVisible) {
+        if (!map.hasLayer(railwayOverlayLayer)) railwayOverlayLayer.addTo(map);
+        btn?.classList.add('active');
+      } else {
+        if (map.hasLayer(railwayOverlayLayer)) map.removeLayer(railwayOverlayLayer);
+        btn?.classList.remove('active');
+      }
+    }
+
+    // Toggle Historic Railways Layer (Heritage Crimson Polylines)
+    function toggleHistoricOverlay() {
+      if (!map) return;
+      isHistoricVisible = !isHistoricVisible;
+      const btn = document.getElementById('btnToggleHistoric');
+      if (isHistoricVisible) {
+        if (!map.hasLayer(historicRailwaysLayer)) historicRailwaysLayer.addTo(map);
+        btn?.classList.add('active');
+      } else {
+        if (map.hasLayer(historicRailwaysLayer)) map.removeLayer(historicRailwaysLayer);
+        btn?.classList.remove('active');
+      }
+    }
+
     // Dynamic 5% Text Scaling Per Zoom Step (1.05^delta)
     function updatePillZoomScale() {
       if (!map) return;
@@ -881,6 +1148,38 @@
 
       L.control.zoom({ position: 'topright' }).addTo(map);
       basemaps.natgeo.addTo(map);
+
+      // 1. Active Tracks Overlay (OpenRailwayMap) — ON by default
+      railwayOverlayLayer = L.tileLayer('https://tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+        attribution: 'Style: &copy; <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+        opacity: 0.85
+      });
+      railwayOverlayLayer.addTo(map);
+
+      // 2. Historic & Abandoned Railway Layer (Heritage Crimson) — ON by default
+      historicRailwaysLayer = L.geoJSON(HISTORIC_NZ_RAILWAYS, {
+        style: {
+          color: '#e11d48',          // Distinctive Heritage Crimson
+          weight: 3.5,
+          opacity: 0.9,
+          dashArray: '6, 6',          // Classic historic dashed track pattern
+          lineJoin: 'round'
+        },
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties || {};
+          layer.bindPopup(`
+            <div class="historic-rail-popup">
+              <h4>${p.name || 'Historic Railway Line'}</h4>
+              <span class="historic-rail-badge">📜 ${p.years || 'Historical Route'}</span>
+              <p style="margin:4px 0 0 0;">${p.desc || ''}</p>
+            </div>
+          `, { maxWidth: 260 });
+          layer.on('mouseover', function() { this.setStyle({ weight: 5, color: '#be123c', opacity: 1 }); });
+          layer.on('mouseout', function() { historicRailwaysLayer.resetStyle(this); });
+        }
+      });
+      historicRailwaysLayer.addTo(map);
 
       // Map event listeners
       map.on('click', () => { map.closePopup(); });
@@ -1053,7 +1352,7 @@
           const rawImg = (ev.image_url || '').trim();
           const hasImageLink = rawImg.length > 0 && rawImg !== '#';
           const safeThumbImg = hasImageLink ? escapeHTML(getThumbnailUrl(rawImg)) : '';
-          const safeFullImg = hasImageLink ? escapeHTML(getFullImageUrl(rawImg)) : '';
+          const safeFullImg = hasImageLink ? escapeHTML(typeof getFullImageUrl === 'function' ? getFullImageUrl(rawImg) : rawImg) : '';
 
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
@@ -1349,6 +1648,9 @@
         'data/trains.csv',
         './trains.csv',
         'trains.csv',
+        '../data/trails.csv',
+        './data/trails.csv',
+        'trails.csv',
         LIVE_CSV_URL,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
         `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`
@@ -1373,6 +1675,8 @@
       document.getElementById('minYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('maxYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
+      document.getElementById('btnToggleRailways')?.addEventListener('click', toggleRailwayOverlay);
+      document.getElementById('btnToggleHistoric')?.addEventListener('click', toggleHistoricOverlay);
 
       document.getElementById('btnFitNZ')?.addEventListener('click', () => {
         if (markers && markers.getLayers().length > 0) {
