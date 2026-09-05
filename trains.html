@@ -546,7 +546,183 @@
       margin-top: -1px !important;
     }
     .dark .marker-pin-tail { border-top-color: rgba(15, 23, 42, 0.50) !important; }
-    .marker-stem { width: 2px; background: #0284c7; margin-top: -1px; }
+    /* Leader Line Stem & Anchor Point Dot */
+    .marker-stem {
+      width: 2px !important;
+      background: #0284c7 !important;
+      margin-top: -1px !important;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.25) !important;
+      flex-shrink: 0 !important;
+    }
+    .dark .marker-stem { background: #38bdf8 !important; }
+
+    .marker-point-dot {
+      width: 8px !important;
+      height: 8px !important;
+      border-radius: 50% !important;
+      background: #0284c7 !important;
+      border: 2px solid #ffffff !important;
+      box-shadow: 0 0 0 1.5px rgba(2, 132, 199, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+      flex-shrink: 0 !important;
+      margin-top: -1px !important;
+      transition: transform 0.15s ease, background-color 0.15s ease !important;
+    }
+    .dark .marker-point-dot {
+      background: #38bdf8 !important;
+      border-color: #0f172a !important;
+      box-shadow: 0 0 0 1.5px rgba(56, 189, 248, 0.75), 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+    }
+    .nz-train-marker:hover .marker-point-dot {
+      transform: scale(1.4) !important;
+    }
+
+    /* Category Themed Leader Lines & Anchor Dots */
+    .cat-firsts .marker-stem { background: #d97706 !important; }
+    .cat-firsts .marker-point-dot { background: #d97706 !important; box-shadow: 0 0 0 1.5px rgba(217, 119, 6, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-feats .marker-stem { background: #0284c7 !important; }
+    .cat-feats .marker-point-dot { background: #0284c7 !important; box-shadow: 0 0 0 1.5px rgba(2, 132, 199, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-loco .marker-stem { background: #4f46e5 !important; }
+    .cat-loco .marker-point-dot { background: #4f46e5 !important; box-shadow: 0 0 0 1.5px rgba(79, 70, 229, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-towns .marker-stem { background: #7c3aed !important; }
+    .cat-towns .marker-point-dot { background: #7c3aed !important; box-shadow: 0 0 0 1.5px rgba(124, 58, 237, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-disasters .marker-stem { background: #ea580c !important; }
+    .cat-disasters .marker-point-dot { background: #ea580c !important; box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-decline .marker-stem { background: #ea580c !important; }
+    .cat-decline .marker-point-dot { background: #ea580c !important; box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-scenic .marker-stem { background: #db2777 !important; }
+    .cat-scenic .marker-point-dot { background: #db2777 !important; box-shadow: 0 0 0 1.5px rgba(219, 39, 119, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-commuter .marker-stem { background: #0891b2 !important; }
+    .cat-commuter .marker-point-dot { background: #0891b2 !important; box-shadow: 0 0 0 1.5px rgba(8, 145, 178, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+    .cat-lines .marker-stem { background: #059669 !important; }
+    .cat-lines .marker-point-dot { background: #059669 !important; box-shadow: 0 0 0 1.5px rgba(5, 150, 105, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
+
+    
+    /* Saved Hearts Header Button & Badge */
+    .btn-saved-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-saved-toggle .saved-pill-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 900;
+      background: rgba(225, 29, 72, 0.12);
+      color: #e11d48;
+      border: 1px solid rgba(225, 29, 72, 0.25);
+    }
+    .dark .btn-saved-toggle .saved-pill-count {
+      background: rgba(251, 113, 133, 0.18);
+      color: #fda4af;
+      border-color: rgba(251, 113, 133, 0.35);
+    }
+    .btn-saved-toggle.active {
+      background: #ffe4e6 !important;
+      border-color: #f43f5e !important;
+      color: #be123c !important;
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.3) !important;
+    }
+    .btn-saved-toggle.active .saved-pill-count {
+      background: #e11d48 !important;
+      color: #ffffff !important;
+      border-color: #be123c !important;
+    }
+    .dark .btn-saved-toggle.active {
+      background: #4c0519 !important;
+      border-color: #fb7185 !important;
+      color: #fda4af !important;
+    }
+    .dark .btn-saved-toggle.active .saved-pill-count {
+      background: #f43f5e !important;
+      color: #ffffff !important;
+    }
+
+    /* Pop-up Card Saved Heart Button */
+    .btn-card-heart {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+      user-select: none;
+    }
+    .btn-card-heart:hover {
+      background: #ffe4e6;
+      border-color: #fda4af;
+      color: #e11d48;
+      transform: scale(1.05);
+    }
+    .btn-card-heart.saved {
+      background: #ffe4e6;
+      border-color: #f43f5e;
+      color: #e11d48;
+    }
+    .dark .btn-card-heart {
+      background: #1e293b;
+      border-color: #475569;
+      color: #cbd5e1;
+    }
+    .dark .btn-card-heart:hover {
+      background: #4c0519;
+      border-color: #fb7185;
+      color: #fda4af;
+      transform: scale(1.05);
+    }
+    .dark .btn-card-heart.saved {
+      background: #4c0519;
+      border-color: #fb7185;
+      color: #fda4af;
+    }
+    .marker-saved-heart {
+      font-size: 10px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+    }
+
+    /* Leader Line Stem & Anchor Point Dot */
+    .marker-stem {
+      width: 2px !important;
+      background: #0284c7 !important;
+      margin-top: -1px !important;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.25) !important;
+      flex-shrink: 0 !important;
+    }
+    .dark .marker-stem { background: #38bdf8 !important; }
+
+    .marker-point-dot {
+      width: 8px !important;
+      height: 8px !important;
+      border-radius: 50% !important;
+      background: #0284c7 !important;
+      border: 2px solid #ffffff !important;
+      box-shadow: 0 0 0 1.5px rgba(2, 132, 199, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+      flex-shrink: 0 !important;
+      margin-top: -1px !important;
+      transition: transform 0.15s ease, background-color 0.15s ease !important;
+    }
+    .dark .marker-point-dot {
+      background: #38bdf8 !important;
+      border-color: #0f172a !important;
+      box-shadow: 0 0 0 1.5px rgba(56, 189, 248, 0.75), 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+    }
+    .nz-history-marker:hover .marker-point-dot,
+    .nz-train-marker:hover .marker-point-dot {
+      transform: scale(1.4) !important;
+    }
 
     /* Category Distinct Border Colors */
     .cat-firsts .marker-pill { border-color: rgba(217, 119, 6, 0.85) !important; }
@@ -730,6 +906,26 @@
       .map-search-box { min-width: 140px; }
       .year-slider-container { left: 10px; bottom: 12px; width: calc(100vw - 20px); max-width: calc(100vw - 20px); }
     }
+  
+    .cat-firsts .marker-stem { background: #d97706 !important; }
+    .cat-firsts .marker-point-dot { background: #d97706 !important; box-shadow: 0 0 0 1.5px rgba(217, 119, 6, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-feats .marker-stem { background: #0284c7 !important; }
+    .cat-feats .marker-point-dot { background: #0284c7 !important; box-shadow: 0 0 0 1.5px rgba(2, 132, 199, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-loco .marker-stem { background: #4f46e5 !important; }
+    .cat-loco .marker-point-dot { background: #4f46e5 !important; box-shadow: 0 0 0 1.5px rgba(79, 70, 229, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-towns .marker-stem { background: #7c3aed !important; }
+    .cat-towns .marker-point-dot { background: #7c3aed !important; box-shadow: 0 0 0 1.5px rgba(124, 58, 237, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-disasters .marker-stem { background: #ea580c !important; }
+    .cat-disasters .marker-point-dot { background: #ea580c !important; box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-decline .marker-stem { background: #ea580c !important; }
+    .cat-decline .marker-point-dot { background: #ea580c !important; box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-scenic .marker-stem { background: #db2777 !important; }
+    .cat-scenic .marker-point-dot { background: #db2777 !important; box-shadow: 0 0 0 1.5px rgba(219, 39, 119, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-commuter .marker-stem { background: #0891b2 !important; }
+    .cat-commuter .marker-point-dot { background: #0891b2 !important; box-shadow: 0 0 0 1.5px rgba(8, 145, 178, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+    .cat-lines .marker-stem { background: #059669 !important; }
+    .cat-lines .marker-point-dot { background: #059669 !important; box-shadow: 0 0 0 1.5px rgba(5, 150, 105, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
+
   </style>
 </head>
 <body>
@@ -767,6 +963,12 @@
       </button>
       <button id="btnToggleHistoric" class="top-action-btn active btn-historic-rail" title="Toggle Historic &amp; Abandoned Rail Corridors">
         <span>📜</span> <span>Historic Lines</span>
+      </button>
+
+      <button id="btnToggleSaved" class="top-action-btn btn-saved-toggle" title="Filter by Saved Items">
+        <span class="heart-icon">❤️</span>
+        <span>Saved</span>
+        <span id="savedCountBadge" class="saved-pill-count">0</span>
       </button>
 
       <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
@@ -1149,11 +1351,18 @@
       L.control.zoom({ position: 'topright' }).addTo(map);
       basemaps.natgeo.addTo(map);
 
-      // 1. Active Tracks Overlay (OpenRailwayMap) — ON by default
+      // Create dedicated pane so active rail tracks always remain on top of basemaps and historic vectors
+      map.createPane('activeRailwaysPane');
+      const activeRailPane = map.getPane('activeRailwaysPane');
+      activeRailPane.style.zIndex = 450;
+      activeRailPane.style.pointerEvents = 'none';
+
+      // 1. Active Tracks Overlay (OpenRailwayMap) — ALWAYS on top pane
       railwayOverlayLayer = L.tileLayer('https://tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
         attribution: 'Style: &copy; <a href="https://www.openrailwaymap.org/">OpenRailwayMap</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
-        opacity: 0.85
+        opacity: 0.9,
+        pane: 'activeRailwaysPane'
       });
       railwayOverlayLayer.addTo(map);
 
@@ -1193,10 +1402,91 @@
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: true,
         zoomToBoundsOnClick: true,
-        maxClusterRadius: 35,
+        maxClusterRadius: 45,
+        spiderfyDistanceMultiplier: 1.6,
         disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM
       });
       map.addLayer(markers);
+    }
+
+    
+    const SAVED_STORAGE_KEY = 'bMMC_nz_trains_saved_ids';
+    let isSavedFilterActive = false;
+
+    function getSavedSet() {
+      try {
+        const raw = localStorage.getItem(SAVED_STORAGE_KEY);
+        if (raw) return new Set(JSON.parse(raw));
+      } catch (e) {}
+      return new Set();
+    }
+
+    function saveSavedSet(set) {
+      try {
+        localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(Array.from(set)));
+      } catch (e) {}
+    }
+
+    function updateSavedCountHeader() {
+      const count = getSavedSet().size;
+      const badge = document.getElementById('savedCountBadge');
+      if (badge) badge.textContent = count;
+    }
+
+    window.toggleSaveItem = function(id, evt) {
+      if (evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+      }
+      const savedSet = getSavedSet();
+      const isNowSaved = !savedSet.has(id);
+      if (isNowSaved) {
+        savedSet.add(id);
+      } else {
+        savedSet.delete(id);
+      }
+      saveSavedSet(savedSet);
+      updateSavedCountHeader();
+
+      // Update button inside current popup if present
+      const btn = document.querySelector(`.btn-card-heart[data-id="${id}"]`);
+      if (btn) {
+        if (isNowSaved) {
+          btn.classList.add('saved');
+          btn.innerHTML = '<span class="heart-icon">❤️</span> <span class="heart-label">Saved</span>';
+          btn.title = 'Remove from Saved';
+        } else {
+          btn.classList.remove('saved');
+          btn.innerHTML = '<span class="heart-icon">🤍</span> <span class="heart-label">Save</span>';
+          btn.title = 'Save to Favorites';
+        }
+      }
+
+      // Re-filter if viewing saved filter
+      if (isSavedFilterActive) {
+        filterEvents();
+      } else {
+        // Refresh dataset markers to sync marker heart icon
+        filterEvents();
+      }
+    };
+
+    function toggleSavedFilter() {
+      isSavedFilterActive = !isSavedFilterActive;
+      const btn = document.getElementById('btnToggleSaved');
+      if (btn) {
+        if (isSavedFilterActive) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+      filterEvents();
+      if (isSavedFilterActive && markers && markers.getLayers().length > 0) {
+        try {
+          map.fitBounds(markers.getBounds(), { padding: [50, 50], maxZoom: 14 });
+        } catch (e) {}
+      }
     }
 
     let allEvents = [];
@@ -1344,11 +1634,12 @@
         grp.items.forEach((ev, idx) => {
           const safeYear = escapeHTML(ev.year || '');
           const safeDate = escapeHTML(ev.date || ev.year || '');
-          const safeHeadline = escapeHTML(ev.headline || 'Railway Event');
+          const safeHeadline = escapeHTML(ev.headline || 'Event');
           const safeLocation = escapeHTML(ev.location || '');
-          const safeCategory = escapeHTML(ev.category || 'Railways');
+          const safeCategory = escapeHTML(ev.category || 'History');
           const safeDetails = escapeHTML(ev.details || '');
-          
+          const safeUid = escapeHTML(ev._uid || ev.id || '');
+
           const rawImg = (ev.image_url || '').trim();
           const hasImageLink = rawImg.length > 0 && rawImg !== '#';
           const safeThumbImg = hasImageLink ? escapeHTML(getThumbnailUrl(rawImg)) : '';
@@ -1357,8 +1648,18 @@
           const catClass = getCategoryClass(ev.category);
           const catIcon = getCategoryIcon(ev.category);
 
-          const stemHeight = idx * 36;
-          const totalIconHeight = 48 + stemHeight;
+          const isSaved = getSavedSet().has(ev._uid);
+
+          // Baseline leader line + 56px step for vertical separation
+          const baseLeaderHeight = 22;
+          const stemHeight = baseLeaderHeight + (idx * 56);
+          const pillHeight = 44;
+          const tailHeight = 7;
+          const dotHeight = 8;
+          const totalIconHeight = pillHeight + tailHeight + stemHeight + dotHeight;
+          const iconWidth = 260;
+          const iconAnchorX = iconWidth / 2;
+          const iconAnchorY = totalIconHeight - (dotHeight / 2);
 
           const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand')}`;
 
@@ -1372,7 +1673,7 @@
             }
           }
 
-          // ONLY display thumbnail box if an explicit image link exists in the data
+          // Marker capsule + leader line stem + anchor point dot on track/ground
           const markerHTML = `
             <div class="nz-train-marker ${catClass}">
               <div class="marker-pill">
@@ -1388,20 +1689,23 @@
                 <div class="marker-text-block">
                   <div class="marker-header-row">
                     <span class="marker-date-tag">${catIcon} ${safeYear}</span>
+                    ${isSaved ? '<span class="marker-saved-heart" title="Saved">❤️</span>' : ''}
                   </div>
                   <div class="marker-headline-text" title="${safeHeadline}">${safeHeadline}</div>
                 </div>
               </div>
               <div class="marker-pin-tail"></div>
-              ${stemHeight > 0 ? `<div class="marker-stem" style="height: ${stemHeight}px;"></div>` : ''}
+              <div class="marker-stem" style="height: ${stemHeight}px;"></div>
+              <div class="marker-point-dot"></div>
             </div>
           `;
 
           const customIcon = L.divIcon({
             html: markerHTML,
             className: 'history-div-icon',
-            iconSize: [240, totalIconHeight],
-            iconAnchor: [120, totalIconHeight]
+            iconSize: [iconWidth, totalIconHeight],
+            iconAnchor: [iconAnchorX, iconAnchorY],
+            popupAnchor: [0, -totalIconHeight + 12]
           });
 
           const popupImageBlock = hasImageLink ? `
@@ -1428,9 +1732,15 @@
               ${popupImageBlock}
               <div class="history-card-body">
                 <div class="history-card-stepper">
-                  <button type="button" class="btn-step-nav" onclick="window.stepHistory(-1); event.stopPropagation();" ${isFirst ? 'disabled' : ''} title="Previous event (earlier)">◀</button>
-                  <span class="step-index-label">Milestone <strong>#${itemIndex + 1}</strong> of <strong>${totalCount}</strong></span>
-                  <button type="button" class="btn-step-nav" onclick="window.stepHistory(1); event.stopPropagation();" ${isLast ? 'disabled' : ''} title="Next event (later)">▶</button>
+                  <div style="display:inline-flex; align-items:center; gap:4px;">
+                    <button type="button" class="btn-step-nav" onclick="window.stepHistory(-1); event.stopPropagation();" ${isFirst ? 'disabled' : ''} title="Previous event (earlier)">◀</button>
+                    <span class="step-index-label">Item <strong>#${itemIndex + 1}</strong> of <strong>${totalCount}</strong></span>
+                    <button type="button" class="btn-step-nav" onclick="window.stepHistory(1); event.stopPropagation();" ${isLast ? 'disabled' : ''} title="Next event (later)">▶</button>
+                  </div>
+                  <button type="button" class="btn-card-heart ${isSaved ? 'saved' : ''}" data-id="${safeUid}" onclick="window.toggleSaveItem('${safeUid}', event);" title="${isSaved ? 'Remove from Saved' : 'Save to Favorites'}">
+                    <span class="heart-icon">${isSaved ? '❤️' : '🤍'}</span>
+                    <span class="heart-label">${isSaved ? 'Saved' : 'Save'}</span>
+                  </button>
                 </div>
 
                 <h3>${safeHeadline}</h3>
@@ -1498,6 +1808,9 @@
       document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
 
       const filtered = allEvents.filter(ev => {
+        const savedSet = getSavedSet();
+        if (isSavedFilterActive && !savedSet.has(ev._uid)) return false;
+
         const inYear = ev.year >= minVal && ev.year <= maxVal;
         if (!inYear) return false;
 
@@ -1594,8 +1907,13 @@
           parsedYear = parseYearNum(dateStr);
         }
 
+        const rawId = getCol(row, ['id', 'no', 'item']);
+        const headlineStr = getCol(row, ['headline', 'title', 'event', 'name']);
+        const safeUid = rawId || `${parsedYear || 0}_${(headlineStr || '').slice(0, 24).replace(/[^a-zA-Z0-9]/g, '_')}_${lat.toFixed(3)}_${lng.toFixed(3)}`;
+
         return {
-          id: getCol(row, ['id', 'no', 'item']),
+          id: safeUid,
+          _uid: safeUid,
           year: isNaN(parsedYear) ? 0 : parsedYear,
           date: dateStr || String(parsedYear || ''),
           headline: getCol(row, ['headline', 'title', 'event', 'name']),
@@ -1677,6 +1995,9 @@
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
       document.getElementById('btnToggleRailways')?.addEventListener('click', toggleRailwayOverlay);
       document.getElementById('btnToggleHistoric')?.addEventListener('click', toggleHistoricOverlay);
+
+      document.getElementById('btnToggleSaved')?.addEventListener('click', toggleSavedFilter);
+      updateSavedCountHeader();
 
       document.getElementById('btnFitNZ')?.addEventListener('click', () => {
         if (markers && markers.getLayers().length > 0) {
