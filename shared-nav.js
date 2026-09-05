@@ -68,6 +68,12 @@
           icon: '📷', 
           label: 'Historical Photo Archives', 
           desc: 'Historic photography & Alan Starling WWII oral history' 
+        },
+        { 
+          href: 'trains.html', 
+          icon: '🚂', 
+          label: 'Aotearoa NZ Railway Map', 
+          desc: 'Interactive rail history, steam pioneers, disasters & KiwiRail' 
         }
       ]
     }
