@@ -125,6 +125,11 @@
             <span class="hidden sm:inline">Wings</span>
           </button>
 
+          <!-- Stamp Identifier / Visual Detective Tool Trigger -->
+          <button onclick="openIdentifierModal()" title="Visual Detective & Stamp Identifier" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer animate-pulse">
+            <span aria-hidden="true">🕵️</span> <span class="hidden md:inline">Identifier</span>
+          </button>
+
           <button onclick="clearAllFilters()" title="Reset All & Browse Catalog" class="flex items-center gap-1 text-xs font-extrabold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
             <span aria-hidden="true">🌐</span> <span class="hidden sm:inline">All Stamps</span>
           </button>
@@ -435,6 +440,210 @@
   </main>
 
   <!-- Enlarge Lightbox Modal -->
+  
+  <!-- App 3: Visual Detective Tool (Stamp & Coin Identifier Modal) -->
+  <div id="identifierModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[85] flex items-center justify-center p-2 sm:p-4 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="identifierModalTitle">
+    <div id="identifierModalContainer" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[92vh] max-h-[92vh] shadow-2xl border-2 border-amber-500/50 relative flex flex-col overflow-hidden" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="px-4 sm:px-6 py-3 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-transparent border-b border-slate-200 dark:border-slate-800 flex items-center justify-between z-10 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl p-1.5 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-2xl border border-amber-500/30">🕵️</span>
+          <div>
+            <h2 id="identifierModalTitle" class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+              Visual Detective: Stamp &amp; Coin Identifier
+            </h2>
+            <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
+              3-Step decision tree to pinpoint confusing watermarks, monarchs, die varieties &amp; market valuations
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="resetIdentifier()" class="text-xs font-bold text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 px-2 py-1 transition cursor-pointer">
+            🔄 Reset
+          </button>
+          <button onclick="closeIdentifierModal()" aria-label="Close Identifier Modal" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <!-- Step Navigation Stepper Bar -->
+      <div class="bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-2 flex items-center justify-between shrink-0 overflow-x-auto no-scrollbar gap-2">
+        <div class="flex items-center gap-2 text-xs font-bold">
+          <button id="idStepTab1" onclick="jumpToIdentifierStep(1)" class="px-2.5 py-1 rounded-xl bg-amber-500 text-slate-950 font-black shadow-sm flex items-center gap-1.5 transition cursor-pointer">
+            <span>1</span> <span>Shape &amp; Border</span>
+          </button>
+          <span class="text-slate-300 dark:text-slate-600">→</span>
+          <button id="idStepTab2" onclick="jumpToIdentifierStep(2)" class="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold flex items-center gap-1.5 transition cursor-pointer">
+            <span>2</span> <span>Markings &amp; Monarch</span>
+          </button>
+          <span class="text-slate-300 dark:text-slate-600">→</span>
+          <button id="idStepTab3" onclick="jumpToIdentifierStep(3)" class="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold flex items-center gap-1.5 transition cursor-pointer">
+            <span>3</span> <span>Denom &amp; Color</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Candidate Pool:</span>
+          <span id="idCandidateBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-mono font-black text-xs border border-emerald-300 dark:border-emerald-800">
+            0 Matches
+          </span>
+        </div>
+      </div>
+
+      <!-- Main Body: Split View (Options on Left, Live Matches on Right) -->
+      <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        
+        <!-- Left Panel: Questionnaire Steps (7 Cols) -->
+        <div class="lg:col-span-7 overflow-y-auto p-4 sm:p-6 space-y-5 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800">
+          
+          <!-- STEP 1: Shape & Border -->
+          <div id="idStepPanel1" class="space-y-3">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Step 1 of 3</span>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">What is the shape and physical border format?</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Inspect the silhouette, perforations, and outer boundary of your specimen.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+              <button onclick="setIdentifierShape('vert-rect')" id="shapeBtn_vert-rect" class="id-shape-card p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-amber-500 bg-slate-50 dark:bg-slate-800/60 text-left transition flex flex-col justify-between cursor-pointer group">
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🔲</span>
+                <div>
+                  <h4 class="text-xs font-black text-slate-900 dark:text-white">Vertical Portrait</h4>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Tall standard format (Chalon, Side Faces, Pictorials)</p>
+                </div>
+              </button>
+
+              <button onclick="setIdentifierShape('horiz-rect')" id="shapeBtn_horiz-rect" class="id-shape-card p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-amber-500 bg-slate-50 dark:bg-slate-800/60 text-left transition flex flex-col justify-between cursor-pointer group">
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🖼️</span>
+                <div>
+                  <h4 class="text-xs font-black text-slate-900 dark:text-white">Horizontal Landscape</h4>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Wide commemorative format (Centennials, Scenics)</p>
+                </div>
+              </button>
+
+              <button onclick="setIdentifierShape('triangle')" id="shapeBtn_triangle" class="id-shape-card p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-amber-500 bg-slate-50 dark:bg-slate-800/60 text-left transition flex flex-col justify-between cursor-pointer group">
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🔺</span>
+                <div>
+                  <h4 class="text-xs font-black text-slate-900 dark:text-white">Triangle</h4>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Three-sided commemorative (e.g. 1958 Trans-Antarctic)</p>
+                </div>
+              </button>
+
+              <button onclick="setIdentifierShape('circular')" id="shapeBtn_circular" class="id-shape-card p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-amber-500 bg-slate-50 dark:bg-slate-800/60 text-left transition flex flex-col justify-between cursor-pointer group">
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🔘</span>
+                <div>
+                  <h4 class="text-xs font-black text-slate-900 dark:text-white">Circular / Die-Cut</h4>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Embossed round Kiwi stamps or round self-adhesives</p>
+                </div>
+              </button>
+
+              <button onclick="setIdentifierShape('minisheet')" id="shapeBtn_minisheet" class="id-shape-card p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-amber-500 bg-slate-50 dark:bg-slate-800/60 text-left transition flex flex-col justify-between cursor-pointer group">
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">📜</span>
+                <div>
+                  <h4 class="text-xs font-black text-slate-900 dark:text-white">Miniature Sheet</h4>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Souvenir sheet with surrounding commemorative margins</p>
+                </div>
+              </button>
+
+              <button onclick="setIdentifierShape('all')" id="shapeBtn_all" class="id-shape-card p-3 rounded-2xl border-2 border-amber-500 bg-amber-50/50 dark:bg-amber-950/30 text-left transition flex flex-col justify-between cursor-pointer group">
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🌐</span>
+                <div>
+                  <h4 class="text-xs font-black text-amber-700 dark:text-amber-400">Any / Standard</h4>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">Do not restrict by outer shape (includes all)</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2: Key Inscriptions & Monarch Portrait -->
+          <div id="idStepPanel2" class="space-y-3 hidden">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Step 2 of 3</span>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">Which monarch, marking, or portrait appears?</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Match the central figure, text banners, or security overprints.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1" id="identifierInscriptionGrid">
+              <!-- Dynamically populated via renderIdentifierInscriptions() -->
+            </div>
+          </div>
+
+          <!-- STEP 3: Denomination & Color Palette -->
+          <div id="idStepPanel3" class="space-y-4 hidden">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Step 3 of 3</span>
+              <h3 class="text-base font-black text-slate-900 dark:text-white">Filter by face value denomination &amp; dominant color</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Select either the printed value, the ink color, or both to lock in the exact record.</p>
+            </div>
+
+            <!-- Pre-Decimal vs Decimal Denominations Tab -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase text-slate-500 tracking-wider">Face Value Denomination:</span>
+                <span id="idActiveDenomLabel" class="text-xs font-black text-amber-600 dark:text-amber-400">Any Value</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5" id="identifierDenomPills">
+                <!-- Dynamically populated based on remaining candidates -->
+              </div>
+            </div>
+
+            <!-- Color Palette Filter -->
+            <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase text-slate-500 tracking-wider">Dominant Color:</span>
+                <span id="idActiveColorLabel" class="text-xs font-black text-emerald-600 dark:text-emerald-400">Any Color</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5" id="identifierColorPills">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Step Bottom Controls (Prev / Next Buttons) -->
+          <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <button id="idBtnPrevStep" onclick="stepIdentifier(-1)" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+              ← Previous Step
+            </button>
+            <button id="idBtnNextStep" onclick="stepIdentifier(1)" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-black shadow transition flex items-center gap-1 cursor-pointer">
+              Next Step →
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right Panel: Live Matches & Catalog Pinpoint (5 Cols) -->
+        <div class="lg:col-span-5 bg-slate-50/70 dark:bg-slate-950/70 flex flex-col justify-between overflow-hidden">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="text-sm">🎯</span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                Matched Specimen Records
+              </h4>
+            </div>
+            <button onclick="applyIdentifierToCatalog()" id="btnApplyIdentifier" class="text-xs font-black text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer">
+              Show in Main Catalog →
+            </button>
+          </div>
+
+          <!-- Matches Card Scrollable Container -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-3" id="identifierMatchesContainer">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Bottom Summary Banner -->
+          <div class="p-3.5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+            <span>StampsNZ Philatelic Engine</span>
+            <span id="idAccuracyStatus" class="font-bold text-emerald-600 dark:text-emerald-400 font-mono">Ready</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <div id="enlargeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[90] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="enlargeModalTitle">
     <div id="enlargeModalContainer" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[88vh] shadow-2xl border-2 border-emerald-500/50 relative flex flex-col overflow-hidden" onclick="event.stopPropagation()">
       
@@ -2307,6 +2516,409 @@
       }
     }
 
+    
+    // =========================================================================
+    // APP 3: STAMP & COIN IDENTIFIER (VISUAL DETECTIVE 3-STEP DECISION TREE)
+    // =========================================================================
+    let idCurrentStep = 1;
+    let idFilterShape = 'all';
+    let idFilterInscription = 'all';
+    let idFilterDenom = 'all';
+    let idFilterColor = 'all';
+
+    const ID_INSCRIPTIONS = [
+      { id: 'all', label: 'All Inscriptions', icon: '🌐', desc: 'Any portrait / issue' },
+      { id: 'chalon', label: 'Chalon Head (Full Face)', icon: '👑', desc: 'Victoria bust in coronation robe (1855–1873)' },
+      { id: 'side-face', label: 'Victoria Side Faces', icon: '👑', desc: 'First/Second Side Face profiles (1874–1900)' },
+      { id: 'universal', label: 'Universal / Zealandia', icon: '🕊️', desc: 'Universal Penny Postage (1901–1909)' },
+      { id: 'edward', label: 'King Edward VII', icon: '👑', desc: 'Edward VII uniformed profile (1909–1915)' },
+      { id: 'george-v', label: 'King George V', icon: '👑', desc: 'Surface prints & engraved issues (1915–1935)' },
+      { id: 'george-vi', label: 'King George VI', icon: '👑', desc: 'Left profile during WWII era (1936–1952)' },
+      { id: 'elizabeth', label: 'Queen Elizabeth II', icon: '👑', desc: 'Gillick, Machin, & Buckley portraits (1953–)' },
+      { id: 'scenic', label: 'Scenic & Wildlife', icon: '🌿', desc: 'Kiwi, Tui, Cook, Mitre Peak, Pohutukawa' },
+      { id: 'health', label: 'Health / Hygieia / Camp', icon: '🏥', desc: 'Annual health issue with surcharge (+1d)' },
+      { id: 'lighthouse', label: 'Life Insurance (Lighthouse)', icon: '💡', desc: 'Government Life lighthouse beacon designs' },
+      { id: 'arms', label: 'Arms Type (Postal Fiscal)', icon: '⚖️', desc: 'NZ Coat of Arms high-value fiscal duty' },
+      { id: 'airmail', label: 'Air Mail / Aeroplane', icon: '✈️', desc: 'Flying boats, biplanes, Great Barrier pigeon' },
+      { id: 'official', label: 'Official Overprint', icon: '🏢', desc: 'Overprinted "Official" or "O.P.S.O."' },
+      { id: 'military', label: 'ANZAC & Military', icon: '🎖️', desc: 'WWI/WWII memorials, Gallipoli, soldiers' }
+    ];
+
+    const ID_COLORS = [
+      { id: 'all', label: 'All Colors', hex: 'transparent' },
+      { id: 'red', label: 'Red / Carmine', hex: '#dc2626' },
+      { id: 'blue', label: 'Blue / Ultramarine', hex: '#2563eb' },
+      { id: 'green', label: 'Green / Emerald', hex: '#16a34a' },
+      { id: 'brown', label: 'Brown / Bistre', hex: '#78350f' },
+      { id: 'orange', label: 'Orange / Yellow', hex: '#ea580c' },
+      { id: 'purple', label: 'Purple / Lilac', hex: '#9333ea' },
+      { id: 'black', label: 'Black / Grey', hex: '#1f2937' },
+      { id: 'multi', label: 'Multi-Coloured', hex: 'linear-gradient(135deg, #ef4444, #3b82f6, #10b981)' }
+    ];
+
+    window.openIdentifierModal = function() {
+      const modal = document.getElementById('identifierModal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      idCurrentStep = 1;
+      renderIdentifierUI();
+      evaluateIdentifierCandidates();
+    };
+
+    window.closeIdentifierModal = function() {
+      const modal = document.getElementById('identifierModal');
+      if (modal) modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    };
+
+    window.resetIdentifier = function() {
+      idCurrentStep = 1;
+      idFilterShape = 'all';
+      idFilterInscription = 'all';
+      idFilterDenom = 'all';
+      idFilterColor = 'all';
+      renderIdentifierUI();
+      evaluateIdentifierCandidates();
+      showToast('Visual Detective Reset', '🕵️');
+    };
+
+    window.jumpToIdentifierStep = function(step) {
+      idCurrentStep = step;
+      renderIdentifierUI();
+    };
+
+    window.stepIdentifier = function(delta) {
+      idCurrentStep = Math.max(1, Math.min(3, idCurrentStep + delta));
+      renderIdentifierUI();
+    };
+
+    function renderIdentifierUI() {
+      // Step Tab Indicators
+      [1, 2, 3].forEach(step => {
+        const tab = document.getElementById(`idStepTab${step}`);
+        const panel = document.getElementById(`idStepPanel${step}`);
+        const isActive = (step === idCurrentStep);
+        if (tab) {
+          tab.className = isActive 
+            ? "px-2.5 py-1 rounded-xl bg-amber-500 text-slate-950 font-black shadow-sm flex items-center gap-1.5 transition cursor-pointer"
+            : "px-2.5 py-1 rounded-xl bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold flex items-center gap-1.5 transition cursor-pointer";
+        }
+        if (panel) {
+          panel.classList.toggle('hidden', !isActive);
+        }
+      });
+
+      // Prev/Next Step Buttons
+      const prevBtn = document.getElementById('idBtnPrevStep');
+      const nextBtn = document.getElementById('idBtnNextStep');
+      if (prevBtn) prevBtn.disabled = (idCurrentStep === 1);
+      if (nextBtn) {
+        if (idCurrentStep === 3) {
+          nextBtn.innerHTML = '🎯 Apply to Catalog';
+          nextBtn.onclick = applyIdentifierToCatalog;
+        } else {
+          nextBtn.innerHTML = 'Next Step →';
+          nextBtn.onclick = () => stepIdentifier(1);
+        }
+      }
+
+      // Render Step 2 Inscription Cards
+      renderIdentifierInscriptions();
+      // Render Step 3 Denom & Color Pills
+      renderIdentifierDenomAndColors();
+    }
+
+    function renderIdentifierInscriptions() {
+      const grid = document.getElementById('identifierInscriptionGrid');
+      if (!grid) return;
+
+      grid.innerHTML = ID_INSCRIPTIONS.map(ins => {
+        const isSelected = (idFilterInscription === ins.id);
+        return `
+          <button onclick="setIdentifierInscription('${ins.id}')" class="p-2.5 rounded-2xl border-2 text-left transition flex flex-col justify-between cursor-pointer ${
+            isSelected 
+              ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 shadow-sm' 
+              : 'border-slate-200 dark:border-slate-800 hover:border-amber-400 bg-white dark:bg-slate-900'
+          }">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xl">${ins.icon}</span>
+              ${isSelected ? '<span class="text-[10px] font-black text-amber-600 dark:text-amber-400">✓ Active</span>' : ''}
+            </div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 dark:text-white leading-tight">${ins.label}</h4>
+              <p class="text-[9px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5 line-clamp-2">${ins.desc}</p>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderIdentifierDenomAndColors() {
+      const denomBox = document.getElementById('identifierDenomPills');
+      const colorBox = document.getElementById('identifierColorPills');
+
+      if (denomBox) {
+        const POPULAR_DENOMS = [
+          'all', '1/2d', '1d', '2d', '3d', '4d', '5d', '6d', '8d', '9d', '1/-', '2/-', '2/6', '5/-', '10/-', '£1',
+          '1c', '2c', '3c', '4c', '5c', '10c', '20c', '50c', '$1', '$2', '$5'
+        ];
+
+        denomBox.innerHTML = POPULAR_DENOMS.map(d => {
+          const isAct = (idFilterDenom === d);
+          return `
+            <button onclick="setIdentifierDenom('${d}')" class="px-2.5 py-1 rounded-xl text-xs font-black transition cursor-pointer border ${
+              isAct 
+                ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-sm' 
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:border-amber-400'
+            }">
+              ${d === 'all' ? '🌐 Any Value' : d}
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (colorBox) {
+        colorBox.innerHTML = ID_COLORS.map(c => {
+          const isAct = (idFilterColor === c.id);
+          return `
+            <button onclick="setIdentifierColor('${c.id}')" class="px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
+              isAct 
+                ? 'bg-emerald-600 text-white border-emerald-700 font-black shadow-sm' 
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:border-emerald-400'
+            }">
+              ${c.id !== 'all' ? `<span class="w-3 h-3 rounded-full border border-white/40 shadow-sm" style="background:${c.hex};"></span>` : ''}
+              <span>${c.label}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('idActiveDenomLabel').textContent = (idFilterDenom === 'all' ? 'Any Value' : idFilterDenom);
+      document.getElementById('idActiveColorLabel').textContent = (idFilterColor === 'all' ? 'Any Color' : idFilterColor.toUpperCase());
+    }
+
+    window.setIdentifierShape = function(shape) {
+      idFilterShape = shape;
+      document.querySelectorAll('.id-shape-card').forEach(btn => {
+        btn.classList.toggle('border-amber-500', btn.id === `shapeBtn_${shape}`);
+        btn.classList.toggle('bg-amber-50/50', btn.id === `shapeBtn_${shape}`);
+      });
+      evaluateIdentifierCandidates();
+      stepIdentifier(1); // Auto-advance to step 2
+    };
+
+    window.setIdentifierInscription = function(inscriptionId) {
+      idFilterInscription = inscriptionId;
+      renderIdentifierInscriptions();
+      evaluateIdentifierCandidates();
+      stepIdentifier(1); // Auto-advance to step 3
+    };
+
+    window.setIdentifierDenom = function(denom) {
+      idFilterDenom = denom;
+      renderIdentifierDenomAndColors();
+      evaluateIdentifierCandidates();
+    };
+
+    window.setIdentifierColor = function(color) {
+      idFilterColor = color;
+      renderIdentifierDenomAndColors();
+      evaluateIdentifierCandidates();
+    };
+
+    function matchIdentifierCriteria(group) {
+      // 1. Shape & Border
+      if (idFilterShape !== 'all') {
+        const fmt = (group.Format_Type || '').toLowerCase();
+        const fullText = `${group.Title} ${group.Subject} ${group.Details || ''}`.toLowerCase();
+
+        if (idFilterShape === 'triangle' && !fullText.includes('triangle') && !fullText.includes('triangular') && !fmt.includes('triangle')) {
+          return false;
+        }
+        if (idFilterShape === 'circular' && !fullText.includes('round') && !fullText.includes('circular') && !fullText.includes('die-cut') && !fullText.includes('embossed')) {
+          return false;
+        }
+        if (idFilterShape === 'minisheet' && !fmt.includes('miniature') && !fmt.includes('sheetlet') && !fullText.includes('miniature sheet')) {
+          return false;
+        }
+        if (idFilterShape === 'horiz-rect' && (fullText.includes('portrait') || (!fullText.includes('landscape') && !fullText.includes('horizontal') && group.Year < 1898))) {
+          // Early NZ issues were predominantly vertical
+          if (group.Year < 1898) return false;
+        }
+      }
+
+      // 2. Inscription / Monarch / Motif
+      if (idFilterInscription !== 'all') {
+        const scan = `${group.Title} ${group.Subject} ${group.Details || ''} ${group.Categories || ''} ${group.baseId}`.toLowerCase();
+        const yr = group.Year || 0;
+
+        if (idFilterInscription === 'chalon') {
+          const isChalon = scan.includes('chalon') || scan.includes('full face') || (yr >= 1855 && yr <= 1873 && scan.includes('victoria'));
+          if (!isChalon) return false;
+        } else if (idFilterInscription === 'side-face') {
+          const isSide = scan.includes('side face') || scan.includes('first side') || scan.includes('second side') || (yr >= 1874 && yr <= 1900 && scan.includes('victoria'));
+          if (!isSide) return false;
+        } else if (idFilterInscription === 'universal') {
+          if (!scan.includes('universal') && !scan.includes('zealandia')) return false;
+        } else if (idFilterInscription === 'edward') {
+          if (!scan.includes('edward') && !(yr >= 1909 && yr <= 1915 && scan.includes('king'))) return false;
+        } else if (idFilterInscription === 'george-v') {
+          if (!scan.includes('george v') && !scan.includes('george 5') && !(yr >= 1915 && yr <= 1935 && scan.includes('king'))) return false;
+        } else if (idFilterInscription === 'george-vi') {
+          if (!scan.includes('george vi') && !scan.includes('george 6') && !(yr >= 1937 && yr <= 1952 && scan.includes('king'))) return false;
+        } else if (idFilterInscription === 'elizabeth') {
+          if (!scan.includes('elizabeth') && !scan.includes('qeii') && !scan.includes('coronation') && !(yr >= 1953 && scan.includes('queen'))) return false;
+        } else if (idFilterInscription === 'scenic') {
+          const isScenic = scan.includes('scenic') || scan.includes('pictorial') || scan.includes('kiwi') || scan.includes('bird') || scan.includes('mountain') || scan.includes('sound') || scan.includes('cook');
+          if (!isScenic) return false;
+        } else if (idFilterInscription === 'health') {
+          if (!scan.includes('health') && !scan.includes('hygieia') && !scan.includes('camp')) return false;
+        } else if (idFilterInscription === 'lighthouse') {
+          if (!scan.includes('life insurance') && !scan.includes('lighthouse') && !scan.includes('beacon')) return false;
+        } else if (idFilterInscription === 'arms') {
+          if (!scan.includes('arms') && !scan.includes('postal fiscal')) return false;
+        } else if (idFilterInscription === 'airmail') {
+          if (!scan.includes('airmail') && !scan.includes('air mail') && !scan.includes('pigeon') && !scan.includes('flight')) return false;
+        } else if (idFilterInscription === 'official') {
+          if (!scan.includes('official') && !scan.includes('o.p.s.o.')) return false;
+        } else if (idFilterInscription === 'military') {
+          if (!scan.includes('anzac') && !scan.includes('war') && !scan.includes('military') && !scan.includes('gallipoli')) return false;
+        }
+      }
+
+      // 3. Denomination Filter
+      if (idFilterDenom !== 'all') {
+        const dClean = idFilterDenom.toLowerCase().trim();
+        const hasDenom = group.varieties.some(v => {
+          const vd = (v.Denomination || '').toLowerCase().trim();
+          const vs = (v.Subject || '').toLowerCase();
+          return vd === dClean || vs.includes(dClean) || (dClean === '1/2d' && (vd.includes('half') || vd.includes('½')));
+        });
+        if (!hasDenom && !(group.Denomination || '').toLowerCase().includes(dClean)) {
+          return false;
+        }
+      }
+
+      // 4. Color Filter
+      if (idFilterColor !== 'all') {
+        const cTarget = idFilterColor.toLowerCase();
+        const groupColorScan = `${group.Title} ${group.Subject} ${group.Details || ''} ${group.varieties.map(v => v.Subject).join(' ')}`.toLowerCase();
+        if (!groupColorScan.includes(cTarget)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function evaluateIdentifierCandidates() {
+      const matched = rawCatalog.filter(matchIdentifierCriteria);
+      const container = document.getElementById('identifierMatchesContainer');
+      const badge = document.getElementById('idCandidateBadge');
+      const status = document.getElementById('idAccuracyStatus');
+
+      if (badge) badge.textContent = `${matched.length} Match${matched.length === 1 ? '' : 'es'}`;
+      if (status) {
+        if (matched.length === 0) status.textContent = 'No records match';
+        else if (matched.length <= 3) status.textContent = '🎯 High Accuracy Pinpoint';
+        else if (matched.length <= 15) status.textContent = '✨ Narrowed Subset';
+        else status.textContent = 'Broad Match';
+      }
+
+      if (!container) return;
+
+      if (matched.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 p-6">
+            <span class="text-3xl block mb-2">🔍</span>
+            <h4 class="text-xs font-black text-slate-800 dark:text-slate-200">No stamp matches this exact 3-step profile</h4>
+            <p class="text-[11px] text-slate-500 mt-1">Try relaxing the denomination or set markings to "All" to view related series.</p>
+            <button onclick="resetIdentifier()" class="mt-3 px-3 py-1 bg-amber-500 text-slate-950 text-xs font-bold rounded-lg cursor-pointer">Reset Detective</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = matched.slice(0, 40).map((g, mIdx) => {
+        const minMuh = g.minMuh > 0 ? `$${g.minMuh.toFixed(2)}` : '—';
+        const maxMuh = g.maxMuh > 0 ? `$${g.maxMuh.toFixed(2)}` : '—';
+        const minUsed = g.minUsed > 0 ? `$${g.minUsed.toFixed(2)}` : '—';
+        const maxUsed = g.maxUsed > 0 ? `$${g.maxUsed.toFixed(2)}` : '—';
+
+        // Catalog index
+        const catalogIndex = rawCatalog.findIndex(x => x.groupId === g.groupId);
+
+        return `
+          <div class="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-3 hover:border-amber-500 transition group">
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-slate-200 dark:border-slate-800 shrink-0">
+              <img src="${g.Image_URL || 'placeholder.png'}" alt="${escapeHTML(g.Title)}" class="max-h-full max-w-full object-contain drop-shadow" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>'"/>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-1 mb-0.5">
+                <span class="font-mono text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">${escapeHTML(g.baseId)}</span>
+                <span class="text-[10px] font-black px-1.5 py-0.2 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">📅 ${g.Year || 'NZ'}</span>
+              </div>
+              <h5 class="text-xs font-black text-slate-900 dark:text-white truncate" title="${escapeHTML(g.Title)}">${escapeHTML(g.Title)}</h5>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${escapeHTML(g.Denomination || 'Multiple')} • ${escapeHTML(g.Format_Type)}</p>
+
+              <!-- Valuations -->
+              <div class="mt-1.5 flex items-center justify-between text-[10px] bg-slate-50 dark:bg-slate-800/60 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-800">
+                <span>MUH: <strong class="text-emerald-600 dark:text-emerald-400 font-bold">${minMuh === maxMuh ? minMuh : minMuh + '–' + maxMuh}</strong></span>
+                <span>Used: <strong class="text-purple-600 dark:text-purple-400 font-bold">${minUsed === maxUsed ? minUsed : minUsed + '–' + maxUsed}</strong></span>
+              </div>
+
+              <div class="mt-2 flex items-center justify-between">
+                <button onclick="inspectIdentifierResult(${catalogIndex})" class="text-[10px] font-black text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-0.5 cursor-pointer">
+                  <span>Inspect Varieties (${g.varietyCount})</span> <span>↗</span>
+                </button>
+                <button onclick="pinpointSingleInCatalog('${escapeHTML(g.baseId)}')" class="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer">
+                  Pinpoint in Catalog
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.inspectIdentifierResult = function(catalogIndex) {
+      if (catalogIndex < 0 || catalogIndex >= rawCatalog.length) return;
+      closeIdentifierModal();
+      openModalByIndex(catalogIndex);
+    };
+
+    window.pinpointSingleInCatalog = function(baseId) {
+      closeIdentifierModal();
+      document.getElementById('searchInput').value = baseId;
+      document.getElementById('clearSearchBtn').classList.remove('hidden');
+      applyFiltersAndRender();
+      showToast(`Filtered catalog to ${baseId}`, '🎯');
+    };
+
+    window.applyIdentifierToCatalog = function() {
+      const matched = rawCatalog.filter(matchIdentifierCriteria);
+      if (!matched.length) {
+        showToast('No candidates to apply to catalog', '⚠️');
+        return;
+      }
+      closeIdentifierModal();
+
+      // Formulate query from choices
+      const terms = [];
+      if (idFilterInscription !== 'all') terms.push(idFilterInscription.replace(/-/g, ' '));
+      if (idFilterDenom !== 'all') terms.push(idFilterDenom);
+      if (idFilterColor !== 'all') terms.push(idFilterColor);
+
+      const query = terms.join(' ') || (matched[0]?.baseId || '');
+      document.getElementById('searchInput').value = query;
+      document.getElementById('clearSearchBtn').classList.remove('hidden');
+      applyFiltersAndRender();
+      showToast(`Applied Detective Filter (${matched.length} items)`, '🕵️');
+    };
+
+
     function showToast(msg, icon = '✨') {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').innerText = msg;
@@ -2330,6 +2942,7 @@
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeIdentifierModal();
         closeModal();
         closeEnlargeModal();
       }
