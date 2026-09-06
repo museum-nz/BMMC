@@ -74,6 +74,12 @@
           icon: '🚂', 
           label: 'Aotearoa NZ Railway Map', 
           desc: 'Interactive rail history, steam pioneers, disasters & KiwiRail' 
+        },
+        { 
+          href: 'maritime.html', 
+          icon: '⚓', 
+          label: 'Maritime & Coastal Shipping', 
+          desc: 'Mosquito Fleet, shipwrecks, whaling & lighthouses' 
         }
       ]
     }
