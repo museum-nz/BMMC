@@ -124,11 +124,6 @@
     .theme-light .marker-stem { background: #f59e0b; }
     .theme-light .marker-dot { background: #f59e0b; }
 
-    .theme-landing .marker-capsule { background: rgba(243, 232, 255, 0.95); border-color: #9333ea; color: #6b21a8; }
-    .dark .theme-landing .marker-capsule { background: rgba(59, 7, 100, 0.95); border-color: #c084fc; color: #f3e8ff; }
-    .theme-landing .marker-stem { background: #9333ea; }
-    .theme-landing .marker-dot { background: #9333ea; }
-
     .theme-whaling .marker-capsule { background: rgba(240, 253, 250, 0.92); border-color: #14b8a6; color: #115e59; }
     .dark .theme-whaling .marker-capsule { background: rgba(19, 78, 74, 0.92); border-color: #2dd4bf; color: #ccfbf1; }
     .theme-whaling .marker-stem { background: #14b8a6; }
@@ -138,18 +133,6 @@
     .dark .theme-port .marker-capsule { background: rgba(8, 47, 73, 0.92); border-color: #38bdf8; color: #e0f2fe; }
     .theme-port .marker-stem { background: #0284c7; }
     .theme-port .marker-dot { background: #0284c7; }
-
-    /* Shipping Route Polyline Tooltips */
-    .maritime-route-tooltip {
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      border-radius: 12px;
-      padding: 6px 10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
 
     /* Custom Map Popups */
     .maritime-popup .leaflet-popup-content-wrapper {
@@ -165,7 +148,7 @@
 
 <body class="bg-gradient-to-br from-slate-50/40 via-sky-50/20 to-slate-100/40 dark:from-slate-950 dark:via-slate-900 dark:to-sky-950/20 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
 
-  <!-- Ambient Sky / Water Background -->
+  <!-- Ambient Sky Background -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
     <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none opacity-40 dark:opacity-20"></div>
   </div>
@@ -183,7 +166,7 @@
               Maritime &amp; Coastal Archive
             </h1>
             <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">
-              Settlers • Mosquito Fleet • Shipwrecks • Lighthouses • Whaling (1829–1960)
+              Mosquito Fleet • Shipwrecks • Lighthouses • Whaling (1822–1960)
             </p>
           </div>
         </a>
@@ -218,13 +201,13 @@
 
       <div class="relative z-10 max-w-4xl space-y-3">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-black uppercase tracking-wider">
-          <span>🌊 Aotearoa Coastal Navigation &amp; Settler Heritage</span>
+          <span>🌊 Aotearoa Coastal Navigation Heritage</span>
         </div>
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
-          Settler Voyages, Dangerous Reefs &amp; Sentinels of Light
+          The Mosquito Fleet, Dangerous Reefs &amp; Sentinels of Light
         </h2>
         <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-          Before railways pierced the bush and mountains, New Zealand’s rugged coastline was its true main highway. Pioneers survived 100-day passages through the Roaring Forties to land on open surf beaches, while flat-bottomed scows and steamers of the <strong>Mosquito Fleet</strong> traded through bar harbours alongside heroic lighthouses and tragic shipwrecks.
+          Before railways pierced the bush and mountains, New Zealand’s rugged coastline was its true main highway. Shallow-draught scows, cutters, and steamers—fondly named the <strong>Mosquito Fleet</strong>—ferried timber, butter, wool, and pioneers across bar harbours, while hazardous rocks and wild Southern Ocean swells gave birth to tragic shipwrecks and a legendary chain of coastal lighthouses.
         </p>
 
         <!-- Quick Jump Filter Tabs -->
@@ -256,7 +239,7 @@
           <span class="text-2xl p-2 bg-sky-50 dark:bg-sky-950/80 text-sky-600 rounded-2xl border border-sky-200 dark:border-sky-900/60">🗺️</span>
           <div>
             <h3 class="text-lg font-black text-slate-900 dark:text-white">Coastal Shipping &amp; Nautical Heritage GIS Map</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Explore historic lighthouses, catastrophic wrecks, settler landing points &amp; ocean routes</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Explore historic lighthouses, catastrophic wrecks, pioneer whaling stations &amp; coaster ports</p>
           </div>
         </div>
 
@@ -271,17 +254,11 @@
           <button onclick="setMapFilter('light')" id="mapFilterLight" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-amber-500 transition cursor-pointer">
             💡 Lighthouses (<span id="countLights">0</span>)
           </button>
-          <button onclick="setMapFilter('landing')" id="mapFilterLanding" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-purple-500 transition cursor-pointer">
-            ⚓ Settler Landings (<span id="countLandings">0</span>)
-          </button>
           <button onclick="setMapFilter('whaling')" id="mapFilterWhaling" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-teal-500 transition cursor-pointer">
-            🐋 Whaling (<span id="countWhaling">0</span>)
+            🐋 Whaling Stations (<span id="countWhaling">0</span>)
           </button>
           <button onclick="setMapFilter('port')" id="mapFilterPort" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
-            🚢 Ports (<span id="countPorts">0</span>)
-          </button>
-          <button onclick="toggleShippingRoutes()" id="btnToggleRoutes" class="px-2.5 py-1 rounded-xl text-xs font-black bg-purple-600 hover:bg-purple-500 text-white shadow transition cursor-pointer">
-            🧭 Routes: ON
+            🚢 Coaster Ports (<span id="countPorts">0</span>)
           </button>
         </div>
       </div>
@@ -297,13 +274,13 @@
       <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         <span class="text-2xl p-2 bg-red-50 dark:bg-red-950/80 text-red-600 rounded-2xl border border-red-200 dark:border-red-900/60">🚨</span>
         <div>
-          <h3 class="text-lg font-black text-slate-900 dark:text-white">Wreck &amp; Salvage Lore: Tragedies that Shaped Safety</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Disasters that reformed navigational law, airmail history, and coastal rescue</p>
+          <h3 class="text-lg font-black text-slate-900 dark:text-white">Wreck &amp; Salvage Lore: Three Defining Disasters</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Tragedies that reformed navigation safety, maritime law, and airmail history</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- SS Tararua -->
+        <!-- 1. SS Tararua -->
         <article class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-red-200/80 dark:border-red-900/40 shadow-sm flex flex-col justify-between hover:border-red-500 transition">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
@@ -312,18 +289,25 @@
               </span>
               <span class="text-xs font-mono font-bold text-slate-400">Waipapa Point</span>
             </div>
-            <h4 class="text-base font-black text-slate-900 dark:text-white leading-snug">The Catlins Disaster &amp; Waipapa Lighthouse</h4>
+            <h4 class="text-base font-black text-slate-900 dark:text-white leading-snug">
+              The Catlins Tragedy &amp; The Birth of Waipapa Lighthouse
+            </h4>
             <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              On 29 April 1881, the steamer <strong>SS *Tararua*</strong> struck Otara Reef off Waipapa Point. For 20 hours, heavy surf broke over the ship while onlookers stood helplessly on the beach. 131 drowned, making it NZ's worst civilian shipping disaster and forcing the rapid construction of Waipapa Lighthouse.
+              On 29 April 1881, the passenger steamer <strong>SS *Tararua*</strong> struck the submerged Otara Reef 1.2 km off Waipapa Point in Southland en route to Melbourne. For over twenty agonizing hours, heavy surf broke over the ship while helpless onlookers stood on the shore. Only 20 survived; 131 passengers and crew drowned, making it New Zealand’s worst civilian shipping disaster.
             </p>
+            <div class="p-3 bg-red-50 dark:bg-red-950/40 rounded-xl border border-red-200 dark:border-red-900/60 text-[11px] text-red-900 dark:text-red-200">
+              <strong>Heritage Impact:</strong> The catastrophe forced the Marine Department to commission the wooden <strong>Waipapa Point Lighthouse</strong> in 1884. Most victims were buried in the historic <em>Tararua Acre</em> cemetery nearby in Fortrose.
+            </div>
           </div>
           <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <button onclick="focusMapItem('wreck_tararua')" class="text-red-600 dark:text-red-400 font-extrabold hover:underline cursor-pointer">Pinpoint on Map ↗</button>
+            <button onclick="focusMapItem('wreck_tararua')" class="text-red-600 dark:text-red-400 font-extrabold hover:underline cursor-pointer">
+              Pinpoint on Map ↗
+            </button>
             <span class="text-[10px] text-slate-400">Southland Coast</span>
           </div>
         </article>
 
-        <!-- SS Wairarapa -->
+        <!-- 2. SS Wairarapa -->
         <article class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-amber-200/80 dark:border-amber-900/40 shadow-sm flex flex-col justify-between hover:border-amber-500 transition">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
@@ -332,34 +316,50 @@
               </span>
               <span class="text-xs font-mono font-bold text-slate-400">Great Barrier Island</span>
             </div>
-            <h4 class="text-base font-black text-slate-900 dark:text-white leading-snug">Fog on Miners Head &amp; The First Airmail</h4>
+            <h4 class="text-base font-black text-slate-900 dark:text-white leading-snug">
+              Fog on Miners Head &amp; The Great Barrier Pigeongram
+            </h4>
             <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Steaming blind at full speed from Sydney, the <strong>SS *Wairarapa*</strong> smashed into the cliffs of Miners Head. Over 120 perished. The three-day delay in sending news to Auckland inspired the establishment of the <strong>Great Barrier Pigeongram Service</strong> (1897)—the world's first official airmail stamps!
+              Steaming blind through dense fog at near full speed of 13 knots from Sydney, the Union Steam Ship Co liner <strong>SS *Wairarapa*</strong> smashed headlong into the vertical rock cliffs of Miners Head on 29 October 1894. More than 120 perished in the swirling breakers. Surviving crew and local Māori of Ngāti Rehua bravely hauled exhausted passengers up sheer cliffs using lifelines.
             </p>
+            <div class="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-900/60 text-[11px] text-amber-900 dark:text-amber-200">
+              <strong>Philatelic Link:</strong> News of the wreck took three days to reach Auckland. This sheer isolation triggered the founding of the <strong>Great Barrier Pigeongram Service</strong> (1897), producing the world’s very first official airmail stamps!
+            </div>
           </div>
           <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <button onclick="focusMapItem('wreck_wairarapa')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer">Pinpoint on Map ↗</button>
-            <a href="stamps.html?q=pigeon" class="text-[10px] text-amber-600 dark:text-amber-400 font-bold hover:underline">Pigeongram Stamps ↗</a>
+            <button onclick="focusMapItem('wreck_wairarapa')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer">
+              Pinpoint on Map ↗
+            </button>
+            <a href="stamps.html?q=pigeon" class="text-[10px] text-amber-600 dark:text-amber-400 font-bold hover:underline">
+              Pigeongram Stamps ↗
+            </a>
           </div>
         </article>
 
-        <!-- HMS Orpheus -->
-        <article class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-red-200/80 dark:border-red-900/40 shadow-sm flex flex-col justify-between hover:border-red-500 transition">
+        <!-- 3. SS Penguin -->
+        <article class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-sky-200/80 dark:border-sky-900/40 shadow-sm flex flex-col justify-between hover:border-sky-500 transition">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800">
-                189 Lives Lost • 1863
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800">
+                75 Lives Lost • 1909
               </span>
-              <span class="text-xs font-mono font-bold text-slate-400">Manukau Bar</span>
+              <span class="text-xs font-mono font-bold text-slate-400">Cook Strait</span>
             </div>
-            <h4 class="text-base font-black text-slate-900 dark:text-white leading-snug">The Manukau Bar &amp; NZ's Worst Naval Tragedy</h4>
+            <h4 class="text-base font-black text-slate-900 dark:text-white leading-snug">
+              Cook Strait's Darkest Night &amp; Heroism at Cape Terawhiti
+            </h4>
             <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              On 7 February 1863, the Royal Navy steam corvette <strong>HMS *Orpheus*</strong> grounded on the shifting sandbanks of the Manukau Harbour entrance while bringing troop reinforcements. Breaking seas shattered the ship, drowning 189 officers and seamen.
+              On 12 February 1909, during a ferocious southerly tempest, the reliable coastal ferry <strong>SS *Penguin*</strong> missed the entrance to Wellington Harbour and ran onto Tom’s Rock off Cape Terawhiti. When seawater flooded the engine boilers, they exploded, tearing the hull in two. 75 people drowned, including every child on board. Sole female survivor Mrs. Ada Hannam clung to a wooden raft for hours in icy breakers.
             </p>
+            <div class="p-3 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-200 dark:border-sky-900/60 text-[11px] text-sky-900 dark:text-sky-200">
+              <strong>Navigation Legacy:</strong> The disaster led to automated explosive fog signals on Pencarrow Head and expedited the completion of the <strong>Karori Rock beacon</strong> and <strong>Cape Brett lighthouse</strong> in 1910.
+            </div>
           </div>
           <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <button onclick="focusMapItem('wreck_orpheus')" class="text-red-600 dark:text-red-400 font-extrabold hover:underline cursor-pointer">Pinpoint on Map ↗</button>
-            <span class="text-[10px] text-slate-400">Auckland West Coast</span>
+            <button onclick="focusMapItem('wreck_penguin')" class="text-sky-600 dark:text-sky-400 font-extrabold hover:underline cursor-pointer">
+              Pinpoint on Map ↗
+            </button>
+            <span class="text-[10px] text-slate-400">Wellington Entrance</span>
           </div>
         </article>
       </div>
@@ -370,54 +370,66 @@
       <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         <span class="text-2xl p-2 bg-teal-50 dark:bg-teal-950/80 text-teal-600 rounded-2xl border border-teal-200 dark:border-teal-900/60">🐋</span>
         <div>
-          <h3 class="text-lg font-black text-slate-900 dark:text-white">Early Southern Whaling &amp; Sealing Shore Stations (1827–1850s)</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">The first European-Māori frontier trading posts in Murihiku and Cook Strait</p>
+          <h3 class="text-lg font-black text-slate-900 dark:text-white">Early Southern Whaling &amp; Sealing Shore Stations (1822–1850s)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">The first European-Māori frontier communities in Murihiku / Southland</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
           <div class="flex items-center justify-between">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">Est. 1829 • Cuttle Cove</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
+              Est. 1829 • Cuttle Cove
+            </span>
             <span class="text-xs font-mono font-bold text-slate-400">Fiordland</span>
           </div>
           <h4 class="text-base font-black text-slate-900 dark:text-white">Preservation Inlet (Rakituma)</h4>
           <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-            Established by Australian merchant Peter Williams in 1829, this was mainland Southland's first commercial shore whaling station. Try-pots boiled down right whale blubber into train oil.
+            Established by Australian trader Peter Williams at Cuttle Cove in 1829, this was mainland Southland's first commercial shore whaling station. Try-pots boiled down right whale blubber into valuable train oil. Later in the 1890s, the nearby gold mining towns of Cromarty and Te Oneroa bloomed, guarded by the isolated Puysegur Point Light.
           </p>
           <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <button onclick="focusMapItem('whaling_preservation')" class="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">View on Map ↗</button>
-            <span class="text-[10px] text-slate-400">Fiordland</span>
+            <button onclick="focusMapItem('whaling_preservation')" class="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">
+              View on Map ↗
+            </button>
+            <span class="text-[10px] text-slate-400">Fiordland Wilderness</span>
           </div>
         </div>
 
         <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
           <div class="flex items-center justify-between">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">Est. 1836 • Motupōhue</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
+              Est. 1836 • Motupōhue
+            </span>
             <span class="text-xs font-mono font-bold text-slate-400">Bluff Port</span>
           </div>
           <h4 class="text-base font-black text-slate-900 dark:text-white">Stirling Point &amp; Bluff Harbour</h4>
           <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-            Captain William Stirling set up six-oared whaleboats in Foveaux Strait in 1836. It quickly transitioned into Southland's primary international seaport for grain, timber, meat, and Bluff oysters.
+            Captain William Stirling established a shore whaling station in 1836 beneath the volcanic bluff of Motupōhue. Operating six-oared whaleboats in Foveaux Strait, it quickly evolved into Southland's primary international seaport, exporting frozen mutton from 1882, timber, and the world-renowned Bluff dredge oysters.
           </p>
           <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <button onclick="focusMapItem('whaling_bluff')" class="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">View on Map ↗</button>
-            <span class="text-[10px] text-slate-400">Bluff</span>
+            <button onclick="focusMapItem('whaling_bluff')" class="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">
+              View on Map ↗
+            </button>
+            <span class="text-[10px] text-slate-400">State Highway 1 Anchor</span>
           </div>
         </div>
 
         <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
           <div class="flex items-center justify-between">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">Est. 1837 • Howell's Point</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
+              Est. 1837 • Howell's Point
+            </span>
             <span class="text-xs font-mono font-bold text-slate-400">Aparima</span>
           </div>
           <h4 class="text-base font-black text-slate-900 dark:text-white">Riverton / Aparima &amp; Capt. Howell</h4>
           <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-            Captain John Howell sailed into the Aparima estuary to set up a shore station in 1837. Partnering with Ngāti Māmoe and Ngāi Tahu through marriage to Kohikohi, he founded Southland's oldest permanent settlement.
+            In 1837, 27-year-old Captain John Howell sailed into the Aparima estuary to set up a shore whaling base. Partnering with local Ngāti Māmoe and Ngāi Tahu chiefs through marriage to Kohikohi, he created a peaceful, prosperous bicultural settlement that holds the title of the oldest permanent European settlement in Southland.
           </p>
           <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <button onclick="focusMapItem('whaling_riverton')" class="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">View on Map ↗</button>
-            <span class="text-[10px] text-slate-400">Riverton</span>
+            <button onclick="focusMapItem('whaling_riverton')" class="text-xs font-extrabold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">
+              View on Map ↗
+            </button>
+            <span class="text-[10px] text-slate-400">Oreti Beach Frontier</span>
           </div>
         </div>
       </div>
@@ -437,7 +449,6 @@
             </p>
           </div>
         </div>
-
         <a href="stamps.html?cats=Life%20Insurance%20(Lighthouse)" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-black rounded-xl shadow transition self-start md:self-auto flex items-center gap-1.5 cursor-pointer">
           <span>📮 Explore All Lighthouse Stamps in Catalog ↗</span>
         </a>
@@ -449,28 +460,34 @@
             When the government abolished free departmental franking privileges in 1890, the <strong>Government Life Insurance Department (GLI)</strong> chose a coastal lighthouse as its official emblem, symbolizing <em>“security, steadfast guidance through stormy seas, and protection for the home.”</em>
           </p>
           <p>
-            From 1891 until 1981, New Zealand was the only country in the British Empire to issue distinct postage stamps exclusively for its life insurance department, depicting genuine sentinel lights including Pencarrow Head, Dog Island, Waipapa Point, Cape Palliser, and Cape Brett.
+            From 1891 until 1981, New Zealand was the only country in the British Empire to issue distinct postage stamps exclusively for its life insurance department, depicting genuine sentinel lights:
           </p>
+          <ul class="space-y-1.5 pl-4 list-disc text-slate-600 dark:text-slate-300">
+            <li><strong>Pencarrow Head (1859):</strong> Guarding Wellington Harbour; New Zealand’s first permanent lighthouse, kept by Mary Jane Bennett (the country’s only female keeper).</li>
+            <li><strong>Dog Island (1865):</strong> Towering 37 metres over Foveaux Strait, it is New Zealand’s tallest stone lighthouse with black-and-white bands.</li>
+            <li><strong>Waipapa Point (1884):</strong> Wooden kauri tower directly constructed to prevent a recurrence of the horrific SS <em>Tararua</em> disaster.</li>
+            <li><strong>Puysegur Point (1879):</strong> Located on the storm-lashed southwestern tip of the South Island, known to keepers as "the loneliest light in the world."</li>
+            <li><strong>Cape Brett (1910):</strong> The famous 4c red and yellow stamp issued on the centenary in 1969.</li>
+          </ul>
         </div>
 
-        <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-5 border border-amber-500/30 shadow-md space-y-3">
-          <div class="flex items-center justify-between">
+        <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-5 border border-amber-500/30 shadow-md space-y-3 text-center">
+          <div class="flex items-center justify-between text-left">
             <span class="text-[10px] font-black uppercase text-amber-600 dark:text-amber-400">Philatelic Artifact</span>
             <span class="text-[10px] font-mono text-slate-400 font-bold">1891–1981 Special Issue</span>
           </div>
-
-          <div class="h-44 bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-3 border border-slate-800">
-            <img src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80" alt="Lighthouse Beacon" class="w-full h-full object-cover rounded-lg opacity-85" loading="lazy" />
-          </div>
-
-          <div class="space-y-1 text-center">
+          <div class="p-4 bg-amber-50/50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-900/60">
+            <span class="text-3xl block mb-1">🏛️ 💡 📮</span>
             <h5 class="text-xs font-black text-slate-900 dark:text-white">NZ Government Life "VR" Lighthouse Issues</h5>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400">Engraved by Waterlow &amp; Sons, London (1/2d to 1/-)</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Engraved by Waterlow &amp; Sons, London (1/2d to 1/-)</p>
           </div>
-
           <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <button onclick="focusMapItem('light_waipapa')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">Fly to Waipapa Light ↗</button>
-            <button onclick="focusMapItem('light_dog')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">Fly to Dog Island Light ↗</button>
+            <button onclick="focusMapItem('light_waipapa')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">
+              Fly to Waipapa Light ↗
+            </button>
+            <button onclick="focusMapItem('light_dog')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">
+              Fly to Dog Island Light ↗
+            </button>
           </div>
         </div>
       </div>
@@ -484,7 +501,7 @@
           <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">
             The Mosquito Fleet: Workhorses of Harbours and Bar Rivers
           </h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Flat-bottomed scows, puffing coasters, and the lifeline to pioneer farming outposts</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Flat-bottomed scows, puffing coasters, and the lifeline to frontier towns</p>
         </div>
       </div>
 
@@ -492,14 +509,21 @@
         <div class="space-y-3">
           <h4 class="text-sm font-black text-slate-900 dark:text-white">Submarines of the Hauraki Gulf &amp; Kauri Trade</h4>
           <p>
-            In the 1880s to 1920s, hundreds of small steamers, ketches, and distinctive New Zealand scows navigated tidal rivers and shallow sandbars. Built with centreboard drop-keels and shallow flat hulls, scows were celebrated as <em>"the submarines of the coast"</em> because waves broke straight across their flush timber decks.
+            In the 1880s to 1920s, hundreds of small steamers, ketches, and distinctive New Zealand scows navigated tidal rivers and shallow sandbars. Built with centreboard drop-keels and shallow flat hulls, scows were celebrated as <em>"the submarines of the coast"</em> because waves often broke straight across their heavily laden flush decks of kauri logs and road shingles.
+          </p>
+          <p>
+            From Onehunga on the Manukau Harbour, coasters tackled the dangerous Manukau Bar to supply the goldfields of Thames, the coal mines of Westport and Greymouth, and isolated dairy factories throughout Taranaki.
           </p>
         </div>
+
         <div class="space-y-3">
           <h4 class="text-sm font-black text-slate-900 dark:text-white">Connecting Farming Outposts to the World</h4>
           <p>
-            Before the railway reached inland Southland and Otago, farms like Bonniefields depended on local coastal shipping through Bluff and Fortrose. Wool bales, tallow, and butter pats were hauled by dray to estuary jetties and loaded aboard steamers for transfer to ocean-going cargo liners.
+            Before the railway reached inland Southland and Otago, farms like Bonniefields depended on local coastal shipping through Bluff and Fortrose. Wool bales, tallow, and butter pats were hauled by dray to estuary jetties and loaded aboard puffing steamers for transfer to ocean-going refrigerated cargo liners.
           </p>
+          <div class="p-3 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-200 dark:border-sky-900/60 text-xs text-sky-900 dark:text-sky-200 font-medium">
+            <strong>Museum Link:</strong> Discover how pioneer farm machinery was imported through southern roadsteads in our <a href="index.html" class="underline font-bold text-sky-600 dark:text-sky-400">Main Artifact Showcase</a> and <a href="gallery.html" class="underline font-bold text-sky-600 dark:text-sky-400">Photo Archives</a>.
+          </div>
         </div>
       </div>
     </section>
@@ -521,12 +545,6 @@
     </div>
   </div>
 
-  <!-- Toast Notification System -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
-    <span id="toastIcon">✨</span>
-    <span id="toastMsg">Notification message</span>
-  </div>
-
   <!-- Universal BMMC Navigation Drawer Script -->
   <script src="shared-nav.js"></script>
 
@@ -545,23 +563,10 @@
     }
   </script>
 
-  <!-- Complete Maritime GIS Dataset & Interactive Application Engine -->
+  <!-- Maritime GIS Dataset & Application Engine -->
   <script>
     const MARITIME_SITES = [
-      // -------------------------------------------------------------
-      // 1. SHIPWRECKS (20 Tragedies)
-      // -------------------------------------------------------------
-      {
-        id: 'wreck_orpheus',
-        type: 'wreck',
-        title: 'HMS Orpheus (Manukau Bar)',
-        year: 1863,
-        lat: -37.0530,
-        lng: 174.4750,
-        tag: '189 Casualties • Worst NZ Naval Disaster',
-        desc: 'Royal Navy steam corvette wrecked while crossing the shifting Manukau Bar on 7 February 1863.',
-        detailsHtml: '<p><strong>HMS Orpheus</strong> brought military reinforcements for the New Zealand Wars. Relying on outdated navigation charts, she ran aground on the middle bank of the Manukau Bar where pounding breakers destroyed her hull. 189 lives lost.</p>'
-      },
+      // --- SHIPWRECKS ---
       {
         id: 'wreck_tararua',
         type: 'wreck',
@@ -570,8 +575,9 @@
         lat: -46.6675,
         lng: 168.8520,
         tag: '131 Casualties • Worst Civilian Wreck',
-        desc: 'Passenger steamer grounded on Otara Reef, Waipapa Point on 29 April 1881. Only 20 survived out of 151 aboard.',
-        detailsHtml: '<p>En route to Melbourne via Bluff, <strong>SS Tararua</strong> struck Otara Reef in darkness. Heavy surf broke over the ship for 20 hours while helpless onlookers stood on shore. This catastrophe led directly to the construction of Waipapa Point Lighthouse.</p>'
+        desc: 'Struck Otara Reef on 29 April 1881. The 20-hour tragedy claimed 131 lives and led directly to the building of the Waipapa Point Lighthouse.',
+        linkText: 'Read Waipapa Point Lore',
+        detailsHtml: `<p><strong>SS Tararua</strong> was a 563-ton steamship owned by the Union Steam Ship Company. Running between Port Chalmers (Dunedin) and Melbourne via Bluff, she struck Otara Reef in darkness. Heavy surf broke over the ship while helpless onlookers stood on the shore. Only 20 survived; 131 passengers and crew drowned.</p><p class="mt-2">The Tararua Acre cemetery at Fortrose holds the remains of many who washed ashore.</p>`
       },
       {
         id: 'wreck_wairarapa',
@@ -581,8 +587,9 @@
         lat: -36.0592,
         lng: 175.3400,
         tag: '121 Casualties • Great Barrier Island',
-        desc: 'Steaming blind through dense fog from Sydney, the steamer struck the cliffs of Great Barrier Island on 29 October 1894.',
-        detailsHtml: '<p>Over 120 died in the boiling surf. Local Ngāti Rehua and settlers heroically saved passengers clinging to the rigging. The 3-day communications delay inspired the world\'s first airmail stamps on the <strong>Great Barrier Pigeongram Service</strong> (1897).</p>'
+        desc: 'Steaming through thick fog from Sydney, the Wairarapa struck Miners Head cliffs at full speed on 29 October 1894 with catastrophic loss of life.',
+        linkText: 'Great Barrier Pigeongram Link',
+        detailsHtml: `<p>The disaster resulted in 121 deaths. Local Māori and settlers heroically saved dozens of survivors clinging to rigging. The delay in alerting Auckland led to the creation of the world-famous <strong>Great Barrier Pigeongram Service</strong> (1897).</p>`
       },
       {
         id: 'wreck_penguin',
@@ -592,19 +599,21 @@
         lat: -41.3025,
         lng: 174.6180,
         tag: '75 Casualties • Cook Strait',
-        desc: 'Coastal ferry struck Tom\'s Rock off Cape Terawhiti during a southerly gale on 12 February 1909.',
-        detailsHtml: '<p>Water flooded the engine compartment, blowing up the boilers. 75 perished, including every child on board. Sole female survivor Mrs Ada Hannam clung to a wooden raft for hours.</p>'
+        desc: 'Wrecked on Tom\'s Rock off Cape Terawhiti during a screaming southerly gale on 12 February 1909. Cook Strait\'s deadliest peacetime disaster.',
+        linkText: 'Cape Terawhiti Safety Legacy',
+        detailsHtml: `<p>En route from Picton to Wellington in ferocious weather, the Penguin struck Tom's Rock. Her boilers exploded as she foundered. All children and all women except Mrs Ada Hannam drowned. 75 perished in total.</p>`
       },
       {
-        id: 'wreck_wahine',
+        id: 'wreck_orpheus',
         type: 'wreck',
-        title: 'TEV Wahine (Barrett Reef)',
-        year: 1968,
-        lat: -41.3508,
-        lng: 174.8347,
-        tag: '53 Casualties • Wellington Harbour',
-        desc: 'Interisland roll-on/roll-off ferry foundered on Barrett Reef during Cyclone Giselle on 10 April 1968.',
-        detailsHtml: '<p>Cyclone Giselle brought hurricane winds exceeding 275 km/h. Radar failed and the ship drifted onto Barrett Reef, later capsizing near Steeple Rock. 53 died in New Zealand\'s defining modern maritime disaster.</p>'
+        title: 'HMS Orpheus (Manukau Bar)',
+        year: 1863,
+        lat: -37.0530,
+        lng: 174.4750,
+        tag: '189 Casualties • Worst NZ Naval Disaster',
+        desc: 'Royal Navy corvette flagship wrecked crossing the treacherous shifting sandbars of the Manukau Harbour entrance on 7 February 1863.',
+        linkText: 'Manukau Bar History',
+        detailsHtml: `<p>HMS Orpheus carried military troops and naval supplies for the New Zealand Wars. Misleading navigational signals led her onto the middle bank of the Manukau Bar where pounding breakers destroyed her.</p>`
       },
       {
         id: 'wreck_general_grant',
@@ -614,287 +623,23 @@
         lat: -50.5333,
         lng: 166.0000,
         tag: 'Gold Bullion Legend • Subantarctic',
-        desc: 'American full-rigged ship driven into a sea cave on the western cliffs of the Auckland Islands on 13 May 1866.',
-        detailsHtml: '<p>Carrying Australian gold bullion and 83 passengers, the ship was sucked into an enormous cavern. 15 survivors spent 18 harrowing months eating seals and wild pigs before rescue.</p>'
-      },
-      {
-        id: 'wreck_dundonald',
-        type: 'wreck',
-        title: 'Dundonald (Disappointment Island)',
-        year: 1907,
-        lat: -50.6060,
-        lng: 165.9750,
-        tag: 'Subantarctic • Canvas Coracle Feat',
-        desc: 'Four-masted barque driven ashore on Disappointment Island in the Auckland Islands group on 7 March 1907.',
-        detailsHtml: '<p>16 survivors constructed an ingenious coracle from bent branches and canvas sailcloth, rowing across 9 km of turbulent ocean swells to the government castaway depot on the main island.</p>'
-      },
-      {
-        id: 'wreck_elingamite',
-        type: 'wreck',
-        title: 'SS Elingamite (Three Kings Islands)',
-        year: 1902,
-        lat: -34.1610,
-        lng: 172.1520,
-        tag: '45 Casualties • Gold Bullion Shipment',
-        desc: 'Steamer smashed into West Island in dense fog on 9 November 1902 carrying £17,320 in gold and silver coin.',
-        detailsHtml: '<p>Survivors suffered days on rocky ledges and open rafts. The disaster expedited the construction of radio beacons and outer north-coast safety lights.</p>'
-      },
-      {
-        id: 'wreck_delaware',
-        type: 'wreck',
-        title: 'Delaware (Huria Matenga Heroism)',
-        year: 1863,
-        lat: -41.1612,
-        lng: 173.4350,
-        tag: 'Delaware Bay • Heroic Rescue',
-        desc: 'Brigantine wrecked off Wakapuaka; young chieftainess Huria Matenga swam through raging surf to save crew.',
-        detailsHtml: '<p>On 4 September 1863, Huria Matenga, Hēmi Whiro, and Ropata Hurumutu plunged into breakers with a lead line, securing a hawser that saved every crew member except the cook.</p>'
-      },
-      {
-        id: 'wreck_ventnor',
-        type: 'wreck',
-        title: 'SS Ventnor (Hokianga Coast)',
-        year: 1902,
-        lat: -35.4330,
-        lng: 173.3500,
-        tag: '499 Coffins • Chinese Gold Miners',
-        desc: 'Chartered steamer carrying bones of 499 Cantonese gold miners struck a reef off Taranaki and sank off Hokianga.',
-        detailsHtml: '<p>Sunk on 27 October 1902. Te Roroa and Te Rarawa iwi reverently interred the washed-ashore ancestral remains in their sacred urupā, forging an enduring century-long bond with Chinese families.</p>'
-      },
-      {
-        id: 'wreck_surat',
-        type: 'wreck',
-        title: 'Surat (Catlins Coast)',
-        year: 1874,
-        lat: -46.4670,
-        lng: 169.7040,
-        tag: '271 Immigrants • Miraculously Saved',
-        desc: 'Full-rigged immigrant vessel from London struck Chaslands Mistake on New Year\'s Eve 1873.',
-        detailsHtml: '<p>Despite severe hull leakage, the captain ran her ashore on False Islet (now Surat Beach). All 271 immigrants and crew were evacuated safely onto the dunes.</p>'
-      },
-      {
-        id: 'wreck_white_swan',
-        type: 'wreck',
-        title: 'SS White Swan (Uruti Point)',
-        year: 1862,
-        lat: -41.1730,
-        lng: 175.9870,
-        tag: 'Government Records Saved • Castlepoint',
-        desc: 'Steamship transporting the Premier and parliamentary archives grounded on 29 June 1862.',
-        detailsHtml: '<p>All 65 passengers and crew safely reached shore on the remote Wairarapa coast. Many state archives and early colonial papers were saved from the surf.</p>'
-      },
-      {
-        id: 'wreck_boyd',
-        type: 'wreck',
-        title: 'The Boyd (Whangaroa Harbour)',
-        year: 1809,
-        lat: -35.0333,
-        lng: 173.7500,
-        tag: 'Timber Trader • Early Contact Conflict',
-        desc: 'English brig burned in Whangaroa Harbour in 1809 following mistreatment of a local chief.',
-        detailsHtml: '<p>66 passengers and crew were killed in December 1809. The tragedy isolated Northland from European trade until Reverend Samuel Marsden brokered peace in 1814.</p>'
-      },
-      {
-        id: 'wreck_buffalo',
-        type: 'wreck',
-        title: 'HMS Buffalo (Mercury Bay)',
-        year: 1840,
-        lat: -36.8375,
-        lng: 175.7111,
-        tag: 'Kauri Spar Store Ship • Whitianga',
-        desc: 'Admiralty store ship driven onto Buffalo Beach during a storm on 28 July 1840.',
-        detailsHtml: '<p>Carrying kauri spars for Royal Navy shipyards, her cables parted and the ship was run aground. Only two crew drowned; her timber ribs still appear at low tides.</p>'
-      },
-      {
-        id: 'wreck_lermontov',
-        type: 'wreck',
-        title: 'Mikhail Lermontov (Port Gore)',
-        year: 1986,
-        lat: -41.0420,
-        lng: 174.2280,
-        tag: 'Soviet Cruise Liner • Marlborough Sounds',
-        desc: 'Sank after tearing hull on Gannet Rock passage in the Marlborough Sounds on 16 February 1986.',
-        detailsHtml: '<p>The 155-metre Soviet liner struck an 8-metre reef passage. 737 passengers and crew were evacuated safely in darkness, with only one casualty. It is now a premier scuba diving wreck.</p>'
-      },
-      {
-        id: 'wreck_rena',
-        type: 'wreck',
-        title: 'MV Rena (Astrolabe Reef)',
-        year: 2011,
-        lat: -37.5400,
-        lng: 176.4280,
-        tag: 'Container Disaster • Bay of Plenty',
-        desc: '37,209-ton container ship struck Astrolabe Reef off Tauranga at 17 knots on 5 October 2011.',
-        detailsHtml: '<p>New Zealand\'s worst environmental maritime disaster. Over 350 tonnes of fuel oil spilled onto beaches and reefs before the broken vessel slipped into deep water.</p>'
-      },
-      {
-        id: 'wreck_endeavour_facile',
-        type: 'wreck',
-        title: 'Endeavour (Dusky Sound)',
-        year: 1795,
-        lat: -45.7480,
-        lng: 166.5880,
-        tag: 'NZ\'s First Recorded European Wreck',
-        desc: 'Unseaworthy 800-ton ship scuttled in Facile Harbour, Fiordland; survivors built NZ\'s first European ship.',
-        detailsHtml: '<p>In October 1795, Captain Bampton scuttled the leaking vessel. 40 castaways built the 40-ton schooner <em>Providence</em> from Fiordland timber—the first European vessel constructed in NZ.</p>'
-      },
-      {
-        id: 'wreck_wiltshire',
-        type: 'wreck',
-        title: 'SS Wiltshire (Rosalie Bay)',
-        year: 1922,
-        lat: -36.2950,
-        lng: 175.5220,
-        tag: 'Miracle Rescue • Great Barrier Island',
-        desc: '12,000-ton liner wrecked on southeast cliffs of Great Barrier Island on 31 May 1922.',
-        detailsHtml: '<p>Broken in two amidst howling breakers, all 103 crew were saved in an epic 36-hour breeches buoy operation rigged from the clifftops by naval men and local islanders.</p>'
-      },
-      {
-        id: 'wreck_star_of_canada',
-        type: 'wreck',
-        title: 'Star of Canada (Gisborne)',
-        year: 1912,
-        lat: -38.6750,
-        lng: 178.0260,
-        tag: 'Kaiti Beach • Gisborne Roadstead',
-        desc: '7,280-ton refrigerated cargo steamer driven onto rocks during a gale on 23 June 1912.',
-        detailsHtml: '<p>Her cargo of frozen meat was fully salvaged. The two-story wheelhouse was moved ashore in Gisborne and preserved inside the Tairāwhiti Museum.</p>'
-      },
-      {
-        id: 'wreck_city_of_dunedin',
-        type: 'wreck',
-        title: 'City of Dunedin (Cook Strait)',
-        year: 1865,
-        lat: -41.5000,
-        lng: 174.5000,
-        tag: '39 Casualties • Vanished Without Trace',
-        desc: 'Paddle steamer vanished in Cook Strait on 20 May 1865 between Wellington and Nelson.',
-        detailsHtml: '<p>Only floating timber washboards and casks were found near Cape Terawhiti. The complete loss spurred colonial investment in Cook Strait lighthouses.</p>'
+        desc: 'American full-rigged ship driven into an ocean sea-cave on the precipitous western cliffs of the uninhabited Auckland Islands.',
+        linkText: 'Auckland Islands Castaways',
+        detailsHtml: `<p>Wrecked while carrying Australian gold bullion to London. The 15 survivors spent 18 harrowing months eating seals and pigs on the subantarctic island before rescue, inspiring generations of salvage expeditions.</p>`
       },
 
-      // -------------------------------------------------------------
-      // 2. HISTORIC LIGHTHOUSES (31 Sentinels)
-      // -------------------------------------------------------------
+      // --- LIGHTHOUSES ---
       {
-        id: 'light_reinga',
+        id: 'light_waipapa',
         type: 'light',
-        title: 'Cape Reinga Lighthouse',
-        year: 1941,
-        lat: -34.4289,
-        lng: 172.6798,
-        tag: 'Meeting of Two Oceans • 10m Tower',
-        desc: 'Guards the northern tip of Aotearoa where the Tasman Sea clashes with the Pacific Ocean.',
-        detailsHtml: '<p>Erected in 1941 to replace the inaccessible Motuopao Island light. Visible 19 nautical miles, it looks out over Te Rerenga Wairua (leaping-off place of ancestral spirits).</p>'
-      },
-      {
-        id: 'light_maria',
-        type: 'light',
-        title: 'Cape Maria van Diemen Light (Historic)',
-        year: 1879,
-        lat: -34.4816,
-        lng: 172.6469,
-        tag: 'Motuopao Island • Notorious Flying Fox',
-        desc: 'Constructed on offshore island in 1879. Keepers used a perilous aerial cableway for supplies.',
-        detailsHtml: '<p>One of NZ\'s most isolated posts. Livestock and keeper families crossed the churning ocean channel in a cage suspended on a steel ropeway until the light was moved to Cape Reinga in 1941.</p>'
-      },
-      {
-        id: 'light_cape_brett',
-        type: 'light',
-        title: 'Cape Brett Lighthouse',
-        year: 1910,
-        lat: -35.1744,
-        lng: 174.3339,
-        tag: 'Bay of Islands • Famous 4c Stamp',
-        desc: 'Perched on 150m sea cliffs; featured on the 1969 4c Government Life Insurance centenary stamp.',
-        detailsHtml: '<p>Its 7-ton clockwork lens rotated in an open mercury bath. Warned shipping away from Piercy Island and the rocky approaches to the Bay of Islands.</p>'
-      },
-      {
-        id: 'light_mokohinau',
-        type: 'light',
-        title: 'Mokohinau Islands Lighthouse',
-        year: 1883,
-        lat: -35.9080,
-        lng: 175.1160,
-        tag: 'Outer Hauraki Gulf Sentinel',
-        desc: 'Constructed on Burgess Island 100 km northeast of Auckland to guide Pacific mail steamers.',
-        detailsHtml: '<p>Built in 1883 using stone quarried right on the isolated island. Keepers braved violent ocean gales with relief ships sometimes delayed for months.</p>'
-      },
-      {
-        id: 'light_tiritiri',
-        type: 'light',
-        title: 'Tiritiri Matangi Lighthouse',
-        year: 1865,
-        lat: -36.6006,
-        lng: 174.8890,
-        tag: 'Oldest Operating Light in NZ',
-        desc: 'Cast-iron tower fabricated in London and erected in 1865; the oldest active light in the nation.',
-        detailsHtml: '<p>Guarding Auckland Harbour\'s Rangitoto Channel, its 11-ton lens once produced the most powerful beam in the Southern Hemisphere (11 million candlepower, visible 30 miles).</p>'
-      },
-      {
-        id: 'light_bean_rock',
-        type: 'light',
-        title: 'Bean Rock Cottage Lighthouse',
-        year: 1871,
-        lat: -36.8395,
-        lng: 174.8327,
-        tag: 'Auckland Harbour • Screw-Pile Cottage',
-        desc: 'Victorian wooden cottage on iron screw-piles at the end of the reef in Waitematā Harbour.',
-        detailsHtml: '<p>Erected in 1871, it is the sole surviving screw-pile cottage lighthouse in New Zealand, fully preserved and operating in Auckland Harbour.</p>'
-      },
-      {
-        id: 'light_cuvier',
-        type: 'light',
-        title: 'Cuvier Island Lighthouse',
-        year: 1889,
-        lat: -36.4350,
-        lng: 175.7720,
-        tag: 'Coromandel Gateway',
-        desc: '15m cast-iron tower guarding the approaches to the Hauraki Gulf and Firth of Thames.',
-        detailsHtml: '<p>Built in 1889 to safeguard the timber and kauri trade. Its light lens used a clockwork weight mechanism wound by hand every four hours through the night.</p>'
-      },
-      {
-        id: 'light_east_cape',
-        type: 'light',
-        title: 'East Cape Lighthouse',
-        year: 1900,
-        lat: -37.6908,
-        lng: 178.5475,
-        tag: 'First Light to Greet the Dawn',
-        desc: 'Originally on East Island; relocated to mainland Otiki Hill in 1922 due to severe landslides.',
-        detailsHtml: '<p>Reached by climbing 700 steps, this 14-metre tower marks the easternmost point of the New Zealand mainland, welcoming each new day\'s sunrise over the Pacific.</p>'
-      },
-      {
-        id: 'light_portland',
-        type: 'light',
-        title: 'Portland Island Lighthouse',
-        year: 1878,
-        lat: -39.2830,
-        lng: 177.8680,
-        tag: 'Māhia Peninsula Sentinel',
-        desc: 'Guarded Hawke\'s Bay\'s northern approaches. The original 1878 wooden tower is now in Wairoa.',
-        detailsHtml: '<p>Constructed of solid kauri in 1878. When automated in 1984, the wooden tower was dismantled and transported to Wairoa township, where it stands on the riverbank as a monument.</p>'
-      },
-      {
-        id: 'light_castlepoint',
-        type: 'light',
-        title: 'Castlepoint Lighthouse',
-        year: 1913,
-        lat: -40.9004,
-        lng: 176.2235,
-        tag: 'The Holiday Light • 23m Concrete Tower',
-        desc: 'Perched on a limestone reef in the Wairarapa; one of the last manned stations constructed.',
-        detailsHtml: '<p>Built in 1913 from prefabricated concrete panels shipped from Wellington, it watched over coastal scows and wool ketches loading bales in the bay.</p>'
-      },
-      {
-        id: 'light_palliser',
-        type: 'light',
-        title: 'Cape Palliser Lighthouse',
-        year: 1897,
-        lat: -41.6118,
-        lng: 175.2901,
-        tag: 'Cook Strait Red & White Bands',
-        desc: 'Striped tower reached by 253 steep steps, marking the North Island entrance to Cook Strait.',
-        detailsHtml: '<p>Illuminated in 1897 after 20 ships wrecked on the coastline between Palliser Bay and Wellington. It remains one of New Zealand\'s most recognizable landmarks.</p>'
+        title: 'Waipapa Point Lighthouse',
+        year: 1884,
+        lat: -46.6610,
+        lng: 168.8470,
+        tag: 'Wood Tower • Catlins Sentinel',
+        desc: 'Constructed directly in response to the SS Tararua disaster; one of the last wooden towers built in NZ.',
+        linkText: 'Govt Life Stamp Series',
+        detailsHtml: `<p>Erected in 1884 by the Marine Department, this wooden kauri tower houses a 2nd-order Fresnel lens. It still stands sentinel today on the Southland coast adjacent to sea lion colonies.</p>`
       },
       {
         id: 'light_pencarrow',
@@ -903,185 +648,10 @@
         year: 1859,
         lat: -41.3551,
         lng: 174.8475,
-        tag: 'NZ\'s First Permanent Lighthouse',
-        desc: 'Cast-iron tower fabricated in London; Mary Jane Bennett was New Zealand\'s only female head keeper.',
-        detailsHtml: '<p>Erected in 1859 above Wellington Harbour. When keeper George Bennett drowned in 1855, his widow Mary Jane Bennett took over keeper duties from 1859 to 1864, raising five children at the post.</p>'
-      },
-      {
-        id: 'light_baring',
-        type: 'light',
-        title: 'Baring Head Lighthouse',
-        year: 1935,
-        lat: -41.4080,
-        lng: 174.8710,
-        tag: 'First Electrified Beacon (1935)',
-        desc: 'Constructed in 1935 to replace fog-bound Pencarrow; New Zealand\'s first main electric light.',
-        detailsHtml: '<p>Perched 87 metres above sea level, Baring Head replaced high-elevation Pencarrow as Wellington\'s principal beacon in 1935.</p>'
-      },
-      {
-        id: 'light_brothers',
-        type: 'light',
-        title: 'The Brothers Lighthouse',
-        year: 1877,
-        lat: -41.1030,
-        lng: 174.4420,
-        tag: 'Cook Strait\'s Storm Fortress',
-        desc: 'Stands on an isolated sheer rock stack in the center of Cook Strait\'s roaring tidal race.',
-        detailsHtml: '<p>NZ\'s sternest lighthouse post. No families were stationed here due to the violent winds and perilous rock-ledge crane landing.</p>'
-      },
-      {
-        id: 'light_stephens',
-        type: 'light',
-        title: 'Stephens Island Lighthouse (Takapourewa)',
-        year: 1894,
-        lat: -40.6680,
-        lng: 173.9980,
-        tag: 'Cook Strait Sentinel • Tuatara Haven',
-        desc: 'Perched 183m high on Takapourewa above Cook Strait, home to the world\'s densest tuatara colony.',
-        detailsHtml: '<p>Constructed in 1894 to mark the northern gateway to Cook Strait. Famous in biology lore for keeper cat \'Tibbles\' and the flightless Lyall\'s wren.</p>'
-      },
-      {
-        id: 'light_campbell',
-        type: 'light',
-        title: 'Cape Campbell Lighthouse',
-        year: 1870,
-        lat: -41.7275,
-        lng: 174.2760,
-        tag: 'Striped Cook Strait Guide',
-        desc: 'Guards the southern approach to Cook Strait in Marlborough with black-and-white stripes.',
-        detailsHtml: '<p>Built in 1870 and replaced with cast-iron in 1905, Cape Campbell guides ships entering Cook Strait from the south. Featured in <em>The Light Between Oceans</em>.</p>'
-      },
-      {
-        id: 'light_french_pass',
-        type: 'light',
-        title: 'French Pass Beacon',
-        year: 1884,
-        lat: -40.9230,
-        lng: 173.8340,
-        tag: 'Ripping Tidal Churn (8 Knots)',
-        desc: 'Marks the narrow channel between D\'Urville Island and the mainland where currents reach 8 knots.',
-        detailsHtml: '<p>Erected in 1884 to protect coasters taking the inside passage to Nelson. Pelorus Jack, the famous Risso\'s dolphin, escorted steamers past this light from 1888 to 1912.</p>'
-      },
-      {
-        id: 'light_farewell_spit',
-        type: 'light',
-        title: 'Farewell Spit Lighthouse',
-        year: 1870,
-        lat: -40.5460,
-        lng: 173.0090,
-        tag: 'Open Lattice Steel Tower (27m)',
-        desc: 'Stands on the 32 km sand spit curving into Golden Bay; steel lattice tower built in 1897.',
-        detailsHtml: '<p>Farewell Spit is one of the world\'s longest sandspits. The 1897 open lattice tower was designed to withstand sandstorms and shifting tidal dunes.</p>'
-      },
-      {
-        id: 'light_kahurangi',
-        type: 'light',
-        title: 'Kahurangi Point Lighthouse',
-        year: 1903,
-        lat: -40.7760,
-        lng: 172.2170,
-        tag: 'Remote West Coast Wilderness',
-        desc: 'Guards the northern West Coast of the South Island against Southern Ocean swells.',
-        detailsHtml: '<p>Completed in 1903 in dense native rainforest. Keepers relied on packhorse tracks across coastal rivers or surf boat landings on wild beaches.</p>'
-      },
-      {
-        id: 'light_foulwind',
-        type: 'light',
-        title: 'Cape Foulwind Lighthouse',
-        year: 1876,
-        lat: -41.7483,
-        lng: 171.4680,
-        tag: 'Buller Coasters & Coal Fleet',
-        desc: 'Guides vessels arriving at the bar harbour of Westport to load coal from the Denniston mines.',
-        detailsHtml: '<p>Named by Captain Cook in 1770 during violent gales. The wooden 1876 tower was replaced with concrete in 1926 above roaring fur seal colonies.</p>'
-      },
-      {
-        id: 'light_egmont',
-        type: 'light',
-        title: 'Cape Egmont Lighthouse',
-        year: 1881,
-        lat: -39.2783,
-        lng: 173.7547,
-        tag: 'Taranaki Coastline Sentinel',
-        desc: 'Originally built on Mana Island (1865), dismantled and shifted to Cape Egmont in 1881.',
-        detailsHtml: '<p>Manufactured in London in 1864 and first erected on Mana Island. After multiple ships confused Mana with Pencarrow, the tower was shipped to Cape Egmont.</p>'
-      },
-      {
-        id: 'light_godley',
-        type: 'light',
-        title: 'Godley Head Lighthouse',
-        year: 1865,
-        lat: -43.5900,
-        lng: 172.8020,
-        tag: 'Lyttelton Harbour Entrance',
-        desc: 'Guards the volcanic heads of Lyttelton Harbour; guided Canterbury settlers and Antarctic expeditions.',
-        detailsHtml: '<p>Built of volcanic stone in 1865 at 136m above sea level. It guided Scott\'s <em>Discovery</em> and Shackleton\'s <em>Nimrod</em> heading south to Antarctica.</p>'
-      },
-      {
-        id: 'light_akaroa',
-        type: 'light',
-        title: 'Akaroa Head Lighthouse',
-        year: 1880,
-        lat: -43.8910,
-        lng: 172.9780,
-        tag: 'Banks Peninsula Wooden Sentinel',
-        desc: 'Built on sea cliffs in 1880; the historic wooden tower was saved and moved to Akaroa in 1980.',
-        detailsHtml: '<p>Constructed in 1880 to guide sailing vessels past the cliffs of Banks Peninsula. When automated in 1977, volunteers barged the wooden tower into Akaroa harbour.</p>'
-      },
-      {
-        id: 'light_moeraki',
-        type: 'light',
-        title: 'Moeraki (Katiki Point) Lighthouse',
-        year: 1878,
-        lat: -45.3940,
-        lng: 170.8640,
-        tag: 'Otago Coast • Yellow-Eyed Penguin Haven',
-        desc: 'Wooden tower built in 1878 following multiple wrecks on the reef off Katiki Point.',
-        detailsHtml: '<p>Operating over Katiki Point near the Moeraki Boulders, this wooden tower is encircled by yellow-eyed penguin (hoiho) colonies and fur seal nurseries.</p>'
-      },
-      {
-        id: 'light_taiaroa',
-        type: 'light',
-        title: 'Taiaroa Head Lighthouse',
-        year: 1864,
-        lat: -45.7725,
-        lng: 170.7289,
-        tag: 'Otago Harbour Gateway • Est. 1864',
-        desc: 'Built in 1864 during the Otago Gold Rush to guide thousands of immigrant and mining ships.',
-        detailsHtml: '<p>Oldest lighthouse on the South Island mainland. It shares its headland with the world\'s only mainland royal albatross breeding colony and historic Armstrong gun fortifications.</p>'
-      },
-      {
-        id: 'light_saunders',
-        type: 'light',
-        title: 'Cape Saunders Lighthouse',
-        year: 1880,
-        lat: -45.8750,
-        lng: 170.7440,
-        tag: 'Otago Peninsula High Cliffs',
-        desc: 'Guided Southern Ocean immigrant traffic approaching Port Chalmers from Australia and Britain.',
-        detailsHtml: '<p>Erected in 1880 on the southern outer coast of Otago Peninsula with a clockwork lens mechanism crafted by James Dove & Co. of Edinburgh.</p>'
-      },
-      {
-        id: 'light_nugget',
-        type: 'light',
-        title: 'Nugget Point Lighthouse',
-        year: 1870,
-        lat: -46.4475,
-        lng: 169.8169,
-        tag: 'The Catlins • Wave-Carved Rocks',
-        desc: 'Stone tower dramatically perched 76m atop sheer rock islets in the Catlins.',
-        detailsHtml: '<p>Completed in 1870 from stone quarried directly on the headland. It guided goldfield steamers and immigrant barques steaming toward Port Chalmers.</p>'
-      },
-      {
-        id: 'light_waipapa',
-        type: 'light',
-        title: 'Waipapa Point Lighthouse',
-        year: 1884,
-        lat: -46.6610,
-        lng: 168.8470,
-        tag: 'Wooden Kauri Tower • Built After SS Tararua',
-        desc: 'Built directly in response to the SS Tararua disaster; one of New Zealand\'s last wooden lighthouses.',
-        detailsHtml: '<p>Commissioned following the 131 deaths on Otara Reef. Built of native kauri and totara, it still stands sentinel alongside roaring sea lion colonies.</p>'
+        tag: 'NZ\'s First Lighthouse (1859)',
+        desc: 'Cast-iron tower fabricated in England; Mary Jane Bennett was New Zealand\'s first and only official female lighthouse keeper.',
+        linkText: 'Pencarrow Archive',
+        detailsHtml: `<p>Perched high above the eastern entrance to Wellington Harbour, Pencarrow was cast in Britain and bolted together on site. Keeper George Bennett drowned in 1855, after which his widow Mary Jane Bennett was formally appointed head keeper from 1859 to 1864.</p>`
       },
       {
         id: 'light_dog',
@@ -1091,19 +661,9 @@
         lat: -46.6528,
         lng: 168.4111,
         tag: 'Tallest Stone Light in NZ (37m)',
-        desc: 'Foveaux Strait sentinel guarding Bluff Harbour with iconic black and white horizontal bands.',
-        detailsHtml: '<p>Designed by James Balfour and built in 1865 from Bluff granite. Rising 37 metres, it is New Zealand\'s tallest lighthouse tower and was prominently featured on the 1969 Decimal Life Insurance stamp series.</p>'
-      },
-      {
-        id: 'light_centre_island',
-        type: 'light',
-        title: 'Centre Island Lighthouse',
-        year: 1878,
-        lat: -46.4620,
-        lng: 167.9250,
-        tag: 'Foveaux Strait Western Approach',
-        desc: 'Guards the shallow, storm-swept western mouth of Foveaux Strait between Riverton and Stewart Island.',
-        detailsHtml: '<p>Erected in 1878 to safeguard coastal steamers running between Bluff and the West Coast goldfields. It is New Zealand\'s last remaining wooden lighthouse with keeper quarters built directly into the tower base.</p>'
+        desc: 'Foveaux Strait sentinel guarding Bluff Harbour approach with iconic black and white horizontal bands.',
+        linkText: 'Featured on 1969 Decimal Stamp',
+        detailsHtml: `<p>Designed by James Balfour and constructed of local Bluff stone, Dog Island rises 37 metres, making it New Zealand’s tallest lighthouse tower. Featured prominently in the NZ Government Life Insurance stamp series.</p>`
       },
       {
         id: 'light_puysegur',
@@ -1112,150 +672,49 @@
         year: 1879,
         lat: -46.1601,
         lng: 166.6080,
-        tag: 'Fiordland • \'The Loneliest Light\'',
-        desc: 'Guarding the storm-lashed southwestern tip of New Zealand; notoriously known as the most isolated station in the country.',
-        detailsHtml: '<p>Located where the Southern Ocean roars into Foveaux Strait. All materials were hauled by hand over dense bush trails from Preservation Inlet. Keepers survived months of savage gales between government supply ship visits.</p>'
+        tag: 'Fiordland • "The Loneliest Light"',
+        desc: 'Guarding the dangerous southwestern entrance to Foveaux Strait, notoriously known as the most isolated and wind-swept station in New Zealand.',
+        linkText: 'Preservation Inlet Access',
+        detailsHtml: `<p>Located on the rugged, storm-lashed southwestern tip of the South Island, Puysegur was constructed in 1879. Materials had to be hauled by hand from Preservation Inlet. Keepers survived months between supply ship visits.</p>`
+      },
+      {
+        id: 'light_cape_brett',
+        type: 'light',
+        title: 'Cape Brett Lighthouse',
+        year: 1910,
+        lat: -35.1744,
+        lng: 174.3339,
+        tag: 'Bay of Islands • Famous 4c Stamp',
+        desc: 'Perched on high cliffs in Northland, featured on the 1969 4c Government Life Insurance stamp centenary edition.',
+        linkText: 'Bay of Islands Beacon',
+        detailsHtml: `<p>Erected in 1910, Cape Brett warned vessels away from the rocky outer Bay of Islands. Its clockwork mechanism rotated a seven-ton lens floating in a mercury bath.</p>`
+      },
+      {
+        id: 'light_palliser',
+        type: 'light',
+        title: 'Cape Palliser Lighthouse',
+        year: 1897,
+        lat: -41.6118,
+        lng: 175.2901,
+        tag: 'Cook Strait Eastern Entrance',
+        desc: 'Striped red-and-white iron tower reached by 253 steep wooden steps on the southern tip of the North Island.',
+        linkText: 'Wairarapa Coast',
+        detailsHtml: `<p>Before Cape Palliser was illuminated in 1897, over 20 ships wrecked on the rocky shore between Palliser Bay and Wellington. It remains one of NZ\'s most famous landmarks.</p>`
+      },
+      {
+        id: 'light_nugget',
+        type: 'light',
+        title: 'Nugget Point Lighthouse',
+        year: 1870,
+        lat: -46.4475,
+        lng: 169.8169,
+        tag: 'Otago Coast / Catlins',
+        desc: 'Stone tower dramatically perched atop steep rocky islets and wave-carved nuggets.',
+        linkText: 'Catlins Maritime Trail',
+        detailsHtml: `<p>Built in 1869–1870, Nugget Point guided goldfield steamers and immigrant vessels steaming toward Port Chalmers.</p>`
       },
 
-      // -------------------------------------------------------------
-      // 3. EARLY SETTLERS LANDING POINTS (12 Historic Sites)
-      // -------------------------------------------------------------
-      {
-        id: 'landing_petone',
-        type: 'landing',
-        title: 'Petone Beach & Pito-one (Wellington, 1840)',
-        year: 1840,
-        lat: -41.2290,
-        lng: 174.8720,
-        tag: 'NZ Company First Ships • Petone',
-        desc: 'Arrival of the first New Zealand Company settler fleet (Aurora, Oriental, Duke of Roxburgh, Bengal Merchant) in early 1840.',
-        detailsHtml: '<p>On 22 January 1840, the immigrant ship <em>Aurora</em> dropped anchor off Pito-one beach. Local Te Āti Awa chiefs Te Puni and Wharepōuri welcomed the settlers as they built raupō huts on the sandflats. Severe Hutt River floods later prompted them to shift across the harbour to Thorndon.</p>'
-      },
-      {
-        id: 'landing_thorndon',
-        type: 'landing',
-        title: 'Thorndon & Commercial Bay (Port Nicholson, 1840)',
-        year: 1840,
-        lat: -41.2780,
-        lng: 174.7800,
-        tag: 'Capital Foundation Port • Port Nicholson',
-        desc: 'Permanent site chosen by William Wakefield for the town of Britannia (Wellington) after Petone floods in mid-1840.',
-        detailsHtml: '<p>Between April and September 1840, hundreds of British settlers relocated their tents, carts, and wooden homes to the sheltered bay under Thorndon bluffs. John Plimmer established his famous trading ark from the hull of the wrecked barque <em>Inconstant</em>.</p>'
-      },
-      {
-        id: 'landing_lyttelton',
-        type: 'landing',
-        title: 'Lyttelton Harbour & The Bridle Path (Canterbury, 1850)',
-        year: 1850,
-        lat: -43.6025,
-        lng: 172.7180,
-        tag: 'The \'First Four Ships\' • Canterbury',
-        desc: 'Arrival of Charlotte Jane, Randolph, Sir George Seymour, and Cressy in December 1850 carrying Canterbury Association pilgrims.',
-        detailsHtml: '<p>Nearly 800 colonists stepped ashore onto the Lyttelton jetties in December 1850. Carrying their possessions in trunks, families walked the grueling 330-metre volcanic saddle of the <strong>Bridle Path</strong> down onto the Canterbury Plains to build Christchurch.</p>'
-      },
-      {
-        id: 'landing_port_chalmers',
-        type: 'landing',
-        title: 'Port Chalmers & Koputai (Otago, 1848)',
-        year: 1848,
-        lat: -45.8150,
-        lng: 170.6200,
-        tag: 'Otago Pioneers • John Wickliffe & Philip Laing',
-        desc: 'Scottish Free Church settlers arrived in March/April 1848 under Captain William Cargill and Reverend Thomas Burns.',
-        detailsHtml: '<p>The <em>John Wickliffe</em> landed on 23 March 1848, followed three weeks later by the <em>Philip Laing</em> from Greenock. Settlers transshipped onto whaleboats and cutters to navigate the shallow upper harbour to the mudflats of Dunedin (New Edinburgh).</p>'
-      },
-      {
-        id: 'landing_nelson',
-        type: 'landing',
-        title: 'Nelson Haven & Wakatu (Nelson, 1841)',
-        year: 1841,
-        lat: -41.2610,
-        lng: 173.2790,
-        tag: 'Wakatu Haven • Fifeshire & Will Watch',
-        desc: 'Captain Arthur Wakefield navigated through the natural Boulder Bank cut into Wakatu Haven in November 1841.',
-        detailsHtml: '<p>In November 1841, expedition vessels <em>Arrow</em>, <em>Whitby</em>, and <em>Will Watch</em> sailed behind the 13-kilometre natural boulder bank. The first immigrant ships (<em>Fifeshire</em>, <em>Mary Ann</em>, <em>Lord Auckland</em>) arrived in February 1842, pitching tents beneath Church Hill.</p>'
-      },
-      {
-        id: 'landing_new_plymouth',
-        type: 'landing',
-        title: 'Ngāmotu / Sugar Loaf Roadstead (New Plymouth, 1841)',
-        year: 1841,
-        lat: -39.0600,
-        lng: 174.0260,
-        tag: 'Plymouth Company • William Bryan',
-        desc: 'Devon and Cornwall settlers landed by surf boats at Ngāmotu beneath Mount Taranaki in March 1841.',
-        detailsHtml: '<p>On 30 March 1841, the <em>William Bryan</em> arrived with 148 Devon and Cornish settlers sent by the Plymouth Company. Lacking a natural harbour, passengers were rowed through thundering surf in large whaleboats to the black volcanic iron-sand beaches.</p>'
-      },
-      {
-        id: 'landing_commercial_bay',
-        type: 'landing',
-        title: 'Commercial Bay & Point Britomart (Auckland, 1840)',
-        year: 1840,
-        lat: -36.8435,
-        lng: 174.7670,
-        tag: 'Founding of Auckland • Anna Watson & Jane Gifford',
-        desc: 'Governor Hobson founded Auckland in September 1840; first immigrant ships Jane Gifford & Duchess of Argyle arrived in 1842.',
-        detailsHtml: '<p>Captain William Hobson raised the Union Jack at Point Britomart on 18 September 1840. In October 1842, the <em>Duchess of Argyle</em> and <em>Jane Gifford</em> sailed direct from Greenock carrying over 500 Scottish settlers who landed on Queen Street\'s original beach front.</p>'
-      },
-      {
-        id: 'landing_akaroa',
-        type: 'landing',
-        title: 'French Colonists at Akaroa (Banks Peninsula, 1840)',
-        year: 1840,
-        lat: -43.8050,
-        lng: 172.9660,
-        tag: 'French Nanto-Bordelaise Colony',
-        desc: 'Arrival of the French naval frigate L\'Aube and immigrant ship Comte de Paris in August 1840.',
-        detailsHtml: '<p>63 French and German colonists arrived on the <em>Comte de Paris</em> intending to claim the South Island for France. British officials hastily dispatched <em>HMS Britomart</em> days earlier to assert British sovereignty, though the French pioneers remained and founded Akaroa\'s distinct township.</p>'
-      },
-      {
-        id: 'landing_waipu',
-        type: 'landing',
-        title: 'Waipu River Landing (Northland, 1854)',
-        year: 1854,
-        lat: -35.9860,
-        lng: 174.4550,
-        tag: 'Nova Scotian Gaelic Pioneers',
-        desc: 'Reverend Norman McLeod led nearly 1,000 Highland Scots via Nova Scotia and Australia to settle Waipu in 1853–1854.',
-        detailsHtml: '<p>One of the most epic migrations in colonial history. Fleeing Highland Clearances, Gaelic Scots settled Nova Scotia for 30 years, built their own ocean barques (<em>Highland Lass</em>, <em>Gertrude</em>, <em>Gazelle</em>), and sailed across the world to carve out thriving farming communities at Waipu.</p>'
-      },
-      {
-        id: 'landing_puhoi',
-        type: 'landing',
-        title: 'Puhoi Estuary Landing (North Auckland, 1863)',
-        year: 1863,
-        lat: -36.5160,
-        lng: 174.6650,
-        tag: 'Bohemian Immigrant Pioneers',
-        desc: 'Bohemian settlers landed from cutter hulls on the muddy tidal banks of the Puhoi River on 29 June 1863.',
-        detailsHtml: '<p>German-speaking pioneers from Staab, Bohemia arrived in Auckland on the <em>War Spirit</em>. Transshipped by scow and Māori canoe up the remote tidal Puhoi River in the dead of winter, they found primeval kauri bush, surviving on nikau hearts and bush fungi until they cleared farmland.</p>'
-      },
-      {
-        id: 'landing_albertland',
-        type: 'landing',
-        title: 'Port Albert / Kaipara (Albertland, 1862)',
-        year: 1862,
-        lat: -36.2950,
-        lng: 174.4370,
-        tag: 'Albertland Nonconformist Fleet',
-        desc: 'Matilda Wattenbach & Hanover landed 3,000 nonconformist settlers to establish Port Albert in 1862.',
-        detailsHtml: '<p>Organised by the Christian Nonconformist movement, 3,000 English settlers sailed on ships like the <em>Matilda Wattenbach</em>. Landing on the remote inland shores of Kaipara Harbour, they navigated tidal channels by whaleboat to build schools, mills, and farms.</p>'
-      },
-      {
-        id: 'landing_hokitika',
-        type: 'landing',
-        title: 'Hokitika River Quay (West Coast, 1865)',
-        year: 1865,
-        lat: -42.7160,
-        lng: 170.9630,
-        tag: 'West Coast Gold Rush Seaport',
-        desc: 'Tens of thousands of Australian and colonial diggers braved the notorious river spit to reach the goldfields.',
-        detailsHtml: '<p>In 1865–1867, Hokitika became New Zealand\'s busiest port. Steamers crossed the dangerous, boiling sandbar known as the \'Graveyard of Ships\', discharging thousands of miners with swags, picks, and tents.</p>'
-      },
-
-      // -------------------------------------------------------------
-      // 4. WHALING STATIONS & MOSQUITO COASTER PORTS
-      // -------------------------------------------------------------
+      // --- WHALING & SEALING STATIONS ---
       {
         id: 'whaling_preservation',
         type: 'whaling',
@@ -1264,8 +723,9 @@
         lat: -46.1000,
         lng: 166.7000,
         tag: 'Cuttle Cove • First Shore Station',
-        desc: 'Established by Peter Williams in 1829; mainland Southland\'s first commercial European-Māori shore station.',
-        detailsHtml: '<p>Whalers targeted southern right whales migrating through Fiordland waters. At its height, the station employed dozens of whalers boiling blubber in open iron try-pots.</p>'
+        desc: 'Established by Peter Williams in 1829; mainland Southland’s first commercial European-Māori shore station.',
+        linkText: 'Rakituma History',
+        detailsHtml: `<p>Whalers targeted southern right whales migrating through Fiordland. At its height, the station employed dozens of men boiling blubber in open try-pots.</p>`
       },
       {
         id: 'whaling_bluff',
@@ -1275,8 +735,9 @@
         lat: -46.6115,
         lng: 168.3582,
         tag: 'Capt. William Stirling • Bluff',
-        desc: 'Founded in 1836 beneath Motupōhue; the foundation of Southland\'s major deep-water seaport.',
-        detailsHtml: '<p>Captain William Stirling operated six-oared whaleboats in Foveaux Strait. As whaling declined, Bluff grew into the vital export port for southern wool, frozen meat, and Bluff dredge oysters.</p>'
+        desc: 'Founded in 1836 beneath Motupōhue; the foundation of Southland\'s major international deep-water seaport.',
+        linkText: 'Bluff Maritime Museum',
+        detailsHtml: `<p>Captain William Stirling set up six-oared whaleboats in Foveaux Strait. As whaling declined, Bluff transitioned into the vital export port for southern meat, wool, and the iconic Foveaux Strait oyster fleet.</p>`
       },
       {
         id: 'whaling_riverton',
@@ -1287,7 +748,8 @@
         lng: 168.0160,
         tag: 'Capt. John Howell • Aparima',
         desc: 'Founded in 1837; established the oldest permanent European settlement in Southland in partnership with Ngāi Tahu.',
-        detailsHtml: '<p>Captain John Howell married Kohikohi, daughter of chief Horomona Patu, founding a stable, intermarried maritime trading post at Riverton/Aparima.</p>'
+        linkText: 'Riverton Heritage',
+        detailsHtml: `<p>Captain John Howell brought whaleboats from Sydney and married Kohikohi, daughter of chief Horomona Patu, founding a stable, intermarried maritime trading post at Riverton/Aparima.</p>`
       },
       {
         id: 'whaling_tory',
@@ -1298,144 +760,441 @@
         lng: 174.2880,
         tag: 'Marlborough Sounds • Jacky Guard',
         desc: 'New Zealand\'s first permanent shore whaling base, established in 1827 by Captain John \'Jacky\' Guard.',
-        detailsHtml: '<p>Known to whalers as \'Tar\'white\', it operated into the mid-20th century, culminating in the Perano family whaling station hunting humpbacks until 1964.</p>'
+        linkText: 'Marlborough Maritime Lore',
+        detailsHtml: `<p>Known to whalers as \'Tar\'white\', it survived into the 20th century, culminating in the Perano whaling operations which hunted humpbacks until 1964.</p>`
+      },
+
+      // --- 35 NEW ZEALAND PORTS & COASTAL SHIPPING BASES ---
+      {
+        id: 'port_auckland',
+        type: 'port',
+        title: 'Port of Auckland (Waitematā)',
+        year: 1841,
+        lat: -36.8435,
+        lng: 174.7745,
+        tag: 'Commercial Capital Harbour',
+        desc: 'NZ\'s historic commercial hub on the Waitematā Harbour, handling passenger ocean liners, naval convoys, and global container freight.',
+        linkText: 'Waitematā Heritage',
+        detailsHtml: `<p>Established as the colonial capital\'s port in 1841 by Lieutenant-Governor Hobson. The sheltered waters of the Waitematā Harbour replaced Russell as the commercial nexus of New Zealand, serving overseas sailing ships, inter-colonial steamers, and coastal Mosquito Fleet traders.</p>`
       },
       {
         id: 'port_onehunga',
         type: 'port',
         title: 'Onehunga Wharf (Manukau)',
-        year: 1860,
-        lat: -36.9250,
-        lng: 174.7850,
+        year: 1858,
+        lat: -36.9280,
+        lng: 174.7860,
         tag: 'West Coast Coaster Hub',
-        desc: 'Base for the Mosquito Fleet navigating the notorious Manukau Bar to supply Taranaki and West Coast towns.',
-        detailsHtml: '<p>Onehunga was Auckland\'s gateway to the western coast of New Zealand before the railway linked the North and South islands.</p>'
+        desc: 'Base for coastal steamers and scows crossing the hazardous Manukau Bar to connect Auckland with Taranaki, Whanganui, and the South Island.',
+        linkText: 'Manukau Coasters',
+        detailsHtml: `<p>Onehunga was Auckland\'s vital western outlet before the North Island Main Trunk railway opened in 1908. Coasters routinely risked the treacherous shifting shoals of the Manukau Bar (where HMS <em>Orpheus</em> foundered in 1863) to link North Island settlements.</p>`
+      },
+      {
+        id: 'port_marsden',
+        type: 'port',
+        title: 'Northport / Marsden Point',
+        year: 1865,
+        lat: -35.8360,
+        lng: 174.4980,
+        tag: 'Deepwater Northern Port',
+        desc: 'Deepwater entrance to Whangārei Harbour, historically exporting coal and timber, and later hosting New Zealand\'s sole oil refinery from 1964.',
+        linkText: 'Whangārei Maritime',
+        detailsHtml: `<p>Historically serving northern timber and coal exports, Marsden Point now operates as Northport, a deep-water commercial cargo facility capable of berthing large bulk cargo ships.</p>`
       },
       {
         id: 'port_kaipara',
         type: 'port',
-        title: 'Kaipara Harbour (Dargaville)',
-        year: 1870,
+        title: 'Kaipara Harbour (Dargaville & Pouto)',
+        year: 1854,
         lat: -35.9333,
         lng: 173.8667,
         tag: 'Kauri Timber Scow Fleet',
-        desc: 'Bustling timber port where flat-bottomed scows loaded millions of super feet of kauri logs.',
-        detailsHtml: '<p>The massive inland waters of the Kaipara required specialised shallow-draught scows with drop-keels capable of beaching on mudflats at low tide.</p>'
+        desc: 'Vast sheltered inland waterway where flat-bottomed scows loaded millions of super feet of native kauri logs and gum.',
+        linkText: 'Kauri Coast Scows',
+        detailsHtml: `<p>Known as the \'Graveyard of the North\' due to its wild bar entrance (over 110 shipwrecks), the massive inland arms of the Kaipara birthed the iconic NZ centerboard scow—shallow-draught timber workhorses that floated on mudflats at low tide.</p>`
+      },
+      {
+        id: 'port_russell',
+        type: 'port',
+        title: 'Port of Russell (Kororāreka)',
+        year: 1826,
+        lat: -35.2610,
+        lng: 174.1230,
+        tag: 'First International Port',
+        desc: 'New Zealand\'s first international port of call, whaling replenishment haven, and seat of the first Customs House in 1840.',
+        linkText: 'Bay of Islands Anchorage',
+        detailsHtml: `<p>In the 1830s, Kororāreka was known as the \'Hell Hole of the Pacific\', hosting up to 30 American, British, and French whaling ships at a time. It became the colony\'s first official Port of Entry under British sovereignty in 1840.</p>`
+      },
+      {
+        id: 'port_opua',
+        type: 'port',
+        title: 'Port of Opua (Bay of Islands)',
+        year: 1876,
+        lat: -35.3140,
+        lng: 174.1200,
+        tag: 'Deepwater Rail Wharf',
+        desc: 'Historic deepwater port where the Opua branch railway met overseas refrigerated meat ships and coastal colliers.',
+        linkText: 'Kawakawa-Opua Rail Port',
+        detailsHtml: `<p>Built to ship coal from the Kawakawa mines, Opua quickly became Northland\'s deep-water port, equipped with a long timber railway wharf where steamers loaded butter, frozen beef, and wool directly from rail wagons.</p>`
+      },
+      {
+        id: 'port_hokianga',
+        type: 'port',
+        title: 'Hokianga Harbour (Rawene & Kohukohu)',
+        year: 1822,
+        lat: -35.3970,
+        lng: 173.5040,
+        tag: 'Pioneer Timber & Shipyards',
+        desc: 'Early 19th-century shipyard and kauri spar export estuary, where shipwrights built vessels for the trans-Tasman trade.',
+        linkText: 'Hokianga Spars',
+        detailsHtml: `<p>The Admiralty sent naval storeships to Hokianga in the 1820s to cut tall kauri trees for masts. Pioneer shipyards at Horeke built the <em>Sir George Murray</em> in 1830, sparking the creation of the 1834 Declaration of Independence and NZ\'s first national flag.</p>`
+      },
+      {
+        id: 'port_magonui',
+        type: 'port',
+        title: 'Mangōnui Harbour (Doubtless Bay)',
+        year: 1832,
+        lat: -34.9890,
+        lng: 173.5330,
+        tag: 'Far North Whaling Haven',
+        desc: 'Landlocked deepwater harbour in the Far North that sheltered international whaling fleets and shipped kauri timber and flax.',
+        linkText: 'Mangōnui Heritage',
+        detailsHtml: `<p>Surrounded by steep hills, Mangōnui offered perfect shelter from ocean gales. American whalers traded iron tools and tobacco with local Māori for fresh pork, sweet potatoes, and timber spars.</p>`
+      },
+      {
+        id: 'port_thames',
+        type: 'port',
+        title: 'Port of Thames (Waihou Estuary)',
+        year: 1867,
+        lat: -37.1380,
+        lng: 175.5390,
+        tag: 'Goldfields Steamer Terminal',
+        desc: 'Bustling passenger and machinery wharf serving the Thames gold rush, connected to Auckland via daily paddle steamers.',
+        linkText: 'Coromandel Steamers',
+        detailsHtml: `<p>During the gold rush peak of 1868-1872, Thames was New Zealand\'s second-largest population center. Fast paddle steamers like the <em>Enterprise</em> and <em>Rotomahana</em> shuttled thousands of diggers and tons of heavy stamp battery equipment across the Firth of Thames.</p>`
+      },
+      {
+        id: 'port_coromandel',
+        type: 'port',
+        title: 'Coromandel Wharf (McGregor Bay)',
+        year: 1852,
+        lat: -36.7550,
+        lng: 175.4850,
+        tag: 'Gold & Granite Coaster Pier',
+        desc: 'Historic coastal jetty exporting timber, gold concentrates, and Coromandel tonalite granite for Wellington government buildings.',
+        linkText: 'Hauraki Scow Port',
+        detailsHtml: `<p>Coromandel granite quarried here was shipped aboard Mosquito Fleet scows to construct the Parliament Buildings and Chief Post Office in Wellington. It also serviced local quartz mines and fishing boats.</p>`
+      },
+      {
+        id: 'port_tauranga',
+        type: 'port',
+        title: 'Port of Tauranga (Mount Maunganui)',
+        year: 1873,
+        lat: -37.6620,
+        lng: 176.1850,
+        tag: 'NZ\'s Largest Export Port',
+        desc: 'New Zealand’s largest and busiest port by cargo volume, exporting central North Island forestry, kiwifruit, and dairy produce.',
+        linkText: 'Tauranga Gateway',
+        detailsHtml: `<p>From modest beginnings serving military cutters and coastal ketches during the New Zealand Wars, Tauranga grew exponentially after the 1950s with the construction of Mount Maunganui deep-water wharves and the opening of the Kaimai rail tunnel in 1978.</p>`
+      },
+      {
+        id: 'port_whakatane',
+        type: 'port',
+        title: 'Whakatāne River Port',
+        year: 1880,
+        lat: -37.9480,
+        lng: 176.9970,
+        tag: 'Eastern Bay Coaster Port',
+        desc: 'Tidal river bar port where Northern Steam Ship coasters loaded maize, butter, and timber beside the sacred rock Pohaturoa.',
+        linkText: 'Bay of Plenty Coasters',
+        detailsHtml: `<p>Small steamers of the Northern Steam Ship Company made regular runs to Auckland via Whakatāne, carefully timing their arrivals to cross the river bar at high water before roads pierced the Rangitaiki plains.</p>`
+      },
+      {
+        id: 'port_gisborne',
+        type: 'port',
+        title: 'Port of Gisborne (Tūranganui River)',
+        year: 1872,
+        lat: -38.6720,
+        lng: 178.0210,
+        tag: 'East Coast Maritime Gateway',
+        desc: 'The first river port to greet the rising sun, shipping East Coast wool, frozen lamb, maize, and vast plantation pine logs.',
+        linkText: 'Poverty Bay Port',
+        detailsHtml: `<p>Because the Tūranganui River entrance was prone to silt and swell, lighters originally ferried passengers and cargo out to coastal steamers rolling in Poverty Bay roadstead until concrete training breakwaters were constructed.</p>`
+      },
+      {
+        id: 'port_napier',
+        type: 'port',
+        title: 'Port of Napier (Ahuriri & Breakwater)',
+        year: 1855,
+        lat: -39.4795,
+        lng: 176.9140,
+        tag: 'Hawke\'s Bay Wool & Wine Port',
+        desc: 'Vital East Coast harbour dramatically altered by the 1931 earthquake, which raised the inner lagoon seabed by over two metres.',
+        linkText: 'Hawke\'s Bay Shipping',
+        detailsHtml: `<p>Originally operating inside the Ahuriri spit, big ocean liners were forced into the outer breakwater harbour. The devastating 7.8 magnitude 1931 earthquake uplifted the seabed, creating 2,000 hectares of dry land and permanently altering the port layout.</p>`
+      },
+      {
+        id: 'port_taranaki',
+        type: 'port',
+        title: 'Port Taranaki (New Plymouth)',
+        year: 1881,
+        lat: -39.0560,
+        lng: 174.0370,
+        tag: 'Only Deepwater West Coast Port',
+        desc: 'Constructed on an open wave-swept surf coast under Mount Taranaki, shielded by massive volcanic concrete breakwaters.',
+        linkText: 'Taranaki Breakwater',
+        detailsHtml: `<p>Before the breakwater, pioneer immigrant ships like the <em>William Bryan</em> (1841) had to anchor in the surf roadstead while surfboats braved rollers. Port Taranaki now supports international container trade and the offshore oil/gas industry.</p>`
+      },
+      {
+        id: 'port_patea',
+        type: 'port',
+        title: 'Patea River Port',
+        year: 1870,
+        lat: -39.7610,
+        lng: 174.4840,
+        tag: 'The Historic \'Cheese Port\'',
+        desc: 'Narrow tidal river port that once shipped more cheddar cheese and dairy produce to Great Britain than any other port in New Zealand.',
+        linkText: 'Patea Cheese Fleet',
+        detailsHtml: `<p>Small, sturdy insulated coastal reefers like the <em>Inaha</em> and <em>Kapuni</em> crossed the perilous Patea bar laden with thousands of crates of cheese, delivering them to Wellington refrigerated ocean liners until coastal trade ended in 1959.</p>`
+      },
+      {
+        id: 'port_whanganui',
+        type: 'port',
+        title: 'Port of Whanganui (Castlecliff)',
+        year: 1855,
+        lat: -39.9430,
+        lng: 174.9910,
+        tag: 'Whanganui River Outlet',
+        desc: 'Flourishing river port where paddle steamers and coasters connected inland Māori settlements with Cook Strait and Tasman sea routes.',
+        linkText: 'Whanganui River Navigation',
+        detailsHtml: `<p>Whanganui maintained both town wharves for river paddle steamers (the renowned Hatrick riverboat fleet) and deep-water ocean berths at Castlecliff for frozen meat and coastal shipping.</p>`
+      },
+      {
+        id: 'port_foxton',
+        type: 'port',
+        title: 'Foxton River Port (Manawatū)',
+        year: 1860,
+        lat: -40.4850,
+        lng: 175.2630,
+        tag: 'NZ Harakeke / Flax Port',
+        desc: 'Busy river port that shipped thousands of tons of stripped New Zealand flax (harakeke) fiber across the British Empire.',
+        linkText: 'Manawatū River Trade',
+        detailsHtml: `<p>Foxton was the center of New Zealand\'s booming rope and binder twine industry. Coasters entered the winding Manawatū River mouth to load flax bales bound for Sydney and Liverpool ropeworks.</p>`
+      },
+      {
+        id: 'port_wellington',
+        type: 'port',
+        title: 'Port of Wellington (CentrePort)',
+        year: 1840,
+        lat: -41.2810,
+        lng: 174.7850,
+        tag: 'Cook Strait Ferry & Capital Port',
+        desc: 'New Zealand\'s central capital harbour and Cook Strait rail ferry terminal, linking North and South Island transport arteries.',
+        linkText: 'Wellington Harbour Board',
+        detailsHtml: `<p>Known in colonial times as Port Nicholson, Wellington became the headquarters of the Union Steam Ship Company. Today, CentrePort operates container wharves, vehicle import docks, and the vital Interislander rail ferries crossing Cook Strait to Picton.</p>`
+      },
+      {
+        id: 'port_picton',
+        type: 'port',
+        title: 'Port of Picton (Marlborough Sounds)',
+        year: 1861,
+        lat: -41.2900,
+        lng: 174.0080,
+        tag: 'Cook Strait Rail Ferry Terminal',
+        desc: 'Deep, protected sound terminus connecting the South Island Main Trunk railway to Wellington via drive-on rail ferries.',
+        linkText: 'Queen Charlotte Sound',
+        detailsHtml: `<p>Sheltered inside Queen Charlotte Sound, Picton was transformed in 1962 with the introduction of the first roll-on roll-off rail ferry GMV <em>Aramoana</em>, creating the continuous \'floating bridge\' between New Zealand\'s islands.</p>`
+      },
+      {
+        id: 'port_nelson',
+        type: 'port',
+        title: 'Port of Nelson (Nelson Haven)',
+        year: 1842,
+        lat: -41.2600,
+        lng: 173.2800,
+        tag: 'Boulder Bank Haven',
+        desc: 'Naturally sheltered harbor protected by a remarkable 13-kilometre boulder bank, shipping apples, wine, timber, and fresh seafood.',
+        linkText: 'Nelson Haven History',
+        detailsHtml: `<p>Immigrant ships arriving in 1842 were delighted to discover Nelson Haven completely shielded from Tasman Sea gales by the natural Boulder Bank. The Harbour Board cut a new shipping passage through the boulders in 1906 to accommodate modern steam liners.</p>`
+      },
+      {
+        id: 'port_westport',
+        type: 'port',
+        title: 'Port of Westport (Buller River)',
+        year: 1861,
+        lat: -41.7450,
+        lng: 171.6000,
+        tag: 'Historic Bituminous Coal Port',
+        desc: 'Famous West Coast bar harbour that loaded world-class bituminous steaming coal from Denniston and Stockton plateau mines.',
+        linkText: 'Buller River Colliers',
+        detailsHtml: `<p>Colliers of the Union Steam Ship Company (\'the Black Diamond Line\') braved the Buller River bar to supply fuel for the Royal Navy Pacific fleet and NZ railway locomotives from the famous Denniston Incline.</p>`
+      },
+      {
+        id: 'port_greymouth',
+        type: 'port',
+        title: 'Port of Greymouth (Grey River)',
+        year: 1865,
+        lat: -42.4460,
+        lng: 171.2000,
+        tag: 'West Coast Timber & Coal Bar',
+        desc: 'Heavy surf river bar port that shipped West Coast coal, gold, and native podocarp timber across the Tasman Sea.',
+        linkText: 'Grey River Coasters',
+        detailsHtml: `<p>The notorious Grey River bar claimed dozens of coastal steamers. Long stone training walls built with Brunner shale eventually harnessed river currents to scour a reliable channel for steam colliers and timber ketches.</p>`
+      },
+      {
+        id: 'port_hokitika',
+        type: 'port',
+        title: 'Hokitika River Bar',
+        year: 1864,
+        lat: -42.7180,
+        lng: 170.9600,
+        tag: 'Gold Rush Shipwreck Bar',
+        desc: 'Wild river bar that handled thousands of diggers during the 1865-1867 gold rush, stranding over 100 ships on its sands.',
+        linkText: 'West Coast Gold Port',
+        detailsHtml: `<p>Between 1865 and 1867, Hokitika was one of the busiest ports in Australasia. The narrow river mouth was so hazardous that steamers often grounded in rows on the beach, yet hundreds of eager miners jumped straight over the bulwarks into the surf.</p>`
+      },
+      {
+        id: 'port_jackson_bay',
+        type: 'port',
+        title: 'Jackson Bay (South Westland)',
+        year: 1875,
+        lat: -43.9740,
+        lng: 168.6180,
+        tag: 'Southernmost West Coast Roadstead',
+        desc: 'The only sheltered ocean anchorage on the 600-kilometre stretch of rugged coastline between Greymouth and Milford Sound.',
+        linkText: 'Remote Westland Haven',
+        detailsHtml: `<p>In 1875, the government launched an ambitious immigrant settlement scheme at Jackson Bay. Though farming failed in the dense rain-soaked rainforest, the bay remains an indispensable haven of refuge for southern fishing vessels.</p>`
+      },
+      {
+        id: 'port_lyttelton',
+        type: 'port',
+        title: 'Port of Lyttelton (Whakaraupō)',
+        year: 1850,
+        lat: -43.6030,
+        lng: 172.7200,
+        tag: 'Canterbury\'s Main Port',
+        desc: 'Canterbury\'s deepwater port inside an extinct volcanic caldera, linked to Christchurch via NZ\'s first railway tunnel in 1867.',
+        linkText: 'Canterbury Pilgrims Port',
+        detailsHtml: `<p>Arrival point of the \'First Four Ships\' in December 1850. The engineering triumph of the Lyttelton Rail Tunnel (1867) carved through the Port Hills allowed Canterbury grain and wool to reach international container liners.</p>`
+      },
+      {
+        id: 'port_timaru',
+        type: 'port',
+        title: 'PrimePort Timaru (Caroline Bay)',
+        year: 1865,
+        lat: -44.3940,
+        lng: 171.2580,
+        tag: 'Artificial Breakwater Triumph',
+        desc: 'Built out into open Pacific swells from a dangerous open roadstead into a modern artificial deepwater cargo port.',
+        linkText: 'South Canterbury Port',
+        detailsHtml: `<p>Before massive concrete mole breakwaters were engineered, sailing ships anchored off Timaru were repeatedly wrecked by sudden easterly gales. Today it exports South Canterbury meat, dairy, and fish.</p>`
+      },
+      {
+        id: 'port_oamaru',
+        type: 'port',
+        title: 'Oamaru Harbour & Historic Wharves',
+        year: 1860,
+        lat: -45.1050,
+        lng: 170.9780,
+        tag: 'Victorian White Stone Port',
+        desc: 'Historic breakwater harbour framed by grand 19th-century Oamaru stone grain stores and wool warehouses.',
+        linkText: 'Oamaru Victorian Precinct',
+        detailsHtml: `<p>A booming coastal port during the 1870s-1880s grain and wool boom. Ships took on cargo from the ornate limestone warehouses that now form Oamaru\'s celebrated Victorian Heritage Precinct.</p>`
+      },
+      {
+        id: 'port_chalmers',
+        type: 'port',
+        title: 'Port Chalmers (Otago Deepwater)',
+        year: 1844,
+        lat: -45.8140,
+        lng: 170.6220,
+        tag: 'Birthplace of Refrigerated Trade',
+        desc: 'Deepwater entrance to Otago Harbour where the SS Dunedin departed in 1882 with the world\'s first successful frozen meat cargo.',
+        linkText: 'SS Dunedin 1882 Legacy',
+        detailsHtml: `<p>On 15 February 1882, the clipper ship <em>Dunedin</em> sailed from Port Chalmers carrying 4,988 sheep carcasses under coal-powered Bell-Coleman refrigeration, changing the New Zealand economy forever. It remains Otago\'s main container port.</p>`
+      },
+      {
+        id: 'port_dunedin',
+        type: 'port',
+        title: 'Dunedin Upper Wharves (Rattray St)',
+        year: 1848,
+        lat: -45.8770,
+        lng: 170.5100,
+        tag: 'Gold Rush Steamer Terminus',
+        desc: 'Upper harbor wharves at the foot of Dunedin city where coastal steamers brought thousands of gold diggers to the Tuapeka fields.',
+        linkText: 'Otago Harbour Basin',
+        detailsHtml: `<p>Shallow Victoria Channel allowed coastal steamers to bypass Port Chalmers and discharge directly at Dunedin city wharves. It was the headquarters of the Union Steam Ship Company, once the largest shipping firm in the Southern Hemisphere.</p>`
+      },
+      {
+        id: 'port_waikawa',
+        type: 'port',
+        title: 'Waikawa Harbour (The Catlins)',
+        year: 1865,
+        lat: -46.6180,
+        lng: 169.1430,
+        tag: 'Catlins Timber Wharves',
+        desc: 'Sheltered estuary in the Catlins where ketches and cutters loaded sawn rimu and totara timber from local sawmills.',
+        linkText: 'Catlins Coastal Trade',
+        detailsHtml: `<p>Before rail penetrated the dense rainforest of the Catlins, coastal timber ketches like the <em>Owake Belle</em> loaded timber at Niagara and Waikawa wharves to build the growing cities of Dunedin and Christchurch.</p>`
+      },
+      {
+        id: 'port_fortrose',
+        type: 'port',
+        title: 'Fortrose Harbour (Mataura River)',
+        year: 1874,
+        lat: -46.5770,
+        lng: 168.8020,
+        tag: 'Bonniefields & Mataura Outlet',
+        desc: 'Historic Southland bar port directly servicing early settlers and farms across the Mataura Valley and Bonniefields district.',
+        linkText: 'BMMC Regional Link',
+        detailsHtml: `<p>Small steamers like the <em>Kakanui</em> and <em>Rose Casey</em> entered the mouth of the Mataura River at Fortrose to load Southland farm produce—including wool bales, grain, and butter from the Bonniefields district—for trans-shipment at Bluff.</p>`
       },
       {
         id: 'port_bluff',
         type: 'port',
-        title: 'Bluff Harbour Shipping Port',
+        title: 'Bluff Harbour (Port of Southland)',
         year: 1856,
         lat: -46.5980,
         lng: 168.3390,
-        tag: 'Southern Ocean Terminal',
-        desc: 'The terminus for Southland produce and the gateway to Stewart Island.',
-        detailsHtml: '<p>Bluff served as the southern anchor for Union Steam Ship vessels and coastal traders linking Southland to Dunedin, Lyttelton, and Wellington.</p>'
-      }
-    ];
-
-    // -------------------------------------------------------------
-    // 5. EARLY SETTLERS SHIPPING ROUTES (GIS POLYLINES)
-    // -------------------------------------------------------------
-    const SHIPPING_ROUTES = [
-      {
-        id: 'route_roaring_forties',
-        title: 'The \'Roaring Forties\' Great Circle Immigrant Route (1840–1880)',
-        color: '#38bdf8',
-        dashArray: '8, 6',
-        summary: '100–120 days from Plymouth/Gravesend down the Atlantic, rounding Cape of Good Hope and riding the roaring Southern Ocean swells past The Snares into Lyttelton & Port Chalmers.',
-        coordinates: [
-          [-50.0, 150.0],
-          [-48.5, 160.0],
-          [-47.8, 165.5],
-          [-46.7, 168.8],
-          [-46.2, 170.2],
-          [-45.8150, 170.6200],
-          [-44.5, 171.8],
-          [-43.6025, 172.7180]
-        ]
+        tag: 'Southernmost Commercial Container Port',
+        desc: 'South Island’s southern export gateway, servicing Southland dairy and mutton exports, Stewart Island ferries, and the Bluff oyster fleet.',
+        linkText: 'Southland Gateway',
+        detailsHtml: `<p>Constructed inside a tidal harbor under Motupōhue hill, Bluff is New Zealand\'s southernmost commercial port. It connected Southland farms directly with the British Empire, while its dredge fleet harvests world-famous Bluff oysters in Foveaux Strait.</p>`
       },
       {
-        id: 'route_cook_strait_immigrant',
-        title: 'Cook Strait Immigrant Passage (Wellington & Nelson)',
-        color: '#a855f7',
-        dashArray: '8, 6',
-        summary: 'Immigrant barques entered through the storm-tossed western approach past Cape Farewell and Stephens Island to drop settlers at Nelson Haven and Petone Beach.',
-        coordinates: [
-          [-39.5, 170.5],
-          [-40.2, 172.2],
-          [-40.5, 173.0],
-          [-40.9, 173.6],
-          [-41.2610, 173.2790],
-          [-41.1, 174.1],
-          [-41.28, 174.75],
-          [-41.2290, 174.8720]
-        ]
+        id: 'port_riverton',
+        type: 'port',
+        title: 'Riverton Wharf (Aparima Estuary)',
+        year: 1837,
+        lat: -46.3530,
+        lng: 168.0160,
+        tag: 'Western Southland Fishing Pier',
+        desc: 'Historic estuary port founded by Captain John Howell; home to western Southland\'s coastal schooners and fishing fleet.',
+        linkText: 'Aparima Coastal Fleets',
+        detailsHtml: `<p>Riverton\'s sheltered river wharf saw schooners and cutter-rigged fishing smacks navigate the sandbar to supply western Southland runs, sheep stations, and the Longwood gold diggings with goods from Dunedin.</p>`
       },
       {
-        id: 'route_trans_tasman',
-        title: 'Trans-Tasman Gold & Settler Highway (Melbourne/Sydney)',
-        color: '#eab308',
-        dashArray: '6, 6',
-        summary: 'The vital oceanic lifeline bringing Victorian diggers, livestock, and mail from Melbourne and Sydney across the turbulent Tasman Sea directly to Hokitika, Dunedin, and Bluff.',
-        coordinates: [
-          [-40.0, 155.0],
-          [-41.2, 162.0],
-          [-42.2, 168.0],
-          [-42.7160, 170.9630],
-          [-44.0, 167.5],
-          [-46.2, 166.5],
-          [-46.6115, 168.3582]
-        ]
-      },
-      {
-        id: 'route_northern_immigrant',
-        title: 'Northern Immigrant Route to Waitematā & Whangarei',
-        color: '#10b981',
-        dashArray: '8, 6',
-        summary: 'Carried Scottish, English, and Bohemian settlers rounding North Cape and Cape Brett down the Hauraki Gulf into Auckland Harbour (Commercial Bay), Puhoi, and Waipu.',
-        coordinates: [
-          [-33.5, 170.5],
-          [-34.2, 172.2],
-          [-34.4289, 172.6798],
-          [-34.9, 173.8],
-          [-35.1744, 174.3339],
-          [-35.9860, 174.4550],
-          [-36.5160, 174.6650],
-          [-36.8435, 174.7670]
-        ]
-      },
-      {
-        id: 'route_mosquito_trunk',
-        title: 'Mosquito Fleet Coastal Trunk (Auckland – Dunedin – Bluff)',
-        color: '#f97316',
-        dashArray: '4, 4',
-        summary: 'The bustling inshore highway of scows, ketches, and puffing coastal steamers linking isolated farming bays, bar harbours, and timber mills to the world.',
-        coordinates: [
-          [-36.8435, 174.7670],
-          [-37.6, 176.2],
-          [-37.6908, 178.5475],
-          [-38.7, 178.1],
-          [-39.5, 177.0],
-          [-41.28, 174.78],
-          [-43.6025, 172.7180],
-          [-45.8150, 170.6200],
-          [-46.5980, 168.3390]
-        ]
+        id: 'port_stewart_island',
+        type: 'port',
+        title: 'Halfmoon Bay Wharf (Stewart Island)',
+        year: 1872,
+        lat: -46.8980,
+        lng: 168.1280,
+        tag: 'Rakiura Ferry & Fishing Base',
+        desc: 'New Zealand’s southernmost permanent community port, handling passenger catamarans, crayfish boats, and blue cod fleets.',
+        linkText: 'Rakiura Ocean Terminal',
+        detailsHtml: `<p>The lifeline of Stewart Island/Rakiura, Halfmoon Bay has welcomed coastal supply steamers from Bluff (such as the historic tug <em>Awarua</em> and steamer <em>Wairua</em>) across Foveaux Strait for over 150 years.</p>`
       }
     ];
 
     let map;
     let markersLayer;
-    let routesLayerGroup;
     let markerInstances = new Map();
     let currentCategoryFilter = 'all';
-    let routesVisible = true;
 
     function initMaritimeMap() {
       const isMobile = window.innerWidth <= 768;
-      const initialCenter = [-41.2, 172.8];
+      const initialCenter = [-41.8, 172.5];
       const initialZoom = isMobile ? 5 : 6;
 
       map = L.map('maritimeMap', {
@@ -1447,17 +1206,12 @@
         scrollWheelZoom: true
       });
 
-      // Esri World Topographic Base Map
+      // Esri World Topo Base
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Esri &copy; Topographic Survey',
         maxZoom: 18
       }).addTo(map);
 
-      // Shipping Routes Polyline Layer Group
-      routesLayerGroup = L.layerGroup().addTo(map);
-      renderShippingRoutes();
-
-      // Clustered Marker Layer
       markersLayer = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
@@ -1468,52 +1222,6 @@
 
       renderMapMarkers();
       updateFilterCounts();
-    }
-
-    function renderShippingRoutes() {
-      routesLayerGroup.clearLayers();
-      if (!routesVisible) return;
-
-      SHIPPING_ROUTES.forEach(route => {
-        const polyline = L.polyline(route.coordinates, {
-          color: route.color,
-          weight: 3.5,
-          opacity: 0.85,
-          dashArray: route.dashArray,
-          lineJoin: 'round'
-        });
-
-        polyline.bindTooltip(`<b>${route.title}</b><br><span style="font-size:10px">${route.summary}</span>`, {
-          className: 'maritime-route-tooltip',
-          sticky: true
-        });
-
-        polyline.on('click', () => {
-          openRouteModal(route);
-        });
-
-        routesLayerGroup.addLayer(polyline);
-      });
-    }
-
-    function toggleShippingRoutes() {
-      routesVisible = !routesVisible;
-      const btn = document.getElementById('btnToggleRoutes');
-      if (routesVisible) {
-        renderShippingRoutes();
-        if (btn) {
-          btn.textContent = '🧭 Routes: ON';
-          btn.className = 'px-2.5 py-1 rounded-xl text-xs font-black bg-purple-600 hover:bg-purple-500 text-white shadow transition cursor-pointer';
-        }
-        showToast('Shipping routes visible', '🧭');
-      } else {
-        routesLayerGroup.clearLayers();
-        if (btn) {
-          btn.textContent = '🧭 Routes: OFF';
-          btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer';
-        }
-        showToast('Shipping routes hidden', '👁️');
-      }
     }
 
     function renderMapMarkers() {
@@ -1531,7 +1239,6 @@
 
         if (site.type === 'wreck') { iconEmoji = '🚨'; themeClass = 'theme-wreck'; }
         else if (site.type === 'light') { iconEmoji = '💡'; themeClass = 'theme-light'; }
-        else if (site.type === 'landing') { iconEmoji = '⚓'; themeClass = 'theme-landing'; }
         else if (site.type === 'whaling') { iconEmoji = '🐋'; themeClass = 'theme-whaling'; }
         else if (site.type === 'port') { iconEmoji = '🚢'; themeClass = 'theme-port'; }
 
@@ -1549,21 +1256,15 @@
         const icon = L.divIcon({
           html: markerHtml,
           className: 'maritime-div-icon',
-          iconSize: [210, 42],
-          iconAnchor: [105, 42],
+          iconSize: [180, 42],
+          iconAnchor: [90, 42],
           popupAnchor: [0, -42]
         });
 
         const popupContent = `
           <div class="p-4 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 max-w-xs space-y-2.5">
             <div class="flex items-center justify-between gap-1">
-              <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                site.type === 'wreck' ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300' :
-                site.type === 'light' ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300' :
-                site.type === 'landing' ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300' :
-                site.type === 'whaling' ? 'bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300' :
-                'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300'
-              }">
+              <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${site.type === 'wreck' ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300' : site.type === 'light' ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300' : site.type === 'whaling' ? 'bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300' : 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300'}">
                 ${site.type.toUpperCase()} • ${site.year}
               </span>
               <span class="text-[10px] font-mono text-slate-400 font-bold">${site.lat.toFixed(2)}, ${site.lng.toFixed(2)}</span>
@@ -1576,7 +1277,7 @@
               <button onclick="openMaritimeModal('${site.id}')" class="text-xs font-black text-sky-600 dark:text-sky-400 hover:underline cursor-pointer">
                 Full Dossier ↗
               </button>
-              <span class="text-[10px] text-slate-400 font-bold truncate max-w-[130px]">${site.tag}</span>
+              <span class="text-[10px] text-slate-400 font-bold">${site.tag}</span>
             </div>
           </div>
         `;
@@ -1595,7 +1296,6 @@
         all: 'mapFilterAll',
         wreck: 'mapFilterWreck',
         light: 'mapFilterLight',
-        landing: 'mapFilterLanding',
         whaling: 'mapFilterWhaling',
         port: 'mapFilterPort'
       };
@@ -1617,14 +1317,12 @@
       const elAll = document.getElementById('countAll');
       const elWreck = document.getElementById('countWrecks');
       const elLight = document.getElementById('countLights');
-      const elLanding = document.getElementById('countLandings');
       const elWhale = document.getElementById('countWhaling');
       const elPort = document.getElementById('countPorts');
 
       if (elAll) elAll.textContent = MARITIME_SITES.length;
       if (elWreck) elWreck.textContent = MARITIME_SITES.filter(s => s.type === 'wreck').length;
       if (elLight) elLight.textContent = MARITIME_SITES.filter(s => s.type === 'light').length;
-      if (elLanding) elLanding.textContent = MARITIME_SITES.filter(s => s.type === 'landing').length;
       if (elWhale) elWhale.textContent = MARITIME_SITES.filter(s => s.type === 'whaling').length;
       if (elPort) elPort.textContent = MARITIME_SITES.filter(s => s.type === 'port').length;
     }
@@ -1651,36 +1349,6 @@
       }, 350);
     }
 
-    function openRouteModal(route) {
-      const modal = document.getElementById('maritimeDetailModal');
-      const titleEl = document.getElementById('modalTitle');
-      const iconEl = document.getElementById('modalCategoryIcon');
-      const bodyEl = document.getElementById('modalBody');
-
-      if (iconEl) iconEl.textContent = '🧭';
-      if (titleEl) titleEl.textContent = route.title;
-
-      if (bodyEl) {
-        bodyEl.innerHTML = `
-          <div class="space-y-3">
-            <div class="flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 pb-2 border-b border-slate-200 dark:border-slate-800">
-              <span>HISTORIC SHIPPING CORRIDOR</span>
-              <span>Waypoints: ${route.coordinates.length}</span>
-            </div>
-            <p class="text-sm font-semibold leading-relaxed text-slate-800 dark:text-slate-100">${route.summary}</p>
-            <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
-              <strong>Navigation Lore:</strong> Emigrant vessels and coastal ketches faced ferocious hazards including westerly gales in the Roaring Forties, shifting bar sandspits, and blinding fog off Great Barrier Island.
-            </div>
-          </div>
-        `;
-      }
-
-      if (modal) {
-        modal.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-      }
-    }
-
     function openMaritimeModal(siteId) {
       const site = MARITIME_SITES.find(s => s.id === siteId);
       if (!site) return;
@@ -1693,7 +1361,6 @@
       let icon = '⚓';
       if (site.type === 'wreck') icon = '🚨';
       else if (site.type === 'light') icon = '💡';
-      else if (site.type === 'landing') icon = '⚓';
       else if (site.type === 'whaling') icon = '🐋';
       else if (site.type === 'port') icon = '🚢';
 
@@ -1738,20 +1405,6 @@
       }
     }
 
-    function showToast(msg, icon = '✨') {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      const toastIcon = document.getElementById('toastIcon');
-      if (!toast || !toastMsg) return;
-      toastMsg.textContent = msg;
-      if (toastIcon) toastIcon.textContent = icon;
-      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
-      }, 2500);
-    }
-
-    // Theme Toggle & Key Listeners
     document.addEventListener('DOMContentLoaded', () => {
       const themeBtn = document.getElementById('btnThemeToggle');
       const themeIcon = document.getElementById('themeToggleIcon');
