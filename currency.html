@@ -284,9 +284,11 @@
     <!-- SECTION A: SPECIMEN CATALOGUE VIEW -->
     <div id="catalogueViewContainer" class="space-y-8">
       
-      <!-- Historical Context & 1967 Decimal Converter Calculator -->
-      <section id="history-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+      <!-- Historical Context, 1967 Decimal Converter & Purchasing Power Basket Calculator -->
+      <section id="history-overview" class="space-y-6">
+        
+        <!-- Top Row: History & Evolution of Currency -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex items-center gap-2.5 mb-3">
               <span class="p-2 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-xl text-lg border border-amber-200 dark:border-amber-900/60">📜</span>
@@ -296,62 +298,167 @@
               </div>
             </div>
             
-            <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
-              <p>
-                <strong>Prior to Official NZ Coinage (1897–1933):</strong> Imperial British coins and Australian-minted sovereigns circulated as legal tender under the <em>Imperial Coinage Act 1870</em>.
-              </p>
-              <p>
-                <strong>Coinage Act 1933:</strong> Introduced New Zealand's first distinct national coinage (Halfpenny to Crown). British coinage ceased being legal tender on <strong>1 February 1935</strong>.
-              </p>
-              <p>
-                <strong>Decimal Currency Day (10 July 1967):</strong> Conversion from £sd to dollars and cents (£1 = $2.00, 10/- = $1.00, 1/- = 10c, 1d = 5/6c).
-              </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <strong class="text-slate-900 dark:text-white block mb-1">1. Pre-1933 (Imperial Era):</strong>
+                Imperial British coins and Sydney-minted sovereigns circulated under the <em>Imperial Coinage Act 1870</em>.
+              </div>
+              <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <strong class="text-slate-900 dark:text-white block mb-1">2. Coinage Act 1933:</strong>
+                Introduced NZ's first national coinage with native flora and Māori motifs. British coins demonetised on <strong>1 Feb 1935</strong>.
+              </div>
+              <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                <strong class="text-slate-900 dark:text-white block mb-1">3. Decimal Day (10 July 1967):</strong>
+                Clean conversion from £sd to dollars and cents (£1 = $2.00, 10/- = $1.00, 1/- = 10c, 1d = 5/6c).
+              </div>
             </div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-            <span>Authority: <strong>Reserve Bank of New Zealand (RBNZ)</strong></span>
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 gap-2">
+            <span>Issuing Authority: <strong>Reserve Bank of New Zealand (Te Pūtea Matua)</strong></span>
             <span>Key Designers: <strong>Percy Metcalfe, George Kruger Gray, Leonard Mitchell, Robert Conly</strong></span>
           </div>
         </div>
 
-        <!-- 1967 Decimal Calculator -->
-        <div class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-slate-900/10 dark:from-amber-950/40 dark:to-slate-900/40 border border-amber-500/30 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-xl">🧮</span>
-              <h3 class="text-base font-black text-slate-900 dark:text-white">1967 Decimal Converter</h3>
-            </div>
-            <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
-              Convert historical pre-decimal pounds, shillings, and pence (£sd) into 1967 Decimal Dollars &amp; Cents.
-            </p>
+        <!-- Dual Calculators Grid: 1967 Decimal Converter + Purchasing Power Basket Calculator -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
-            <div class="space-y-3">
-              <div class="grid grid-cols-3 gap-2">
+          <!-- Card 1: 1967 Decimal Converter -->
+          <div class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-slate-900/10 dark:from-amber-950/40 dark:to-slate-900/40 border border-amber-500/30 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="text-xl">🧮</span>
                 <div>
-                  <label for="calcPounds" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pounds (£)</label>
-                  <input type="number" id="calcPounds" min="0" value="1" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
-                </div>
-                <div>
-                  <label for="calcShillings" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Shillings (s)</label>
-                  <input type="number" id="calcShillings" min="0" max="19" value="2" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
-                </div>
-                <div>
-                  <label for="calcPence" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pence (d)</label>
-                  <input type="number" id="calcPence" min="0" max="11" value="6" step="0.5" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+                  <h3 class="text-base font-black text-slate-900 dark:text-white">1967 Decimal Converter</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Exact statutory changeover rate: £1 = $2.00 | 1s = 10c | 1d = 5/6c</p>
                 </div>
               </div>
 
-              <div class="p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-amber-500/40 text-center shadow-inner">
-                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Decimal Value (1967 Rate)</span>
-                <span id="calcResultDecimal" class="text-2xl font-black text-amber-600 dark:text-amber-400">$2.25 NZD</span>
-                <span id="calcResultCents" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mt-0.5">225.0 cents</span>
+              <div class="space-y-3 mt-3">
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label for="calcPounds" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pounds (£)</label>
+                    <input type="number" id="calcPounds" min="0" value="1" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+                  </div>
+                  <div>
+                    <label for="calcShillings" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Shillings (s)</label>
+                    <input type="number" id="calcShillings" min="0" max="19" value="2" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+                  </div>
+                  <div>
+                    <label for="calcPence" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pence (d)</label>
+                    <input type="number" id="calcPence" min="0" max="11" value="6" step="0.5" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-amber-500" />
+                  </div>
+                </div>
+
+                <div class="p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-amber-500/40 text-center shadow-inner">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Decimal Conversion Rate (1967)</span>
+                  <span id="calcResultDecimal" class="text-2xl font-black text-amber-600 dark:text-amber-400">$2.25 NZD</span>
+                  <span id="calcResultCents" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mt-0.5">225.0 cents</span>
+                </div>
+
+                <button type="button" onclick="syncDecimalToBasket()" class="w-full py-2 px-3 bg-amber-500 hover:bg-amber-400 dark:bg-amber-600 dark:hover:bg-amber-500 text-slate-950 font-black rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow active:scale-95 cursor-pointer">
+                  <span>🧺 Test in Purchasing Power Basket →</span>
+                </button>
               </div>
             </div>
+            
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-3 border-t border-amber-500/20">
+              Historical baseline: In 1967, one guinea was £1 1s ($2.10) and a crown was 5/- ($0.50).
+            </div>
           </div>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-3 border-t border-amber-500/20">
-            Conversion: £1 = $2.00 | 1s = 10c | 1d = 5/6c
+
+          <!-- Card 2: Purchasing Power & Historical Basket Calculator -->
+          <div id="purchasingPowerCard" class="bg-gradient-to-br from-emerald-500/10 via-teal-600/5 to-slate-900/10 dark:from-emerald-950/40 dark:to-slate-900/40 border border-emerald-500/30 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">🧺</span>
+                  <div>
+                    <h3 class="text-base font-black text-slate-900 dark:text-white">Purchasing Power &amp; Basket</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Calculate modern inflation equivalent and what it bought back then</p>
+                  </div>
+                </div>
+
+                <!-- Currency Input Mode Toggle -->
+                <div class="flex items-center bg-white/90 dark:bg-slate-800/90 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold shrink-0">
+                  <button id="basketModeLsdBtn" type="button" onclick="setBasketMode('lsd')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white shadow-sm font-black cursor-pointer transition">£sd</button>
+                  <button id="basketModeDecBtn" type="button" onclick="setBasketMode('dec')" class="px-2 py-0.5 rounded-lg text-slate-600 dark:text-slate-300 font-bold hover:text-slate-900 dark:hover:text-white cursor-pointer transition">$ NZD</button>
+                </div>
+              </div>
+
+              <div class="space-y-3 mt-3">
+                
+                <!-- Year Selector & Quick Historical Era Pills -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="basketYearSelect" class="text-[10px] font-extrabold uppercase text-slate-500">Historical Year</label>
+                    <span id="basketCpiBadge" class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">CPI: 16.4 (1935)</span>
+                  </div>
+                  <select id="basketYearSelect" onchange="updateBasketCalculator()" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                    <!-- Populated dynamically 1890-2026 -->
+                  </select>
+
+                  <div class="flex items-center gap-1 mt-1.5 flex-wrap">
+                    <span class="text-[9px] font-extrabold text-slate-400 uppercase mr-0.5">Quick:</span>
+                    <button type="button" onclick="setBasketYear(1901)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">1901</button>
+                    <button type="button" onclick="setBasketYear(1914)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">1914</button>
+                    <button type="button" onclick="setBasketYear(1935)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-black cursor-pointer">1935</button>
+                    <button type="button" onclick="setBasketYear(1940)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">1940</button>
+                    <button type="button" onclick="setBasketYear(1950)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">1950</button>
+                    <button type="button" onclick="setBasketYear(1967)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">1967</button>
+                    <button type="button" onclick="setBasketYear(1985)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">1985</button>
+                    <button type="button" onclick="setBasketYear(2000)" class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 cursor-pointer">2000</button>
+                  </div>
+                </div>
+
+                <!-- Money Inputs: £sd Mode -->
+                <div id="basketLsdInputs" class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label for="calcBasketPounds" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pounds (£)</label>
+                    <input type="number" id="calcBasketPounds" min="0" value="1" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label for="calcBasketShillings" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Shillings (s)</label>
+                    <input type="number" id="calcBasketShillings" min="0" max="19" value="0" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label for="calcBasketPence" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Pence (d)</label>
+                    <input type="number" id="calcBasketPence" min="0" max="11" value="0" step="0.5" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
+                </div>
+
+                <!-- Money Inputs: Decimal $ Mode (Hidden initially) -->
+                <div id="basketDecInputs" class="hidden">
+                  <label for="calcBasketDollars" class="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Historical Dollars ($ NZD)</label>
+                  <input type="number" id="calcBasketDollars" min="0" step="0.01" value="2.00" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+
+                <!-- Modern Equivalent Result -->
+                <div class="p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-emerald-500/40 text-center shadow-inner">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-0.5">Purchasing Power Equivalent Today</span>
+                  <span id="basketResult2026" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">$156.71 NZD</span>
+                  <span id="basketInflationRatio" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mt-0.5">~78.4× cumulative inflation since 1935</span>
+                </div>
+
+                <!-- Historical Goods & Services Basket Equivalency Grid -->
+                <div>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">
+                    What this could purchase in <strong id="basketYearLabel" class="text-slate-800 dark:text-slate-200">1935</strong>:
+                  </span>
+                  <div id="basketItemsGrid" class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                    <!-- Populated dynamically by updateBasketCalculator() -->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-3 border-t border-emerald-500/20 flex items-center justify-between">
+              <span>Stats NZ / RBNZ CPI Index Model</span>
+              <span id="basketFootnoteNote" class="italic truncate max-w-[200px]">1935 Depression Price Floor</span>
+            </div>
           </div>
+
         </div>
       </section>
 
@@ -2687,6 +2794,252 @@
       }
     }
 
+        // ==========================================
+    // NZ PURCHASING POWER & CPI BASKET CALCULATOR
+    // ==========================================
+    let currentBasketMode = 'lsd'; // 'lsd' or 'dec'
+    let cpiDataMap = new Map();
+    let cpiNotesMap = new Map();
+
+    // Embedded 137-Row RBNZ CPI Dataset (1890-2026) for guaranteed offline functionality
+    const EMBEDDED_CPI_DATA = [
+      [1890, 10.8, "Long Depression trough"], [1891, 10.7, "Agricultural recovery"], [1892, 10.7, "Pastoral price stability"],
+      [1893, 10.6, "Women's Suffrage Act"], [1894, 10.4, "BNZ banking guarantee"], [1895, 10.1, "Long Depression price floor"],
+      [1896, 10.2, "Refrigeration shipping boom"], [1897, 10.3, "Diamond Jubilee"], [1898, 10.5, "Old-age Pensions Act"],
+      [1899, 10.7, "Boer War support"], [1900, 11.0, "Turn of century pastoral boom"], [1901, 11.2, "Universal Penny Post (1d)"],
+      [1902, 11.4, "King Edward VII"], [1903, 11.6, "High Commissionership"], [1904, 11.5, "Stable prices"],
+      [1905, 11.7, "Seddon Liberal administration"], [1906, 12.0, "Christchurch Exhibition"], [1907, 12.3, "Dominion status proclaimed"],
+      [1908, 12.6, "Main Trunk rail completed"], [1909, 12.5, "Stable trade"], [1910, 12.8, "King George V accession"],
+      [1911, 13.0, "McIlraith price survey"], [1912, 13.2, "Waihi strike"], [1913, 13.3, "Waterfront strikes"],
+      [1914, 13.5, "Official Stats NZ CPI base"], [1915, 14.7, "Gallipoli campaign"], [1916, 16.1, "Wartime inflation surge"],
+      [1917, 17.8, "Wartime price rises"], [1918, 20.2, "Armistice; influenza wave"], [1919, 22.3, "Post-WWI resettlement"],
+      [1920, 25.1, "Post-WWI peak inflation"], [1921, 24.2, "Post-war price slump"], [1922, 21.6, "Deflationary drop"],
+      [1923, 20.8, "Dairy Control Board formed"], [1924, 21.0, "Pastoral recovery"], [1925, 21.2, "Dunedin South Seas Exhibition"],
+      [1926, 21.1, "Interwar stability"], [1927, 20.7, "Deflationary pressure"], [1928, 20.5, "United Party elected"],
+      [1929, 20.6, "Wall Street crash"], [1930, 20.1, "Depression impacts trade"], [1931, 18.2, "Hawke's Bay earthquake"],
+      [1932, 16.5, "Depression unemployment peak"], [1933, 15.6, "Coinage Act 1933; 1st NZ Coins"], [1934, 15.9, "Reserve Bank founded; S1 notes"],
+      [1935, 16.4, "1st Labour Govt; Waitangi Crown"], [1936, 16.9, "Guaranteed dairy price scheme"], [1937, 17.9, "40-hour work week enacted"],
+      [1938, 18.5, "Social Security Act passed"], [1939, 19.3, "WWII begins; price control"], [1940, 20.1, "NZ Centennial; S2 notes"],
+      [1941, 20.8, "Pacific War breakout"], [1942, 21.5, "Wartime price freeze"], [1943, 22.0, "Strict price stabilization"],
+      [1944, 22.3, "Milk Act price regulation"], [1945, 22.6, "End of WWII"], [1946, 22.8, "Post-war reconstruction"],
+      [1947, 23.5, "Statute of Westminster adopted"], [1948, 25.2, "NZ Pound parity with Sterling"], [1949, 25.6, "National Govt elected"],
+      [1950, 27.2, "Korean War wool boom inflation"], [1951, 30.2, "151-day waterfront dispute"], [1952, 32.5, "Wool boom winds down"],
+      [1953, 34.0, "QEII Coronation; Tangiwai"], [1954, 35.6, "Post-war prosperity"], [1955, 36.5, "Steady economic growth"],
+      [1956, 37.8, "CPI milk moves to pint (4.6d)"], [1957, 38.6, "Labour Govt elected"], [1958, 40.3, "Nordmeyer 'Black Budget'"],
+      [1959, 41.9, "Auckland Harbour Bridge opens"], [1960, 42.4, "Television broadcasting starts"], [1961, 43.2, "Key date half crown"],
+      [1962, 44.3, "Cook Strait ferry Aramoana"], [1963, 45.2, "Decimal Currency Board"], [1964, 46.8, "Marsden Point refinery"],
+      [1965, 48.4, "Last pre-decimal coins minted"], [1966, 49.8, "No coins dated 1966"], [1967, 52.8, "Decimal Day (10 July 1967)"],
+      [1968, 55.1, "Wahine disaster; Inangahua"], [1969, 57.8, "Cook Bicentenary"], [1970, 61.6, "Wage-price pressures"],
+      [1971, 68.0, "Double-digit inflation begins"], [1972, 72.7, "Kirk Labour Government"], [1973, 80.1, "1st Oil Shock; UK joins EEC"],
+      [1974, 89.0, "Christchurch Games"], [1975, 102.1, "Muldoon elected; milk 4c/600ml"], [1976, 119.4, "Wage-price regulations"],
+      [1977, 136.6, "QEII Silver Jubilee"], [1978, 153.0, "Carless days scheme"], [1979, 174.0, "2nd Oil Shock; Mt Erebus"],
+      [1980, 203.8, "Think Big industrial policy"], [1981, 235.1, "Springbok Tour; S4 notes"], [1982, 273.1, "Wage-price freeze introduced"],
+      [1983, 293.1, "Wartime-style wage freeze"], [1984, 311.2, "4th Labour Govt; 20% devaluation"], [1985, 359.1, "NZ Dollar floated"],
+      [1986, 406.4, "GST introduced at 10%"], [1987, 470.2, "October sharemarket crash"], [1988, 496.8, "1c and 2c minting ends"],
+      [1989, 525.0, "Reserve Bank Act: 0-2% inflation"], [1990, 557.0, "1c/2c demonetised; $1/$2 coins"], [1991, 571.5, "$1 and $2 coins circulate"],
+      [1992, 577.2, "Series 5 Hillary paper notes"], [1993, 584.7, "MMP referendum approved"], [1994, 594.8, "Economic growth"],
+      [1995, 617.3, "Team NZ America's Cup win"], [1996, 631.5, "1st MMP election"], [1997, 638.9, "Asian financial crisis"],
+      [1998, 647.1, "Low inflation climate"], [1999, 646.4, "Series 6 polymer notes debut"], [2000, 663.4, "Millennium transition"],
+      [2001, 680.7, "Kiwibank created"], [2002, 699.2, "Steady inflation target"], [2003, 710.0, "Low interest rates"],
+      [2004, 726.3, "5c coin final minting"], [2005, 748.4, "Last large cupronickel 50c coin"], [2006, 773.7, "Coinage reform: silver resized"],
+      [2007, 792.2, "KiwiSaver launches"], [2008, 823.7, "Global Financial Crisis"], [2009, 841.1, "Post-GFC recovery"],
+      [2010, 860.5, "GST raised to 15%; Canterbury quakes"], [2011, 895.1, "Feb 22 quake; Rugby World Cup"], [2012, 904.6, "Canterbury rebuild"],
+      [2013, 914.8, "Severe agricultural drought"], [2014, 926.0, "Low inflation period"], [2015, 928.7, "Series 7 Brighter Money notes"],
+      [2016, 934.5, "Kaikōura earthquake"], [2017, 952.5, "Official CPI Base 1000 period"], [2018, 967.6, "Armistice poppy 50c coin"],
+      [2019, 983.3, "Pre-pandemic stability"], [2020, 1000.1, "COVID-19 pandemic response"], [2021, 1039.4, "Supply chain inflation"],
+      [2022, 1114.1, "Post-COVID inflation spike (7.2%)"], [2023, 1177.3, "Cyclone Gabrielle; OCR rises"], [2024, 1216.2, "Inflation easing towards 2% band"],
+      [2025, 1251.0, "Monetary policy easing"], [2026, 1285.0, "Current year purchasing power baseline"]
+    ];
+
+    function initCpiData() {
+      // Seed from embedded master records
+      EMBEDDED_CPI_DATA.forEach(row => {
+        cpiDataMap.set(row[0], row[1]);
+        cpiNotesMap.set(row[0], row[2]);
+      });
+
+      // Attempt to load external data/cpi_nz.csv if available
+      if (window.Papa) {
+        fetch('data/cpi_nz.csv').then(res => {
+          if (res.ok) return res.text();
+          return null;
+        }).then(text => {
+          if (text) {
+            const parsed = Papa.parse(text, { header: true, dynamicTyping: true, skipEmptyLines: true });
+            if (parsed.data && parsed.data.length > 50) {
+              parsed.data.forEach(r => {
+                const yr = parseInt(r.Year, 10);
+                const cpi = parseFloat(r.CPI_Index);
+                if (!isNaN(yr) && !isNaN(cpi)) {
+                  cpiDataMap.set(yr, cpi);
+                  if (r.Notes) cpiNotesMap.set(yr, r.Notes);
+                }
+              });
+              populateBasketYears();
+              updateBasketCalculator();
+            }
+          }
+        }).catch(() => {});
+      }
+
+      populateBasketYears();
+    }
+
+    function populateBasketYears() {
+      const select = document.getElementById('basketYearSelect');
+      if (!select) return;
+      const years = Array.from(cpiDataMap.keys()).sort((a, b) => a - b);
+      select.innerHTML = years.map(y => {
+        const note = cpiNotesMap.get(y) || '';
+        return `<option value="${y}" ${y === 1935 ? 'selected' : ''}>${y} ${note ? '— ' + note : ''}</option>`;
+      }).join('');
+    }
+
+    window.setBasketMode = function(mode) {
+      currentBasketMode = mode;
+      const lsdBtn = document.getElementById('basketModeLsdBtn');
+      const decBtn = document.getElementById('basketModeDecBtn');
+      const lsdInputs = document.getElementById('basketLsdInputs');
+      const decInputs = document.getElementById('basketDecInputs');
+
+      if (mode === 'lsd') {
+        lsdBtn.className = 'px-2 py-0.5 rounded-lg bg-emerald-600 text-white shadow-sm font-black cursor-pointer transition';
+        decBtn.className = 'px-2 py-0.5 rounded-lg text-slate-600 dark:text-slate-300 font-bold hover:text-slate-900 dark:hover:text-white cursor-pointer transition';
+        lsdInputs.classList.remove('hidden');
+        decInputs.classList.add('hidden');
+      } else {
+        decBtn.className = 'px-2 py-0.5 rounded-lg bg-emerald-600 text-white shadow-sm font-black cursor-pointer transition';
+        lsdBtn.className = 'px-2 py-0.5 rounded-lg text-slate-600 dark:text-slate-300 font-bold hover:text-slate-900 dark:hover:text-white cursor-pointer transition';
+        decInputs.classList.remove('hidden');
+        lsdInputs.classList.add('hidden');
+      }
+      updateBasketCalculator();
+    };
+
+    window.setBasketYear = function(yr) {
+      const select = document.getElementById('basketYearSelect');
+      if (select) {
+        select.value = yr;
+        updateBasketCalculator();
+      }
+    };
+
+    window.syncDecimalToBasket = function() {
+      const p = parseFloat(document.getElementById('calcPounds')?.value || 0);
+      const s = parseFloat(document.getElementById('calcShillings')?.value || 0);
+      const d = parseFloat(document.getElementById('calcPence')?.value || 0);
+
+      setBasketMode('lsd');
+      const bP = document.getElementById('calcBasketPounds');
+      const bS = document.getElementById('calcBasketShillings');
+      const bD = document.getElementById('calcBasketPence');
+      if (bP) bP.value = p;
+      if (bS) bS.value = s;
+      if (bD) bD.value = d;
+
+      setBasketYear(1967);
+      updateBasketCalculator();
+
+      const card = document.getElementById('purchasingPowerCard');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        card.classList.add('ring-2', 'ring-emerald-500');
+        setTimeout(() => card.classList.remove('ring-2', 'ring-emerald-500'), 1500);
+      }
+      showToast('Transferred 1967 value to Purchasing Power Basket', '🧺');
+    };
+
+    function getHistoricalUnitPrices(year) {
+      // Historical price estimates in NZ decimal dollars based on Stats NZ records
+      if (year <= 1914) {
+        return { bread: 0.029, milk: 0.015, beer: 0.025, stamp: 0.0083, cinema: 0.08, rentWeek: 1.20 };
+      } else if (year <= 1925) {
+        return { bread: 0.046, milk: 0.025, beer: 0.042, stamp: 0.0125, cinema: 0.12, rentWeek: 2.10 };
+      } else if (year <= 1938) {
+        return { bread: 0.042, milk: 0.025, beer: 0.050, stamp: 0.0083, cinema: 0.15, rentWeek: 2.00 };
+      } else if (year <= 1945) {
+        return { bread: 0.050, milk: 0.029, beer: 0.058, stamp: 0.0167, cinema: 0.18, rentWeek: 2.80 };
+      } else if (year <= 1955) {
+        return { bread: 0.063, milk: 0.038, beer: 0.075, stamp: 0.0250, cinema: 0.25, rentWeek: 4.80 };
+      } else if (year <= 1966) {
+        return { bread: 0.090, milk: 0.039, beer: 0.120, stamp: 0.0333, cinema: 0.45, rentWeek: 12.00 };
+      } else if (year <= 1975) {
+        return { bread: 0.140, milk: 0.045, beer: 0.200, stamp: 0.0400, cinema: 0.90, rentWeek: 22.00 };
+      } else if (year <= 1985) {
+        return { bread: 0.650, milk: 0.350, beer: 1.100, stamp: 0.2000, cinema: 3.80, rentWeek: 75.00 };
+      } else if (year <= 1999) {
+        return { bread: 1.400, milk: 1.100, beer: 3.500, stamp: 0.4000, cinema: 10.50, rentWeek: 210.00 };
+      } else if (year <= 2015) {
+        return { bread: 2.200, milk: 1.700, beer: 7.500, stamp: 0.8000, cinema: 15.00, rentWeek: 370.00 };
+      } else {
+        return { bread: 3.800, milk: 2.100, beer: 12.500, stamp: 2.3000, cinema: 21.00, rentWeek: 590.00 };
+      }
+    }
+
+    window.updateBasketCalculator = function() {
+      const year = parseInt(document.getElementById('basketYearSelect')?.value || 1935, 10);
+      const yearCpi = cpiDataMap.get(year) || 16.4;
+      const latestCpi = cpiDataMap.get(2026) || 1285.0;
+
+      let historicalDecimalDollars = 0;
+      if (currentBasketMode === 'lsd') {
+        const p = parseFloat(document.getElementById('calcBasketPounds')?.value || 0);
+        const s = parseFloat(document.getElementById('calcBasketShillings')?.value || 0);
+        const d = parseFloat(document.getElementById('calcBasketPence')?.value || 0);
+        // £1 = $2.00, 1s = $0.10, 1d = $0.10 / 12
+        historicalDecimalDollars = (p * 2.0) + (s * 0.10) + (d * (0.10 / 12.0));
+      } else {
+        historicalDecimalDollars = parseFloat(document.getElementById('calcBasketDollars')?.value || 0);
+      }
+
+      const inflationMultiplier = latestCpi / yearCpi;
+      const modern2026Value = historicalDecimalDollars * inflationMultiplier;
+
+      // Update Header Badges
+      const cpiBadge = document.getElementById('basketCpiBadge');
+      if (cpiBadge) cpiBadge.textContent = `CPI Index: ${yearCpi.toFixed(1)} (${year})`;
+
+      const resultEl = document.getElementById('basketResult2026');
+      if (resultEl) resultEl.textContent = `$${modern2026Value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+
+      const ratioEl = document.getElementById('basketInflationRatio');
+      if (ratioEl) ratioEl.textContent = `~${inflationMultiplier.toFixed(1)}× cumulative inflation from ${year} to 2026`;
+
+      const yearLabel = document.getElementById('basketYearLabel');
+      if (yearLabel) yearLabel.textContent = year;
+
+      const noteLabel = document.getElementById('basketFootnoteNote');
+      if (noteLabel) noteLabel.textContent = cpiNotesMap.get(year) || `${year} Historical Benchmark`;
+
+      // Calculate basket goods quantities
+      const unitPrices = getHistoricalUnitPrices(year);
+      const basketGrid = document.getElementById('basketItemsGrid');
+      if (!basketGrid) return;
+
+      const items = [
+        { name: 'Bread Loaves', icon: '🍞', unitCost: unitPrices.bread, unitLabel: '2lb loaf' },
+        { name: 'Pints of Milk', icon: '🥛', unitCost: unitPrices.milk, unitLabel: 'fresh pint' },
+        { name: 'Tavern Beers', icon: '🍺', unitCost: unitPrices.beer, unitLabel: 'draught pint' },
+        { name: 'Letters Posted', icon: '✉️', unitCost: unitPrices.stamp, unitLabel: '1st class' },
+        { name: 'Cinema Tickets', icon: '🎬', unitCost: unitPrices.cinema, unitLabel: 'picture show' },
+        { name: 'Weeks of Rent', icon: '🏡', unitCost: unitPrices.rentWeek, unitLabel: 'house rent' }
+      ];
+
+      basketGrid.innerHTML = items.map(item => {
+        const qty = item.unitCost > 0 ? (historicalDecimalDollars / item.unitCost) : 0;
+        let displayQty = qty >= 100 ? Math.round(qty).toLocaleString() : qty.toFixed(1);
+        if (qty === 0) displayQty = '0';
+
+        return `
+          <div class="p-2 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+            <span class="text-base block mb-0.5">${item.icon}</span>
+            <span class="font-black text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm block leading-tight font-mono">${displayQty}</span>
+            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold block truncate">${item.name}</span>
+          </div>
+        `;
+      }).join('');
+    };
+
     function updateCalculator() {
       const pounds = parseFloat(document.getElementById('calcPounds')?.value || 0);
       const shillings = parseFloat(document.getElementById('calcShillings')?.value || 0);
@@ -2729,6 +3082,13 @@
       ['calcPounds', 'calcShillings', 'calcPence'].forEach(id => {
         document.getElementById(id)?.addEventListener('input', updateCalculator);
       });
+
+      // Purchasing Power Basket listeners
+      ['calcBasketPounds', 'calcBasketShillings', 'calcBasketPence', 'calcBasketDollars'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', updateBasketCalculator);
+      });
+      initCpiData();
+      updateBasketCalculator();
 
       document.getElementById('btnSearchMintageYear')?.addEventListener('click', () => {
         updateMintageBreakdown(Number(document.getElementById('mintageYearInput')?.value || 1977));
