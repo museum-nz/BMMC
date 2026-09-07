@@ -22,6 +22,7 @@
 
   <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin="">
+  <link rel="preconnect" href="https://t1.openseamap.org" crossorigin="">
   <link rel="preconnect" href="https://tiles.openseamap.org" crossorigin="">
   <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin="">
   <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -291,53 +292,55 @@
       </div>
 
       <!-- Map Type & Nautical Layer Options Toolbar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md">
+      <div class="flex flex-col gap-2.5 bg-white/95 dark:bg-slate-900/95 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md">
         
-        <!-- Base Map Type Switcher -->
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
-            <span>🗺️</span> Basemap:
-          </span>
-          <button onclick="setBaseMap('topo')" id="btnBaseTopo" class="px-2.5 py-1 rounded-xl text-xs font-black bg-sky-600 text-white shadow transition cursor-pointer">
-            ESRI Topo
-          </button>
-          <button onclick="setBaseMap('satellite')" id="btnBaseSatellite" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
-            Satellite
-          </button>
-          <button onclick="setBaseMap('ocean')" id="btnBaseOcean" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
-            Ocean Bathymetry
-          </button>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <!-- Base Map Type Switcher -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
+              <span>🗺️</span> Basemap:
+            </span>
+            <button onclick="setBaseMap('topo')" id="btnBaseTopo" class="px-2.5 py-1 rounded-xl text-xs font-black bg-sky-600 text-white shadow transition cursor-pointer">
+              ESRI Topo
+            </button>
+            <button onclick="setBaseMap('satellite')" id="btnBaseSatellite" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
+              Satellite
+            </button>
+            <button onclick="setBaseMap('ocean')" id="btnBaseOcean" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
+              Ocean Bathymetry
+            </button>
+          </div>
+
+          <!-- Nautical Overlays Controls -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
+              <span>⚓</span> Overlays:
+            </span>
+
+            <!-- OpenSeaMap Nautical Marks (ON by default) -->
+            <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-sky-500 transition select-none">
+              <input type="checkbox" id="toggleOpenSeaMap" onchange="toggleOverlayLayer('seamark', this.checked)" checked class="rounded text-sky-600 focus:ring-sky-500 w-3.5 h-3.5 cursor-pointer">
+              <span>OpenSeaMap Seamarks</span>
+            </label>
+
+            <!-- Pioneer & Mosquito Shipping Routes (OFF by default) -->
+            <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-teal-500 transition select-none">
+              <input type="checkbox" id="togglePioneerRoutes" onchange="toggleOverlayLayer('routes', this.checked)" class="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5 cursor-pointer">
+              <span>⛵ Pioneer Shipping Paths</span>
+            </label>
+          </div>
         </div>
 
-        <!-- Nautical & Historical Overlays Controls -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
-            <span>⚓</span> Overlays:
-          </span>
-
-          <!-- OpenSeaMap Nautical Marks -->
-          <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-sky-500 transition select-none">
-            <input type="checkbox" id="toggleOpenSeaMap" onchange="toggleOverlayLayer('seamark', this.checked)" class="rounded text-sky-600 focus:ring-sky-500 w-3.5 h-3.5 cursor-pointer">
-            <span>OpenSeaMap Seamarks</span>
-          </label>
-
-          <!-- 1850 Historic Admiralty Chart (LINZ / NLNZ) -->
-          <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-amber-500 transition select-none">
-            <input type="checkbox" id="toggleHistoricChart" onchange="toggleOverlayLayer('chart', this.checked)" class="rounded text-amber-600 focus:ring-amber-500 w-3.5 h-3.5 cursor-pointer">
-            <span>1850 Historic Chart</span>
-          </label>
-
-          <!-- Pioneer & Mosquito Shipping Routes -->
-          <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-teal-500 transition select-none">
-            <input type="checkbox" id="togglePioneerRoutes" onchange="toggleOverlayLayer('routes', this.checked)" checked class="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5 cursor-pointer">
-            <span>⛵ Pioneer Shipping Paths</span>
-          </label>
-
-          <!-- Dynamic Opacity Slider for Historic Chart -->
-          <div id="chartOpacityContainer" class="hidden items-center gap-1.5 px-2 py-1 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-300 dark:border-amber-800 text-[11px] text-amber-900 dark:text-amber-200 font-bold">
-            <span>Chart Opacity:</span>
-            <input type="range" id="chartOpacitySlider" min="15" max="95" value="45" oninput="setChartOpacity(this.value)" class="w-16 accent-amber-600 cursor-pointer">
-            <span id="chartOpacityVal" class="font-mono">45%</span>
+        <!-- OpenSeaMap Zoom Helper Notification Banner -->
+        <div id="openSeaMapZoomNotice" class="hidden flex items-center justify-between gap-2 p-2 px-3 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-200 dark:border-sky-900 text-xs text-sky-900 dark:text-sky-200">
+          <div class="flex items-center gap-1.5">
+            <span>ℹ️</span>
+            <span><strong>OpenSeaMap Notice:</strong> Buoys, light arcs, and navigation beacons appear at harbour zoom levels (zoom 8+).</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="map.setView([-41.2865, 174.7762], 12)" class="px-2 py-0.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold transition">Zoom to Wellington Port</button>
+            <button onclick="map.setView([-36.840, 174.768], 12)" class="px-2 py-0.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold transition">Auckland</button>
+            <button onclick="map.setView([-46.600, 168.330], 12)" class="px-2 py-0.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold transition">Bluff</button>
           </div>
         </div>
 
@@ -704,12 +707,16 @@
   <script src="vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.L || !window.L.markerClusterGroup) {
-      document.write('<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"><\/script>');
+      document.write('<script src="https://unpkg.com/leaflet@1.4.1/dist/leaflet.markercluster.js"><\/script>');
     }
   </script>
 
-  <!-- Maritime Engine: Multi-Layer Basemap, Nautical Overlays, and Data Loader -->
+  <!-- Maritime Engine: Multi-Layer Basemap, Nautical Overlays, and Resilient Loader -->
   <script>
+    // --- GLOBAL MARITIME BOUNDS & EXTENTS ---
+    const NZ_EXTENT = [[-47.60, 166.00], [-34.10, 179.00]];
+    const NZ_MAX_BOUNDS = [[-52.00, 155.00], [-29.00, 190.00]];
+
     const CSV_ONLINE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=596651309&single=true&output=csv';
     const TSV_ONLINE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=596651309&single=true&output=tsv';
 
@@ -719,10 +726,9 @@
     let markerInstances = new Map();
     let currentCategoryFilter = 'all';
 
-    // Map Basemaps & Nautical Overlays
+    // Basemaps & Nautical Overlays
     let baseLayers = {};
     let openSeaMapLayer;
-    let historicChartOverlay;
     let pioneerRoutesLayer;
     let layerControl;
 
@@ -784,19 +790,50 @@
       }
     ];
 
+    function resetMapExtent() {
+      if (!map) return;
+      const isMobile = window.innerWidth <= 768;
+      map.fitBounds(NZ_EXTENT, {
+        padding: isMobile ? [12, 12] : [30, 30],
+        maxZoom: isMobile ? 6 : 7,
+        animate: true
+      });
+    }
+
     function initMaritimeMap() {
       const isMobile = window.innerWidth <= 768;
-      const initialCenter = [-41.5, 173.0];
-      const initialZoom = isMobile ? 3 : 4;
 
       map = L.map('maritimeMap', {
-        center: initialCenter,
-        zoom: initialZoom,
-        minZoom: 3,
+        center: [-41.3, 173.0],
+        zoom: isMobile ? 5 : 5,
+        minZoom: 4,
         maxZoom: 18,
+        maxBounds: NZ_MAX_BOUNDS,
+        maxBoundsViscosity: 0.75,
         closePopupOnClick: true,
         scrollWheelZoom: true
       });
+
+      // --- Add NZ Extents button directly into Leaflet's zoom control (+/-) ---
+      if (map.zoomControl) {
+        const zoomContainer = map.zoomControl.getContainer();
+        const extentBtn = L.DomUtil.create('a', 'leaflet-control-zoom-in font-bold', zoomContainer);
+        extentBtn.href = '#';
+        extentBtn.title = 'Zoom to New Zealand Extents';
+        extentBtn.setAttribute('role', 'button');
+        extentBtn.setAttribute('aria-label', 'Zoom to New Zealand Extents');
+        extentBtn.innerHTML = '<span style="font-size: 15px; font-weight: bold; line-height: 1;">⤢</span>';
+        extentBtn.style.display = 'flex';
+        extentBtn.style.alignItems = 'center';
+        extentBtn.style.justifyContent = 'center';
+        extentBtn.style.cursor = 'pointer';
+
+        L.DomEvent.disableClickPropagation(extentBtn);
+        L.DomEvent.on(extentBtn, 'click', function(e) {
+          L.DomEvent.stop(e);
+          resetMapExtent();
+        });
+      }
 
       // 1. Base Tile Layers
       baseLayers.topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -814,27 +851,21 @@
         maxZoom: 13
       });
 
-      // Add default base layer (Topo)
+      // Default Basemap: ESRI Topo
       baseLayers.topo.addTo(map);
 
-      // 2. OpenSeaMap Overlay (Free Open Nautical Tiles)
-      openSeaMapLayer = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+      // 2. OpenSeaMap Overlay (ON by default, transparent fallback for ocean 404s)
+      const transparentTile = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      openSeaMapLayer = L.tileLayer('https://t1.openseamap.org/seamark/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://www.openseamap.org" target="_blank" rel="noopener">OpenSeaMap</a>',
-        maxZoom: 18
+        minZoom: 8,
+        maxZoom: 18,
+        errorTileUrl: transparentTile,
+        opacity: 0.95
       });
+      openSeaMapLayer.addTo(map); // OpenSeaMap ON by default
 
-      // 3. National Library / LINZ Historic Charts (1850 Admiralty Chart Overlay)
-      let chartImgUrl = 'media/maps/nz_1850_admiralty_chart.jpg';
-      if (typeof window.resolveOfflineMedia === 'function') {
-        chartImgUrl = window.resolveOfflineMedia(chartImgUrl);
-      }
-      const chartBounds = [[-34.0, 166.0], [-47.5, 179.0]];
-      historicChartOverlay = L.imageOverlay(chartImgUrl, chartBounds, {
-        opacity: 0.45,
-        interactive: false
-      });
-
-      // 4. Pioneer Shipping Paths Layer Group
+      // 3. Pioneer Shipping Paths (OFF by default)
       pioneerRoutesLayer = L.layerGroup();
       PIONEER_SHIPPING_ROUTES.forEach(route => {
         const poly = L.polyline(route.coords, {
@@ -857,11 +888,8 @@
 
         pioneerRoutesLayer.addLayer(poly);
       });
-      
-      // Default: show pioneer routes
-      pioneerRoutesLayer.addTo(map);
 
-      // 5. Clustered Maritime Heritage Sites
+      // 4. Clustered Maritime Heritage Sites
       markersLayer = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
@@ -870,7 +898,7 @@
       });
       map.addLayer(markersLayer);
 
-      // 6. Leaflet Native Layer Switcher Control (Top Right)
+      // 5. Leaflet Native Layer Switcher Control (Top Right)
       const baseMapControls = {
         "ESRI Topo": baseLayers.topo,
         "Satellite Imagery": baseLayers.satellite,
@@ -878,7 +906,6 @@
       };
       const overlayControls = {
         "⚓ OpenSeaMap Seamarks": openSeaMapLayer,
-        "📜 1850 Historic Chart": historicChartOverlay,
         "⛵ Pioneer Shipping Paths": pioneerRoutesLayer,
         "📍 Maritime Sites": markersLayer
       };
@@ -887,30 +914,52 @@
         position: 'topright'
       }).addTo(map);
 
-      // Keep toolbar checkboxes in sync if layers are toggled via Leaflet Control
+      // Keep toolbar checkboxes in sync with Leaflet layer events
       map.on('overlayadd', (e) => {
-        if (e.layer === openSeaMapLayer) document.getElementById('toggleOpenSeaMap').checked = true;
-        if (e.layer === historicChartOverlay) {
-          document.getElementById('toggleHistoricChart').checked = true;
-          document.getElementById('chartOpacityContainer')?.classList.remove('hidden');
-          document.getElementById('chartOpacityContainer')?.classList.add('flex');
+        if (e.layer === openSeaMapLayer) {
+          const chk = document.getElementById('toggleOpenSeaMap');
+          if (chk) chk.checked = true;
+          checkOpenSeaMapZoom();
         }
-        if (e.layer === pioneerRoutesLayer) document.getElementById('togglePioneerRoutes').checked = true;
+        if (e.layer === pioneerRoutesLayer) {
+          const chk = document.getElementById('togglePioneerRoutes');
+          if (chk) chk.checked = true;
+        }
       });
       map.on('overlayremove', (e) => {
-        if (e.layer === openSeaMapLayer) document.getElementById('toggleOpenSeaMap').checked = false;
-        if (e.layer === historicChartOverlay) {
-          document.getElementById('toggleHistoricChart').checked = false;
-          document.getElementById('chartOpacityContainer')?.classList.remove('flex');
-          document.getElementById('chartOpacityContainer')?.classList.add('hidden');
+        if (e.layer === openSeaMapLayer) {
+          const chk = document.getElementById('toggleOpenSeaMap');
+          if (chk) chk.checked = false;
+          document.getElementById('openSeaMapZoomNotice')?.classList.add('hidden');
         }
-        if (e.layer === pioneerRoutesLayer) document.getElementById('togglePioneerRoutes').checked = false;
+        if (e.layer === pioneerRoutesLayer) {
+          const chk = document.getElementById('togglePioneerRoutes');
+          if (chk) chk.checked = false;
+        }
       });
       map.on('baselayerchange', (e) => {
         if (e.layer === baseLayers.topo) updateBaseMapButtonsUI('topo');
         else if (e.layer === baseLayers.satellite) updateBaseMapButtonsUI('satellite');
         else if (e.layer === baseLayers.ocean) updateBaseMapButtonsUI('ocean');
       });
+
+      map.on('zoomend', () => {
+        if (map.hasLayer(openSeaMapLayer)) {
+          checkOpenSeaMapZoom();
+        }
+      });
+
+      resetMapExtent();
+    }
+
+    function checkOpenSeaMapZoom() {
+      const notice = document.getElementById('openSeaMapZoomNotice');
+      if (!notice) return;
+      if (map.hasLayer(openSeaMapLayer) && map.getZoom() < 8) {
+        notice.classList.remove('hidden');
+      } else {
+        notice.classList.add('hidden');
+      }
     }
 
     function setBaseMap(type) {
@@ -949,23 +998,10 @@
       if (type === 'seamark') {
         if (isChecked) {
           if (!map.hasLayer(openSeaMapLayer)) map.addLayer(openSeaMapLayer);
+          checkOpenSeaMapZoom();
         } else {
           if (map.hasLayer(openSeaMapLayer)) map.removeLayer(openSeaMapLayer);
-        }
-      } else if (type === 'chart') {
-        const opacityContainer = document.getElementById('chartOpacityContainer');
-        if (isChecked) {
-          if (!map.hasLayer(historicChartOverlay)) map.addLayer(historicChartOverlay);
-          if (opacityContainer) {
-            opacityContainer.classList.remove('hidden');
-            opacityContainer.classList.add('flex');
-          }
-        } else {
-          if (map.hasLayer(historicChartOverlay)) map.removeLayer(historicChartOverlay);
-          if (opacityContainer) {
-            opacityContainer.classList.remove('flex');
-            opacityContainer.classList.add('hidden');
-          }
+          document.getElementById('openSeaMapZoomNotice')?.classList.add('hidden');
         }
       } else if (type === 'routes') {
         if (isChecked) {
@@ -974,15 +1010,6 @@
           if (map.hasLayer(pioneerRoutesLayer)) map.removeLayer(pioneerRoutesLayer);
         }
       }
-    }
-
-    function setChartOpacity(val) {
-      const opacity = parseFloat(val) / 100;
-      if (historicChartOverlay) {
-        historicChartOverlay.setOpacity(opacity);
-      }
-      const label = document.getElementById('chartOpacityVal');
-      if (label) label.textContent = `${val}%`;
     }
 
     // Delimiter-agnostic CSV / TSV tokenizer with quote handling
@@ -1125,7 +1152,7 @@
       return [...new Set(candidates)];
     }
 
-    async function fetchWithTimeout(url, timeoutMs = 3000) {
+    async function fetchWithTimeout(url, timeoutMs = 2500) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -1143,48 +1170,56 @@
 
     async function loadMaritimeData() {
       const overlay = document.getElementById('mapLoadingOverlay');
-      let rawData = null;
-
-      const candidates = getCandidateDataUrls();
-      for (const url of candidates) {
-        const isRemote = url.startsWith('http://') || url.startsWith('https://');
-        const timeout = isRemote ? 3000 : 2000;
-        rawData = await fetchWithTimeout(url, timeout);
-        if (rawData) {
-          break;
+      const dismissOverlay = () => {
+        if (overlay && overlay.parentNode) {
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            try { overlay.remove(); } catch (e) {}
+          }, 350);
         }
-      }
+      };
 
-      if (!rawData) {
-        if (overlay) {
-          overlay.innerHTML = `
-            <div class="p-4 bg-red-950/80 rounded-2xl border border-red-700 text-center max-w-sm text-red-200 text-xs">
-              <p class="font-bold text-sm mb-1">⚠️ Data Load Error</p>
-              <p>Unable to load maritime repository from Google Sheets or local cache (<code>data/maritime.csv</code>). Please verify network or offline sync files.</p>
-            </div>
-          `;
+      // 4-second safety timeout ensures the overlay can NEVER hang
+      const safetyTimeout = setTimeout(() => {
+        dismissOverlay();
+      }, 4000);
+
+      try {
+        let rawData = null;
+        const candidates = getCandidateDataUrls();
+        for (const url of candidates) {
+          const isRemote = url.startsWith('http://') || url.startsWith('https://');
+          const timeout = isRemote ? 2500 : 1200;
+          rawData = await fetchWithTimeout(url, timeout);
+          if (rawData) break;
         }
-        return;
-      }
 
-      const rows = smartParseData(rawData);
-      MARITIME_SITES = rows
-        .map(normalizeSiteRow)
-        .filter(site => site.id && !isNaN(site.lat) && !isNaN(site.lng) && site.lat !== 0);
+        if (!rawData) {
+          if (overlay) {
+            overlay.innerHTML = `
+              <div class="p-4 bg-red-950/80 rounded-2xl border border-red-700 text-center max-w-sm text-red-200 text-xs shadow-xl">
+                <p class="font-bold text-sm mb-1">⚠️ Repository Notice</p>
+                <p>Could not reach the remote sheet or local CSV cache. The map remains fully interactive.</p>
+                <button onclick="document.getElementById('mapLoadingOverlay')?.remove()" class="mt-2.5 px-3 py-1 bg-red-700 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition cursor-pointer">Continue to Map</button>
+              </div>
+            `;
+          }
+          return;
+        }
 
-      renderMapMarkers();
-      updateFilterCounts();
+        const rows = smartParseData(rawData);
+        MARITIME_SITES = rows
+          .map(normalizeSiteRow)
+          .filter(site => site.id && !isNaN(site.lat) && !isNaN(site.lng) && site.lat !== 0);
 
-      if (markersLayer && markersLayer.getBounds().isValid()) {
-        const isMobile = window.innerWidth <= 768;
-        map.fitBounds(markersLayer.getBounds(), {
-          padding: isMobile ? [16, 16] : [32, 32]
-        });
-      }
-
-      if (overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.remove(), 400);
+        renderMapMarkers();
+        updateFilterCounts();
+        resetMapExtent();
+      } catch (err) {
+        console.error("Maritime data loading encountered an error:", err);
+      } finally {
+        clearTimeout(safetyTimeout);
+        dismissOverlay();
       }
     }
 
@@ -1300,6 +1335,11 @@
     }
 
     function setMapFilter(type) {
+      // If Maritime Sites was turned off via layers control, turn it back on
+      if (map && markersLayer && !map.hasLayer(markersLayer)) {
+        map.addLayer(markersLayer);
+      }
+
       currentCategoryFilter = type;
 
       const buttons = {
@@ -1478,7 +1518,7 @@
         if (e.target === document.getElementById('maritimeDetailModal')) closeMaritimeModal();
       });
 
-      // 1. Initialize Map view with basemaps and overlays
+      // 1. Initialize Map view with basemaps, overlays & [ ⤢ ] Extents button
       initMaritimeMap();
 
       // 2. Fetch and render data from published CSV/TSV or local cached fallback
