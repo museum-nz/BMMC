@@ -513,22 +513,48 @@
           </ul>
         </div>
 
-        <!-- Stamp Visual Feature Box -->
+                <!-- Stamp Visual Feature Box -->
         <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-5 border border-amber-500/30 shadow-md space-y-3.5">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Philatelic Artifact</span></div>
-
-          <!-- Image with localhost:8080 and online stampsnz.com fallback -->
-          <div class="h-48 bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2 border border-slate-800">
-            <img src="http://localhost:8080/media/images/stamps/1947_lighthouses.jpg" onerror="this.onerror=null;this.src='https://stampsnz.com/images/1947_lighthouses.jpg';" alt="1947 NZ Government Life Insurance Lighthouses Stamp" class="w-full h-full object-contain rounded-lg shadow-sm" loading="lazy">
+            <span class="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Philatelic Artifact</span>
+            <span class="text-[10px] font-mono text-slate-400 font-bold">1891–1981 Special Issue</span>
           </div>
 
-          <!-- Header Link Under Image -->
-          <div class="text-center pt-1">&nbsp;<button class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer" <="" div="">
-        </button></div>
-      </div>
+          <!-- Safe Online HTTPS image (avoids browser local network security prompt) with relative fallback -->
+          <div class="h-48 bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2 border border-slate-800">
+            <img src="https://stampsnz.com/images/1947_lighthouses.jpg"
+                 onerror="this.onerror=null;this.src='/media/images/stamps/1947_lighthouses.jpg';"
+                 alt="1947 NZ Government Life Insurance Lighthouses Stamp"
+                 class="w-full h-full object-contain rounded-lg shadow-sm"
+                 loading="lazy">
+          </div>
 
-    </div></section>
+          <!-- Link to lighthouse stamp collection used in header -->
+          <div class="text-center pt-1">
+            <a href="stamps.html?cats=Life%20Insurance%20(Lighthouse)" title="View Lighthouse Stamps in Philatelic Catalog" class="inline-flex items-center gap-1.5 text-xs font-extrabold text-amber-900 dark:text-amber-200 bg-amber-100 dark:bg-amber-950/80 hover:bg-amber-200 dark:hover:bg-amber-900 border border-amber-300 dark:border-amber-800 px-3.5 py-1.5 rounded-xl transition shadow-sm">
+              <span>📮</span> <span>Lighthouse Stamps</span>
+            </a>
+          </div>
+
+          <!-- Details & Emojis -->
+          <div class="space-y-1.5 text-center">
+            <div class="text-xl tracking-widest select-none">🏛️ 💡 📮</div>
+            <h5 class="text-xs font-black text-slate-900 dark:text-white">NZ Government Life "VR" Lighthouse Issues</h5>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Engraved by Waterlow &amp; Sons, London (1/2d to 1/-)</p>
+          </div>
+
+          <!-- Map fly-to actions -->
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <button onclick="focusMapItem('light_waipapa')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">
+              Fly to Waipapa Light ↗
+            </button>
+            <button onclick="focusMapItem('light_dog')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">
+              Fly to Dog Island Light ↗
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- SECTION 5: THE MOSQUITO FLEET CHRONICLE -->
     <section id="mosquito-fleet" class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
