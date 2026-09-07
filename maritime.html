@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>The Mosquito Fleet, Shipwrecks &amp; Lighthouses — BMMC Maritime Archive</title>
 
   <!-- Instant Theme Sync -->
@@ -20,15 +20,15 @@
   </script>
 
   <!-- Preconnect for Performance -->
-  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
-  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin="">
+  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin="">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin="">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 
   <!-- Inline Ship Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;⚓&lt;/text&gt;&lt;/svg&gt;">
 
   <!-- Tailwind CSS Engine with Local & CDN Fallbacks -->
   <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
@@ -60,9 +60,9 @@
   </script>
 
   <!-- Leaflet CSS & MarkerCluster with CDN Fallbacks -->
-  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';" />
-  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';">
 
   <!-- Master Unified Stylesheet & Offline Media Adapter -->
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
@@ -143,10 +143,12 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
     }
     .maritime-popup .leaflet-popup-content { margin: 0; line-height: 1.4; }
+  
+    #btnThemeToggle, #themeToggleIcon { display: none !important; }
   </style>
-</head>
 
-<body class="bg-gradient-to-br from-slate-50/40 via-sky-50/20 to-slate-100/40 dark:from-slate-950 dark:via-slate-900 dark:to-sky-950/20 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+
+
 
   <!-- Ambient Sky Background -->
   <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
@@ -182,32 +184,26 @@
             <span>📮</span> <span>Lighthouse Stamps</span>
           </a>
 
-          <button id="btnThemeToggle" title="Toggle Light / Dark Theme" aria-label="Toggle Color Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-xs flex items-center justify-center transition cursor-pointer">
-            <span id="themeToggleIcon">☀️</span>
-          </button>
+          <!-- Day / Night Theme Toggle (hidden from header, function preserved) -->
+          <button id="btnThemeToggle" class="hidden" style="display:none !important;" aria-hidden="true"><span id="themeToggleIcon" style="display:none !important;"></span></button>
         </div>
 
       </div>
     </div>
   </header>
 
-  <!-- Main Content Body -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-8 relative z-10">
-    
-    <!-- Hero Banner -->
-    <section class="w-full bg-gradient-to-r from-slate-950 via-sky-950 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-sky-500/30 relative overflow-hidden backdrop-blur-md">
+  <!-- Hero Banner -->
+    <section class="w-full bg-gradient-to-r from-slate-950 via-sky-950 to-indigo-950 text-white rounded-none border-b p-6 sm:p-8 shadow-2xl border border-sky-500/30 relative overflow-hidden backdrop-blur-md">
       <div class="absolute -right-10 -top-10 w-72 h-72 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -left-10 -bottom-10 w-72 h-72 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="relative z-10 max-w-4xl space-y-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-black uppercase tracking-wider">
-          <span>🌊 Aotearoa Coastal Navigation Heritage</span>
-        </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
+        
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
           The Mosquito Fleet, Dangerous Reefs &amp; Sentinels of Light
         </h2>
         <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-          Before railways pierced the bush and mountains, New Zealand’s rugged coastline was its true main highway. Shallow-draught scows, cutters, and steamers—fondly named the <strong>Mosquito Fleet</strong>—ferried timber, butter, wool, and pioneers across bar harbours, while hazardous rocks and wild Southern Ocean swells gave birth to tragic shipwrecks and a legendary chain of coastal lighthouses.
+          Before railways, New Zealand’s rugged coastline was its true highway. Shallow-draught scows, cutters, and steamers—fondly named the <strong>Mosquito Fleet</strong>—ferried timber, butter, wool, and pioneers across bar harbours, while hazardous rocks and wild Southern Ocean swells gave birth to tragic shipwrecks and a chain of coastal lighthouses.
         </p>
 
         <!-- Quick Jump Filter Tabs -->
@@ -232,6 +228,12 @@
       </div>
     </section>
 
+
+  <!-- Main Content Body -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-8 relative z-10">
+    
+    
+
     <!-- SECTION 1: INTERACTIVE MARITIME MAP -->
     <section id="interactive-map" class="space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -239,7 +241,7 @@
           <span class="text-2xl p-2 bg-sky-50 dark:bg-sky-950/80 text-sky-600 rounded-2xl border border-sky-200 dark:border-sky-900/60">🗺️</span>
           <div>
             <h3 class="text-lg font-black text-slate-900 dark:text-white">Coastal Shipping &amp; Nautical Heritage GIS Map</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Explore historic lighthouses, catastrophic wrecks, pioneer whaling stations &amp; coaster ports</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Explore historic lighthouses, wrecks, pioneer whaling stations &amp; coastal ports</p>
           </div>
         </div>
 
@@ -436,7 +438,9 @@
     </section>
 
     <!-- SECTION 4: COASTAL LIGHTHOUSES & GOVERNMENT LIFE STAMPS -->
+        <!-- SECTION 4: COASTAL LIGHTHOUSES & GOVERNMENT LIFE STAMPS -->
     <section id="lighthouse-stamps" class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-slate-900/10 dark:from-amber-950/40 dark:to-slate-900/40 rounded-3xl p-6 sm:p-8 border border-amber-500/30 shadow-xl space-y-6">
+      
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amber-500/20 pb-4">
         <div class="flex items-center gap-3">
           <span class="text-3xl p-2.5 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-2xl border border-amber-500/30">💡</span>
@@ -449,6 +453,7 @@
             </p>
           </div>
         </div>
+
         <a href="stamps.html?cats=Life%20Insurance%20(Lighthouse)" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-black rounded-xl shadow transition self-start md:self-auto flex items-center gap-1.5 cursor-pointer">
           <span>📮 Explore All Lighthouse Stamps in Catalog ↗</span>
         </a>
@@ -462,36 +467,68 @@
           <p>
             From 1891 until 1981, New Zealand was the only country in the British Empire to issue distinct postage stamps exclusively for its life insurance department, depicting genuine sentinel lights:
           </p>
-          <ul class="space-y-1.5 pl-4 list-disc text-slate-600 dark:text-slate-300">
-            <li><strong>Pencarrow Head (1859):</strong> Guarding Wellington Harbour; New Zealand’s first permanent lighthouse, kept by Mary Jane Bennett (the country’s only female keeper).</li>
-            <li><strong>Dog Island (1865):</strong> Towering 37 metres over Foveaux Strait, it is New Zealand’s tallest stone lighthouse with black-and-white bands.</li>
-            <li><strong>Waipapa Point (1884):</strong> Wooden kauri tower directly constructed to prevent a recurrence of the horrific SS <em>Tararua</em> disaster.</li>
-            <li><strong>Puysegur Point (1879):</strong> Located on the storm-lashed southwestern tip of the South Island, known to keepers as "the loneliest light in the world."</li>
-            <li><strong>Cape Brett (1910):</strong> The famous 4c red and yellow stamp issued on the centenary in 1969.</li>
+
+          <!-- Interactive Hotlinked Lighthouse List -->
+          <ul class="space-y-2 pl-2 text-slate-600 dark:text-slate-300">
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">•</span>
+              <div>
+                <button onclick="focusMapItem('light_pencarrow')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer inline-flex items-center gap-1">
+                  <span>Pencarrow Head (1859)</span> <span>↗</span>
+                </button>: Guarding Wellington Harbour; New Zealand’s first permanent lighthouse, kept by Mary Jane Bennett (the country’s only female keeper).
+              </div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">•</span>
+              <div>
+                <button onclick="focusMapItem('light_dog')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer inline-flex items-center gap-1">
+                  <span>Dog Island (1865)</span> <span>↗</span>
+                </button>: Towering 37 metres over Foveaux Strait, it is New Zealand’s tallest stone lighthouse with black-and-white bands.
+              </div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">•</span>
+              <div>
+                <button onclick="focusMapItem('light_waipapa')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer inline-flex items-center gap-1">
+                  <span>Waipapa Point (1884)</span> <span>↗</span>
+                </button>: Wooden kauri tower directly constructed to prevent a recurrence of the horrific SS Tararua disaster.
+              </div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">•</span>
+              <div>
+                <button onclick="focusMapItem('light_puysegur')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer inline-flex items-center gap-1">
+                  <span>Puysegur Point (1879)</span> <span>↗</span>
+                </button>: Located on the storm-lashed southwestern tip of the South Island, known to keepers as "the loneliest light in the world."
+              </div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">•</span>
+              <div>
+                <button onclick="focusMapItem('light_cape_brett')" class="text-amber-600 dark:text-amber-400 font-extrabold hover:underline cursor-pointer inline-flex items-center gap-1">
+                  <span>Cape Brett (1910)</span> <span>↗</span>
+                </button>: The famous 4c red and yellow stamp issued on the centenary in 1969.
+              </div>
+            </li>
           </ul>
         </div>
 
-        <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-5 border border-amber-500/30 shadow-md space-y-3 text-center">
-          <div class="flex items-center justify-between text-left">
-            <span class="text-[10px] font-black uppercase text-amber-600 dark:text-amber-400">Philatelic Artifact</span>
-            <span class="text-[10px] font-mono text-slate-400 font-bold">1891–1981 Special Issue</span>
+        <!-- Stamp Visual Feature Box -->
+        <div class="lg:col-span-5 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-5 border border-amber-500/30 shadow-md space-y-3.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Philatelic Artifact</span></div>
+
+          <!-- Image with localhost:8080 and online stampsnz.com fallback -->
+          <div class="h-48 bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2 border border-slate-800">
+            <img src="http://localhost:8080/media/images/stamps/1947_lighthouses.jpg" onerror="this.onerror=null;this.src='https://stampsnz.com/images/1947_lighthouses.jpg';" alt="1947 NZ Government Life Insurance Lighthouses Stamp" class="w-full h-full object-contain rounded-lg shadow-sm" loading="lazy">
           </div>
-          <div class="p-4 bg-amber-50/50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-900/60">
-            <span class="text-3xl block mb-1">🏛️ 💡 📮</span>
-            <h5 class="text-xs font-black text-slate-900 dark:text-white">NZ Government Life "VR" Lighthouse Issues</h5>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Engraved by Waterlow &amp; Sons, London (1/2d to 1/-)</p>
-          </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <button onclick="focusMapItem('light_waipapa')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">
-              Fly to Waipapa Light ↗
-            </button>
-            <button onclick="focusMapItem('light_dog')" class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer">
-              Fly to Dog Island Light ↗
-            </button>
-          </div>
-        </div>
+
+          <!-- Header Link Under Image -->
+          <div class="text-center pt-1">&nbsp;<button class="text-amber-600 dark:text-amber-400 font-bold hover:underline cursor-pointer" <="" div="">
+        </button></div>
       </div>
-    </section>
+
+    </div></section>
 
     <!-- SECTION 5: THE MOSQUITO FLEET CHRONICLE -->
     <section id="mosquito-fleet" class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
@@ -1195,12 +1232,12 @@
     function initMaritimeMap() {
       const isMobile = window.innerWidth <= 768;
       const initialCenter = [-41.8, 172.5];
-      const initialZoom = isMobile ? 5 : 6;
+      const initialZoom = isMobile ? 4 : 5;
 
       map = L.map('maritimeMap', {
         center: initialCenter,
         zoom: initialZoom,
-        minZoom: 4,
+        minZoom: 3,
         maxZoom: 18,
         closePopupOnClick: true,
         scrollWheelZoom: true
@@ -1273,6 +1310,11 @@
             <h4 class="text-sm font-black leading-snug">${site.title}</h4>
             <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">${site.desc}</p>
 
+            <div class="pt-2 flex items-center justify-between">
+              <a href="https://www.google.com/search?q=${encodeURIComponent(site.title + ' New Zealand history')}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline">
+                <span>✨ Google AI Search ↗</span>
+              </a>
+            </div>
             <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <button onclick="openMaritimeModal('${site.id}')" class="text-xs font-black text-sky-600 dark:text-sky-400 hover:underline cursor-pointer">
                 Full Dossier ↗
@@ -1442,5 +1484,4 @@
       initMaritimeMap();
     });
   </script>
-</body>
-</html>
+
