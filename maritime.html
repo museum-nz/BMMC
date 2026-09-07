@@ -22,6 +22,7 @@
 
   <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin="">
+  <link rel="preconnect" href="https://tiles.openseamap.org" crossorigin="">
   <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin="">
   <link rel="preconnect" href="https://unpkg.com" crossorigin="">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="">
@@ -60,17 +61,24 @@
     }
   </script>
 
-  <!-- Leaflet CSS & MarkerCluster with CDN Fallbacks -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';">
+  <!-- Leaflet CSS & MarkerCluster with Local & CDN Fallbacks -->
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';">
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';">
+  <link rel="stylesheet" href="../vendor/leaflet/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';">
 
-  <!-- PapaParse for TSV / CSV Data Ingestion -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- PapaParse for TSV / CSV Data Ingestion with Local & CDN Fallbacks -->
+  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+    }
+  </script>
 
   <!-- Master Unified Stylesheet & Offline Media Adapter -->
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <script src="../main/offline-adapter.js" onerror="this.onerror=null;"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -147,6 +155,21 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
     }
     .maritime-popup .leaflet-popup-content { margin: 0; line-height: 1.4; }
+
+    /* Custom Tooltip Styling for Shipping Routes */
+    .route-tooltip {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #f8fafc;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 4px 8px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    }
+    .route-tooltip::before {
+      border-top-color: rgba(15, 23, 42, 0.92) !important;
+    }
   
     #btnThemeToggle, #themeToggleIcon { display: none !important; }
   </style>
@@ -240,11 +263,11 @@
           <span class="text-2xl p-2 bg-sky-50 dark:bg-sky-950/80 text-sky-600 rounded-2xl border border-sky-200 dark:border-sky-900/60">🗺️</span>
           <div>
             <h3 class="text-lg font-black text-slate-900 dark:text-white">Coastal Shipping &amp; Nautical Heritage Map</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Live data loaded from online TSV repository</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Archival data loaded from offline &amp; online repository</p>
           </div>
         </div>
 
-        <!-- Filter Layers Controls -->
+        <!-- Filter Category Layers Controls -->
         <div class="flex items-center gap-1.5 flex-wrap">
           <button onclick="setMapFilter('all')" id="mapFilterAll" class="px-2.5 py-1 rounded-xl text-xs font-black bg-sky-600 text-white shadow transition cursor-pointer">
             All Sites (<span id="countAll">...</span>)
@@ -265,6 +288,59 @@
             🚢 Ports (<span id="countPorts">0</span>)
           </button>
         </div>
+      </div>
+
+      <!-- Map Type & Nautical Layer Options Toolbar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md">
+        
+        <!-- Base Map Type Switcher -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
+            <span>🗺️</span> Basemap:
+          </span>
+          <button onclick="setBaseMap('topo')" id="btnBaseTopo" class="px-2.5 py-1 rounded-xl text-xs font-black bg-sky-600 text-white shadow transition cursor-pointer">
+            ESRI Topo
+          </button>
+          <button onclick="setBaseMap('satellite')" id="btnBaseSatellite" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
+            Satellite
+          </button>
+          <button onclick="setBaseMap('ocean')" id="btnBaseOcean" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer">
+            Ocean Bathymetry
+          </button>
+        </div>
+
+        <!-- Nautical & Historical Overlays Controls -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
+            <span>⚓</span> Overlays:
+          </span>
+
+          <!-- OpenSeaMap Nautical Marks -->
+          <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-sky-500 transition select-none">
+            <input type="checkbox" id="toggleOpenSeaMap" onchange="toggleOverlayLayer('seamark', this.checked)" class="rounded text-sky-600 focus:ring-sky-500 w-3.5 h-3.5 cursor-pointer">
+            <span>OpenSeaMap Seamarks</span>
+          </label>
+
+          <!-- 1850 Historic Admiralty Chart (LINZ / NLNZ) -->
+          <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-amber-500 transition select-none">
+            <input type="checkbox" id="toggleHistoricChart" onchange="toggleOverlayLayer('chart', this.checked)" class="rounded text-amber-600 focus:ring-amber-500 w-3.5 h-3.5 cursor-pointer">
+            <span>1850 Historic Chart</span>
+          </label>
+
+          <!-- Pioneer & Mosquito Shipping Routes -->
+          <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:border-teal-500 transition select-none">
+            <input type="checkbox" id="togglePioneerRoutes" onchange="toggleOverlayLayer('routes', this.checked)" checked class="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5 cursor-pointer">
+            <span>⛵ Pioneer Shipping Paths</span>
+          </label>
+
+          <!-- Dynamic Opacity Slider for Historic Chart -->
+          <div id="chartOpacityContainer" class="hidden items-center gap-1.5 px-2 py-1 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-300 dark:border-amber-800 text-[11px] text-amber-900 dark:text-amber-200 font-bold">
+            <span>Chart Opacity:</span>
+            <input type="range" id="chartOpacitySlider" min="15" max="95" value="45" oninput="setChartOpacity(this.value)" class="w-16 accent-amber-600 cursor-pointer">
+            <span id="chartOpacityVal" class="font-mono">45%</span>
+          </div>
+        </div>
+
       </div>
 
       <!-- Map Container Box -->
@@ -548,7 +624,7 @@
           </div>
 
           <div class="h-48 bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2 border border-slate-800">
-            <img src="https://stampsnz.com/images/1947_lighthouses.jpg" onerror="this.onerror=null;this.src='/media/images/stamps/1947_lighthouses.jpg';" alt="1947 NZ Government Life Insurance Lighthouses Stamp" class="w-full h-full object-contain rounded-lg shadow-sm" loading="lazy">
+            <img src="https://stampsnz.com/images/1947_lighthouses.jpg" onerror="this.onerror=null; if(window.resolveOfflineMedia){ this.src=window.resolveOfflineMedia(this.src); } else { this.src='../media/images/stamps/1947_lighthouses.jpg'; }" alt="1947 NZ Government Life Insurance Lighthouses Stamp" class="w-full h-full object-contain rounded-lg shadow-sm" loading="lazy">
           </div>
 
           <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
@@ -615,8 +691,9 @@
   <!-- Universal BMMC Navigation Drawer Script -->
   <script src="shared-nav.js"></script>
 
-  <!-- Leaflet & MarkerCluster JS with Fallbacks -->
+  <!-- Leaflet & MarkerCluster JS with Local & CDN Fallbacks -->
   <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.L) {
       document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
@@ -624,23 +701,88 @@
   </script>
 
   <script src="../vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
+  <script src="vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.L || !window.L.markerClusterGroup) {
       document.write('<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"><\/script>');
     }
   </script>
 
-  <!-- Maritime Engine: Remote Google Sheets TSV Loader -->
+  <!-- Maritime Engine: Multi-Layer Basemap, Nautical Overlays, and Data Loader -->
   <script>
-    // Live Google Sheets TSV Endpoint & local offline fallback
+    const CSV_ONLINE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=596651309&single=true&output=csv';
     const TSV_ONLINE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=596651309&single=true&output=tsv';
-    const TSV_LOCAL_FALLBACK = 'maritime_sites.tsv';
 
     let MARITIME_SITES = [];
     let map;
     let markersLayer;
     let markerInstances = new Map();
     let currentCategoryFilter = 'all';
+
+    // Map Basemaps & Nautical Overlays
+    let baseLayers = {};
+    let openSeaMapLayer;
+    let historicChartOverlay;
+    let pioneerRoutesLayer;
+    let layerControl;
+
+    // Pioneer & Coastal Shipping Trunk Routes (Georeferenced Historical Routes)
+    const PIONEER_SHIPPING_ROUTES = [
+      {
+        name: "Trans-Tasman Pioneer Line (Sydney & Melbourne ➔ Wellington / Port Chalmers)",
+        desc: "The primary oceanic bridge ferrying early colonists, livestock, gold-seekers, and colonial mails across the Tasman Sea.",
+        color: "#38bdf8",
+        dashArray: "6, 8",
+        coords: [
+          [-33.8688, 151.2093], // Sydney
+          [-36.5000, 160.0000], // Mid-Tasman
+          [-40.5000, 172.5000], // Cape Farewell Approach
+          [-41.2865, 174.7762], // Wellington Harbour
+          [-43.6050, 172.7180]  // Lyttelton (Christchurch)
+        ]
+      },
+      {
+        name: "Roaring Forties Immigrant Clipper Line (Great Britain ➔ Bluff / Otago)",
+        desc: "Sailing ships running east in the high 40s latitudes, navigating past the Snares into Foveaux Strait and Otago Harbour.",
+        color: "#f59e0b",
+        dashArray: "8, 6",
+        coords: [
+          [-47.8000, 162.0000], // Roaring Forties Approach
+          [-46.7000, 167.5000], // Foveaux Strait
+          [-46.6100, 168.3500], // Bluff Harbour
+          [-46.4500, 169.8000], // Catlins Coast
+          [-45.8167, 170.6333]  // Port Chalmers (Dunedin)
+        ]
+      },
+      {
+        name: "Mosquito Fleet West Coast Bar Route (Onehunga ➔ Taranaki ➔ Nelson ➔ West Coast)",
+        desc: "Shallow-draught scows and coastal steamers braving treacherous bars at Manukau, Westport, and Greymouth.",
+        color: "#2dd4bf",
+        dashArray: "4, 6",
+        coords: [
+          [-36.9230, 174.7870], // Onehunga / Manukau
+          [-37.0500, 174.4800], // Manukau Heads Bar
+          [-39.0556, 174.0752], // New Plymouth Roadstead
+          [-40.9200, 173.8300], // French Pass
+          [-41.2706, 173.2840], // Nelson Haven
+          [-41.7500, 171.5800], // Westport / Buller River
+          [-42.4500, 171.2000]  // Greymouth Bar
+        ]
+      },
+      {
+        name: "Southern Whaling & Pioneer Roadstead (Preservation ➔ Riverton ➔ Bluff ➔ Fortrose)",
+        desc: "The 1820s–1850s southern frontier corridor linking shore whaling bases, kauri and timber sawmills, and early sheep runs.",
+        color: "#fb7185",
+        dashArray: "5, 5",
+        coords: [
+          [-46.1500, 166.6500], // Preservation Inlet (Cuttle Cove)
+          [-46.3600, 167.8500], // Riverton / Aparima
+          [-46.6000, 168.3300], // Bluff / Motupōhue
+          [-46.6200, 169.0000], // Waipapa Point
+          [-46.5800, 169.8500]  // Surat Bay / Catlins
+        ]
+      }
+    ];
 
     function initMaritimeMap() {
       const isMobile = window.innerWidth <= 768;
@@ -656,11 +798,70 @@
         scrollWheelZoom: true
       });
 
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+      // 1. Base Tile Layers
+      baseLayers.topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Esri &copy; Topographic Survey',
         maxZoom: 18
-      }).addTo(map);
+      });
 
+      baseLayers.satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri, Maxar, Earthstar Geographics, CNES/Airbus DS',
+        maxZoom: 18
+      });
+
+      baseLayers.ocean = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri, Garmin, GEBCO, NOAA, NGDC',
+        maxZoom: 13
+      });
+
+      // Add default base layer (Topo)
+      baseLayers.topo.addTo(map);
+
+      // 2. OpenSeaMap Overlay (Free Open Nautical Tiles)
+      openSeaMapLayer = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://www.openseamap.org" target="_blank" rel="noopener">OpenSeaMap</a>',
+        maxZoom: 18
+      });
+
+      // 3. National Library / LINZ Historic Charts (1850 Admiralty Chart Overlay)
+      let chartImgUrl = 'media/maps/nz_1850_admiralty_chart.jpg';
+      if (typeof window.resolveOfflineMedia === 'function') {
+        chartImgUrl = window.resolveOfflineMedia(chartImgUrl);
+      }
+      const chartBounds = [[-34.0, 166.0], [-47.5, 179.0]];
+      historicChartOverlay = L.imageOverlay(chartImgUrl, chartBounds, {
+        opacity: 0.45,
+        interactive: false
+      });
+
+      // 4. Pioneer Shipping Paths Layer Group
+      pioneerRoutesLayer = L.layerGroup();
+      PIONEER_SHIPPING_ROUTES.forEach(route => {
+        const poly = L.polyline(route.coords, {
+          color: route.color,
+          weight: 3.5,
+          opacity: 0.85,
+          dashArray: route.dashArray,
+          lineJoin: 'round'
+        });
+
+        poly.bindTooltip(`
+          <div class="space-y-0.5">
+            <div class="font-extrabold text-sky-400 text-xs">⛵ ${route.name}</div>
+            <div class="text-[10px] text-slate-300 font-normal leading-tight">${route.desc}</div>
+          </div>
+        `, {
+          sticky: true,
+          className: 'route-tooltip'
+        });
+
+        pioneerRoutesLayer.addLayer(poly);
+      });
+      
+      // Default: show pioneer routes
+      pioneerRoutesLayer.addTo(map);
+
+      // 5. Clustered Maritime Heritage Sites
       markersLayer = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
@@ -668,40 +869,221 @@
         maxClusterRadius: 36
       });
       map.addLayer(markersLayer);
-    }
 
-    // Fallback TSV parser if PapaParse is unavailable offline
-    function parseTSVLines(tsvText) {
-      const lines = tsvText.trim().split(/\r?\n/);
-      if (!lines.length) return [];
-      const headers = lines[0].split('\t').map(h => h.trim());
-      return lines.slice(1).map(line => {
-        const values = line.split('\t');
-        const obj = {};
-        headers.forEach((h, idx) => {
-          obj[h] = values[idx] !== undefined ? values[idx].trim() : '';
-        });
-        return obj;
+      // 6. Leaflet Native Layer Switcher Control (Top Right)
+      const baseMapControls = {
+        "ESRI Topo": baseLayers.topo,
+        "Satellite Imagery": baseLayers.satellite,
+        "Ocean Bathymetry": baseLayers.ocean
+      };
+      const overlayControls = {
+        "⚓ OpenSeaMap Seamarks": openSeaMapLayer,
+        "📜 1850 Historic Chart": historicChartOverlay,
+        "⛵ Pioneer Shipping Paths": pioneerRoutesLayer,
+        "📍 Maritime Sites": markersLayer
+      };
+      layerControl = L.control.layers(baseMapControls, overlayControls, {
+        collapsed: true,
+        position: 'topright'
+      }).addTo(map);
+
+      // Keep toolbar checkboxes in sync if layers are toggled via Leaflet Control
+      map.on('overlayadd', (e) => {
+        if (e.layer === openSeaMapLayer) document.getElementById('toggleOpenSeaMap').checked = true;
+        if (e.layer === historicChartOverlay) {
+          document.getElementById('toggleHistoricChart').checked = true;
+          document.getElementById('chartOpacityContainer')?.classList.remove('hidden');
+          document.getElementById('chartOpacityContainer')?.classList.add('flex');
+        }
+        if (e.layer === pioneerRoutesLayer) document.getElementById('togglePioneerRoutes').checked = true;
+      });
+      map.on('overlayremove', (e) => {
+        if (e.layer === openSeaMapLayer) document.getElementById('toggleOpenSeaMap').checked = false;
+        if (e.layer === historicChartOverlay) {
+          document.getElementById('toggleHistoricChart').checked = false;
+          document.getElementById('chartOpacityContainer')?.classList.remove('flex');
+          document.getElementById('chartOpacityContainer')?.classList.add('hidden');
+        }
+        if (e.layer === pioneerRoutesLayer) document.getElementById('togglePioneerRoutes').checked = false;
+      });
+      map.on('baselayerchange', (e) => {
+        if (e.layer === baseLayers.topo) updateBaseMapButtonsUI('topo');
+        else if (e.layer === baseLayers.satellite) updateBaseMapButtonsUI('satellite');
+        else if (e.layer === baseLayers.ocean) updateBaseMapButtonsUI('ocean');
       });
     }
 
-    // Normalizes row fields across variations (e.g., category vs type, lat vs latitude)
+    function setBaseMap(type) {
+      [baseLayers.topo, baseLayers.satellite, baseLayers.ocean].forEach(layer => {
+        if (map.hasLayer(layer)) map.removeLayer(layer);
+      });
+
+      if (type === 'satellite') {
+        map.addLayer(baseLayers.satellite);
+      } else if (type === 'ocean') {
+        map.addLayer(baseLayers.ocean);
+      } else {
+        map.addLayer(baseLayers.topo);
+      }
+      updateBaseMapButtonsUI(type);
+    }
+
+    function updateBaseMapButtonsUI(selectedType) {
+      const btns = {
+        topo: document.getElementById('btnBaseTopo'),
+        satellite: document.getElementById('btnBaseSatellite'),
+        ocean: document.getElementById('btnBaseOcean')
+      };
+
+      Object.entries(btns).forEach(([type, el]) => {
+        if (!el) return;
+        if (type === selectedType) {
+          el.className = "px-2.5 py-1 rounded-xl text-xs font-black bg-sky-600 text-white shadow transition cursor-pointer";
+        } else {
+          el.className = "px-2.5 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-sky-500 transition cursor-pointer";
+        }
+      });
+    }
+
+    function toggleOverlayLayer(type, isChecked) {
+      if (type === 'seamark') {
+        if (isChecked) {
+          if (!map.hasLayer(openSeaMapLayer)) map.addLayer(openSeaMapLayer);
+        } else {
+          if (map.hasLayer(openSeaMapLayer)) map.removeLayer(openSeaMapLayer);
+        }
+      } else if (type === 'chart') {
+        const opacityContainer = document.getElementById('chartOpacityContainer');
+        if (isChecked) {
+          if (!map.hasLayer(historicChartOverlay)) map.addLayer(historicChartOverlay);
+          if (opacityContainer) {
+            opacityContainer.classList.remove('hidden');
+            opacityContainer.classList.add('flex');
+          }
+        } else {
+          if (map.hasLayer(historicChartOverlay)) map.removeLayer(historicChartOverlay);
+          if (opacityContainer) {
+            opacityContainer.classList.remove('flex');
+            opacityContainer.classList.add('hidden');
+          }
+        }
+      } else if (type === 'routes') {
+        if (isChecked) {
+          if (!map.hasLayer(pioneerRoutesLayer)) map.addLayer(pioneerRoutesLayer);
+        } else {
+          if (map.hasLayer(pioneerRoutesLayer)) map.removeLayer(pioneerRoutesLayer);
+        }
+      }
+    }
+
+    function setChartOpacity(val) {
+      const opacity = parseFloat(val) / 100;
+      if (historicChartOverlay) {
+        historicChartOverlay.setOpacity(opacity);
+      }
+      const label = document.getElementById('chartOpacityVal');
+      if (label) label.textContent = `${val}%`;
+    }
+
+    // Delimiter-agnostic CSV / TSV tokenizer with quote handling
+    function robustFallbackParse(text) {
+      const lines = text.trim().split(/\r?\n/).filter(l => l.trim().length > 0);
+      if (!lines.length) return [];
+      
+      const firstLine = lines[0];
+      const tabCount = (firstLine.match(/\t/g) || []).length;
+      const commaCount = (firstLine.match(/,/g) || []).length;
+      const delimiter = tabCount >= commaCount ? '\t' : ',';
+
+      function splitLine(line, delim) {
+        if (delim === '\t') {
+          return line.split('\t').map(s => s.trim().replace(/^["']|["']$/g, ''));
+        }
+        const result = [];
+        let cur = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              cur += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            result.push(cur.trim().replace(/^["']|["']$/g, ''));
+            cur = '';
+          } else {
+            cur += char;
+          }
+        }
+        result.push(cur.trim().replace(/^["']|["']$/g, ''));
+        return result;
+      }
+
+      const headers = splitLine(lines[0], delimiter).map(h => h.trim());
+      const data = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = splitLine(lines[i], delimiter);
+        if (values.length < 2) continue;
+        const row = {};
+        headers.forEach((h, idx) => {
+          row[h] = values[idx] !== undefined ? values[idx] : '';
+        });
+        data.push(row);
+      }
+      return data;
+    }
+
+    function smartParseData(text) {
+      if (window.Papa) {
+        try {
+          const parsed = Papa.parse(text, {
+            header: true,
+            skipEmptyLines: 'greedy',
+            dynamicTyping: false
+          });
+          if (parsed.data && parsed.data.length > 0 && Object.keys(parsed.data[0]).length > 1) {
+            return parsed.data;
+          }
+        } catch (e) {}
+      }
+      return robustFallbackParse(text);
+    }
+
     function normalizeSiteRow(row) {
-      const id = row.id || row.ID || '';
-      const type = (row.category || row.type || row.Category || '').toLowerCase();
-      const subtype = (row.subtype || row.Subtype || '').toLowerCase();
-      const fatalities = parseInt(row.fatalities || row.Fatalities || 0, 10) || 0;
-      const title = row.headline || row.title || row.Headline || '';
-      const year = row.year || row.Year || '';
-      const date = row.date || row.Date || '';
-      const lat = parseFloat(row.latitude || row.lat || row.Latitude || 0);
-      const lng = parseFloat(row.longitude || row.lng || row.Longitude || 0);
-      const tag = row.tag || row.Tag || '';
-      const desc = row.desc || row.description || row.Desc || '';
-      const detailsHtml = row.details || row.detailsHtml || row.Details || '';
-      const img = row.image_url || row.img || row.Image || row['image url'] || '';
-      const linkText = row.link_text || row.linkText || '';
-      const sourceUrl = row.source_url || row.sourceUrl || '';
+      function getVal(aliases) {
+        for (const k of Object.keys(row)) {
+          const cleanK = k.trim().toLowerCase().replace(/[\s_-]+/g, '');
+          for (const a of aliases) {
+            if (cleanK === a.toLowerCase().replace(/[\s_-]+/g, '')) {
+              return row[k] ? String(row[k]).trim() : '';
+            }
+          }
+        }
+        return '';
+      }
+
+      const id = getVal(['id', 'site_id', 'code', 'slug']);
+      const type = getVal(['type', 'category', 'class']).toLowerCase();
+      const subtype = getVal(['subtype', 'sub_type', 'status']).toLowerCase();
+      const fatalities = parseInt(getVal(['fatalities', 'fatal', 'deaths', 'lost']) || 0, 10) || 0;
+      const title = getVal(['headline', 'title', 'vessel', 'ship', 'name', 'sitename']);
+      const year = getVal(['year', 'yr', 'date_year']);
+      const date = getVal(['date', 'wreck_date']);
+      const lat = parseFloat(getVal(['latitude', 'lat']));
+      const lng = parseFloat(getVal(['longitude', 'lng', 'long', 'lon']));
+      const tag = getVal(['tag', 'tags', 'region', 'location']);
+      const desc = getVal(['desc', 'description', 'summary', 'about']);
+      const detailsHtml = getVal(['details', 'detailspanel', 'detail', 'detailshtml', 'story']);
+      let img = getVal(['image_url', 'image', 'img', 'photo', 'picture', 'imageurl']);
+      const linkText = getVal(['link_text', 'linktext', 'sourcename']);
+      const sourceUrl = getVal(['source_url', 'sourceurl', 'source', 'url']);
+
+      if (img && typeof window.resolveOfflineMedia === 'function') {
+        img = window.resolveOfflineMedia(img);
+      }
 
       return {
         id,
@@ -716,35 +1098,60 @@
         tag,
         desc,
         detailsHtml,
-        img: img ? img.trim() : null,
+        img: img && img.trim() ? img.trim() : null,
         linkText,
         sourceUrl
       };
+    }
+
+    function getCandidateDataUrls() {
+      const candidates = [];
+
+      if (typeof window.resolveOfflineMedia === 'function') {
+        const mapped = window.resolveOfflineMedia(CSV_ONLINE_URL);
+        if (mapped && mapped !== CSV_ONLINE_URL) candidates.push(mapped);
+      }
+
+      candidates.push('../data/maritime.csv');
+      candidates.push('data/maritime.csv');
+      candidates.push('/data/maritime.csv');
+      candidates.push('../data/maritime.tsv');
+      candidates.push('data/maritime.tsv');
+      candidates.push('maritime.csv');
+      candidates.push('maritime_sites.tsv');
+      candidates.push(CSV_ONLINE_URL);
+      candidates.push(TSV_ONLINE_URL);
+
+      return [...new Set(candidates)];
+    }
+
+    async function fetchWithTimeout(url, timeoutMs = 3000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { signal: controller.signal, cache: 'no-cache' });
+        clearTimeout(id);
+        if (res.ok) {
+          const txt = await res.text();
+          if (txt && txt.trim().length > 20) return txt;
+        }
+      } catch (e) {
+        clearTimeout(id);
+      }
+      return null;
     }
 
     async function loadMaritimeData() {
       const overlay = document.getElementById('mapLoadingOverlay');
       let rawData = null;
 
-      // 1. Try Live Google Sheets TSV
-      try {
-        const response = await fetch(TSV_ONLINE_URL, { cache: 'no-cache' });
-        if (response.ok) {
-          rawData = await response.text();
-        }
-      } catch (err) {
-        console.warn('Online Google Sheet fetch failed, trying local fallback...', err);
-      }
-
-      // 2. Fallback to local TSV file if offline
-      if (!rawData) {
-        try {
-          const localResponse = await fetch(TSV_LOCAL_FALLBACK);
-          if (localResponse.ok) {
-            rawData = await localResponse.text();
-          }
-        } catch (localErr) {
-          console.error('Local TSV fallback failed:', localErr);
+      const candidates = getCandidateDataUrls();
+      for (const url of candidates) {
+        const isRemote = url.startsWith('http://') || url.startsWith('https://');
+        const timeout = isRemote ? 3000 : 2000;
+        rawData = await fetchWithTimeout(url, timeout);
+        if (rawData) {
+          break;
         }
       }
 
@@ -752,27 +1159,15 @@
         if (overlay) {
           overlay.innerHTML = `
             <div class="p-4 bg-red-950/80 rounded-2xl border border-red-700 text-center max-w-sm text-red-200 text-xs">
-              <p class="font-bold text-sm mb-1">⚠️ Connection Error</p>
-              <p>Unable to load maritime repository from Google Sheets or local fallback. Please verify internet connectivity.</p>
+              <p class="font-bold text-sm mb-1">⚠️ Data Load Error</p>
+              <p>Unable to load maritime repository from Google Sheets or local cache (<code>data/maritime.csv</code>). Please verify network or offline sync files.</p>
             </div>
           `;
         }
         return;
       }
 
-      // 3. Parse via PapaParse or fallback parser
-      let rows = [];
-      if (window.Papa) {
-        const parsed = Papa.parse(rawData, {
-          delimiter: '\t',
-          header: true,
-          skipEmptyLines: true
-        });
-        rows = parsed.data;
-      } else {
-        rows = parseTSVLines(rawData);
-      }
-
+      const rows = smartParseData(rawData);
       MARITIME_SITES = rows
         .map(normalizeSiteRow)
         .filter(site => site.id && !isNaN(site.lat) && !isNaN(site.lng) && site.lat !== 0);
@@ -780,7 +1175,6 @@
       renderMapMarkers();
       updateFilterCounts();
 
-      // Fit bounds to encompasses loaded data
       if (markersLayer && markersLayer.getBounds().isValid()) {
         const isMobile = window.innerWidth <= 768;
         map.fitBounds(markersLayer.getBounds(), {
@@ -788,7 +1182,6 @@
         });
       }
 
-      // Hide loading spinner
       if (overlay) {
         overlay.style.opacity = '0';
         setTimeout(() => overlay.remove(), 400);
@@ -1085,10 +1478,10 @@
         if (e.target === document.getElementById('maritimeDetailModal')) closeMaritimeModal();
       });
 
-      // 1. Initialize Map view
+      // 1. Initialize Map view with basemaps and overlays
       initMaritimeMap();
 
-      // 2. Fetch and render data from published TSV
+      // 2. Fetch and render data from published CSV/TSV or local cached fallback
       loadMaritimeData();
     });
   </script>
