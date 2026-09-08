@@ -1,37 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- 1. Main Museum Showcase & Exhibits Catalog -->
+  <!-- Primary Museum Wings -->
   <url>
     <loc>https://museum-nz.github.io/BMMC/index.html</loc>
-    <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- 2. Photo Archives & Historical Photographic Gallery Wing -->
   <url>
-    <loc>https://museum-nz.github.io/BMMC/gallery.html</loc>
-    <lastmod>2026-08-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- 3. Artifact Care, Conservation & Restoration Guide -->
-  <url>
-    <loc>https://museum-nz.github.io/BMMC/restoration-guide.html</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/2Dmap.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- 4. Interactive 2D Geographic Origin Map -->
   <url>
-    <loc>https://museum-nz.github.io/BMMC/2Dmap.html</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://museum-nz.github.io/BMMC/restoration-guide.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+
+  <!-- Specialist Databases & Archives -->
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/gallery.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/currency.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/stamps.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/2Dmap_stamps.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/nz_history.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/trains.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://museum-nz.github.io/BMMC/maritime.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
