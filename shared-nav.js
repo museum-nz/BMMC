@@ -37,6 +37,12 @@
       group: "Specialist Databases & Archives",
       items: [
         { 
+          href: 'gallery.html', 
+          icon: '📷', 
+          label: 'Historical Photo Archives', 
+          desc: 'Historic photography & Alan Starling WWII oral history' 
+        },
+        { 
           href: 'currency.html', 
           icon: '🪙', 
           label: 'NZ Currency & Minting', 
@@ -64,22 +70,16 @@
           desc: 'Interactive colonial timeline, ships & battles' 
         },
         { 
-          href: 'gallery.html', 
-          icon: '📷', 
-          label: 'Historical Photo Archives', 
-          desc: 'Historic photography & Alan Starling WWII oral history' 
-        },
-        { 
           href: 'trains.html', 
           icon: '🚂', 
           label: 'Aotearoa NZ Railway Map', 
-          desc: 'Interactive rail history, steam pioneers, disasters & KiwiRail' 
+          desc: 'Interactive rail history, steam pioneers, historic railways, disasters & KiwiRail' 
         },
         { 
           href: 'maritime.html', 
           icon: '⚓', 
-          label: 'Maritime & Coastal Shipping', 
-          desc: 'Mosquito Fleet, shipwrecks, whaling & lighthouses' 
+          label: 'Maritime & Coastal Map', 
+          desc: 'Mosquito Fleet, early arrivals, shipwrecks, whaling & lighthouses' 
         }
       ]
     }
