@@ -62,7 +62,12 @@
               desc: 'Geographic 2D map of NZ stamps by issue location' 
             }
           ]
-        },
+        }
+      ]
+	},
+	{
+      group: "NZ Historical Info Maps",
+      items: [
         { 
           href: 'nz_history.html', 
           icon: '📜', 
@@ -78,7 +83,7 @@
         { 
           href: 'maritime.html', 
           icon: '⚓', 
-          label: 'Maritime & Coastal Map', 
+          label: 'Aotearoa NZ Maritime & Coastal Map', 
           desc: 'Mosquito Fleet, early arrivals, shipwrecks, whaling & lighthouses' 
         }
       ]
