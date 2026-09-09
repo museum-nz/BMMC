@@ -921,6 +921,20 @@
       .map-search-box { min-width: 140px; }
       .year-slider-container { left: 10px; bottom: 12px; width: calc(100vw - 20px); max-width: calc(100vw - 20px); }
     }
+  
+    /* Responsive Wings Position: Hard Right on Desktop, Hard Left on Mobile */
+    @media (min-width: 769px) {
+      .top-controls-bar .btn-bmmc-menu-trigger {
+        order: 999 !important;
+        margin-left: auto !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .top-controls-bar .btn-bmmc-menu-trigger {
+        order: -1 !important;
+        margin-left: 0 !important;
+      }
+    }
   </style>
 </head>
 <body>

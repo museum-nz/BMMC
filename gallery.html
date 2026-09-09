@@ -94,7 +94,11 @@
       <div class="flex items-center justify-between gap-2">
         
         <!-- Branding -->
-        <a href="index.html" id="brandLogoLink" title="Return to Main Museum Showcase" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0">
+        <button class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer order-first sm:order-last" title="Open Museum Wings Menu">
+            <span class="text-sm leading-none">☰</span>
+            <span class="hidden sm:inline">Wings</span>
+          </button>
+        <a href="index.html" id="brandLogoLink" title="Return to Main Museum Showcase" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0 order-2 sm:order-1">
           <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">📷</span>
           <div class="leading-none">
             <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap" id="headerTitleText">
@@ -105,13 +109,10 @@
         </a>
         
         <!-- Action Buttons Cluster -->
-        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar">
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap overflow-x-auto no-scrollbar order-3 sm:order-2 ml-auto sm:ml-auto">
           
           <!-- Universal Navigation Drawer Trigger (Hamburger) -->
-          <button class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
-            <span class="text-sm leading-none">☰</span>
-            <span class="hidden sm:inline">Wings</span>
-          </button>
+          
 
           <!-- Surprise Button -->
           <button id="btnSurprise" title="Surprise Me (Random Photo)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">

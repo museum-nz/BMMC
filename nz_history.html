@@ -819,6 +819,20 @@
     .cat-general .marker-stem { background: #16a34a !important; }
     .cat-general .marker-point-dot { background: #16a34a !important; box-shadow: 0 0 0 1.5px rgba(22, 163, 74, 0.75), 0 2px 6px rgba(0,0,0,0.45) !important; }
 
+  
+    /* Responsive Wings Position: Hard Right on Desktop, Hard Left on Mobile */
+    @media (min-width: 769px) {
+      .top-controls-bar .btn-bmmc-menu-trigger {
+        order: 999 !important;
+        margin-left: auto !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .top-controls-bar .btn-bmmc-menu-trigger {
+        order: -1 !important;
+        margin-left: 0 !important;
+      }
+    }
   </style>
 </head>
 <body>

@@ -542,6 +542,23 @@
       #spokeConduits { display: none; }
       .filter-bar { overflow-x: auto; }
     }
+  
+    .brand-section { display: flex; align-items: center; gap: 12px; }
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+    .btn-bmmc-menu-trigger {
+      order: -1;
+      margin-right: 8px;
+    }
+    @media (min-width: 769px) {
+      .brand-section { order: 1 !important; }
+      .hud-actions { order: 2 !important; margin-left: auto !important; }
+      .btn-bmmc-menu-trigger { order: 3 !important; margin-right: 0 !important; margin-left: 10px !important; }
+    }
   </style>
 </head>
 <body>
@@ -558,32 +575,26 @@
   <div class="radar-grid"></div>
 
   <!-- Top Navigation HUD -->
-  <header>    <div class="brand-section">
+  <header>
+    <button class="menu-trigger-btn btn-bmmc-menu-trigger" id="btnMenuToggle" aria-label="Open directory drawer">
+        <span>☰</span> <span>Menu</span>
+      </button>
+    <div class="brand-section">
       <a href="index.html" class="brand">
         <div class="brand-icon">🏛️</div>
         <div class="brand-title">BMMC Hub</div>
       </a>
-      <button class="menu-trigger-btn btn-bmmc-menu-trigger" id="btnMenuToggle" aria-label="Open directory drawer">
-        <span>☰</span> <span>Menu</span>
-      </button>
     </div>
 
-    <!-- Dynamic Actions & Filter Bar -->
+    <!-- Right-aligned Actions -->
     <div class="hud-actions">
-      <div class="filter-bar" id="filterBarContainer">
-        <button class="filter-btn active" data-target="all">All Wings</button>
-      </div>
-
       <!-- Surprise Roulette Button -->
       <button class="surprise-btn" id="btnSurprise" title="Surprise Me (Artifact Roulette)">
         <span>🎲</span> <span>Surprise</span>
       </button>
-    </div>
 
-    <!-- Live Search -->
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="targetSearch" placeholder="Search wings... (/)" />
+      <!-- Menu Button (Hard Right) -->
+      
     </div>
   </header>
 
@@ -728,12 +739,10 @@
       // ==========================================
       const leftFlank = document.getElementById('leftFlank');
       const rightFlank = document.getElementById('rightFlank');
-      const filterBar = document.getElementById('filterBarContainer');
-      const svg = document.getElementById('spokeConduits');
+            const svg = document.getElementById('spokeConduits');
       const core = document.getElementById('nexusCore');
       const stage = document.getElementById('stageContainer');
-      const searchInput = document.getElementById('targetSearch');
-      const btnSurprise = document.getElementById('btnSurprise');
+            const btnSurprise = document.getElementById('btnSurprise');
 
       rawBranches.forEach((branch, index) => {
         const wingId = `wing-cluster-${index}`;
@@ -741,13 +750,6 @@
         const wingTitle = branch.group || branch.name || branch.title || `Wing ${index + 1}`;
         const branchItems = branch.items || branch.links || [];
         const wingImgUrl = branch.image || WING_IMAGE_LOOKUP[wingTitle] || null;
-
-        // Filter Button
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.setAttribute('data-target', wingId);
-        btn.textContent = `${wingTitle} (${branchItems.length})`;
-        filterBar.appendChild(btn);
 
         // Wing Container
         const cluster = document.createElement('div');
@@ -883,14 +885,7 @@
         }
       });
 
-      // Quick Hub Click
-      document.querySelectorAll('.wing-hub').forEach((hub, idx) => {
-        hub.addEventListener('click', (e) => {
-          if (e.target.closest('.wing-media-slot')) return;
-          const btn = document.querySelector(`.filter-btn[data-target="wing-cluster-${idx}"]`);
-          if (btn) btn.click();
-        });
-      });
+      
 
       // Surprise Roulette Launcher
       let isRolling = false;
@@ -938,52 +933,9 @@
       if (btnSurprise) btnSurprise.addEventListener('click', triggerRoulette);
       if (core) core.addEventListener('click', triggerRoulette);
 
-      // Search Filter
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const q = e.target.value.toLowerCase().trim();
-          const cards = document.querySelectorAll('.spoke-card');
-          const clusters = document.querySelectorAll('.wing-cluster');
-
-          if (!q) {
-            cards.forEach(c => c.classList.remove('matched', 'dimmed'));
-            clusters.forEach(cl => cl.classList.remove('dimmed'));
-          } else {
-            cards.forEach(card => {
-              const tags = (card.getAttribute('data-tags') + ' ' + card.innerText).toLowerCase();
-              if (tags.includes(q)) {
-                card.classList.add('matched');
-                card.classList.remove('dimmed');
-              } else {
-                card.classList.add('dimmed');
-                card.classList.remove('matched');
-              }
-            });
-
-            clusters.forEach(cluster => {
-              const hasMatch = cluster.querySelectorAll('.spoke-card.matched').length > 0;
-              if (hasMatch) cluster.classList.remove('dimmed');
-              else cluster.classList.add('dimmed');
-            });
-          }
-          setTimeout(drawConduits, 40);
-        });
-      }
-
       // Hotkeys
       window.addEventListener('keydown', (e) => {
-        if (e.key === '/' && document.activeElement !== searchInput) {
-          e.preventDefault();
-          if (searchInput) searchInput.focus();
-        }
-        if (e.key === 'Escape') {
-          if (searchInput) {
-            searchInput.value = '';
-            searchInput.dispatchEvent(new Event('input'));
-            searchInput.blur();
-          }
-        }
-        if (e.key === ' ' && document.activeElement !== searchInput) {
+        if (e.key === ' ') {
           e.preventDefault();
           triggerRoulette();
         }
