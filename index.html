@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="preload" as="image" href="map-thumb.jpg">
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,6 +25,146 @@
           document.documentElement.classList.remove('dark');
         }
       } catch (e) {}
+    // ==========================================================
+    // Universal 24-Hour Browser Cache for ALL Images & Links
+    // - Automatically caches any <img> and <a> on the page for 24h
+    // - Deduplicates simultaneous requests (downloads shared files once)
+    // ==========================================================
+    (function initUniversal24hBrowserCache() {
+      const DB_NAME = 'bmmc_universal_cache';
+      const STORE_NAME = 'assets_24h';
+      const TTL = 24 * 60 * 60 * 1000; // 24 Hours
+
+      function openDB() {
+        return new Promise(resolve => {
+          if (!('indexedDB' in window)) return resolve(null);
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME);
+            }
+          };
+          req.onsuccess = e => resolve(e.target.result);
+          req.onerror = () => resolve(null);
+        });
+      }
+
+      async function getCached(db, key) {
+        if (!db) return null;
+        return new Promise(resolve => {
+          try {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(key);
+            req.onsuccess = e => {
+              const item = e.target.result;
+              if (item && item.blob && (Date.now() - item.time < TTL)) {
+                resolve(item.blob);
+              } else {
+                resolve(null);
+              }
+            };
+            req.onerror = () => resolve(null);
+          } catch (_) { resolve(null); }
+        });
+      }
+
+      async function setCached(db, key, blob) {
+        if (!db || !blob) return;
+        try {
+          const tx = db.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).put({ blob: blob, time: Date.now() }, key);
+        } catch (_) {}
+      }
+
+      // In-flight fetch map: ensures multiple identical images only fetch ONCE
+      const inFlightRequests = new Map();
+
+      async function fetchAssetBlob(db, url) {
+        if (inFlightRequests.has(url)) {
+          return inFlightRequests.get(url);
+        }
+
+        const fetchPromise = (async () => {
+          // 1. Check 24-hour cache first
+          const cached = await getCached(db, url);
+          if (cached) return cached;
+
+          // 2. Fetch from network if not in cache or expired
+          try {
+            const resp = await fetch(url, { cache: 'default' });
+            if (resp.ok) {
+              const blob = await resp.blob();
+              await setCached(db, url, blob);
+              return blob;
+            }
+          } catch (_) {
+            // If CORS/network blocks fetch, browser native fallback handles it
+          }
+          return null;
+        })();
+
+        inFlightRequests.set(url, fetchPromise);
+        return fetchPromise;
+      }
+
+      async function cacheImage(db, img) {
+        const rawSrc = img.getAttribute('data-original-src') || img.currentSrc || img.src;
+        if (!rawSrc || rawSrc.startsWith('data:') || rawSrc.startsWith('blob:')) return;
+
+        img.setAttribute('data-original-src', rawSrc);
+        const blob = await fetchAssetBlob(db, rawSrc);
+        if (blob) {
+          img.src = URL.createObjectURL(blob);
+        }
+      }
+
+      async function cacheLink(db, link) {
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:')) return;
+        // Pre-cache internal html pages for instant navigation
+        if (href.endsWith('.html') || href.includes('.html#')) {
+          const clean = href.split('#')[0];
+          await fetchAssetBlob(db, clean);
+        }
+      }
+
+      async function startCaching() {
+        const db = await openDB();
+        if (!db) return;
+
+        // Process existing DOM elements
+        document.querySelectorAll('img').forEach(img => cacheImage(db, img));
+        document.querySelectorAll('a[href]').forEach(a => cacheLink(db, a));
+
+        // Observe dynamically injected spoke cards & images
+        const observer = new MutationObserver(mutations => {
+          mutations.forEach(m => {
+            m.addedNodes.forEach(node => {
+              if (node.nodeType === 1) {
+                if (node.tagName === 'IMG') cacheImage(db, node);
+                else if (node.querySelectorAll) {
+                  node.querySelectorAll('img').forEach(img => cacheImage(db, img));
+                  node.querySelectorAll('a[href]').forEach(a => cacheLink(db, a));
+                }
+              }
+            });
+          });
+        });
+
+        observer.observe(document.body || document.documentElement, {
+          childList: true,
+          subtree: true
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startCaching);
+      } else {
+        startCaching();
+      }
+    })();
+
     })();
   </script>
 
@@ -660,16 +801,17 @@
       ];
 
       // Image Lookup Map for Exhibit Items & Wings
+            // Image Lookup Map for Exhibit Items & Wings
+            // Image Lookup Map for Exhibit Items & Wings
       const IMAGE_LOOKUP = {
         'museum.html': 'https://lh3.googleusercontent.com/d/1MPsC_RvHj1FoYs9qY1uszeKAD8nJjnCl=s200',
-        '2Dmap.html': 'https://lh3.googleusercontent.com/d/1Qv4jg-98tqb07tk1Fbix4mfFERJK1lkx=s200-rw',
+        '2Dmap.html': 'https://lh3.googleusercontent.com/d/1Qv4jg-98tqb07tk1Fbix4mfFERJK1lkx=s200',
         'gallery.html': 'https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200',
         'currency.html': 'https://lh3.googleusercontent.com/d/1_iVIkB1Ha1m2k_qXBMaO3DEj56g8jlO1=s200',
         'stamps.html': 'https://lh3.googleusercontent.com/d/1zTcfm-hIry3SRYMhIY6EhtZRbRYTq_sU=s200',
-        '2Dmap_stamps.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw',
-        'nz_history.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw',
-        'trains.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw',
-        'maritime.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw'
+        'nz_history.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200',
+        'trains.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200',
+        'maritime.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200'
       };
 
       const WING_IMAGE_LOOKUP = {
