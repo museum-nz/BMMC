@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BMMC Hub</title>
@@ -57,6 +58,7 @@
       --amber: #d97706;
       --pulse-glow: rgba(2, 132, 199, 0.4);
       --mote-color: rgba(2, 132, 199, 0.35);
+      --slot-bg: rgba(15, 23, 42, 0.03);
     }
 
     /* Dark Mode Palette */
@@ -89,6 +91,7 @@
       --amber: #fbbf24;
       --pulse-glow: rgba(56, 189, 248, 0.8);
       --mote-color: rgba(56, 189, 248, 0.4);
+      --slot-bg: rgba(255, 255, 255, 0.04);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -332,12 +335,12 @@
     }
 
     .spider-network {
-      position: relative; width: 100%; max-width: 1440px;
-      display: grid; grid-template-columns: 1.15fr auto 1.15fr;
-      align-items: center; gap: 32px; z-index: 5;
+      position: relative; width: 100%; max-width: 1480px;
+      display: grid; grid-template-columns: 1.2fr auto 1.2fr;
+      align-items: center; gap: 36px; z-index: 5;
     }
 
-    .network-flank { display: flex; flex-direction: column; gap: 16px; min-width: 280px; }
+    .network-flank { display: flex; flex-direction: column; gap: 16px; min-width: 330px; }
     
     /* Interactive Spotlight Zoom & Receding Transitions */
     .wing-cluster { 
@@ -360,8 +363,9 @@
     .wing-hub {
       background: var(--card-bg); backdrop-filter: blur(16px);
       border: 1.5px solid var(--card-border); border-radius: 12px;
-      padding: 9px 14px; display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; display: flex; align-items: center; justify-content: space-between;
       cursor: pointer; box-shadow: var(--card-shadow); transition: all 0.25s;
+      gap: 12px;
     }
     .wing-hub:hover { transform: translateY(-2px); border-color: var(--card-hover-border); }
 
@@ -369,8 +373,33 @@
     .wing-hub[data-color="1"] { border-left: 4px solid var(--emerald); }
     .wing-hub[data-color="2"] { border-left: 4px solid var(--amber); }
 
+    .wing-info { display: flex; align-items: center; gap: 8px; }
     .wing-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--text); }
     .wing-tag { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 5px; background: var(--filter-bg); color: var(--muted); }
+
+    /* Right-Justified Wing Header Image (Shrink-to-Fit) */
+    .wing-media-slot {
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 76px;
+      height: 40px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--slot-bg);
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+    .wing-media-img {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* shrink to fit */
+      display: block;
+    }
 
     /* Spoke Cards */
     .spoke-cards { display: flex; flex-direction: column; gap: 7px; padding-left: 12px; }
@@ -400,7 +429,23 @@
 
     .spoke-card.dimmed { opacity: 0.12; pointer-events: none; }
 
-    .card-main-link { text-decoration: none; color: inherit; display: block; }
+    /* Main Clickable Card Row (Info on Left, Image on Right) */
+    .card-layout-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card-info-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
     
     .card-header-row {
       display: flex;
@@ -427,9 +472,40 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
+    /* Right-Justified Exhibit Image Slot (Shrink-to-Fit) */
+    .card-media-slot {
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 86px;
+      height: 52px;
+      border-radius: 8px;
+      background: var(--slot-bg);
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px;
+      transition: border-color 0.2s, transform 0.25s ease;
+    }
+
+    .spoke-card:hover .card-media-slot {
+      border-color: var(--card-hover-border);
+      transform: scale(1.05);
+    }
+
+    .card-media-img {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* shrink to fit */
+      display: block;
+    }
+
     /* Sub-Satellite Link */
     .sub-satellite {
-      margin-top: 5px; padding-top: 5px;
+      margin-top: 6px; padding-top: 6px;
       border-top: 1px dashed var(--card-border);
     }
     .sub-satellite-link {
@@ -583,8 +659,24 @@
         }
       ];
 
-      // Use shared-nav.js if available, otherwise fall back immediately
-      const branches = (window.BMMC_BRANCHES && Array.isArray(window.BMMC_BRANCHES) && window.BMMC_BRANCHES.length > 0)
+      // Image Lookup Map for Exhibit Items & Wings
+      const IMAGE_LOOKUP = {
+        'museum.html': 'https://lh3.googleusercontent.com/d/1MPsC_RvHj1FoYs9qY1uszeKAD8nJjnCl=s200',
+        '2Dmap.html': 'https://lh3.googleusercontent.com/d/1Qv4jg-98tqb07tk1Fbix4mfFERJK1lkx=s200-rw',
+        'gallery.html': 'https://lh3.googleusercontent.com/d/1khWSR7cXY2wqfg4tfUjeXVSozwyvI4uf=s200',
+        'currency.html': 'https://lh3.googleusercontent.com/d/1_iVIkB1Ha1m2k_qXBMaO3DEj56g8jlO1=s200',
+        'stamps.html': 'https://lh3.googleusercontent.com/d/1zTcfm-hIry3SRYMhIY6EhtZRbRYTq_sU=s200',
+        '2Dmap_stamps.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw',
+        'nz_history.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw',
+        'trains.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw',
+        'maritime.html': 'https://lh3.googleusercontent.com/d/1mpEFt1vmHJApmU9veudGN7_SI-3NE_bT=s200-rw'
+      };
+
+      const WING_IMAGE_LOOKUP = {
+      };
+
+      // Resilient source detection
+      const rawBranches = (window.BMMC_BRANCHES && Array.isArray(window.BMMC_BRANCHES) && window.BMMC_BRANCHES.length > 0)
         ? window.BMMC_BRANCHES
         : DEFAULT_BRANCHES;
 
@@ -647,15 +739,18 @@
       const searchInput = document.getElementById('targetSearch');
       const btnSurprise = document.getElementById('btnSurprise');
 
-      branches.forEach((branch, index) => {
+      rawBranches.forEach((branch, index) => {
         const wingId = `wing-cluster-${index}`;
         const colorIdx = index % 3;
+        const wingTitle = branch.group || branch.name || branch.title || `Wing ${index + 1}`;
+        const branchItems = branch.items || branch.links || [];
+        const wingImgUrl = branch.image || WING_IMAGE_LOOKUP[wingTitle] || null;
 
         // Filter Button
         const btn = document.createElement('button');
         btn.className = 'filter-btn';
         btn.setAttribute('data-target', wingId);
-        btn.textContent = `${branch.group} (${branch.items.length})`;
+        btn.textContent = `${wingTitle} (${branchItems.length})`;
         filterBar.appendChild(btn);
 
         // Wing Container
@@ -665,19 +760,29 @@
         cluster.setAttribute('data-wing-index', index);
 
         let itemsHTML = '';
-        branch.items.forEach((item, cardIdx) => {
+        branchItems.forEach((item, cardIdx) => {
           const hasChildren = Array.isArray(item.children) && item.children.length > 0;
-          
+          const cleanHref = (item.href || '').replace('./', '');
+          const cardImg = item.image || IMAGE_LOOKUP[item.href] || IMAGE_LOOKUP[cleanHref] || null;
+
           itemsHTML += `
             <div class="spoke-card" id="card-${index}-${cardIdx}" data-wing="${index}" data-card="${cardIdx}" data-tags="${(item.label + ' ' + (item.desc || '') + ' ' + item.href).toLowerCase()}">
-              <a href="${item.href}" class="card-main-link">
-                <div class="card-header-row">
-                  <div class="card-meta">
-                    <div class="card-icon">${item.icon || '📁'}</div>
-                    <div class="card-label">${item.label}</div>
+              <a href="${item.href}" class="card-layout-link">
+                <div class="card-info-col">
+                  <div class="card-header-row">
+                    <div class="card-meta">
+                      <div class="card-icon">${item.icon || '📁'}</div>
+                      <div class="card-label">${item.label}</div>
+                    </div>
                   </div>
+                  ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
                 </div>
-                ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+
+                ${cardImg ? `
+                  <div class="card-media-slot" title="${item.label}">
+                    <img src="${cardImg}" alt="${item.label}" class="card-media-img" loading="lazy" referrerpolicy="no-referrer" />
+                  </div>
+                ` : ''}
               </a>
 
               ${hasChildren ? `
@@ -697,8 +802,15 @@
 
         cluster.innerHTML = `
           <div class="wing-hub" data-color="${colorIdx}" id="hub-node-${index}">
-            <div class="wing-title">${branch.group}</div>
-            <span class="wing-tag">${branch.items.length} Exhibits</span>
+            <div class="wing-info">
+              <div class="wing-title">${wingTitle}</div>
+              <span class="wing-tag">${branchItems.length} Exhibits</span>
+            </div>
+            ${wingImgUrl ? `
+              <div class="wing-media-slot" title="${wingTitle}">
+                <img src="${wingImgUrl}" alt="${wingTitle}" class="wing-media-img" loading="lazy" referrerpolicy="no-referrer" />
+              </div>
+            ` : ''}
           </div>
           <div class="spoke-cards">${itemsHTML}</div>
         `;
@@ -709,7 +821,7 @@
 
       // Conduit Curves Generator
       function createCurve(elemA, elemB, pulseClass, conduitId) {
-        if (!elemA || !elemB) return document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        if (!elemA || !elemB || !stage) return document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const rA = elemA.getBoundingClientRect();
         const rB = elemB.getBoundingClientRect();
         const sR = stage.getBoundingClientRect();
@@ -745,7 +857,6 @@
           const hub = cluster.querySelector('.wing-hub');
           const pulseClass = `pulse-${idx % 3}`;
 
-          // Conduits match the blurred/receded state of the wing
           let stateClass = '';
           if (isReceded) stateClass = 'conduit-receded';
           else if (isSpotlighted) stateClass = 'conduit-spotlighted';
@@ -763,6 +874,19 @@
           });
         });
       }
+
+      // Safe image loading listeners (Recalculates conduits cleanly upon render)
+      document.querySelectorAll('.card-media-img, .wing-media-img').forEach(img => {
+        if (img.complete) {
+          drawConduits();
+        } else {
+          img.addEventListener('load', () => drawConduits());
+          img.addEventListener('error', function() {
+            if (this.parentElement) this.parentElement.style.display = 'none';
+            drawConduits();
+          });
+        }
+      });
 
       // Active Conduit Lightning on Hover
       document.querySelectorAll('.spoke-card').forEach(card => {
@@ -812,7 +936,8 @@
 
       // Quick Hub Click
       document.querySelectorAll('.wing-hub').forEach((hub, idx) => {
-        hub.addEventListener('click', () => {
+        hub.addEventListener('click', (e) => {
+          if (e.target.closest('.wing-media-slot')) return;
           const btn = document.querySelector(`.filter-btn[data-target="wing-cluster-${idx}"]`);
           if (btn) btn.click();
         });
