@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
-  <title>BMMC Showcase — Museum &amp; Gramophone Archive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMMC Hub</title>
+  
+  <!-- Museum Tab Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>" />
 
-  <!-- Instant Theme Sync -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Instant Theme Initializer (Defaults to Light Mode on First Start) -->
   <script>
     (function() {
       try {
@@ -19,650 +26,900 @@
     })();
   </script>
 
-  <!-- Preconnect for Performance -->
-  <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
-  <link rel="preconnect" href="https://docs.google.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Inline Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
-
-  <!-- Tailwind CSS Engine with Local & CDN Fallbacks -->
-  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
-  <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
-  <script>
-    if (!window.tailwind) {
-      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
-    }
-  </script>
-  <script>
-    if (window.tailwind) {
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f0f7ff',
-                100: '#e0effe',
-                500: '#2563eb',
-                600: '#1d4ed8',
-                700: '#1e40af',
-              }
-            }
-          }
-        }
-      };
-    }
-  </script>
-
-  <!-- Master Unified Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- Hide 3D, Hot, Surprise Pills on #stats view -->
   <style>
-    body:has(#statsSection:not(.hidden)) #btn3DOnly,
-    body:has(#statsSection:not(.hidden)) #btnHotOnly,
-    body:has(#statsSection:not(.hidden)) #btnSurprise,
-    .stats-hidden-pill {
-      display: none !important;
+    /* Light Mode Palette (Default) */
+    :root {
+      --bg: #f8fafc;
+      --grid-color: rgba(0, 0, 0, 0.04);
+      --header-bg: rgba(255, 255, 255, 0.88);
+      --header-border: rgba(226, 232, 240, 0.8);
+      --text: #0f172a;
+      --muted: #64748b;
+      --card-bg: rgba(255, 255, 255, 0.86);
+      --card-border: rgba(226, 232, 240, 0.9);
+      --card-hover-bg: #ffffff;
+      --card-hover-border: rgba(2, 132, 199, 0.5);
+      --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --icon-bg: rgba(15, 23, 42, 0.05);
+      --filter-bg: rgba(0, 0, 0, 0.04);
+      --filter-border: rgba(0, 0, 0, 0.08);
+      --filter-active: rgba(2, 132, 199, 0.12);
+      --filter-active-text: #0284c7;
+      --search-bg: rgba(255, 255, 255, 0.95);
+      --search-border: rgba(203, 213, 225, 0.8);
+      --reactor-bg: radial-gradient(circle at 45% 45%, #ffffff, #e2e8f0 85%);
+      --reactor-border: rgba(2, 132, 199, 0.4);
+      --reactor-shadow: 0 10px 40px rgba(2, 132, 199, 0.15), inset 0 0 20px rgba(2, 132, 199, 0.08);
+      --gyro-1: rgba(2, 132, 199, 0.35);
+      --gyro-2: rgba(100, 116, 139, 0.25);
+      --cyan: #0284c7;
+      --emerald: #059669;
+      --amber: #d97706;
+      --pulse-glow: rgba(2, 132, 199, 0.4);
+      --mote-color: rgba(2, 132, 199, 0.35);
+    }
+
+    /* Dark Mode Palette */
+    html.dark {
+      --bg: #050814;
+      --grid-color: rgba(255, 255, 255, 0.02);
+      --header-bg: rgba(5, 8, 20, 0.88);
+      --header-border: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --card-hover-bg: rgba(30, 41, 59, 0.95);
+      --card-hover-border: rgba(255, 255, 255, 0.3);
+      --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      --icon-bg: rgba(255, 255, 255, 0.06);
+      --filter-bg: rgba(255, 255, 255, 0.04);
+      --filter-border: rgba(255, 255, 255, 0.08);
+      --filter-active: rgba(255, 255, 255, 0.16);
+      --filter-active-text: #ffffff;
+      --search-bg: rgba(15, 23, 42, 0.8);
+      --search-border: rgba(255, 255, 255, 0.12);
+      --reactor-bg: radial-gradient(circle at 45% 45%, #1e293b, #090e1a 80%);
+      --reactor-border: rgba(56, 189, 248, 0.6);
+      --reactor-shadow: 0 0 50px rgba(56, 189, 248, 0.25), inset 0 0 25px rgba(56, 189, 248, 0.2);
+      --gyro-1: rgba(56, 189, 248, 0.3);
+      --gyro-2: rgba(255, 255, 255, 0.18);
+      --cyan: #38bdf8;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --pulse-glow: rgba(56, 189, 248, 0.8);
+      --mote-color: rgba(56, 189, 248, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      transition: background-color 0.4s ease, color 0.3s ease;
+    }
+
+    /* Fixed Sky & Horizon Layer */
+    #timeSkyBackground {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes skyCycleLight {
+      0% { background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #fed7aa 100%); }
+      33% { background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #fef3c7 100%); }
+      66% { background: linear-gradient(180deg, #e0e7ff 0%, #f1f5f9 55%, #fed7aa 100%); }
+      100% { background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #fed7aa 100%); }
+    }
+
+    @keyframes skyCycleDark {
+      0% { background: linear-gradient(180deg, #020617 0%, #0f172a 50%, #1e1b4b 100%); }
+      33% { background: linear-gradient(180deg, #030712 0%, #111827 50%, #172554 100%); }
+      66% { background: linear-gradient(180deg, #090d16 0%, #0f172a 55%, #1e1b4b 100%); }
+      100% { background: linear-gradient(180deg, #020617 0%, #0f172a 50%, #1e1b4b 100%); }
+    }
+
+    .time-sky-animated {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      animation: skyCycleLight 22s ease-in-out infinite;
+    }
+
+    html.dark .time-sky-animated {
+      animation: skyCycleDark 22s ease-in-out infinite;
+    }
+
+    #motesCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .horizon-silhouette {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      line-height: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.88;
+    }
+
+    html.dark .horizon-silhouette { opacity: 0.95; }
+    .horizon-silhouette img { width: 100%; height: auto; display: block; }
+
+    .radar-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+    }
+
+    /* Top Navigation HUD */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 24px;
+      background: var(--header-bg);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .brand-section { display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: grid; place-items: center; font-size: 18px;
+      box-shadow: 0 0 16px rgba(2, 132, 199, 0.4);
+    }
+    .brand-title { 
+      font-family: 'Space Grotesk', sans-serif; 
+      font-weight: 800; 
+      font-size: 1.15rem; 
+      letter-spacing: -0.01em; 
+      color: var(--text);
+    }
+
+    .menu-trigger-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 8px;
+      border: 1px solid var(--filter-border);
+      background: var(--filter-bg); color: var(--text);
+      font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .menu-trigger-btn:hover { background: var(--card-hover-bg); border-color: var(--cyan); }
+
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-bar {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--filter-bg); padding: 3px; border-radius: 100px;
+      border: 1px solid var(--filter-border);
+    }
+
+    .filter-btn {
+      background: transparent; border: none; color: var(--muted);
+      font-size: 0.74rem; font-weight: 700; padding: 5px 13px;
+      border-radius: 100px; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover { color: var(--text); background: rgba(125, 125, 125, 0.1); }
+    .filter-btn.active { 
+      color: var(--filter-active-text); 
+      background: var(--filter-active); 
+      box-shadow: 0 0 12px rgba(2, 132, 199, 0.15); 
+    }
+
+    .surprise-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 13px;
+      border-radius: 100px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.12));
+      color: var(--amber);
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .surprise-btn:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(239, 68, 68, 0.25));
+      border-color: var(--amber);
+      transform: scale(1.05);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+    }
+    .surprise-btn.rolling {
+      animation: pulseRoll 0.2s infinite alternate;
+      border-color: #fff;
+    }
+    @keyframes pulseRoll {
+      from { transform: scale(1); filter: brightness(1); }
+      to { transform: scale(1.08); filter: brightness(1.3); }
+    }
+
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box input {
+      background: var(--search-bg); border: 1px solid var(--search-border);
+      border-radius: 100px; padding: 6px 14px 6px 32px;
+      color: var(--text); font-size: 0.78rem; width: 180px; transition: all 0.25s;
+    }
+    .search-box input:focus { outline: none; width: 230px; border-color: var(--cyan); box-shadow: 0 0 16px var(--pulse-glow); }
+    .search-icon { position: absolute; left: 10px; font-size: 12px; color: var(--muted); pointer-events: none; }
+
+    /* Interactive Stage */
+    .stage-container {
+      position: relative;
+      width: 100%;
+      min-height: calc(100vh - 57px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px 60px;
+      z-index: 10;
+    }
+
+    #spokeConduits {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+
+    .laser-line { 
+      fill: none; 
+      stroke-linecap: round; 
+      transition: stroke 0.25s, opacity 0.4s ease, filter 0.4s ease, stroke-width 0.25s; 
+    }
+    @keyframes flowLaser { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+
+    .laser-line.pulse-0 { stroke: var(--cyan); stroke-width: 2; stroke-dasharray: 6 6; animation: flowLaser 1.4s linear infinite; filter: drop-shadow(0 0 6px var(--pulse-glow)); }
+    .laser-line.pulse-1 { stroke: var(--emerald); stroke-width: 2; stroke-dasharray: 6 6; animation: flowLaser 1.4s linear infinite; filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6)); }
+    .laser-line.pulse-2 { stroke: var(--amber); stroke-width: 2; stroke-dasharray: 6 6; animation: flowLaser 1.4s linear infinite; filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6)); }
+
+    /* Active Conduit Lightning Surge */
+    .laser-line.laser-lightning {
+      stroke: #ffffff !important;
+      stroke-width: 3.5px !important;
+      stroke-dasharray: none !important;
+      opacity: 1 !important;
+      filter: drop-shadow(0 0 10px var(--cyan)) drop-shadow(0 0 20px #fff) !important;
+    }
+
+    /* Blurred & Receded Conduits for Non-Selected Wings */
+    .laser-line.conduit-receded {
+      opacity: 0.05 !important;
+      filter: blur(3px) grayscale(85%) !important;
+      stroke-width: 1.2px !important;
+    }
+
+    .laser-line.conduit-spotlighted {
+      opacity: 1 !important;
+      filter: drop-shadow(0 0 8px var(--pulse-glow)) !important;
+      stroke-width: 2.5px !important;
+    }
+
+    .spider-network {
+      position: relative; width: 100%; max-width: 1440px;
+      display: grid; grid-template-columns: 1.15fr auto 1.15fr;
+      align-items: center; gap: 32px; z-index: 5;
+    }
+
+    .network-flank { display: flex; flex-direction: column; gap: 16px; min-width: 280px; }
+    
+    /* Interactive Spotlight Zoom & Receding Transitions */
+    .wing-cluster { 
+      display: flex; flex-direction: column; gap: 7px; 
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, filter 0.4s ease;
+    }
+    .wing-cluster.spotlighted {
+      transform: scale(1.04);
+      opacity: 1 !important;
+      filter: none !important;
+      z-index: 25;
+    }
+    .wing-cluster.receded {
+      opacity: 0.14 !important;
+      filter: blur(2.5px) grayscale(60%) !important;
+      transform: scale(0.92);
+      pointer-events: none;
+    }
+
+    .wing-hub {
+      background: var(--card-bg); backdrop-filter: blur(16px);
+      border: 1.5px solid var(--card-border); border-radius: 12px;
+      padding: 9px 14px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; box-shadow: var(--card-shadow); transition: all 0.25s;
+    }
+    .wing-hub:hover { transform: translateY(-2px); border-color: var(--card-hover-border); }
+
+    .wing-hub[data-color="0"] { border-left: 4px solid var(--cyan); }
+    .wing-hub[data-color="1"] { border-left: 4px solid var(--emerald); }
+    .wing-hub[data-color="2"] { border-left: 4px solid var(--amber); }
+
+    .wing-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--text); }
+    .wing-tag { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 5px; background: var(--filter-bg); color: var(--muted); }
+
+    /* Spoke Cards */
+    .spoke-cards { display: flex; flex-direction: column; gap: 7px; padding-left: 12px; }
+    
+    .spoke-card {
+      display: flex; flex-direction: column;
+      background: var(--card-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border); border-radius: 10px;
+      padding: 8px 12px; transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+    }
+
+    .spoke-card:hover {
+      transform: translateX(4px) scale(1.02);
+      border-color: var(--card-hover-border);
+      background: var(--card-hover-bg);
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.2);
+    }
+    
+    .spoke-card.matched, .spoke-card.roulette-active {
+      border-color: #fff !important;
+      transform: scale(1.04) !important;
+      box-shadow: 0 0 24px var(--amber), 0 0 10px #fff !important;
+      background: var(--card-hover-bg) !important;
+    }
+
+    .spoke-card.dimmed { opacity: 0.12; pointer-events: none; }
+
+    .card-main-link { text-decoration: none; color: inherit; display: block; }
+    
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-meta { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .card-icon {
+      font-size: 15px; width: 26px; height: 26px; border-radius: 6px;
+      background: var(--icon-bg); display: grid; place-items: center; flex-shrink: 0;
+    }
+    
+    .card-label {
+      font-size: 0.82rem; font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color 0.2s;
+    }
+    .spoke-card:hover .card-label { color: var(--cyan); }
+
+    .card-desc {
+      font-size: 0.7rem; color: var(--muted); line-height: 1.25;
+      margin-top: 3px; margin-left: 34px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Sub-Satellite Link */
+    .sub-satellite {
+      margin-top: 5px; padding-top: 5px;
+      border-top: 1px dashed var(--card-border);
+    }
+    .sub-satellite-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 700; color: var(--emerald);
+      text-decoration: none; padding: 3px 8px; border-radius: 5px;
+      background: rgba(16, 185, 129, 0.1); transition: all 0.2s;
+    }
+    .sub-satellite-link:hover { background: rgba(16, 185, 129, 0.22); transform: translateX(3px); }
+
+    /* Center Nexus Reactor */
+    .network-center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+    .nexus-reactor {
+      position: relative; width: 190px; height: 190px; border-radius: 50%;
+      background: var(--reactor-bg);
+      border: 2px solid var(--reactor-border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: var(--reactor-shadow);
+      cursor: pointer; transition: all 0.35s;
+    }
+    .nexus-reactor:hover { transform: scale(1.06); border-color: var(--cyan); }
+
+    .gyro-ring { position: absolute; border-radius: 50%; pointer-events: none; }
+    .gyro-1 { width: 226px; height: 226px; border: 1px dashed var(--gyro-1); animation: spinRings 24s linear infinite; }
+    .gyro-2 { width: 254px; height: 254px; border: 1px dotted var(--gyro-2); animation: spinRingsCounter 36s linear infinite; }
+    @keyframes spinRings { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes spinRingsCounter { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+    .core-icon { font-size: 34px; }
+    .core-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 800; margin-top: 3px; color: var(--text); }
+    .core-desc { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--cyan); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+
+    @media (max-width: 1100px) {
+      .spider-network { grid-template-columns: 1fr; gap: 32px; }
+      .network-center { order: -1; }
+      #spokeConduits { display: none; }
+      .filter-bar { overflow-x: auto; }
     }
   </style>
-  <script>
-    (function() {
-      function syncStatsHeaderPills() {
-        const statsEl = document.getElementById('statsSection');
-        const isStats = window.location.hash.toLowerCase().startsWith('#stats') ||
-                        (statsEl && !statsEl.classList.contains('hidden'));
-        ['btn3DOnly', 'btnHotOnly', 'btnSurprise'].forEach(function(id) {
-          const btn = document.getElementById(id);
-          if (btn) {
-            btn.classList.toggle('stats-hidden-pill', isStats);
-          }
-        });
-      }
-
-      window.addEventListener('hashchange', syncStatsHeaderPills);
-      document.addEventListener('DOMContentLoaded', function() {
-        syncStatsHeaderPills();
-        const statsEl = document.getElementById('statsSection');
-        if (statsEl) {
-          new MutationObserver(syncStatsHeaderPills).observe(statsEl, {
-            attributes: true,
-            attributeFilter: ['class', 'style']
-          });
-        }
-      });
-    })();
-  </script>
-
-
-  <!-- Core Libraries with Local & CDN Fallbacks -->
-  <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
-  <script src="vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
-  <script>
-    if (!window.Papa) {
-      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
-    }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
-
-  <script defer src="../vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
-  <script defer src="vendor/chart.umd.min.js" onerror="this.onerror=null;"></script>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      if (!window.Chart) {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-        document.head.appendChild(s);
-      }
-    });
-  </script>
-
-  <script type="module" src="../vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
-  <script type="module" src="vendor/model-viewer.min.js" onerror="this.onerror=null;"></script>
-  <script type="module">
-    if (!customElements.get('model-viewer')) {
-      import('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js');
-    }
-  </script>
-
-  <!-- Offline Media Adapter -->
-  <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
-
-  <!-- Application Logic -->
-  <script defer src="app.js"></script>
-  <meta name="google-site-verification" content="Lvkay0ZyA_Iz04oh-s2SERucN0aVLn_R-emAvrkY-S0" />
 </head>
-<body class="bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-indigo-50/20 dark:from-slate-950/30 dark:via-slate-900/30 dark:to-indigo-950/30 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased relative transition-colors duration-300 overflow-x-hidden">
+<body>
 
-  <!-- Moving Time & Seasons Sky Background with WW1 Silhouette -->
-  <div id="timeSkyBackground" class="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
-    <div class="time-sky-animated absolute inset-0 transition-all duration-1000 z-0 pointer-events-none"></div>
-
-    <div class="poppy-skyline-drift absolute top-0 left-0 z-10 pointer-events-none">
-      <div class="poppy-flutter w-full h-full flex pointer-events-none">
-        <!-- Tile 1 -->
-        <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-          <defs>
-            <g id="poppySymbol">
-              <path fill="#dc2626" opacity="0.95" d="M 0,-16 C -10,-16 -16,-9 -16,0 C -16,5 -11,9 -7,11 C -11,16 -4,18 0,16 C 4,18 11,16 7,11 C 11,9 16,5 16,0 C 16,-9 10,-16 0,-16 Z"/>
-              <path fill="#ef4444" opacity="0.85" d="M -2,-2 C -8,-2 -11,2 -10,8 C -6,11 6,11 10,8 C 11,2 8,-2 -2,-2 Z"/>
-              <circle cx="0" cy="0" r="4.5" fill="#09090b"/>
-              <circle cx="0" cy="0" r="2" fill="#27272a"/>
-            </g>
-            <g id="poppySmall"><use href="#poppySymbol" transform="scale(0.65)" /></g>
-            <g id="poppyLarge"><use href="#poppySymbol" transform="scale(1.25)" /></g>
-          </defs>
-          <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
-          <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
-          <use href="#poppyLarge" x="620" y="30" opacity="1" />
-          <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
-          <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
-          <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
-          <use href="#poppySmall" x="720" y="120" opacity="0.75" />
-          <use href="#poppySymbol" x="940" y="180" opacity="0.85" />
-          <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
-          <use href="#poppySmall" x="310" y="220" opacity="0.8" />
-          <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
-          <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
-          <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
-          <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
-          <use href="#poppySmall" x="680" y="320" opacity="0.75" />
-          <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
-          <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
-          <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
-          <use href="#poppySmall" x="540" y="470" opacity="0.8" />
-          <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
-          <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
-        </svg>
-        <!-- Tile 2 -->
-        <svg class="w-1/2 h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
-          <use href="#poppyLarge" x="100" y="35" opacity="0.95" />
-          <use href="#poppySymbol" x="350" y="70" opacity="0.85" />
-          <use href="#poppyLarge" x="620" y="30" opacity="1" />
-          <use href="#poppySymbol" x="880" y="85" opacity="0.9" />
-          <use href="#poppySymbol" x="180" y="130" opacity="0.85" />
-          <use href="#poppyLarge" x="460" y="170" opacity="0.95" />
-          <use href="#poppySmall" x="720" y="120" opacity="0.75" />
-          <use href="#poppySymbol" x="940" y="180" opacity="0.85" />
-          <use href="#poppyLarge" x="80" y="240" opacity="0.9" />
-          <use href="#poppySmall" x="310" y="220" opacity="0.8" />
-          <use href="#poppySymbol" x="570" y="270" opacity="0.95" />
-          <use href="#poppyLarge" x="810" y="230" opacity="0.85" />
-          <use href="#poppySymbol" x="200" y="330" opacity="0.85" />
-          <use href="#poppyLarge" x="430" y="380" opacity="0.9" />
-          <use href="#poppySmall" x="680" y="320" opacity="0.75" />
-          <use href="#poppySymbol" x="920" y="360" opacity="0.9" />
-          <use href="#poppyLarge" x="120" y="440" opacity="0.95" />
-          <use href="#poppySymbol" x="340" y="420" opacity="0.85" />
-          <use href="#poppySmall" x="540" y="470" opacity="0.8" />
-          <use href="#poppyLarge" x="760" y="430" opacity="0.9" />
-          <use href="#poppySymbol" x="950" y="460" opacity="0.85" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Horizon Silhouette -->
-    <div class="absolute bottom-0 left-0 right-0 w-full leading-none z-20 opacity-85 dark:opacity-95 pointer-events-none select-none">
-      <img 
-        src="background.webp" 
-        alt="" 
-        aria-hidden="true" 
-        class="w-full h-auto block pointer-events-none select-none drop-shadow-sm" 
-        loading="eager"
-      />
+  <!-- Fixed Background Container (Behind everything) -->
+  <div id="timeSkyBackground" aria-hidden="true">
+    <div class="time-sky-animated"></div>
+    <canvas id="motesCanvas"></canvas>
+    <div class="horizon-silhouette">
+      <img src="background.webp" alt="" loading="eager" />
     </div>
   </div>
 
-  <!-- Header Section with Universal Hamburger Drawer Trigger -->
-  <header id="mainHeader" class="solid-header border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-sm backdrop-blur-md transition-colors">
-    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2.5">
-      <div class="flex items-start sm:items-center justify-between gap-2">
-        
-        <!-- Brand Link -->
-        <a href="#" id="brandLogoLink" class="group flex items-center gap-2 shrink-0 pt-0.5 sm:pt-0">
-          <span class="text-2xl transition-transform group-hover:scale-110 drop-shadow" id="headerLogoIcon">🏛️</span>
-          <div class="leading-none">
-            <h1 class="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent tracking-tight whitespace-nowrap" id="headerTitleText">
-              BMMC Showcase
-            </h1>
-            <p class="text-[8px] sm:text-[9px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500 hidden sm:block">Bonniefields Museum Catalog</p>
-          </div>
-        </a>
-        
-        <!-- Action Buttons & Navigation Cluster -->
-        <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap sm:flex-nowrap justify-end overflow-visible">
-          
-          <!-- Universal Navigation Drawer Trigger (Hamburger) -->
-          <button id="btnExploreDropdown" class="btn-bmmc-menu-trigger flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-100 bg-white/95 dark:bg-slate-800/95 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer" title="Open Museum Wings Menu">
-            <span class="text-sm leading-none">☰</span>
-            <span class="hidden sm:inline">Wings</span>
-          </button>
+  <div class="radar-grid"></div>
 
-          <!-- Primary Actions -->
-          <button id="btnBrowseAllHeader" title="Browse All Exhibits" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
-            <span>🌐</span> <span class="hidden sm:inline">Browse</span>
-          </button>
+  <!-- Top Navigation HUD -->
+  <header>
+    <div class="brand-section">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">🏛️</div>
+        <div class="brand-title">BMMC Hub</div>
+      </a>
+      <button class="menu-trigger-btn btn-bmmc-menu-trigger" id="btnMenuToggle" aria-label="Open directory drawer">
+        <span>☰</span> <span>Menu</span>
+      </button>
+    </div>
 
-          <button id="btn3DOnly" title="Filter to 3D Models Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
-            <span>👓</span> <span class="hidden md:inline">3D</span>
-          </button>
-
-          <button id="btnHotOnly" title="Filter to Hot Items Only" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
-            <span>🔥</span> <span class="hidden md:inline">Hot</span>
-          </button>
-
-          <button id="btnSurprise" title="Surprise Me (Random Item)" class="flex items-center gap-1 text-[11px] sm:text-xs font-extrabold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 px-2 sm:px-2.5 py-1.5 rounded-xl transition shadow-sm active:scale-95 shrink-0 cursor-pointer">
-            <span>✨</span> <span class="hidden lg:inline">Surprise</span>
-          </button>
-
-          <!-- Utility Pill Cluster Wrapper -->
-          <div class="basis-full sm:basis-auto flex justify-end mt-1.5 sm:mt-0 shrink-0">
-            <div class="flex items-center bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-0.5 shadow-sm backdrop-blur-sm divide-x divide-slate-200 dark:divide-slate-700/80 shrink-0">
-              
-              <!-- Favorites -->
-              <button id="btnFavorites" title="Saved Favorites" aria-label="Saved Favorites" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
-                <span id="favHeartIcon">🤍</span>
-                <span id="favCountText" class="text-[10px] sm:text-[11px]">Saved (0)</span>
-              </button>
-
-              <!-- Filter Controls Toggle -->
-              <button id="toggleControlsBtn" title="Toggle Search & Filters" aria-label="Toggle Search & Controls" class="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1 rounded-lg transition cursor-pointer">
-                <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                </svg>
-                <span id="toggleChevron" class="text-[8px] text-slate-400">▼</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
+    <!-- Dynamic Actions & Filter Bar -->
+    <div class="hud-actions">
+      <div class="filter-bar" id="filterBarContainer">
+        <button class="filter-btn active" data-target="all">All Wings</button>
       </div>
 
-      <!-- Collapsible Controls -->
-      <div id="collapsibleControls" class="mt-2.5 flex flex-col gap-2.5 transition-all duration-300">
-        <p id="subheadingText" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-          Discover historical artifacts, equipment, and memorabilia at the Bonniefields Museum.
-        </p>
+      <!-- Surprise Roulette Button -->
+      <button class="surprise-btn" id="btnSurprise" title="Surprise Me (Artifact Roulette)">
+        <span>🎲</span> <span>Surprise</span>
+      </button>
+    </div>
 
-        <div id="searchSortBar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
-          <div class="flex items-center justify-between sm:justify-start gap-2 sm:gap-3 shrink-0 flex-wrap">
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold tracking-wide" id="itemCount"></p>
-            
-            <!-- Catalog View Switcher Buttons -->
-            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60" role="group" aria-label="View Switcher">
-              <button id="btnViewGrid" title="Card Grid View" class="px-2 py-1 rounded-lg text-xs font-bold transition bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm cursor-pointer">
-                <span>🔲</span> <span class="hidden md:inline">Grid</span>
-              </button>
-              <button id="btnViewTable" title="Compact Table / Ledger View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
-                <span>📋</span> <span class="hidden md:inline">Table</span>
-              </button>
-              <button id="btnViewPhotos" title="Photo Wall View" class="px-2 py-1 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
-                <span>🖼️</span> <span class="hidden md:inline">Photos</span>
-              </button>
-            </div>
-
-            <!-- Sort Dropdown -->
-            <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
-              <label for="sortBy" class="text-[10px] font-extrabold uppercase text-slate-400">Sort:</label>
-              <select id="sortBy" class="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
-                <option value="default" class="dark:bg-slate-900">Default</option>
-                <option value="title-asc" class="dark:bg-slate-900">Title (A-Z)</option>
-                <option value="title-desc" class="dark:bg-slate-900">Title (Z-A)</option>
-                <option value="age-oldest" class="dark:bg-slate-900">Age / Year (Oldest First)</option>
-                <option value="age-newest" class="dark:bg-slate-900">Age / Year (Newest First)</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="activeFiltersBar" class="hidden flex-wrap items-center gap-1.5 flex-1 min-w-0">
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Active:</span>
-            <div id="activeFiltersContainer" class="flex flex-wrap gap-1 flex-1 min-w-0"></div>
-            <button id="btnClearAllFilters" class="text-[10px] text-rose-600 dark:text-rose-400 font-extrabold hover:underline shrink-0 ml-auto cursor-pointer">Clear</button>
-          </div>
-          
-          <!-- Search Input with Auto-Suggest Dropdown -->
-          <div class="w-full sm:w-72 relative shrink-0">
-            <input type="text" id="searchInput" placeholder="Fuzzy search items, details, artists..." autocomplete="off" aria-label="Search catalog" class="w-full pl-9 pr-9 py-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-xs text-slate-800 dark:text-slate-100 transition shadow-inner font-medium"/>
-            <svg class="w-4 h-4 text-blue-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <button id="clearSearch" title="Clear Search" aria-label="Clear Search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold bg-slate-200 dark:bg-slate-700 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer">✕</button>
-            
-            <!-- Live Suggestion Overlay Box -->
-            <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden text-xs"></div>
-          </div>
-        </div>
-
-        <!-- Museum Filter Grid -->
-        <div id="exhibitsFilterGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-          <select id="filterAge" aria-label="Filter by Era or Age" class="w-full py-1.5 px-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Eras / Ages</option></select>
-          <select id="filterType" aria-label="Filter by Type" class="w-full py-1.5 px-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Types</option></select>
-          <select id="filterCategory" aria-label="Filter by Category" class="w-full py-1.5 px-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Categories</option></select>
-          <select id="filterSubcategory" aria-label="Filter by Subcategory" class="w-full py-1.5 px-2.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Subcategories</option></select>
-        </div><!-- Gramophone Filter Grid -->
-        <div id="gramophoneFilterGrid" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <div>
-            <label for="filterArtist" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Artist</label>
-            <select id="filterArtist" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Artists</option></select>
-          </div>
-          <div>
-            <label for="filterLabel" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Record Label</label>
-            <select id="filterLabel" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Labels</option></select>
-          </div>
-          <div>
-            <label for="filterFormat" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Format</label>
-            <select id="filterFormat" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Formats</option></select>
-          </div>
-          <div>
-            <label for="filterYear" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Release Year</label>
-            <select id="filterYear" class="w-full p-2 bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"><option value="">All Years</option></select>
-          </div>
-        </div>
-
-        <!-- Collection Hubs -->
-        <div id="collectionHubsSection" class="hidden pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80">
-          <div id="hubsGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"></div>
-        </div>
-
-      </div>
+    <!-- Live Search -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="targetSearch" placeholder="Search wings... (/)" />
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full relative z-10">
-    
-    <!-- Skeleton Loader -->
-    <div id="loading" class="py-6 hidden">
-      <div class="flex items-center justify-center gap-2 mb-8">
-        <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
-        <span class="text-sm font-semibold text-slate-500">Fetching catalog archive...</span>
+  <!-- Interactive Constellation Stage -->
+  <main class="stage-container" id="stageContainer">
+    <svg id="spokeConduits"></svg>
+
+    <div class="spider-network">
+      <div class="network-flank" id="leftFlank"></div>
+
+      <!-- Center Nexus -->
+      <div class="network-center">
+        <div class="nexus-reactor" id="nexusCore" title="Click to launch Surprise Roulette!">
+          <div class="gyro-ring gyro-1"></div>
+          <div class="gyro-ring gyro-2"></div>
+          <div class="core-icon">🏛️</div>
+          <div class="core-title">BMMC</div>
+          <div class="core-desc">Surprise / Core</div>
+        </div>
       </div>
+
+      <div class="network-flank" id="rightFlank"></div>
     </div>
-    
-    <!-- Initial Prompt -->
-    <div id="gridPrompt" class="text-center py-16 sm:py-20 bg-white/35 dark:bg-slate-950/40 rounded-3xl border border-white/50 dark:border-slate-800/60 shadow-xl backdrop-blur-md hidden">
-      <div class="max-w-md mx-auto px-4">
-        <div class="w-16 h-16 bg-white/60 dark:bg-slate-900/60 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/60 dark:border-slate-800/80 shadow-inner" id="promptIcon">🔍</div>
-        <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 drop-shadow-sm" id="promptTitle">Ready to Explore Exhibits</h3>
-        <p class="text-xs text-slate-700 dark:text-slate-300 mt-2 mb-6 leading-relaxed font-semibold" id="promptDesc">Select a Collection Hub above, search by keyword, or view all items in the BMMC archive.</p>
-        <button id="btnBrowseAllPrompt" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition active:scale-95 cursor-pointer">Browse All →</button>
-      </div>
-    </div>
-
-    <!-- Exhibit Cards Grid -->
-    <div id="gridSection">
-      <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 hidden"></div>
-    </div>
-
-    <!-- Museum Insights / Stats Dashboard Section -->
-    <div id="statsSection" class="hidden space-y-6">
-      <!-- Top Intro Card -->
-      <div id="statIntroCard" class="hidden bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md">
-        <div class="absolute -right-10 -top-10 w-52 h-52 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -left-10 -bottom-10 w-52 h-52 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 max-w-4xl">
-          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-3.5">Welcome to the Bonniefields Museum Catalog</h2>
-          <p id="statIntroText" class="text-sm sm:text-base text-slate-200 leading-relaxed font-normal whitespace-pre-line"></p>
-        </div>
-      </div>
-
-      <!-- Interactive 2D Map -->
-      <div id="statMapCard" class="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md flex flex-col gap-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <h3 class="text-base sm:text-lg font-black text-blue-300 uppercase tracking-wider flex items-center gap-2"><span>🗺️</span> Map of item origin</h3>
-          <button onclick="openEnlargeModal('2Dmap.html', true)" title="Open Map in Full Scale Pop-Up" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-md border border-blue-400/40 transition flex items-center gap-1 active:scale-95 cursor-pointer">Enlarge ↗</button>
-        </div>
-        <div class="w-full h-[400px] sm:h-[520px] relative overflow-hidden rounded-2xl bg-slate-900 border border-indigo-500/30 shadow-inner">
-          <iframe data-src="2Dmap.html" id="statMapIframe" class="w-full h-full border-0 rounded-2xl bg-white" title="Map of item origin"></iframe>
-        </div>
-      </div>
-
-      <!-- Timeline Era Breakdown Grid -->
-      <div id="timelineEraSection" class="pt-1 border-t border-slate-200/60 dark:border-slate-800/80">
-        <div id="timelineEraGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"></div>
-      </div>
-
-      <!-- Primary KPI Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/50 transition">
-          <div class="w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 absolute top-0 left-0"></div>
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Items</span>
-              <span class="p-1.5 bg-blue-50 dark:bg-blue-950/80 text-blue-600 rounded-xl text-base border border-blue-100 dark:border-blue-900/60">🏛️</span>
-            </div>
-            <div class="text-2xl font-black text-blue-600 dark:text-blue-400" id="statTotalItems">1,193</div>
-          </div>
-        </div>
-
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-amber-500/50 transition">
-          <div class="w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500 absolute top-0 left-0"></div>
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Date Span</span>
-              <span class="p-1.5 bg-amber-50 dark:bg-amber-950/80 text-amber-600 rounded-xl text-base border border-amber-100 dark:border-amber-900/60">⏳</span>
-            </div>
-            <div class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400" id="statDateRange">--</div>
-          </div>
-        </div>
-
-        <!-- Pre / Post 1950 Dual Metrics Card -->
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/50 transition">
-          <div class="w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 absolute top-0 left-0"></div>
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Era Distribution</span>
-              <span class="p-1.5 bg-purple-50 dark:bg-purple-950/80 text-purple-600 rounded-xl text-base border border-purple-100 dark:border-purple-900/60">📜</span>
-            </div>
-            <div class="space-y-0.5 mt-1">
-              <div class="text-sm font-black text-slate-900 dark:text-white" id="statPre1950">Pre 1950: <span class="text-purple-600 dark:text-purple-400">--</span></div>
-              <div class="text-sm font-black text-slate-900 dark:text-white" id="statPost1950">Post 1950: <span class="text-pink-600 dark:text-pink-400">--</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Highlighted Wings & Archival Links Card -->
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/50 transition">
-          <div class="w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 absolute top-0 left-0"></div>
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Explore Museum Wings</span>
-              <span class="p-1.5 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 rounded-xl text-base border border-emerald-100 dark:border-emerald-900/60">🔗</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-1.5 min-h-[32px]">
-              <a href="nz_history.html" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1">📜 NZ History ↗</a>
-              <a href="stamps.html" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-emerald-500 shadow-sm transition flex items-center gap-1">📮 NZ Stamps ↗</a>
-              <a href="currency.html" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-amber-500 shadow-sm transition flex items-center gap-1">🪙 NZ Currency ↗</a>
-              <a href="gallery.html" class="bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-teal-500 shadow-sm transition flex items-center gap-1">📷 Gallery ↗</a>
-              <a href="restoration-guide.html" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-amber-500 shadow-sm transition flex items-center gap-1">🛠️ Care ↗</a>
-              <a id="statDocLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-blue-500 shadow-sm transition flex items-center gap-1">📄 Doc ↗</a>
-              <a id="statWebLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-slate-600 shadow-sm transition flex items-center gap-1">🌐 Web ↗</a>
-              <button id="btnTogglePoppyMotion" onclick="togglePoppyMotion()" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-xl border border-rose-500 shadow-sm transition flex items-center gap-1 active:scale-95 cursor-pointer">🌺 Dynamic</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Charts Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between backdrop-blur-sm">
-          <div class="mb-4">
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Item Date by Type</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Distribution of artifacts by decade (post-1800)</p>
-          </div>
-          <div class="chart-container relative h-[380px] w-full">
-            <canvas id="chartStackedDateType"></canvas>
-          </div>
-        </div>
-
-        <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between backdrop-blur-sm">
-          <div class="mb-4">
-            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">Origin Locations (Where Made)</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Top manufacturing places</p>
-          </div>
-          <div class="chart-container relative h-[380px] w-full">
-            <canvas id="chartLocations"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subcategories Breakdown Chart -->
-      <div class="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm backdrop-blur-sm">
-        <div class="mb-4">
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">Subcategories Breakdown</h3>
-        </div>
-        <div class="chart-container relative h-[480px] w-full">
-          <canvas id="chartSubcatCategory"></canvas>
-        </div>
-      </div>
-
-      <!-- Title Details Section -->
-      <div id="statTitleDetailsCard" class="hidden bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm backdrop-blur-sm relative overflow-hidden">
-        <div id="statTitleDetailsContent" class="text-slate-700 dark:text-slate-300 leading-relaxed font-normal"></div>
-      </div>
-
-    </div>
-
   </main>
 
-  <!-- Floating Mobile Jump Pill -->
-  <button id="floatingJumpBtn" aria-label="Jump to Archive Grid" class="sm:hidden fixed bottom-5 right-5 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-1.5 hidden border border-white/20 active:scale-95 cursor-pointer">
-    <span>⬇️ View Archive</span>
-  </button>
-
-  <!-- Floating Compare Bar -->
-  <div id="floatingCompareBar" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white dark:bg-slate-800/95 dark:text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-xl flex items-center gap-3 hidden transition-all duration-300 transform translate-y-4">
-    <div class="flex items-center gap-2">
-      <span class="text-base">⚖️</span>
-      <span id="compareCountText" class="text-xs font-black text-blue-400">2 Items Selected</span>
-    </div>
-    <button id="btnOpenCompareModal" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black px-3.5 py-1.5 rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-      Compare Side-by-Side →
-    </button>
-    <button id="btnClearCompare" title="Clear Selection" class="text-slate-400 hover:text-rose-400 text-xs font-bold px-1 transition cursor-pointer">
-      ✕
-    </button>
-  </div>
-
-  <!-- Toast Notification System -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-900/90 text-white dark:bg-slate-100 dark:text-slate-900 px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700/50 dark:border-slate-300/50 text-xs font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-3" role="status" aria-live="polite">
-    <span id="toastIcon">✨</span>
-    <span id="toastMsg">Notification message</span>
-  </div>
-
-  <!-- Fullscale Enlarge Modal Pop-Up -->
-  <div id="enlargeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[85] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
-    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
-      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
-        <h3 class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Full Scale Interactive View</h3>
-        <button id="closeEnlargeModal" onclick="closeEnlargeModal()" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition cursor-pointer">✕</button>
-      </div>
-      <div id="enlargeModalBody" class="w-full h-full flex items-center justify-center bg-slate-950 p-2 overflow-auto"></div>
-    </div>
-  </div>
-
-  <!-- Item Detail Pop-up Modal -->
-  <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[80] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-indigo-500/40 relative flex flex-col backdrop-blur-2xl" id="modalContainer">
-      <div class="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-indigo-500/20 px-4 sm:px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-1.5">
-          <button id="modalPrevBtn" title="Previous Item" aria-label="Previous Item" class="p-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1 cursor-pointer">
-            <span>←</span> <span class="hidden sm:inline">Prev</span>
-          </button>
-          <span id="modalCounter" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-300 px-2"></span>
-          <button id="modalNextBtn" title="Next Item" aria-label="Next Item" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition flex items-center gap-1 cursor-pointer">
-            <span class="hidden sm:inline">Next</span> <span>→</span>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button id="btnShareExhibit" title="Copy Link" aria-label="Copy Link" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-extrabold transition cursor-pointer">🔗</button>
-          <button id="closeModal" title="Close (Esc)" aria-label="Close modal" class="p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 font-extrabold transition cursor-pointer">✕</button>
-        </div>
-      </div>
-      <div id="modalContent" class="px-4 sm:px-8 pt-4 pb-6 sm:pb-8"></div>
-    </div>
-  </div>
-
-  <!-- Standalone 3D & Augmented Reality (AR) Lightbox Modal -->
-  <div id="lightbox3DModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-[85] flex items-center justify-center p-3 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true">
-    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-5xl w-full h-[85vh] shadow-2xl border-2 border-indigo-500/50 relative flex flex-col overflow-hidden">
-      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between z-10">
-        <div class="flex items-center gap-2 overflow-hidden">
-          <span class="text-xl">👓</span>
-          <h3 id="lightboxTitle" class="text-sm sm:text-base font-extrabold truncate text-slate-900 dark:text-white">Interactive 3D Model</h3>
-        </div>
-        <div class="flex items-center gap-2">
-          <button id="btnToggleLightboxSkybox" onclick="toggleModal3DSkybox(event)" class="text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer">☀️ Light Sky</button>
-          <button id="close3DLightbox" title="Close 3D View" aria-label="Close 3D View" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition cursor-pointer">✕</button>
-        </div>
-      </div>
-
-      <div id="lightbox3DContainer" class="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden transition-colors duration-300">
-        <div id="lightboxSpinner" class="absolute z-10 flex flex-col items-center justify-center gap-3 transition-opacity duration-300">
-          <div class="spinner-3d"></div>
-          <span class="text-xs font-bold text-slate-300">Loading 3D Model...</span>
-        </div>
-        
-        <!-- Native AR & 3D Model Viewer -->
-        <model-viewer 
-          id="lightboxViewer" 
-          ar 
-          ar-modes="webxr scene-viewer quick-look" 
-          ar-scale="auto" 
-          camera-controls 
-          auto-rotate 
-          shadow-intensity="1.2" 
-          exposure="1.1" 
-          style="width: 100%; height: 100%; display: block;" 
-          class="w-full h-full">
-          
-          <button slot="ar-button" class="absolute top-4 left-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-black px-4 py-2 rounded-2xl shadow-xl border border-purple-300/40 flex items-center gap-2 active:scale-95 transition-all z-20 cursor-pointer animate-pulse">
-            <span class="text-base">📱</span>
-            <span>Place in Your Room (AR)</span>
-          </button>
-        </model-viewer>
-
-        <span id="lightboxScaleBadge" class="absolute bottom-4 right-4 bg-slate-900/85 text-white backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-xl z-10 shadow border border-slate-700/60 pointer-events-none flex items-center gap-2">
-          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-          <span id="lightboxScaleText">Scale Reference Available</span>
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Side-by-Side Artifact Compare Modal -->
-  <div id="compareModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-[85] flex items-center justify-center p-2 sm:p-6 hidden transition-opacity" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
-    <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-7xl w-full h-[92vh] shadow-2xl border-2 border-indigo-500/40 relative flex flex-col overflow-hidden">
-      <!-- Header -->
-      <div class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between z-10 shrink-0">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">⚖️</span>
-          <div>
-            <h3 id="compareModalTitle" class="text-sm sm:text-base font-black text-slate-900 dark:text-white">Side-by-Side Artifact Comparison</h3>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Compare historical origins, eras, specs, and curator notes</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button id="btnClearCompareInModal" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline px-2 py-1 cursor-pointer">Clear All</button>
-          <button id="btnCloseCompareModal" class="p-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-extrabold transition cursor-pointer">✕</button>
-        </div>
-      </div>
-
-      <!-- Body -->
-      <div id="compareModalBody" class="w-full flex-1 overflow-y-auto p-4 sm:px-6"></div>
-    </div>
-  </div>
-
-  <!-- Print Placard & Passport Container -->
-  <div id="printablePlacard" class="hidden"></div>
-
-  <!-- Universal BMMC Navigation Drawer Engine -->
+  <!-- Load Navigation Script (Dynamic Source of Truth) -->
   <script src="shared-nav.js"></script>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ==========================================
+      // Built-in Failsafe Directory Data
+      // Ensures the wings ALWAYS render even if shared-nav.js is missing/cached
+      // ==========================================
+      const DEFAULT_BRANCHES = [
+        {
+          group: "Primary Museum Wings",
+          items: [
+            { href: 'museum.html', icon: '🏛️', label: 'Museum Showcase & Catalog', desc: 'Main artifact exhibition, 3D models & gramophones' },
+            { href: 'museum.html#stats', icon: '📊', label: 'Museum Insights & Analytics', desc: 'Chronological charts & artifact distribution' },
+            { href: '2Dmap.html', icon: '🌍', label: 'Museum Artifact Origin Map', desc: 'Global manufacturing locations & timeline' },
+            { href: 'restoration-guide.html', icon: '🛠️', label: 'Artifact Care & Restoration', desc: 'Workshop guide for metals, timber, leather & finishes' }
+          ]
+        },
+        {
+          group: "Specialist Databases & Archives",
+          items: [
+            { href: 'gallery.html', icon: '📷', label: 'Historical Photo Archives', desc: 'Historic photography & Alan Starling WWII oral history' },
+            { href: 'currency.html', icon: '🪙', label: 'NZ Currency & Minting', desc: '1933–2026 coins, banknotes & RBNZ Table F3 metrics' },
+            { 
+              href: 'stamps.html', 
+              icon: '📮', 
+              label: 'NZ Stamp Archive (StampsNZ)', 
+              desc: 'Comprehensive philatelic catalog & valuations',
+              children: [
+                { href: '2Dmap_stamps.html', icon: '🗺️', label: 'Philatelic Photo Map', desc: 'Geographic 2D map of NZ stamps by issue location' }
+              ]
+            }
+          ]
+        },
+        {
+          group: "NZ Historical Info Maps",
+          items: [
+            { href: 'nz_history.html', icon: '📜', label: 'Aotearoa NZ History Map', desc: 'Interactive colonial timeline, ships & battles' },
+            { href: 'trains.html', icon: '🚂', label: 'Aotearoa NZ Railway Map', desc: 'Interactive rail history, steam pioneers, historic railways, disasters & KiwiRail' },
+            { href: 'maritime.html', icon: '⚓', label: 'Aotearoa NZ Maritime & Coastal Map', desc: 'Mosquito Fleet, early arrivals, shipwrecks, whaling & lighthouses' }
+          ]
+        }
+      ];
+
+      // Use shared-nav.js if available, otherwise fall back immediately
+      const branches = (window.BMMC_BRANCHES && Array.isArray(window.BMMC_BRANCHES) && window.BMMC_BRANCHES.length > 0)
+        ? window.BMMC_BRANCHES
+        : DEFAULT_BRANCHES;
+
+      // ==========================================
+      // Ambient Floating Motes Canvas
+      // ==========================================
+      const motesCanvas = document.getElementById('motesCanvas');
+      const mCtx = motesCanvas ? motesCanvas.getContext('2d') : null;
+      let motes = [];
+
+      if (mCtx) {
+        function resizeMotes() {
+          motesCanvas.width = window.innerWidth;
+          motesCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeMotes);
+        resizeMotes();
+
+        for (let i = 0; i < 35; i++) {
+          motes.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            r: Math.random() * 2 + 0.8,
+            dx: (Math.random() - 0.5) * 0.4,
+            dy: -(Math.random() * 0.4 + 0.2),
+            alpha: Math.random() * 0.5 + 0.2
+          });
+        }
+
+        function drawMotes() {
+          mCtx.clearRect(0, 0, motesCanvas.width, motesCanvas.height);
+          const isDark = document.documentElement.classList.contains('dark');
+
+          motes.forEach(m => {
+            m.x += m.dx;
+            m.y += m.dy;
+            if (m.y < -10) { m.y = motesCanvas.height + 10; m.x = Math.random() * motesCanvas.width; }
+            if (m.x < -10) m.x = motesCanvas.width + 10;
+            if (m.x > motesCanvas.width + 10) m.x = -10;
+
+            mCtx.beginPath();
+            mCtx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+            mCtx.fillStyle = (isDark ? 'rgba(56, 189, 248, ' : 'rgba(2, 132, 199, ') + m.alpha + ')';
+            mCtx.fill();
+          });
+          requestAnimationFrame(drawMotes);
+        }
+        requestAnimationFrame(drawMotes);
+      }
+
+      // ==========================================
+      // Dynamic Constellation Engine
+      // ==========================================
+      const leftFlank = document.getElementById('leftFlank');
+      const rightFlank = document.getElementById('rightFlank');
+      const filterBar = document.getElementById('filterBarContainer');
+      const svg = document.getElementById('spokeConduits');
+      const core = document.getElementById('nexusCore');
+      const stage = document.getElementById('stageContainer');
+      const searchInput = document.getElementById('targetSearch');
+      const btnSurprise = document.getElementById('btnSurprise');
+
+      branches.forEach((branch, index) => {
+        const wingId = `wing-cluster-${index}`;
+        const colorIdx = index % 3;
+
+        // Filter Button
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.setAttribute('data-target', wingId);
+        btn.textContent = `${branch.group} (${branch.items.length})`;
+        filterBar.appendChild(btn);
+
+        // Wing Container
+        const cluster = document.createElement('div');
+        cluster.className = 'wing-cluster';
+        cluster.id = wingId;
+        cluster.setAttribute('data-wing-index', index);
+
+        let itemsHTML = '';
+        branch.items.forEach((item, cardIdx) => {
+          const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+          
+          itemsHTML += `
+            <div class="spoke-card" id="card-${index}-${cardIdx}" data-wing="${index}" data-card="${cardIdx}" data-tags="${(item.label + ' ' + (item.desc || '') + ' ' + item.href).toLowerCase()}">
+              <a href="${item.href}" class="card-main-link">
+                <div class="card-header-row">
+                  <div class="card-meta">
+                    <div class="card-icon">${item.icon || '📁'}</div>
+                    <div class="card-label">${item.label}</div>
+                  </div>
+                </div>
+                ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+              </a>
+
+              ${hasChildren ? `
+                <div class="sub-satellite">
+                  ${item.children.map(ch => `
+                    <a href="${ch.href}" class="sub-satellite-link">
+                      <span>${ch.icon || '🗺️'}</span>
+                      <span>${ch.label}</span>
+                      <span style="opacity:0.75; margin-left:3px; font-family:'JetBrains Mono',monospace;">→</span>
+                    </a>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+
+        cluster.innerHTML = `
+          <div class="wing-hub" data-color="${colorIdx}" id="hub-node-${index}">
+            <div class="wing-title">${branch.group}</div>
+            <span class="wing-tag">${branch.items.length} Exhibits</span>
+          </div>
+          <div class="spoke-cards">${itemsHTML}</div>
+        `;
+
+        if (index === 0) leftFlank.appendChild(cluster);
+        else rightFlank.appendChild(cluster);
+      });
+
+      // Conduit Curves Generator
+      function createCurve(elemA, elemB, pulseClass, conduitId) {
+        if (!elemA || !elemB) return document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const rA = elemA.getBoundingClientRect();
+        const rB = elemB.getBoundingClientRect();
+        const sR = stage.getBoundingClientRect();
+
+        const x1 = (rA.left + rA.width / 2) - sR.left;
+        const y1 = (rA.top + rA.height / 2) - sR.top;
+        const x2 = (rB.left + rB.width / 2) - sR.left;
+        const y2 = (rB.top + rB.height / 2) - sR.top;
+
+        const deltaX = (x2 - x1) * 0.45;
+        const d = `M ${x1} ${y1} C ${x1 + deltaX} ${y1}, ${x2 - deltaX} ${y2}, ${x2} ${y2}`;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('class', `laser-line ${pulseClass}`);
+        if (conduitId) path.id = conduitId;
+        return path;
+      }
+
+      // Redraw conduits with matched blur and recede states
+      function drawConduits() {
+        if (!svg || window.innerWidth <= 1100) {
+          if (svg) svg.innerHTML = '';
+          return;
+        }
+
+        svg.innerHTML = '';
+        const clusters = document.querySelectorAll('.wing-cluster');
+
+        clusters.forEach((cluster, idx) => {
+          const isReceded = cluster.classList.contains('receded');
+          const isSpotlighted = cluster.classList.contains('spotlighted');
+          const hub = cluster.querySelector('.wing-hub');
+          const pulseClass = `pulse-${idx % 3}`;
+
+          // Conduits match the blurred/receded state of the wing
+          let stateClass = '';
+          if (isReceded) stateClass = 'conduit-receded';
+          else if (isSpotlighted) stateClass = 'conduit-spotlighted';
+
+          // Core -> Wing Hub
+          const corePath = createCurve(core, hub, `${pulseClass} ${stateClass}`, `conduit-core-${idx}`);
+          svg.appendChild(corePath);
+
+          // Wing Hub -> Cards
+          const cards = cluster.querySelectorAll('.spoke-card');
+          cards.forEach((card, cIdx) => {
+            const cardPath = createCurve(hub, card, `${pulseClass} ${stateClass}`, `conduit-card-${idx}-${cIdx}`);
+            cardPath.style.opacity = isReceded ? '0.05' : (isSpotlighted ? '0.65' : '0.35');
+            svg.appendChild(cardPath);
+          });
+        });
+      }
+
+      // Active Conduit Lightning on Hover
+      document.querySelectorAll('.spoke-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          const wIdx = card.getAttribute('data-wing');
+          const cIdx = card.getAttribute('data-card');
+          const coreLine = document.getElementById(`conduit-core-${wIdx}`);
+          const cardLine = document.getElementById(`conduit-card-${wIdx}-${cIdx}`);
+
+          if (coreLine) coreLine.classList.add('laser-lightning');
+          if (cardLine) cardLine.classList.add('laser-lightning');
+        });
+
+        card.addEventListener('mouseleave', () => {
+          const wIdx = card.getAttribute('data-wing');
+          const cIdx = card.getAttribute('data-card');
+          const coreLine = document.getElementById(`conduit-core-${wIdx}`);
+          const cardLine = document.getElementById(`conduit-card-${wIdx}-${cIdx}`);
+
+          if (coreLine) coreLine.classList.remove('laser-lightning');
+          if (cardLine) cardLine.classList.remove('laser-lightning');
+        });
+      });
+
+      // Interactive Spotlight Zoom Filter (Wings + Conduits Blur Together)
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const target = btn.getAttribute('data-target');
+          document.querySelectorAll('.wing-cluster').forEach(cluster => {
+            if (target === 'all') {
+              cluster.classList.remove('receded', 'spotlighted');
+            } else if (cluster.id === target) {
+              cluster.classList.remove('receded');
+              cluster.classList.add('spotlighted');
+            } else {
+              cluster.classList.add('receded');
+              cluster.classList.remove('spotlighted');
+            }
+          });
+          
+          drawConduits();
+        });
+      });
+
+      // Quick Hub Click
+      document.querySelectorAll('.wing-hub').forEach((hub, idx) => {
+        hub.addEventListener('click', () => {
+          const btn = document.querySelector(`.filter-btn[data-target="wing-cluster-${idx}"]`);
+          if (btn) btn.click();
+        });
+      });
+
+      // Surprise Roulette Launcher
+      let isRolling = false;
+      function triggerRoulette() {
+        if (isRolling) return;
+        isRolling = true;
+        btnSurprise.classList.add('rolling');
+
+        // Reset any spotlight filters
+        const allBtn = document.querySelector('.filter-btn[data-target="all"]');
+        if (allBtn) allBtn.click();
+
+        const allCards = Array.from(document.querySelectorAll('.spoke-card'));
+        let step = 0;
+        const totalSteps = 16;
+        let delay = 60;
+        let lastSelected = null;
+
+        function rollStep() {
+          if (lastSelected) lastSelected.classList.remove('roulette-active');
+          const randCard = allCards[Math.floor(Math.random() * allCards.length)];
+          randCard.classList.add('roulette-active');
+          lastSelected = randCard;
+
+          step++;
+          if (step < totalSteps) {
+            delay += 18;
+            setTimeout(rollStep, delay);
+          } else {
+            // Winner locked
+            btnSurprise.classList.remove('rolling');
+            isRolling = false;
+            if (typeof window.showBMMCToast === 'function') {
+              window.showBMMCToast('✨ Opening Surprise Exhibit...', '🎲');
+            }
+            setTimeout(() => {
+              const url = randCard.querySelector('a').getAttribute('href');
+              if (url) window.location.href = url;
+            }, 550);
+          }
+        }
+        rollStep();
+      }
+
+      if (btnSurprise) btnSurprise.addEventListener('click', triggerRoulette);
+      if (core) core.addEventListener('click', triggerRoulette);
+
+      // Search Filter
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const q = e.target.value.toLowerCase().trim();
+          const cards = document.querySelectorAll('.spoke-card');
+          const clusters = document.querySelectorAll('.wing-cluster');
+
+          if (!q) {
+            cards.forEach(c => c.classList.remove('matched', 'dimmed'));
+            clusters.forEach(cl => cl.classList.remove('dimmed'));
+          } else {
+            cards.forEach(card => {
+              const tags = (card.getAttribute('data-tags') + ' ' + card.innerText).toLowerCase();
+              if (tags.includes(q)) {
+                card.classList.add('matched');
+                card.classList.remove('dimmed');
+              } else {
+                card.classList.add('dimmed');
+                card.classList.remove('matched');
+              }
+            });
+
+            clusters.forEach(cluster => {
+              const hasMatch = cluster.querySelectorAll('.spoke-card.matched').length > 0;
+              if (hasMatch) cluster.classList.remove('dimmed');
+              else cluster.classList.add('dimmed');
+            });
+          }
+          setTimeout(drawConduits, 40);
+        });
+      }
+
+      // Hotkeys
+      window.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          if (searchInput) searchInput.focus();
+        }
+        if (e.key === 'Escape') {
+          if (searchInput) {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+            searchInput.blur();
+          }
+        }
+        if (e.key === ' ' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          triggerRoulette();
+        }
+      });
+
+      window.addEventListener('resize', drawConduits);
+      window.addEventListener('load', drawConduits);
+      setTimeout(drawConduits, 100);
+      setTimeout(drawConduits, 500);
+    })();
+  </script>
 </body>
 </html>

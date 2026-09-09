@@ -1,20 +1,20 @@
-// shared-nav.js — BMMC Universal Navigation Drawer (Safe, Resilient & Hierarchical)
+// shared-nav.js — BMMC Universal Navigation Drawer & Central Directory
 (function() {
   'use strict';
 
-  // 1. Navigation Directory Definition
+  // 1. Navigation Directory Definition (Single Source of Truth)
   const BMMC_BRANCHES = [
     {
       group: "Primary Museum Wings",
       items: [
         { 
-          href: 'index.html', 
+          href: 'museum.html', 
           icon: '🏛️', 
           label: 'Museum Showcase & Catalog', 
           desc: 'Main artifact exhibition, 3D models & gramophones' 
         },
         { 
-          href: 'index.html#stats', 
+          href: 'museum.html#stats', 
           icon: '📊', 
           label: 'Museum Insights & Analytics', 
           desc: 'Chronological charts & artifact distribution' 
@@ -64,8 +64,8 @@
           ]
         }
       ]
-	},
-	{
+    },
+    {
       group: "NZ Historical Info Maps",
       items: [
         { 
@@ -89,6 +89,9 @@
       ]
     }
   ];
+
+  // Expose globally so index.html (Spider Hub) can dynamically render from this array
+  window.BMMC_BRANCHES = BMMC_BRANCHES;
 
   // 2. Active Link Matching
   function getCleanCurrentPath() {
@@ -195,7 +198,7 @@
             <span style="font-size:24px;">🏛️</span>
             <div>
               <div style="font-size:14px;font-weight:900;line-height:1;color:#0f172a;" class="dark:text-white">BMMC Showcase</div>
-              <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;margin-top:3px;">Archive Directory</div>
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;margin-top:3px;">Hub &amp; Directory</div>
             </div>
           </a>
           <button id="btnCloseDrawer" style="width:32px;height:32px;border-radius:50%;border:none;background:none;font-size:16px;font-weight:bold;cursor:pointer;color:#64748b;" aria-label="Close menu">✕</button>
@@ -209,7 +212,7 @@
           <button id="btnDrawerThemeToggle" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:12px;font-weight:700;cursor:pointer;" class="dark:bg-slate-800 dark:border-slate-700 dark:text-white">
             <span id="drawerThemeIcon">☀️</span> <span id="drawerThemeLabel">Theme</span>
           </button>
-          <a href="index.html" style="font-size:12px;font-weight:800;color:#0284c7;text-decoration:none;">Museum Home →</a>
+          <a href="index.html" style="font-size:12px;font-weight:800;color:#0284c7;text-decoration:none;">Navigation Hub →</a>
         </div>
       </aside>
     `;
@@ -248,7 +251,7 @@
   window.openBMMCDrawer = openDrawer;
   window.closeBMMCDrawer = closeDrawer;
 
-  // 8. Event Delegation (Works for all triggers, even dynamically rendered ones)
+  // 8. Event Delegation (Trigger buttons across all museum pages)
   document.addEventListener('click', function(e) {
     const openBtn = e.target.closest('.btn-bmmc-menu-trigger, [data-bmmc-menu], #btnMenuToggle');
     if (openBtn) {
