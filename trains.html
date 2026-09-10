@@ -216,7 +216,7 @@
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      width: 290px;
+      width: 300px;
       max-height: calc(100vh - 120px);
       overflow-y: auto;
       background: rgba(255, 255, 255, 0.97);
@@ -263,7 +263,7 @@
     .layer-option-btn {
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
       padding: 7px 9px;
       border-radius: 10px;
       border: 1px solid transparent;
@@ -312,6 +312,115 @@
     }
     .layer-option-btn.active .layer-status-indicator {
       opacity: 1;
+    }
+
+    /* Numeric Badge Pills on Station Buttons */
+    .stn-count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9.5px;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.08);
+      color: #475569;
+      margin-left: 4px;
+      letter-spacing: 0;
+    }
+    .dark .stn-count-pill {
+      background: rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+    }
+    .layer-option-btn.active .stn-count-pill {
+      background: rgba(2, 132, 199, 0.16);
+      color: #0284c7;
+    }
+    .dark .layer-option-btn.active .stn-count-pill {
+      background: rgba(56, 189, 248, 0.22);
+      color: #38bdf8;
+    }
+
+    /* Station Sub-Types Styling */
+    .station-div-icon { background: none !important; border: none !important; }
+    .station-marker-pin {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      border: 2px solid;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      user-select: none;
+    }
+    .station-marker-pin:hover {
+      transform: scale(1.4) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+      z-index: 999999 !important;
+    }
+    .station-marker-pin.saved-station {
+      box-shadow: 0 0 0 2px #f43f5e, 0 2px 10px rgba(244, 63, 94, 0.5) !important;
+    }
+    .stn-heart-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      font-size: 8px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+      pointer-events: none;
+    }
+    
+    .station-marker-pin.stn-active {
+      border-color: #059669;
+      color: #065f46;
+    }
+    .station-marker-pin.stn-regional {
+      border-color: #d97706;
+      color: #92400e;
+      background: rgba(255, 251, 235, 0.96);
+    }
+    .station-marker-pin.stn-heritage {
+      border-color: #64748b;
+      color: #334155;
+      background: rgba(241, 245, 249, 0.92);
+      filter: grayscale(25%);
+    }
+
+    .dark .station-marker-pin.stn-active {
+      background: rgba(6, 78, 59, 0.92);
+      border-color: #34d399;
+      color: #a7f3d0;
+    }
+    .dark .station-marker-pin.stn-regional {
+      background: rgba(69, 39, 10, 0.92);
+      border-color: #fbbf24;
+      color: #fde68a;
+    }
+    .dark .station-marker-pin.stn-heritage {
+      background: rgba(30, 41, 59, 0.92);
+      border-color: #94a3b8;
+      color: #cbd5e1;
+    }
+
+    .station-sub-toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-left: 6px;
+      border-left: 2px solid #e2e8f0;
+      margin-bottom: 6px;
+    }
+    .dark .station-sub-toggle-group {
+      border-left-color: #334155;
     }
 
     /* Era Bar */
@@ -953,9 +1062,9 @@
         <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
       </div>
 
-      <!-- Unified Layers Switcher (Basemaps & Overlays in One Dropdown) -->
+      <!-- Unified Layers Switcher (Basemaps, Track Overlays & Stations in One Dropdown) -->
       <div class="layer-switcher-container">
-        <button id="btnLayersToggle" class="top-action-btn" title="Toggle Basemaps &amp; Rail Overlays">
+        <button id="btnLayersToggle" class="top-action-btn" title="Toggle Basemaps, Overlays &amp; Stations">
           <span>🗺️</span> <span>Layers ▾</span>
         </button>
         <div id="layerDropdownCard" class="layer-dropdown-card">
@@ -972,7 +1081,7 @@
           <div class="layer-section-title">Railway Overlays</div>
           <div class="layer-overlay-col">
             <!-- Historic Networks (Native Red Lines: Branches, Industrial, Sidings, Preserved, Disused) -->
-            <button id="btnToggleHistoricNet" class="layer-option-btn active btn-historic-net" title="Toggle Historic Networks in Red (80% Line Width)">
+            <button id="btnToggleHistoricNet" class="layer-option-btn active btn-historic-net" title="Toggle Historic Networks in Red">
               <span class="layer-opt-left"><span>🔴</span><span>Historic Networks</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
@@ -983,6 +1092,39 @@
               <span class="layer-status-indicator">✓</span>
             </button>
           </div>
+
+          <div class="layer-section-divider"></div>
+
+          <!-- Railway Station Sub-selection Suite with Live Counter Badges -->
+          <div class="layer-section-title">Stations &amp; Hubs</div>
+          <div class="station-sub-toggle-group">
+            <button id="btnToggleStnRegional" class="layer-option-btn active" title="Regional Hubs &amp; Junctions (Gore, Frankton, Taumarunui, Oamaru...)">
+              <span class="layer-opt-left">
+                <span>🏛️</span>
+                <span>Regional Junctions</span>
+                <span id="badgeStnRegional" class="stn-count-pill">0</span>
+              </span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+            <button id="btnToggleStnActive" class="layer-option-btn active" title="Active Commuter &amp; Scenic Passenger Stations">
+              <span class="layer-opt-left">
+                <span>🟢</span>
+                <span>Active Passenger</span>
+                <span id="badgeStnActive" class="stn-count-pill">0</span>
+              </span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+            <!-- Heritage & Disused defaults to ON -->
+            <button id="btnToggleStnHeritage" class="layer-option-btn active" title="Disused, Preserved &amp; Heritage Line Halts">
+              <span class="layer-opt-left">
+                <span>📜</span>
+                <span>Heritage &amp; Disused</span>
+                <span id="badgeStnHeritage" class="stn-count-pill">0</span>
+              </span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+          </div>
+
         </div>
       </div>
 
@@ -1057,9 +1199,6 @@
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1351464718&single=true&output=csv';
     const CACHE_STORAGE_KEY = 'bMMC_nz_trains_csv_cache';
 
-    // NATIVE EMBEDDED HISTORIC CORRIDORS (No external file needed)
-    // Historic networks now load exclusively live via Overpass API
-
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
     const CONSISTENT_EVENT_ZOOM = 14;
@@ -1070,6 +1209,21 @@
     let historicNetLayer = null;
     let isRailwaysVisible = true;
     let isHistoricNetVisible = true;
+
+    // Station Layers & Visibility State (Heritage defaults to ON)
+    const stnLayers = {
+      regional: L.layerGroup(),
+      active: L.layerGroup(),
+      heritage: L.layerGroup()
+    };
+
+    const stnVisibility = {
+      regional: true,  // Regional Junctions ON by default
+      active: true,    // Active passenger stations ON by default
+      heritage: true   // Heritage & Disused halts ON by default
+    };
+
+    let allStationRecords = [];
 
     const basemaps = {
       natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -1144,12 +1298,12 @@
         applyLayer(type);
       }
 
-      document.querySelectorAll('.layer-option-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
       if (activeBtn) activeBtn.classList.add('active');
     }
 
-    // Dynamic 80% line weight scaling with zoom
+    // Dynamic line weight scaling for Historic Networks
     function getHistoricNetWeight(zoom) {
       if (zoom <= 5) return 2.8;
       if (zoom <= 7) return 3.6;
@@ -1186,12 +1340,10 @@
       }
     }
 
-    // Natively initializes historic networks (with embedded fallback + live Overpass query)
     function initNativeHistoricNetworks() {
       const curZoom = map.getZoom();
       const weight = getHistoricNetWeight(curZoom);
 
-      // 1. Initialize empty layer for live vector data
       historicNetLayer = L.geoJSON(null, {
         style: {
           color: '#dc2626',
@@ -1218,7 +1370,6 @@
         historicNetLayer.addTo(map);
       }
 
-      // 2. Fetch live OSM vector data for secondary/disused/industrial lines
       fetchLiveOverpassLines();
     }
 
@@ -1269,9 +1420,7 @@
             historicNetLayer.addData({ type: 'FeatureCollection', features: features });
           }
         }
-      } catch (err) {
-        // Embedded lines remain visible
-      }
+      } catch (err) {}
     }
 
     function toggleRailwayOverlay() {
@@ -1294,6 +1443,208 @@
       const delta = currentZoom - baseZoom;
       const factor = Math.pow(1.05, Math.max(-2, Math.min(10, delta)));
       document.documentElement.style.setProperty('--pill-zoom-factor', factor.toFixed(3));
+    }
+
+    // =========================================================================
+    // AUTHORITATIVE EMBEDDED STATION DIRECTORY
+    // =========================================================================
+    const GUARANTEED_STATIONS = [
+      { name: "Gore Railway Station", lat: -46.0988, lon: 168.9461, sub: "regional", hub: "Southland Main Junction (Waimea Plains & Waikaka branches)", opened: "1875" },
+      { name: "Mataura Station", lat: -46.1895, lon: 168.8550, sub: "regional", hub: "Main South Line paper mill rail hub", opened: "1875" },
+      { name: "Clinton Railway Station", lat: -46.2023, lon: 169.3665, sub: "regional", hub: "Main South Line historic dining & refreshment stop", opened: "1878" },
+      { name: "Balclutha Station", lat: -46.2392, lon: 169.7428, sub: "regional", hub: "Clutha River crossing & Catlins River Branch junction", opened: "1875" },
+      { name: "Milton Station", lat: -46.1172, lon: 169.9678, sub: "regional", hub: "Roxburgh Branch junction", opened: "1875" },
+      { name: "Mosgiel Station", lat: -45.8775, lon: 170.3540, sub: "regional", hub: "Otago Central & Main South Line junction", opened: "1875" },
+      { name: "Dunedin Railway Station", lat: -45.8745, lon: 170.5085, sub: "regional", hub: "Iconic George Troup Flemish-Renaissance station", opened: "1906" },
+      { name: "Port Chalmers Station", lat: -45.8155, lon: 170.6235, sub: "regional", hub: "First railway line opened in Otago (1872)", opened: "1872" },
+      { name: "Palmerston Station", lat: -45.4855, lon: 170.7160, sub: "regional", hub: "Dunback Branch junction", opened: "1877" },
+      { name: "Oamaru Railway Station", lat: -45.1018, lon: 170.9710, sub: "regional", hub: "Historic limestone coastal seaport station", opened: "1875" },
+      { name: "Studholme Junction", lat: -44.7330, lon: 171.1110, sub: "regional", hub: "Waimate Branch junction", opened: "1876" },
+      { name: "Makikihi Station", lat: -44.6210, lon: 171.1340, sub: "regional", hub: "South Canterbury grain & sheep siding", opened: "1876" },
+      { name: "Timaru Station", lat: -44.3945, lon: 171.2548, sub: "regional", hub: "Fairlie Branch junction & deepwater port hub", opened: "1876" },
+      { name: "Temuka Station", lat: -44.2415, lon: 171.2785, sub: "regional", hub: "Main South Line Canterbury depot", opened: "1876" },
+      { name: "Orari Station", lat: -44.1355, lon: 171.3285, sub: "regional", hub: "Geraldine horse-tramway transfer depot", opened: "1876" },
+      { name: "Ashburton Station", lat: -43.9022, lon: 171.7482, sub: "regional", hub: "Mount Somers & Springburn Branch junction", opened: "1874" },
+      { name: "Rakaia Station", lat: -43.7540, lon: 172.0235, sub: "regional", hub: "Rakaia - Methven Branch junction", opened: "1873" },
+      { name: "Dunsandel Station", lat: -43.6625, lon: 172.1965, sub: "regional", hub: "Selwyn district pioneer depot", opened: "1872" },
+      { name: "Invercargill Railway Station", lat: -46.4155, lon: 168.3495, sub: "regional", hub: "Bluff, Kingston & Tokanui rail terminus", opened: "1867" },
+      { name: "Bluff Port Station", lat: -46.6015, lon: 168.3375, sub: "regional", hub: "Oldest continuously operating railway in Southland (1867)", opened: "1867" },
+      { name: "Stillwater Junction", lat: -42.4335, lon: 171.3995, sub: "regional", hub: "West Coast hub for Westport & Reefton lines", opened: "1889" },
+      { name: "Reefton Station", lat: -42.1225, lon: 171.8655, sub: "regional", hub: "Inangahua gold and coal railway depot", opened: "1892" },
+      { name: "Westport Station", lat: -41.7535, lon: 171.6025, sub: "regional", hub: "Buller coal port and Cape Foulwind line", opened: "1876" },
+      { name: "Hokitika Station", lat: -42.7165, lon: 170.9635, sub: "regional", hub: "Ross Branch & Westland coastal rail terminus", opened: "1893" },
+      { name: "Ross Station", lat: -42.9000, lon: 170.8120, sub: "regional", hub: "Southernmost railhead on the West Coast", opened: "1909" },
+      { name: "Frankton / Hamilton Station", lat: -37.7885, lon: 175.2635, sub: "regional", hub: "Central North Island junction (NIMT & East Coast Main Trunk)", opened: "1877" },
+      { name: "Huntly Station", lat: -37.5585, lon: 175.1610, sub: "regional", hub: "Waikato coalfields rail terminal", opened: "1877" },
+      { name: "Mercer Railway Station", lat: -37.2805, lon: 175.0482, sub: "regional", hub: "Waikato River military and pioneer railway depot", opened: "1875" },
+      { name: "Te Kūiti Station", lat: -38.3345, lon: 175.1675, sub: "regional", hub: "King Country railhead & limestone center", opened: "1887" },
+      { name: "Taumarunui Station", lat: -38.8845, lon: 175.2595, sub: "regional", hub: "Historic NIMT heartland locomotive depot & dining room", opened: "1903" },
+      { name: "Waiouru Station", lat: -39.4715, lon: 175.6705, sub: "regional", hub: "Highest railway station in New Zealand (814m altitude)", opened: "1907" },
+      { name: "Taihape Station", lat: -39.7145, lon: 175.7950, sub: "regional", hub: "NIMT mountain locomotive servicing depot", opened: "1904" },
+      { name: "Mangaweka Station", lat: -39.8080, lon: 175.7940, sub: "regional", hub: "Rangitīkei viaducts district depot", opened: "1902" },
+      { name: "Hunterville Station", lat: -39.9395, lon: 175.5680, sub: "regional", hub: "Rangitīkei pastoral railhead", opened: "1888" },
+      { name: "Marton Junction", lat: -40.0760, lon: 175.3780, sub: "regional", hub: "Junction of NIMT and Marton - New Plymouth Line", opened: "1878" },
+      { name: "Feilding Station", lat: -40.2285, lon: 175.5645, sub: "regional", hub: "Manawatū pastoral railway junction", opened: "1876" },
+      { name: "Palmerston North Station", lat: -40.3470, lon: 175.6080, sub: "regional", hub: "Largest regional rail freight hub in New Zealand", opened: "1877" },
+      { name: "Woodville Station", lat: -40.3400, lon: 175.8670, sub: "regional", hub: "Junction connecting Hawke's Bay, Wairarapa & Manawatū", opened: "1887" },
+      { name: "Pahiatua Station", lat: -40.4535, lon: 175.8415, sub: "regional", hub: "Wairarapa Line northern depot", opened: "1897" },
+      { name: "Eketāhuna Station", lat: -40.6435, lon: 175.7035, sub: "regional", hub: "Forty-Mile Bush historic railhead", opened: "1889" },
+      { name: "Stratford Station", lat: -39.3405, lon: 174.2865, sub: "regional", hub: "Stratford-Okahukura Line junction to King Country", opened: "1879" },
+      { name: "Eltham Station", lat: -39.4295, lon: 174.2980, sub: "regional", hub: "Taranaki dairy railway pioneer", opened: "1881" },
+      { name: "Hāwera Station", lat: -39.5885, lon: 174.2825, sub: "regional", hub: "South Taranaki rail freight hub", opened: "1881" },
+      { name: "Pātea Station", lat: -39.7575, lon: 174.4785, sub: "regional", hub: "South Taranaki meat-freezing rail port", opened: "1883" },
+      { name: "Waverley Station", lat: -39.7610, lon: 174.6325, sub: "regional", hub: "South Taranaki pastoral depot", opened: "1881" },
+      { name: "Whanganui Station", lat: -39.9325, lon: 175.0515, sub: "regional", hub: "Castlecliff & Whanganui branch terminal", opened: "1878" },
+      { name: "Dannevirke Station", lat: -40.2075, lon: 176.0965, sub: "regional", hub: "Seventy-Mile Bush Scandinavian railway depot", opened: "1884" },
+      { name: "Waipukurau Station", lat: -39.9985, lon: 176.5595, sub: "regional", hub: "Central Hawke's Bay railway hub", opened: "1876" },
+      { name: "Hastings Station", lat: -39.6415, lon: 176.8440, sub: "regional", hub: "Hawke's Bay fruit & produce rail terminal", opened: "1874" },
+      { name: "Napier Station", lat: -39.4935, lon: 176.9145, sub: "regional", hub: "Port of Napier & Gisborne line hub", opened: "1874" },
+      { name: "Gisborne Station", lat: -38.6655, lon: 178.0210, sub: "regional", hub: "Isolated East Coast rail terminus", opened: "1902" },
+      { name: "Whangārei Station", lat: -35.7315, lon: 174.3210, sub: "regional", hub: "Northland Main Line depot & port junction", opened: "1880" },
+      { name: "Dargaville Station", lat: -35.9325, lon: 173.8745, sub: "regional", hub: "Kaihu Valley Railway junction", opened: "1896" },
+      { name: "Britomart (Waitematā)", lat: -36.8443, lon: 174.7684, sub: "active", hub: "Auckland Central Underground Terminal", opened: "2003" },
+      { name: "Wellington Railway Station", lat: -41.2788, lon: 174.7804, sub: "active", hub: "Bunny Street national railway headquarters & terminal", opened: "1937" },
+      { name: "Christchurch Station (Addington)", lat: -43.5395, lon: 172.6075, sub: "active", hub: "TranzAlpine & Coastal Pacific passenger terminal", opened: "1993" },
+      { name: "Arthur's Pass Station", lat: -42.9425, lon: 171.5605, sub: "active", hub: "Southern Alps TranzAlpine passenger station", opened: "1914" },
+      { name: "Greymouth Railway Station", lat: -42.4515, lon: 171.2085, sub: "active", hub: "TranzAlpine western coastal terminus", opened: "1876" },
+      { name: "Picton Railway Station", lat: -41.2910, lon: 174.0045, sub: "active", hub: "Cook Strait Ferry & Coastal Pacific passenger terminal", opened: "1875" },
+      { name: "Lumsden Railway Station", lat: -45.7360, lon: 168.4410, sub: "heritage", hub: "Preserved Southland hub; junction for Kingston & Waimea lines", opened: "1878" },
+      { name: "Kingston Railway Station", lat: -45.3340, lon: 168.7130, sub: "heritage", hub: "Home of the Kingston Flyer vintage steam train on Lake Wakatipu", opened: "1878" },
+      { name: "Middlemarch Station", lat: -45.5080, lon: 170.1235, sub: "heritage", hub: "Otago Central Railway / Taieri Gorge line terminal", opened: "1891" },
+      { name: "Ferrymead Heritage Park", lat: -43.5605, lon: 172.7050, sub: "heritage", hub: "Site of NZ's first railway line (1863) & working steam tramway", opened: "1863" }
+    ];
+
+    function buildStationMarkerIcon(stnId, name, subType, statusText, isSaved) {
+      const typeClass = `stn-${subType}`;
+      const iconEmoji = subType === 'regional' ? '🏛️' : (subType === 'active' ? '🟢' : '📜');
+      const iconHtml = `
+        <div class="station-marker-pin ${typeClass} ${isSaved ? 'saved-station' : ''}" id="stn_pin_${stnId}" title="${escapeHTML(name)} (${escapeHTML(statusText || subType)})">
+          <span style="font-size:10px;">${iconEmoji}</span>
+          ${isSaved ? '<span class="stn-heart-badge">❤️</span>' : ''}
+        </div>
+      `;
+      return L.divIcon({
+        className: 'station-div-icon',
+        html: iconHtml,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+        popupAnchor: [0, -14]
+      });
+    }
+
+    function createStationMarker(record) {
+      const { id, name, lat, lon, subType, hub, statusText } = record;
+      const isSaved = getSavedSet().has(id);
+      const marker = L.marker([lat, lon], {
+        icon: buildStationMarkerIcon(id, name, subType, statusText, isSaved)
+      });
+
+      const papersPastUrl = `https://paperspast.natlib.govt.nz/newspapers?query=${encodeURIComponent(name + ' railway station')}`;
+      const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(name + ' railway station New Zealand history')}`;
+      const subLabel = subType === 'regional' ? 'Regional Hub / Junction'
+                     : (subType === 'active' ? 'Active Passenger Station' : 'Heritage &amp; Disused Station');
+
+      function buildStationPopup() {
+        const currentlySaved = getSavedSet().has(id);
+        return `
+          <div class="history-card" style="width:270px;">
+            <div style="padding:12px 14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="category-pill" style="font-size:9px;">${subLabel}</span>
+                <button type="button" class="btn-card-heart ${currentlySaved ? 'saved' : ''}" data-id="${id}" onclick="window.toggleSaveItem('${id}', event);" title="${currentlySaved ? 'Remove from Saved' : 'Save to Favorites'}">
+                  <span class="heart-icon">${currentlySaved ? '❤️' : '🤍'}</span>
+                  <span class="heart-label">${currentlySaved ? 'Saved' : 'Save'}</span>
+                </button>
+              </div>
+              <h3 style="margin:0 0 3px 0; font-size:14px; font-weight:900; color:#0f172a;" class="dark:text-white">🚉 ${escapeHTML(name)}</h3>
+              <div style="font-size:11px; color:#64748b; font-weight:700; margin-bottom:6px;">${escapeHTML(hub || 'New Zealand Railway System')}</div>
+              <div style="font-size:11px; line-height:1.4; color:#334155;" class="dark:text-slate-300">
+                ${statusText ? `<p style="margin:0 0 4px 0;"><strong>Status:</strong> ${escapeHTML(statusText)}</p>` : ''}
+                <p style="margin:0 0 6px 0; font-family:monospace; color:#64748b;">${lat.toFixed(4)}°S, ${lon.toFixed(4)}°E</p>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:5px; border-top:1px solid #f1f5f9; padding-top:8px;" class="dark:border-slate-800">
+                <a href="${papersPastUrl}" target="_blank" rel="noopener noreferrer" class="btn-source-archive" style="justify-content:center;">
+                  <span>🗞️</span> Search Papers Past ↗
+                </a>
+                <a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai" style="justify-content:center;">
+                  <span>✨</span> Historical Research ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      marker.bindPopup(buildStationPopup, { maxWidth: 295 });
+      return marker;
+    }
+
+    function initStationRecords() {
+      allStationRecords = GUARANTEED_STATIONS.map(stn => {
+        const id = 'stn_' + stn.name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + stn.lat.toFixed(3) + '_' + stn.lon.toFixed(3);
+        const record = {
+          id: id,
+          name: stn.name,
+          lat: stn.lat,
+          lon: stn.lon,
+          subType: stn.sub,
+          hub: stn.hub,
+          statusText: `Opened ${stn.opened}`
+        };
+        record.marker = createStationMarker(record);
+        return record;
+      });
+
+      refreshStationsOnMap();
+    }
+
+    function refreshStationsOnMap() {
+      const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
+      const savedSet = getSavedSet();
+
+      Object.values(stnLayers).forEach(lg => lg.clearLayers());
+
+      allStationRecords.forEach(rec => {
+        if (isSavedFilterActive && !savedSet.has(rec.id)) return;
+
+        if (search) {
+          const hay = `${rec.name} ${rec.hub} ${rec.subType} ${rec.statusText}`.toLowerCase();
+          if (!hay.includes(search)) return;
+        }
+
+        stnLayers[rec.subType].addLayer(rec.marker);
+      });
+
+      Object.keys(stnLayers).forEach(sub => {
+        if (!map) return;
+        if (stnVisibility[sub]) {
+          if (!map.hasLayer(stnLayers[sub])) stnLayers[sub].addTo(map);
+        } else {
+          if (map.hasLayer(stnLayers[sub])) map.removeLayer(stnLayers[sub]);
+        }
+      });
+
+      const regEl = document.getElementById('badgeStnRegional');
+      const actEl = document.getElementById('badgeStnActive');
+      const herEl = document.getElementById('badgeStnHeritage');
+      if (regEl) regEl.textContent = allStationRecords.filter(r => r.subType === 'regional').length;
+      if (actEl) actEl.textContent = allStationRecords.filter(r => r.subType === 'active').length;
+      if (herEl) herEl.textContent = allStationRecords.filter(r => r.subType === 'heritage').length;
+    }
+
+    function toggleStationSubGroup(subType) {
+      stnVisibility[subType] = !stnVisibility[subType];
+      const btnId = subType === 'regional' ? 'btnToggleStnRegional'
+                  : (subType === 'active' ? 'btnToggleStnActive' : 'btnToggleStnHeritage');
+      const btn = document.getElementById(btnId);
+
+      if (stnVisibility[subType]) {
+        btn?.classList.add('active');
+      } else {
+        btn?.classList.remove('active');
+      }
+
+      refreshStationsOnMap();
     }
 
     function initMap() {
@@ -1340,8 +1691,8 @@
       });
       map.addLayer(markers);
 
-      // Render native historic networks in red immediately
       initNativeHistoricNetworks();
+      initStationRecords();
     }
 
     const SAVED_STORAGE_KEY = 'bMMC_nz_trains_saved_ids';
@@ -1382,8 +1733,8 @@
       saveSavedSet(savedSet);
       updateSavedCountHeader();
 
-      const btn = document.querySelector(`.btn-card-heart[data-id="${id}"]`);
-      if (btn) {
+      // Update any open popup heart button matching this ID
+      document.querySelectorAll(`.btn-card-heart[data-id="${id}"]`).forEach(btn => {
         if (isNowSaved) {
           btn.classList.add('saved');
           btn.innerHTML = '<span class="heart-icon">❤️</span> <span class="heart-label">Saved</span>';
@@ -1393,6 +1744,12 @@
           btn.innerHTML = '<span class="heart-icon">🤍</span> <span class="heart-label">Save</span>';
           btn.title = 'Save to Favorites';
         }
+      });
+
+      // If it is a station record, re-render its icon immediately
+      const stn = allStationRecords.find(s => s.id === id);
+      if (stn && stn.marker) {
+        stn.marker.setIcon(buildStationMarkerIcon(stn.id, stn.name, stn.subType, stn.statusText, isNowSaved));
       }
 
       filterEvents();
@@ -1409,10 +1766,24 @@
         }
       }
       filterEvents();
-      if (isSavedFilterActive && markers && markers.getLayers().length > 0) {
-        try {
-          map.fitBounds(markers.getBounds(), { padding: [50, 50], maxZoom: 14 });
-        } catch (e) {}
+
+      if (isSavedFilterActive) {
+        const boundsList = [];
+        if (markers && markers.getLayers().length > 0) {
+          boundsList.push(markers.getBounds());
+        }
+        allStationRecords.forEach(stn => {
+          if (getSavedSet().has(stn.id) && map.hasLayer(stn.marker)) {
+            boundsList.push(L.latLngBounds([stn.marker.getLatLng(), stn.marker.getLatLng()]));
+          }
+        });
+        if (boundsList.length > 0) {
+          try {
+            let combined = boundsList[0];
+            for (let i = 1; i < boundsList.length; i++) combined.extend(boundsList[i]);
+            map.fitBounds(combined, { padding: [50, 50], maxZoom: 14 });
+          } catch (e) {}
+        }
       }
     }
 
@@ -1746,6 +2117,7 @@
       });
 
       renderDataset(filtered);
+      refreshStationsOnMap();
     }
 
     function toggleTimelinePlayback() {
@@ -1874,26 +2246,48 @@
       return null;
     }
 
+    // Built-in offline emergency fallback milestones
+    const FALLBACK_TRAINS_CSV = `id,year,date,headline,category,location,latitude,longitude,details,image_url,source_url
+NZR001,1862,7 May 1862,Dun Mountain Railway Opens (NZ's First Railway),Railway Firsts,Nelson,-41.2711,173.2842,New Zealand's first operational railway opened in Nelson to haul chromite and copper from Dun Mountain to Nelson Port.,https://lh3.googleusercontent.com/d/1XilUceRtJ56Z-VyeY4QXklv6ISsWOjkf,https://teara.govt.nz/en/railways/page-1
+NZR002,1863,1 Dec 1863,First Public Steam Railway Opens,Railway Firsts,Ferrymead (Christchurch),-43.5558,172.7051,Canterbury Provincial Railways opened NZ's first steam-powered public railway line between Christchurch and Ferrymead wharf.,,https://nzhistory.govt.nz/first-public-railway-opens
+NZR004,1867,9 Dec 1867,Lyttelton Rail Tunnel Pierces Crater Rim,Engineering Feats,Lyttelton,-43.5997,172.7197,The 2.6 km Lyttelton Rail Tunnel pierced the volcanic crater wall of the Port Hills to link Christchurch directly to Lyttelton Harbour.,,https://nzhistory.govt.nz/culture/tunnel-through-the-port-hills
+NZR005,1867,18 Jun 1867,Bluff to Invercargill Railway Opens,Lines & Corridors,Bluff Harbour,-46.6000,168.3333,Southland opened its first permanent iron-rail line connecting Invercargill to the deep-water ocean port at Bluff.,https://lh3.googleusercontent.com/d/1s-5BXtF21CZOMLSM5UUVr-40yklME6T-,https://teara.govt.nz/en/southland-places/page-14
+NZR008,1873,20 Dec 1873,Auckland to Onehunga Railway Opens,Lines & Corridors,Onehunga (Auckland),-36.9247,174.7865,The first railway line in Auckland Province opened between Point Britomart and Manukau Harbour port at Onehunga.,https://lh3.googleusercontent.com/d/1qgIWoTt02nxubDAU1_V8qUAe65HgsmIP,https://kura.aucklandlibraries.govt.nz
+NZR013,1878,12 Oct 1878,Rimutaka Incline Opens with Fell Mountain Engines,Engineering Feats,Cross Creek (Wairarapa),-41.1783,175.2017,To breach the Rimutaka Range into Wairarapa, engineers built a 1-in-15 gradient using the Swedish Fell center-rail system.,https://lh3.googleusercontent.com/d/1CeT-zMSy_K_Xn9HITcCC0afX0ejXWyzM,https://nzhistory.govt.nz/media/photo/fell-locomotive
+NZR016,1879,1 Nov 1879,Denniston Incline Opens ('Eighth Wonder of the World'),Engineering Feats,Denniston (West Coast),-41.7333,171.7967,A gravity coal railway dropped 518 vertical meters down Mount Rochfort at grades up to 1-in-1.25.,https://lh3.googleusercontent.com/d/1Ee_8AFNsaob_5q9mkVic6taGQcFf9q3x,https://teara.govt.nz/en/west-coast-places/page-5
+NZR027,1898,1 Jun 1898,Raurimu Spiral Surveyed by Peter Ellis,Engineering Feats,Raurimu,-39.1167,175.4000,Confronted with a 132m bluff, surveyor Peter Ellis designed an ingenious spiral incorporating a horseshoe curve and two tunnels.,,https://nzhistory.govt.nz/culture/raurimu-spiral
+NZR032,1906,22 Oct 1906,Dunedin Railway Station Opens,Architecture,Dunedin,-45.8753,170.5078,Designed by George Troup, this Flemish Renaissance palace of rail featured dark basalt stone and 750,000 Royal Doulton tiles.,https://lh3.googleusercontent.com/d/1ljlVfFMhXvkOqf7oOskDLEKcbKjJ14au,https://nzhistory.govt.nz/media/photo/dunedin-railway-station
+NZR034,1908,6 Nov 1908,Driving of the Last Spike on the NIMT,Lines & Corridors,Manganui-o-te-Ao (Pokaka),-39.3500,175.4167,Prime Minister Sir Joseph Ward drove the final silver spike, connecting Wellington and Auckland by rail after 38 years of work.,,https://nzhistory.govt.nz/driving-the-last-spike
+NZR041,1923,4 Aug 1923,Otira Tunnel Opens (NZ's First Electric Mainline),Engineering Feats,Otira (Southern Alps),-42.8300,171.5600,At 8.5 km, the Otira Tunnel through the Southern Alps connected the West Coast to Christchurch under 1500V DC electric power.,https://lh3.googleusercontent.com/d/1T-VuGZq3aZzwggQ2I-HLJ79oXWZg8iXx,https://nzhistory.govt.nz/otira-tunnel-opened
+NZR057,1953,24 Dec 1953,Tangiwai Railway Disaster,Disasters & Accidents,Tangiwai Bridge (Ruapehu),-39.4647,175.5728,A volcanic lahar washed away the bridge pier minutes before the night express arrived, claiming 151 lives on Christmas Eve.,https://lh3.googleusercontent.com/d/19gVYSoWBlvJUGYKCtZpJR64MvlcOujR1,https://nzhistory.govt.nz/culture/tangiwai-railway-disaster
+NZR063,1962,11 Aug 1962,Interisland Rail Ferry GMV Aramoana Arrives,Lines & Corridors,Cook Strait,-41.2780,174.7850,The GMV Aramoana turned Cook Strait into an extension of the railway, rolling wagons directly between Wellington and Picton.,https://lh3.googleusercontent.com/d/1DmUZ8fFVr0qI3tsRLWJxR8gO8KQUG7j5,https://nzhistory.govt.nz/cook-strait-rail-ferry-service-begins
+NZR074,1978,12 Sep 1978,Kaimai Rail Tunnel Opens (NZ's Longest Tunnel),Engineering Feats,Kaimai Range,-37.7200,175.8900,The 8.85 km Kaimai Rail Tunnel opened, bypassing Paeroa gorge to link Waikato freight directly to the Port of Tauranga.,https://lh3.googleusercontent.com/d/1_BEDRvgDCPMlM7PK02tTovYQvZW8nkSK,https://nzhistory.govt.nz/kaimai-tunnel-opened
+NZR080,1987,22 Nov 1987,The TranzAlpine Express Launched,Scenic & Tourism,Arthur's Pass,-42.9400,171.5600,NZR rebranded the Christchurch-Greymouth run into The TranzAlpine, globally recognized as one of the great rail journeys of the world.,,https://www.journeys.kiwirail.co.nz/tranzalpine
+NZR094,2008,1 Jul 2008,Full Renationalization: KiwiRail is Born,Renationalization,Wellington Railway Station,-41.2789,174.7803,The government bought back all trains, tracks, and Cook Strait ferries, reuniting operations under state-owned KiwiRail.,,https://nzhistory.govt.nz/renationalisation-of-rail-network
+NZR099,2014,28 Apr 2014,Auckland Suburban Rail Electrification Opens,Suburban & Commuter,Auckland CBD,-36.8442,174.7681,Auckland transformed passenger transport with 25kV AC overhead electrification and modern three-car electric AM trains.,https://lh3.googleusercontent.com/d/1ShsjLZuzUQ1v_jnemNobe9ZIeZiQHbo8,https://teara.govt.nz/en/auckland-places/page-3
+NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Engineering Feats,Auckland CBD,-36.8530,174.7610,New Zealand's largest transport infrastructure project completed twin 3.45 km underground tunnels through Auckland's CBD.,https://lh3.googleusercontent.com/d/1_Ek5JuENq8iOiGs8YMr5wqaeke4z--WP,https://www.cityraillink.co.nz`;
+
     async function loadDataset() {
+      // 1. Check local storage cache for instant rendering
       try {
         const cached = localStorage.getItem(CACHE_STORAGE_KEY);
         if (cached && parseCSVData(cached)) {
-          // Cached
+          // Cached version mounted
         }
       } catch (e) {}
 
+      // 2. Candidate fetch URLs in prioritized order:
+      // Online Google Drive / Sheets first -> Proxies -> Offline backup files
       const candidateUrls = [
+        LIVE_CSV_URL,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`,
+        '/data/trains.csv',
         '../data/trains.csv',
         './data/trains.csv',
         'data/trains.csv',
         './trains.csv',
-        'trains.csv',
-        '../data/trails.csv',
-        './data/trails.csv',
-        'trails.csv',
-        LIVE_CSV_URL,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
-        `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`
+        'trains.csv'
       ];
 
       const csvText = await fetchFirstValidCsv(candidateUrls);
@@ -1904,8 +2298,7 @@
       }
 
       if (allEvents.length === 0) {
-        document.getElementById('itemCountBadge').textContent = 'Offline';
-        document.getElementById('yearRangeText').textContent = 'Data Offline';
+        parseCSVData(FALLBACK_TRAINS_CSV);
       }
     }
 
@@ -1917,6 +2310,11 @@
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
       document.getElementById('btnToggleHistoricNet')?.addEventListener('click', toggleHistoricNetOverlay);
       document.getElementById('btnToggleRailways')?.addEventListener('click', toggleRailwayOverlay);
+
+      // Station Sub-Group Toggles
+      document.getElementById('btnToggleStnRegional')?.addEventListener('click', () => toggleStationSubGroup('regional'));
+      document.getElementById('btnToggleStnActive')?.addEventListener('click', () => toggleStationSubGroup('active'));
+      document.getElementById('btnToggleStnHeritage')?.addEventListener('click', () => toggleStationSubGroup('heritage'));
 
       document.getElementById('btnToggleSaved')?.addEventListener('click', toggleSavedFilter);
       updateSavedCountHeader();
