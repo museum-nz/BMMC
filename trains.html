@@ -1224,6 +1224,7 @@
     };
 
     let allStationRecords = [];
+    let isTimelinePlaying = false;
 
     const basemaps = {
       natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -1582,6 +1583,8 @@
     function initStationRecords() {
       allStationRecords = GUARANTEED_STATIONS.map(stn => {
         const id = 'stn_' + stn.name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + stn.lat.toFixed(3) + '_' + stn.lon.toFixed(3);
+        const parsedYear = parseYearNum(stn.opened || stn.year || stn.date);
+        const hasYear = !isNaN(parsedYear) && parsedYear > 0;
         const record = {
           id: id,
           name: stn.name,
@@ -1589,7 +1592,8 @@
           lon: stn.lon,
           subType: stn.sub,
           hub: stn.hub,
-          statusText: `Opened ${stn.opened}`
+          year: hasYear ? parsedYear : null,
+          statusText: stn.opened ? `Opened ${stn.opened}` : (stn.statusText || (hasYear ? `Opened ${parsedYear}` : ''))
         };
         record.marker = createStationMarker(record);
         return record;
@@ -1601,6 +1605,10 @@
     function refreshStationsOnMap() {
       const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
       const savedSet = getSavedSet();
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+      const minVal = minSlider ? parseInt(minSlider.value, 10) : globalMinYear;
+      const maxVal = maxSlider ? parseInt(maxSlider.value, 10) : globalMaxYear;
 
       Object.values(stnLayers).forEach(lg => lg.clearLayers());
 
@@ -1610,6 +1618,16 @@
         if (search) {
           const hay = `${rec.name} ${rec.hub} ${rec.subType} ${rec.statusText}`.toLowerCase();
           if (!hay.includes(search)) return;
+        }
+
+        const hasDate = rec.year !== null && !isNaN(rec.year);
+        if (isTimelinePlaying) {
+          // When playing: add stations with a date as their opening year comes up
+          if (!hasDate) return;
+          if (rec.year < minVal || rec.year > maxVal) return;
+        } else {
+          // When paused, at the end, or stopped: add all stations without a date + dated stations in range
+          if (hasDate && (rec.year < minVal || rec.year > maxVal)) return;
         }
 
         stnLayers[rec.subType].addLayer(rec.marker);
@@ -1627,9 +1645,9 @@
       const regEl = document.getElementById('badgeStnRegional');
       const actEl = document.getElementById('badgeStnActive');
       const herEl = document.getElementById('badgeStnHeritage');
-      if (regEl) regEl.textContent = allStationRecords.filter(r => r.subType === 'regional').length;
-      if (actEl) actEl.textContent = allStationRecords.filter(r => r.subType === 'active').length;
-      if (herEl) herEl.textContent = allStationRecords.filter(r => r.subType === 'heritage').length;
+      if (regEl) regEl.textContent = stnLayers.regional.getLayers().length;
+      if (actEl) actEl.textContent = stnLayers.active.getLayers().length;
+      if (herEl) herEl.textContent = stnLayers.heritage.getLayers().length;
     }
 
     function toggleStationSubGroup(subType) {
@@ -2128,9 +2146,12 @@
       if (timelineTimer) {
         clearInterval(timelineTimer);
         timelineTimer = null;
+        isTimelinePlaying = false;
         btn.textContent = '▶';
         btn.classList.remove('playing');
+        filterEvents(); // Re-render map immediately on pause to add undated stations
       } else {
+        isTimelinePlaying = true;
         btn.textContent = '⏸';
         btn.classList.add('playing');
 
@@ -2140,17 +2161,18 @@
         if (currentMax >= globalMaxYear || currentMax < 1880) {
           maxSlider.value = 1880;
         }
-        filterEvents();
 
         timelineTimer = setInterval(() => {
           let curr = parseInt(maxSlider.value, 10);
           if (curr >= globalMaxYear) {
-            toggleTimelinePlayback();
+            toggleTimelinePlayback(); // Automatically pauses at end and displays undated stations
           } else {
             maxSlider.value = Math.min(globalMaxYear, curr + 3);
             filterEvents();
           }
         }, 250);
+
+        filterEvents();
       }
     }
 
@@ -2359,6 +2381,9 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
 
       document.querySelectorAll('.era-chip').forEach(chip => {
         chip.addEventListener('click', function () {
+          if (timelineTimer) {
+            toggleTimelinePlayback();
+          }
           document.querySelectorAll('.era-chip').forEach(c => c.classList.remove('active'));
           this.classList.add('active');
           document.getElementById('minYearSlider').value = this.dataset.min;
