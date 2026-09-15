@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trimble New Zealand — #HISTORYWALL & Innovation Archive</title>
+  <style>
+    :root {
+      --bg-dark: #071320;
+      --panel-bg: rgba(13, 27, 42, 0.88);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      
+      --era-1: #004369; /* 1978-1987 Deep Ocean */
+      --era-2: #005f8d; /* 1988-1997 Classic Trimble Navy */
+      --era-3: #007ea7; /* 1998-2007 Pacific Blue */
+      --era-4: #00a8cc; /* 2008-2018 Cyan Horizon */
+
+      --yellow: #ffbc00;
+      --orange: #f36f21;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(ellipse at 15% 10%, rgba(0, 168, 204, 0.18), transparent 45%),
+        radial-gradient(ellipse at 85% 90%, rgba(243, 111, 33, 0.12), transparent 45%);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    /* Clean Header without Status Pill or File Button */
+    header {
+      background: rgba(7, 19, 32, 0.98);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 2000;
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #007ea7, #00a8cc);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 168, 204, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-text span {
+      font-size: 0.7rem;
+      color: var(--orange);
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    nav button:hover, nav button.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--card-border);
+    }
+
+    nav button.active {
+      background: #007ea7;
+      border-color: #00a8cc;
+      box-shadow: 0 0 14px rgba(0, 168, 204, 0.5);
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Master Interactive Viewport */
+    .viewport-box {
+      background: #02060d;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .stage-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .stage-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stage-canvas-wrap {
+      width: 100%;
+      height: 460px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: #010408;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .stage-canvas-wrap:active { cursor: grabbing; }
+
+    #masterCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .focus-reticle {
+      position: absolute;
+      border: 3px solid var(--yellow);
+      background: rgba(255, 188, 0, 0.22);
+      border-radius: 8px;
+      box-shadow: 0 0 25px rgba(255, 188, 0, 0.95), inset 0 0 15px rgba(255, 188, 0, 0.4);
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+      transition: all 0.25s ease-out;
+    }
+
+    .map-tooltip {
+      position: absolute;
+      background: rgba(3, 10, 20, 0.94);
+      border: 1px solid var(--yellow);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 20;
+      display: none;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+      transform: translate(-50%, -135%);
+      white-space: nowrap;
+    }
+
+    /* Filter Bar */
+    .search-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .era-pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .era-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .era-pill:hover, .era-pill.active { color: #fff; }
+    .era-pill[data-era="all"].active { background: #007ea7; border-color: #00a8cc; }
+    .era-pill[data-era="1978-1987"].active { background: var(--era-1); border-color: #007ea7; }
+    .era-pill[data-era="1988-1997"].active { background: var(--era-2); border-color: #00a8cc; }
+    .era-pill[data-era="1998-2007"].active { background: var(--era-3); border-color: #38bdf8; }
+    .era-pill[data-era="2008-2018"].active { background: var(--era-4); border-color: #fff; color: #002b49; }
+
+    .search-input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      width: 280px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .search-input:focus { border-color: #00a8cc; }
+
+    /* Wall Bands & Artifact Cards */
+    .wall-band {
+      margin-bottom: 2rem;
+      background: rgba(13, 27, 42, 0.6);
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+    }
+
+    .band-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+    }
+
+    .band-header.era-1 { background: linear-gradient(90deg, #002840, #004369); }
+    .band-header.era-2 { background: linear-gradient(90deg, #003c5b, #005f8d); }
+    .band-header.era-3 { background: linear-gradient(90deg, #005273, #007ea7); }
+    .band-header.era-4 { background: linear-gradient(90deg, #007096, #00a8cc); }
+
+    .band-title { font-size: 1.35rem; font-weight: 900; letter-spacing: 1px; }
+    .band-subtitle { font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); }
+
+    .band-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.25rem;
+      padding: 1.5rem;
+    }
+
+    .artifact-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      scroll-margin-top: 90px;
+    }
+
+    .artifact-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #00a8cc;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes cardSelectPulse {
+      0% { box-shadow: 0 0 0 rgba(255, 188, 0, 0); border-color: var(--card-border); transform: scale(1); }
+      30% { box-shadow: 0 0 35px rgba(255, 188, 0, 0.95), inset 0 0 15px rgba(255, 188, 0, 0.4); border-color: var(--yellow); background: rgba(255, 188, 0, 0.14); transform: translateY(-5px) scale(1.02); }
+      100% { box-shadow: 0 0 15px rgba(0, 168, 204, 0.4); border-color: #00a8cc; transform: translateY(-2px); }
+    }
+
+    .artifact-card.highlight-pulse {
+      animation: cardSelectPulse 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .artifact-thumb {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: #001f33;
+      border: 1px solid var(--card-border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .artifact-thumb canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .artifact-body { flex-grow: 1; }
+
+    .artifact-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .artifact-year { font-size: 1.15rem; font-weight: 900; color: #fff; }
+
+    .artifact-type {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .artifact-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+
+    .artifact-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .locate-btn {
+      background: rgba(0, 168, 204, 0.15);
+      border: 1px solid rgba(0, 168, 204, 0.4);
+      color: #38bdf8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .locate-btn:hover { background: #007ea7; color: #fff; }
+
+    .details-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .details-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.15); }
+
+    /* Overview Tab Layout */
+    .wall-hero {
+      background: linear-gradient(135deg, #003755 0%, #006894 40%, #009dbf 100%);
+      border-radius: 16px;
+      padding: 2.5rem 2.2rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      margin-bottom: 2rem;
+    }
+
+    .wall-tag {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 2px;
+    }
+
+    .anniversary-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--yellow);
+      margin-bottom: 1rem;
+    }
+
+    .wall-hero h2 {
+      font-size: 2.6rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 0.8rem;
+      color: #fff;
+    }
+
+    .wall-hero p {
+      max-width: 820px;
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1.8rem;
+    }
+
+    .quotes-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .wall-quote {
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(8px);
+      padding: 1.1rem 1.4rem;
+      border-radius: 0 10px 10px 0;
+      border-left: 5px solid var(--yellow);
+    }
+
+    .wall-quote.corinne { border-left-color: var(--orange); }
+
+    .wall-quote-text {
+      font-size: 0.92rem;
+      font-style: italic;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .wall-quote-author {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .wall-quote.corinne .wall-quote-author { color: #ff9e43; }
+
+    /* Headcount Growth Strip */
+    .growth-meter {
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .meter-label {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .meter-track {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .meter-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .meter-node:hover { transform: translateY(-3px); }
+
+    .node-bubble {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #002b49;
+      border: 3px solid #00a8cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 168, 204, 0.4);
+      margin-bottom: 4px;
+    }
+
+    .node-bubble.highlight {
+      background: var(--orange);
+      border-color: #ff9e43;
+      box-shadow: 0 4px 15px rgba(243, 111, 33, 0.5);
+    }
+
+    .node-text {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Dedicated View Layouts */
+    .view-hero-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .view-hero-panel h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .view-hero-panel p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 860px;
+      margin-bottom: 1.5rem;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+    }
+
+    .feature-box:hover {
+      border-color: #00a8cc;
+      transform: translateY(-4px);
+    }
+
+    .feature-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.8rem;
+    }
+
+    .feature-title { font-size: 1.3rem; font-weight: 800; color: #fff; }
+
+    .feature-pill {
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: rgba(255, 188, 0, 0.15);
+      color: var(--yellow);
+      padding: 3px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 188, 0, 0.3);
+    }
+
+    .feature-body {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .feature-specs {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      border-left: 3px solid #00a8cc;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+    }
+
+    /* Modal System */
+    .modal-veil {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-veil.show { display: flex; }
+
+    .modal-box {
+      background: #0d1e30;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 680px;
+      padding: 2.2rem;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: #fff; }
+
+    /* Quiz Widget */
+    .quiz-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2.2rem;
+      max-width: 740px;
+      margin: 0 auto;
+    }
+
+    .quiz-question {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .quiz-option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #00a8cc;
+    }
+
+    .quiz-option.correct {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: #22c55e;
+      color: #86efac;
+    }
+
+    .quiz-option.wrong {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    .quiz-feedback {
+      font-size: 0.95rem;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    footer {
+      max-width: 1440px;
+      margin: 4rem auto 0;
+      padding: 2rem;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .wall-hero h2 { font-size: 2.2rem; }
+      .band-cards-grid { grid-template-columns: 1fr; }
+      .stage-canvas-wrap { height: 280px; }
+      header { padding: 0.75rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Clean Collision-Free Navigation Header -->
+  <header>
+    <div class="brand-group">
+      <div class="brand-icon">T</div>
+      <div class="brand-text">
+        <h1>Trimble New Zealand</h1>
+        <span>#HISTORYWALL Interactive Archive</span>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-tab="wallTab">The History Wall</button>
+      <button class="nav-btn" data-tab="overviewTab">40 Years & Milestones</button>
+      <button class="nav-btn" data-tab="madeInNzTab">What Was Made in NZ</button>
+      <button class="nav-btn" data-tab="acquisitionsTab">NZ Acquisitions</button>
+      <button class="nav-btn" data-tab="rebuildTab">2011 Quake & Rebuild</button>
+      <button class="nav-btn" data-tab="peopleTab">Leadership</button>
+      <button class="nav-btn" data-tab="quizTab">Heritage Quiz</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- TAB 1: THE HISTORY WALL (Starts directly at the top with master canvas & era bands) -->
+    <section id="wallTab" class="tab-content active">
+      <!-- Master Viewport (Immediate top position) -->
+      <div class="viewport-box">
+        <div class="stage-toolbar">
+          <div class="stage-title">
+            <span>🎯 Master Panoramic Viewport (Direct High-Res Engine)</span>
+            <span id="targetFocusText" style="font-weight: 400; color: var(--text-muted);">(Scroll to zoom, drag to pan, click photo to view card below)</span>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="locate-btn" onclick="zoomCentered(1.35)">➕ Zoom In</button>
+            <button class="locate-btn" onclick="zoomCentered(0.74)">➖ Zoom Out</button>
+            <button class="locate-btn" onclick="resetMasterView()">Fit Whole Wall</button>
+          </div>
+        </div>
+
+        <div class="stage-canvas-wrap" id="stageWrap">
+          <canvas id="masterCanvas"></canvas>
+          <div class="focus-reticle" id="focusReticle"></div>
+          <div class="map-tooltip" id="mapTooltip">Click to view card ↓</div>
+        </div>
+      </div>
+
+      <!-- Filter Bar for Wall View -->
+      <div class="search-row" id="searchRow">
+        <div class="era-pills">
+          <button class="era-pill active" data-era="all">All 4 Wall Eras</button>
+          <button class="era-pill" data-era="1978-1987">1978–1987</button>
+          <button class="era-pill" data-era="1988-1997">1988–1997</button>
+          <button class="era-pill" data-era="1998-2007">1998–2007</button>
+          <button class="era-pill" data-era="2008-2018">2008–2018</button>
+        </div>
+        <input type="text" id="wallSearch" class="search-input" placeholder="Search wall artifacts, photos, tech..." />
+      </div>
+
+      <!-- 4 Era Bands with Auto-Sliced Thumbnails -->
+      <div id="bandsContainer"></div>
+    </section>
+
+    <!-- TAB 2: 40 YEARS & MILESTONES (Dedicated space for Hero, Quotes & Headcount) -->
+    <section id="overviewTab" class="tab-content">
+      <!-- 40 Years Hero Banner -->
+      <div class="wall-hero">
+        <div class="wall-tag">#HISTORYWALL</div>
+        <div class="anniversary-badge">40 YEARS (1978 – 2018) • A HISTORY TO BE PROUD OF</div>
+        <h2>Innovation Born in Christchurch & Scaled Worldwide</h2>
+        <p>
+          An interactive exploration of the physical history wall hanging in the Christchurch headquarters. 
+          Follow the 40-year journey across four color-coded eras, archival photos, newspaper clippings, 
+          and high-tech engineering milestones.
+        </p>
+        <div class="quotes-container">
+          <div class="wall-quote">
+            <div class="wall-quote-text">“Believe you can and you’re halfway there!”</div>
+            <div class="wall-quote-author">— Charlie Trimble (1978 Founder)</div>
+          </div>
+          <div class="wall-quote corinne">
+            <div class="wall-quote-text">“Today marks the end of a long journey since the fire, and it is great to have all our employees located in one building on site.”</div>
+            <div class="wall-quote-author">— Corinne Haines, Managing Director TNZ (April 2014)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Headcount Growth Ribbon -->
+      <div class="growth-meter">
+        <div class="meter-label">New Zealand Headcount Milestones (From Wall Chart Ribbons)</div>
+        <div class="meter-track">
+          <div class="meter-node" onclick="jumpToYear('w1992_growth')">
+            <div class="node-bubble">60</div>
+            <div class="node-text">1992<br>60% Goal</div>
+          </div>
+          <div style="color:var(--text-muted);">&rarr;</div>
+          <div class="meter-node" onclick="jumpToYear('w1995_birmingham')">
+            <div class="node-bubble">120</div>
+            <div class="node-text">1995<br>Birmingham Dr</div>
+          </div>
+          <div style="color:var(--text-muted);">&rarr;</div>
+          <div class="meter-node" onclick="jumpToYear('w1999_berglund')">
+            <div class="node-bubble">170</div>
+            <div class="node-text">1999<br>Expansion</div>
+          </div>
+          <div style="color:var(--text-muted);">&rarr;</div>
+          <div class="meter-node" onclick="jumpToYear('w2002_clearwater')">
+            <div class="node-bubble">200</div>
+            <div class="node-text">2002<br>Milestone</div>
+          </div>
+          <div style="color:var(--text-muted);">&rarr;</div>
+          <div class="meter-node" onclick="jumpToYear('w2008')">
+            <div class="node-bubble">240</div>
+            <div class="node-text">2008<br>Milestone</div>
+          </div>
+          <div style="color:var(--text-muted);">&rarr;</div>
+          <div class="meter-node" onclick="jumpToYear('w2016_matter')">
+            <div class="node-bubble">280</div>
+            <div class="node-text">2016<br>Milestone</div>
+          </div>
+          <div style="color:var(--text-muted);">&rarr;</div>
+          <div class="meter-node" onclick="jumpToYear('w2017')">
+            <div class="node-bubble highlight">400</div>
+            <div class="node-text">2017+<br>Workforce</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: WHAT WAS MADE IN NZ -->
+    <section id="madeInNzTab" class="tab-content">
+      <div class="view-hero-panel">
+        <div class="feature-pill" style="margin-bottom: 0.75rem; display: inline-block;">SOFTWARE & HARDWARE PORTFOLIO</div>
+        <h2>Engineered & Programmed in Aotearoa</h2>
+        <p>
+          From the foundational SDR data logger software in the 1980s to real-time machine guidance, 
+          precision agriculture, hydrographic dredging, and seismic timber engineering, New Zealand has been 
+          the software engine room of Trimble’s global Field Solutions and Heavy Civil divisions.
+        </p>
+        <div class="grid-2col" id="madeInNzGrid"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: NZ ACQUISITIONS -->
+    <section id="acquisitionsTab" class="tab-content">
+      <div class="view-hero-panel">
+        <div class="feature-pill" style="margin-bottom: 0.75rem; display: inline-block;">NEW ZEALAND INVESTMENT HISTORY</div>
+        <h2>Trimble's New Zealand Acquisitions Portfolio</h2>
+        <p>
+          Starting with Charlie Trimble's historic 1991 acquisition of Datacom Software Research in Christchurch, 
+          Trimble continued to invest across New Zealand's technology hubs in Auckland, Rotorua, and Wellington.
+        </p>
+        <div class="grid-2col" id="acquisitionsGrid"></div>
+      </div>
+    </section>
+
+    <!-- TAB 5: 2011 QUAKE & REBUILD -->
+    <section id="rebuildTab" class="tab-content">
+      <div class="view-hero-panel">
+        <div class="feature-pill" style="margin-bottom: 0.75rem; display: inline-block;">CRISIS & REBUILDING RESILIENCE</div>
+        <h2>The Christchurch Crucible & The 2014 Pres-Lam Rebuild</h2>
+        <p>
+          In 2011, Christchurch experienced an unprecedented double blow: the catastrophic February 22 earthquake, 
+          followed three months later by a massive fire that destroyed Building One at 11 Birmingham Drive. 
+          Rather than retreating, Trimble International reaffirmed its dedication to Christchurch, embarking on a $23 million 
+          timber engineering marvel that set a global benchmark for low-damage earthquake resilience.
+        </p>
+        <div class="grid-2col">
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title">February 2011 Quake</span>
+              <span class="feature-pill">Disruption</span>
+            </div>
+            <p class="feature-body">
+              The M6.3 earthquake severely damaged Christchurch infrastructure. Under Managing Director Corinne Haines, 
+              Trimble teams activated cloud recovery and remote sprint workflows, keeping global survey software releases 
+              and dealer deliveries completely on schedule with zero loss of client data.
+            </p>
+            <div class="feature-specs" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span><strong>Visual on Wall:</strong> Damaged Canterbury city center & seismic monitoring telemetry</span>
+              <button class="locate-btn" onclick="zoomToItem('w2011_quake')">🎯 Fly Camera to Wall</button>
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title">May 2011 Fire</span>
+              <span class="feature-pill">Building One</span>
+            </div>
+            <p class="feature-body">
+              An accidental electrical fire completely consumed Building One. Trimble leadership flew to NZ and publicly 
+              pledged to keep Christchurch as Trimble's primary R&D home, quickly establishing temporary portacabin 
+              offices on site to keep developers coding.
+            </p>
+            <div class="feature-specs" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span><strong>Visual on Wall:</strong> Night photo of flames engulfing Building One at Birmingham Drive</span>
+              <button class="locate-btn" onclick="zoomToItem('w2011_fire')">🎯 Fly Camera to Wall</button>
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title">Pres-Lam Rocking Timber</span>
+              <span class="feature-pill">World First</span>
+            </div>
+            <p class="feature-body">
+              Designed with WSP/Opus and City Care, the new 6,000 m² headquarters opened in April 2014. It was the first commercial 
+              building in the world combining post-tensioned laminated veneer lumber (LVL) rocking frames, rocking shear walls, 
+              and timber-concrete composite floors designed to rock and self-center during quakes.
+            </p>
+            <div class="feature-specs" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span><strong>Visual on Wall:</strong> Twilight photo of glowing glass-timber facade with Corinne Haines' quote</span>
+              <button class="locate-btn" onclick="zoomToItem('w2014_building')">🎯 Fly Camera to Wall</button>
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title">Living Laboratory</span>
+              <span class="feature-pill">Seismic Sensors</span>
+            </div>
+            <p class="feature-body">
+              The building is outfitted with embedded Trimble seismic accelerometers and displacement sensors, providing 
+              structural engineering researchers at the University of Canterbury real-time telemetry on low-damage timber performance.
+            </p>
+            <div class="feature-specs" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span><strong>Sensors on Wall:</strong> Pres-Lam embedded seismic accelerometers & telemetry</span>
+              <button class="locate-btn" onclick="zoomToItem('w2014_building')">🎯 Fly Camera to Wall</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: LEADERSHIP -->
+    <section id="peopleTab" class="tab-content">
+      <div class="view-hero-panel">
+        <div class="feature-pill" style="margin-bottom: 0.75rem; display: inline-block;">EXECUTIVE & TECHNICAL CHAMPIONS</div>
+        <h2>Leaders & Visionaries</h2>
+        <p>The founders, executives, and engineering champions who bridged Silicon Valley and Aotearoa.</p>
+        <div class="grid-2col" id="peopleGrid"></div>
+      </div>
+    </section>
+
+    <!-- TAB 7: HERITAGE QUIZ -->
+    <section id="quizTab" class="tab-content">
+      <div class="view-hero-panel" style="padding-bottom: 1rem;">
+        <h2 style="text-align: center; margin-bottom: 0.5rem;">Trimble NZ Heritage Challenge</h2>
+        <p style="text-align: center; margin: 0 auto 2rem;">Test your knowledge of three decades of Kiwi high-tech surveying, agricultural, and engineering milestones.</p>
+        <div class="quiz-container">
+          <div id="quizBox">
+            <div class="quiz-question" id="quizQuestion">Question will appear here</div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-feedback" id="quizFeedback"></div>
+            <button id="quizNextBtn" class="locate-btn" style="display:none; padding: 0.6rem 1.5rem; font-size: 0.95rem; margin-top: 1rem;">Next Question →</button>
+          </div>
+          <div id="quizResult" style="display:none; text-align: center;">
+            <h4 style="font-size: 1.5rem; color: #38bdf8; margin-bottom: 1rem;">Quiz Completed!</h4>
+            <p id="quizScoreText" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
+            <button id="quizRestartBtn" class="locate-btn" style="padding: 0.6rem 1.5rem;">Restart Quiz</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Deep Dive -->
+  <div class="modal-veil" id="modalVeil">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Faithfully adapted from the official Trimble New Zealand #HISTORYWALL ("A history to be proud of. 40 YEARS").</p>
+    <p style="margin-top: 4px; opacity: 0.7;">Trimble Navigation New Zealand Limited • Christchurch • Auckland • Rotorua • Wellington</p>
+  </footer>
+
+  <script>
+    /* -----------------------------------------------------------
+       COMPLETE DATA STRUCTURES
+    ----------------------------------------------------------- */
+    const wallBands = [
+      {
+        eraId: "1978-1987",
+        title: "1978 – 1987: The Genesis & Marine Navigation",
+        subtitle: "Loran C, America's Cup, and the dawn of commercial GPS",
+        cssClass: "era-1",
+        events: [
+          {
+            id: "w1978",
+            year: "1978",
+            month: "",
+            title: "Trimble Founded",
+            text: "Charlie Trimble, Kit Mura-Smith, Tom Coates, and Dan Babitch leave HP to found Trimble Navigation.",
+            wallVisual: "Archival photograph of Charlie Trimble and the original Hewlett-Packard spin-off founders.",
+            badgeType: "Founding",
+            fullStory: "Founded in Los Altos, California. Charlie Trimble’s belief that satellite navigation would transform commercial industries laid the groundwork for decades of innovation. Charlie coined his personal motto: 'Believe you can and you’re halfway there!'",
+            x: 19.5, y: 77.5, w: 7.5, h: 15.5
+          },
+          {
+            id: "w1980_loran",
+            year: "1980",
+            month: "",
+            title: "LORAN C Launched & America's Cup",
+            text: "Trimble launches LORAN C, the first system with highly accurate Latitude and Longitude. Appeals to yachtsmen and competitive sailors; all America's Cup boats have Trimble onboard in the 80s.",
+            wallVisual: "Photo of classic racing yacht competing in the America's Cup with Trimble LORAN antenna and tabletop navigation console.",
+            badgeType: "Marine Tech",
+            fullStory: "LORAN C established Trimble as the undisputed market leader in precision maritime navigation, setting the gold standard across ocean racing.",
+            x: 36.5, y: 77.5, w: 7.5, h: 15.5
+          },
+          {
+            id: "w1980_gps",
+            year: "1980–1982",
+            month: "",
+            title: "Early GPS Satellite Tracking",
+            text: "Trimble begins engineering products that take advantage of the U.S. Government's newly launched GPS satellites.",
+            wallVisual: "Orbital diagram of early Block I GPS satellites orbiting Earth with ground receiver stations.",
+            badgeType: "Satellite",
+            fullStory: "Recognizing that land-based radio navigation had physical horizon limits, Trimble pivoted research to track the experimental U.S. DOD GPS constellation.",
+            x: 52.0, y: 77.5, w: 6.5, h: 15.5
+          },
+          {
+            id: "w1984",
+            year: "1984",
+            month: "",
+            title: "First Commercial GPS Positioning Product",
+            text: "Trimble introduces the first commercial GPS positioning product, used by hydrographic survey boats.",
+            wallVisual: "Photo of hydrographic workboat conducting harbor soundings and dredging positioning.",
+            badgeType: "Commercial First",
+            fullStory: "Brought satellite navigation out of laboratory defense setups into practical maritime survey contracts worldwide.",
+            x: 69.5, y: 77.5, w: 7.5, h: 15.5
+          }
+        ]
+      },
+      {
+        eraId: "1988-1997",
+        title: "1988 – 1997: The New Zealand Partnership & Agritech",
+        subtitle: "DSR Acquisition, 60 to 120 staff, TrimFlight topdressing, and FieldGuide Ag",
+        cssClass: "era-2",
+        events: [
+          {
+            id: "w1990_ipo",
+            year: "1990",
+            month: "",
+            title: "NASDAQ IPO & Sole GPS Dedication",
+            text: "Trimble becomes the first GPS company to go public on NASDAQ (TRMB). Trimble's product line becomes solely dedicated to GPS.",
+            wallVisual: "Photo of NASDAQ TRMB ticker and early commercial GPS catalog.",
+            badgeType: "NASDAQ IPO",
+            fullStory: "The initial public offering provided capital for global software research and corporate acquisitions.",
+            x: 18.0, y: 62.0, w: 5.0, h: 14.5
+          },
+          {
+            id: "w1990_award",
+            year: "1990",
+            month: "",
+            title: "DSR Wins Export Commendation Award",
+            text: "Export Commendation Award presented to Datacom Software Research Ltd by the Right Honourable Geoffrey Palmer (Prime Minister of NZ).",
+            wallVisual: "Newspaper clipping showing Prime Minister Geoffrey Palmer presenting the award to DSR Christchurch.",
+            badgeType: "NZ Award",
+            fullStory: "Recognized the Christchurch team’s international market leadership in creating electronic data logger software for Sokkisha/Sokkia SDR devices.",
+            x: 21.0, y: 62.0, w: 5.5, h: 15.0
+          },
+          {
+            id: "w1991",
+            year: "1991",
+            month: "April",
+            title: "Trimble Purchases Datacom Software Research (DSL/DSR)",
+            text: "Trimble purchases Datacom Software Research Limited (DSL), the first of many acquisitions to come, and Trimble Navigation New Zealand Limited (TNZ) is formed.",
+            wallVisual: "Historic group photo of the original DSR Christchurch engineering staff.",
+            badgeType: "TNZ Formed",
+            fullStory: "Charlie Trimble flew to Christchurch and agreed on a deal after a Japanese buyout stalled. This became Trimble’s first overseas acquisition and transformed Trimble from a hardware maker into a full-stack software company.",
+            x: 26.5, y: 61.5, w: 6.8, h: 15.5
+          },
+          {
+            id: "w1992_growth",
+            year: "1992",
+            month: "June",
+            title: "60 Staff & Charlie's 60% Growth Goal",
+            text: "Charlie Trimble sets a 60% compound growth goal for Trimble NZ, currently employing 60 full-time staff.",
+            wallVisual: "Team photo on the steps and the '60' staff circular milestone bubble.",
+            badgeType: "Headcount: 60",
+            fullStory: "Under Alan Townsend and Corinne Haines, the Christchurch operation scaled rapidly to supply survey and mapping software to global dealers.",
+            x: 32.5, y: 61.5, w: 5.5, h: 15.0
+          },
+          {
+            id: "w1992_rtk",
+            year: "1992",
+            month: "",
+            title: "Real-Time Kinematic (RTK) Developed",
+            text: "Trimble develops real-time kinematic (RTK) technology, allowing moment-by-moment GPS updates while on the move.",
+            wallVisual: "Photo of surveyor carrying early backpack receiver with RTK radio link antenna.",
+            badgeType: "RTK Tech",
+            fullStory: "RTK revolutionized engineering surveying by eliminating hours of post-processing, giving centimeter accuracy instantaneously.",
+            x: 35.5, y: 61.5, w: 5.0, h: 15.0
+          },
+          {
+            id: "w1993_trimflight",
+            year: "1993",
+            month: "September",
+            title: "TrimFlight™ Aerial Topdressing System",
+            text: "Trimble NZ's TrimFlight™ brings the power of satellite-based navigation to topdressing aircraft.",
+            wallVisual: "Newspaper clipping 'NZ high-tech...' and photo of Fletcher agricultural topdressing aircraft flying over Canterbury hills.",
+            badgeType: "Made in NZ",
+            fullStory: "Developed in Christchurch specifically for the Kiwi aviation industry, enabling aerial topdressers to lay precise swaths of fertilizer without ground flagmen.",
+            x: 41.5, y: 62.0, w: 6.5, h: 15.0
+          },
+          {
+            id: "w1993_pccard",
+            year: "1993",
+            month: "",
+            title: "First PC Card GPS Receiver",
+            text: "Trimble develops the first GPS receiver small enough to be integrated on a PC card (PCMCIA).",
+            wallVisual: "Photograph of PC Card inserted into a portable field laptop.",
+            badgeType: "Hardware First",
+            fullStory: "Allowed rugged field computers to run Trimble survey mapping software without heavy external receiver boxes.",
+            x: 44.5, y: 62.0, w: 5.0, h: 15.0
+          },
+          {
+            id: "w1994",
+            year: "1994",
+            month: "November",
+            title: "Canterbury Regional Council Riverbed Monitoring",
+            text: "The Canterbury Regional Council opts for Trimble® GPS system to be used for flood plain mapping, and coastal and riverbed environmental monitoring.",
+            wallVisual: "Circular photo of braided Canterbury riverbeds (Waimakariri/Rakaia) mapped with Trimble receivers.",
+            badgeType: "Canterbury Adoption",
+            fullStory: "Pioneered the use of precision GPS in New Zealand regional catchment management and natural hazard tracking.",
+            x: 48.5, y: 62.5, w: 6.0, h: 14.5
+          },
+          {
+            id: "w1995_birmingham",
+            year: "1995",
+            month: "",
+            title: "120 Staff Move to 11 Birmingham Drive",
+            text: "Trimble NZ moves its 120 staff to 11 Birmingham Drive in Riccarton/Middleton, Christchurch.",
+            wallVisual: "Photograph of the original 11 Birmingham Drive office and the '120' staff milestone bubble.",
+            badgeType: "Headcount: 120",
+            fullStory: "Having doubled staff from 60 to 120 in three years, Trimble consolidated into its dedicated campus at Birmingham Drive.",
+            x: 55.5, y: 62.0, w: 6.5, h: 15.0
+          },
+          {
+            id: "w1995_sensor",
+            year: "1995",
+            month: "",
+            title: "First Plug-and-Play GPS for Laptops & PDAs",
+            text: "Trimble introduces the first 'plug-and-play' GPS sensor for laptops and PDAs.",
+            wallVisual: "Photo of early palmtop/PDA device connected to miniature Trimble sensor.",
+            badgeType: "Mobile Mapping",
+            fullStory: "Enabled utility workers and foresters to collect asset points straight into geographic information systems.",
+            x: 58.5, y: 62.0, w: 5.0, h: 15.0
+          },
+          {
+            id: "w1996",
+            year: "1996",
+            month: "October",
+            title: "'Trimble Solutions' Published",
+            text: "First issue of Trimble Solutions is published, a localised news and views newsletter.",
+            wallVisual: "Cover photo of the premiere issue of 'Trimble Solutions' newsletter.",
+            badgeType: "Publication",
+            fullStory: "Served as an engineering journal linking Kiwi developers with field surveyors worldwide.",
+            x: 62.5, y: 62.0, w: 5.0, h: 15.0
+          },
+          {
+            id: "w1997_fieldguide",
+            year: "1997",
+            month: "",
+            title: "FieldGuide Precision Ag System Launched",
+            text: "Trimble NZ development group launches FieldGuide, its latest GPS Precision Agriculture System product.",
+            wallVisual: "Photo of agricultural tractor cab equipped with FieldGuide guidance console.",
+            badgeType: "Made in NZ",
+            fullStory: "Created in Christchurch to provide precision guidance for tractors, cutting input costs and overlapping passes.",
+            x: 69.5, y: 61.5, w: 6.5, h: 16.0
+          },
+          {
+            id: "w1997_singleboard",
+            year: "1997",
+            month: "",
+            title: "First Single-Board GPS and Cellular Unit",
+            text: "Trimble is the first to put GPS and cellular communications on a single board.",
+            wallVisual: "Close-up photo of integrated circuit board containing GPS and GSM cellular modems.",
+            badgeType: "World First",
+            fullStory: "The foundation for modern fleet telematics and IoT tracking.",
+            x: 73.0, y: 61.5, w: 5.0, h: 15.0
+          }
+        ]
+      },
+      {
+        eraId: "1998-2007",
+        title: "1998 – 2007: Surveying Innovation & Machine Guidance",
+        subtitle: "Trimble 4800, Everest Expedition, Caterpillar JV, and Clearwater testing",
+        cssClass: "era-3",
+        events: [
+          {
+            id: "w1998_everest",
+            year: "1998",
+            month: "",
+            title: "Charlie Steps Down & Everest Expedition",
+            text: "Charlie Trimble steps down as president and CEO after 20 years. Trimble GPS equipment joins researchers on the 1998 Everest Extreme Expedition to measure Mt. Everest.",
+            wallVisual: "Photo of climbers at the summit ridge of Mount Everest taking measurements with Trimble GPS antennas.",
+            badgeType: "Everest Expedition",
+            fullStory: "Researchers on the 1998 expedition used Trimble equipment to determine the exact elevation of the world's tallest peak.",
+            x: 18.5, y: 44.5, w: 6.5, h: 15.2
+          },
+          {
+            id: "w1998_4800",
+            year: "1998",
+            month: "",
+            title: "Trimble 4800 Released — Developed out of NZ",
+            text: "The Trimble 4800, developed out of NZ, is released for professional surveyors. Provides accuracy within a centimeter and allows surveyors to take accurate readings quicker than traditional tools.",
+            wallVisual: "Photo of surveyor with Trimble 4800 integrated rover pole.",
+            badgeType: "Made in NZ",
+            fullStory: "One of the most famous survey tools in history. Christchurch engineers integrated the antenna and receiver inside the compact rover head, eliminating heavy backpack cables.",
+            x: 23.5, y: 44.5, w: 6.5, h: 15.2
+          },
+          {
+            id: "w1999_berglund",
+            year: "1999",
+            month: "",
+            title: "Steve Berglund CEO; Staff Reaches 170",
+            text: "Steve Berglund leaves Spectra Precision to become CEO of Trimble. Trimble NZ numbers reach 170 staff.",
+            wallVisual: "Portrait of Steve Berglund and the '170' staff milestone bubble.",
+            badgeType: "Headcount: 170",
+            fullStory: "Berglund spearheaded an aggressive acquisition and expansion strategy across construction and geospatial industries.",
+            x: 31.0, y: 46.5, w: 6.0, h: 12.8
+          },
+          {
+            id: "w1999_epson",
+            year: "1999",
+            month: "",
+            title: "Seiko Epson Location Device",
+            text: "Trimble GPS used in Seiko Epson's Location communication device, the world's first combination PDA, wireless phone, personal navigator, and digital camera.",
+            wallVisual: "Photo of Seiko Epson all-in-one PDA phone with flip camera and GPS stub.",
+            badgeType: "Consumer First",
+            fullStory: "A remarkable precursor to modern smartphones, powered by Trimble positioning silicon.",
+            x: 35.0, y: 46.5, w: 5.5, h: 12.8
+          },
+          {
+            id: "w2000",
+            year: "2000",
+            month: "",
+            title: "Panoramic Christchurch Staff Milestone",
+            text: "Trimble NZ team gathers outside 11 Birmingham Drive for a commemorative company photograph.",
+            wallVisual: "Large wide panoramic photo of ~200 Christchurch staff gathered in front of the building.",
+            badgeType: "Team Photo",
+            fullStory: "Showcased the thriving software development and quality testing ecosystem in Christchurch.",
+            x: 56.5, y: 44.0, w: 7.8, h: 15.5
+          },
+          {
+            id: "w2002_cat",
+            year: "2002",
+            month: "",
+            title: "Trimble and Caterpillar Form Joint Venture",
+            text: "Trimble and Caterpillar begin a joint venture to develop and install the next generation of advanced electronic guidance and control products for earthmoving machines.",
+            wallVisual: "Logo of Caterpillar & Trimble partnership with yellow construction machinery.",
+            badgeType: "Global JV",
+            fullStory: "Formed Caterpillar Trimble Control Technologies (CTCT), permanently connecting earthmoving machines with 3D terrain models.",
+            x: 63.5, y: 44.0, w: 6.0, h: 15.5
+          },
+          {
+            id: "w2002_clearwater",
+            year: "2002",
+            month: "",
+            title: "Clearwater Resort Field Testing (200 Staff)",
+            text: "Trimble NZ plays a key role in developing Trimble's first machine guidance system for earthmoving equipment, field testing the technology on Clearwater Resort in Christchurch. Staff reaches 200.",
+            wallVisual: "Photo of Cat bulldozer grading fairways at Clearwater Resort and newspaper clipping from 'The Press'.",
+            badgeType: "Made in NZ",
+            fullStory: "Christchurch engineers fitted heavy bulldozers with dual GPS antennas and automated hydraulic valves during the construction of Christchurch’s Clearwater Golf Resort.",
+            x: 68.5, y: 44.0, w: 7.5, h: 15.5
+          }
+        ]
+      },
+      {
+        eraId: "2008-2018",
+        title: "2008 – 2018: Resilience, National Expansion & 40 Years",
+        subtitle: "VirtualSite, the 2011 Quake & Fire, the Pres-Lam Rebuild, and 400 Staff",
+        cssClass: "era-4",
+        events: [
+          {
+            id: "w2008",
+            year: "2008",
+            month: "October",
+            title: "VirtualSite Solutions JV with Caterpillar (240 Staff)",
+            text: "Trimble and Caterpillar announce second joint venture, VirtualSite Solutions, to integrate deep expertise of both parent companies in product design and software development. Staff reaches 240.",
+            wallVisual: "Photo of Connected Site software interface on multi-monitor workstations.",
+            badgeType: "Headcount: 240",
+            fullStory: "Connected site telematics allowed civil engineering contractors to track machine productivity, fuel, and compaction in real time.",
+            x: 17.5, y: 28.0, w: 6.2, h: 12.5
+          },
+          {
+            id: "w2011_quake",
+            year: "2011",
+            month: "February",
+            title: "Christchurch Earthquake Strikes",
+            text: "Christchurch earthquake disrupts business. Emergency protocols ensure all staff safety and cloud continuity.",
+            wallVisual: "Photo of damaged Christchurch buildings and emergency response coordination.",
+            badgeType: "Earthquake",
+            fullStory: "Canterbury’s devastating magnitude 6.3 earthquake tested Trimble's disaster resilience. Systems were preserved with zero loss of client intellectual property.",
+            x: 37.5, y: 26.0, w: 5.5, h: 14.8
+          },
+          {
+            id: "w2011_fire",
+            year: "2011",
+            month: "May",
+            title: "Building One Destroyed in Fire",
+            text: "Building One destroyed in fire. Trimble International is committed to rebuilding and keeping its New Zealand base in Christchurch. Staff relocated to alternative office space.",
+            wallVisual: "Dramatic photo of Building One on fire at night at Birmingham Drive.",
+            badgeType: "Fire & Rebuild",
+            fullStory: "Just months after the quake, an accidental fire burned the main office to the ground. Managing Director Corinne Haines and Trimble leadership pledged to remain in Christchurch and rebuild.",
+            x: 41.5, y: 26.0, w: 5.5, h: 14.8
+          },
+          {
+            id: "w2013_loadrite",
+            year: "2013",
+            month: "June",
+            title: "Acquisition: Actronic Holdings / LOADRITE (Auckland)",
+            text: "Trimble acquires privately-held Actronic Holdings Limited (Auckland NZ based) to extend its machine monitoring and reporting solutions for the Connected Site.",
+            wallVisual: "Photo of LOADRITE cab indicator inside a front-end loader bucket.",
+            badgeType: "Acquisition",
+            fullStory: "LOADRITE dynamic weighing systems calculate payload weight in moving loader buckets, preventing vehicle overloading across quarries and mines.",
+            x: 26.5, y: 26.5, w: 5.0, h: 14.5
+          },
+          {
+            id: "w2013_iq",
+            year: "2013",
+            month: "August",
+            title: "Acquisition: IQ Irrigation (Christchurch)",
+            text: "Trimble acquires the assets of privately-held IQ Irrigation (Christchurch NZ based).",
+            wallVisual: "Photo of center pivot irrigator applying variable-rate water across Canterbury farmland.",
+            badgeType: "Acquisition",
+            fullStory: "IQ Irrigation pioneered individual nozzle control on center pivot and linear irrigators, optimizing water use on crops.",
+            x: 31.0, y: 26.5, w: 4.5, h: 14.5
+          },
+          {
+            id: "w2013_forestry",
+            year: "2013",
+            month: "September",
+            title: "Acquisition: Asset Forestry Limited (Rotorua)",
+            text: "Trimble acquires the assets of privately-held Asset Forestry Limited (Rotorua NZ based), a provider of forestry logistics software and services.",
+            wallVisual: "Photo of logging truck and log weighbridge dispatch yard in Rotorua.",
+            badgeType: "Acquisition",
+            fullStory: "Integrated WSX dispatch software into Trimble’s global Forestry division, tracking log harvesting from forest floor to export mill.",
+            x: 34.5, y: 26.5, w: 4.5, h: 14.5
+          },
+          {
+            id: "w2014_building",
+            year: "2014",
+            month: "April",
+            title: "New Birmingham Drive Pres-Lam Building Opens",
+            text: "Trimble NZ opens the new Birmingham Drive building, setting a new global design standard in timber seismic engineering.",
+            wallVisual: "Twilight architectural photo of the new Birmingham Drive building with Corinne Haines quote banner.",
+            badgeType: "Pres-Lam HQ",
+            fullStory: "A world-first engineered post-tensioned timber structure with rocking frames that absorb seismic shocks. Corinne Haines: 'Today marks the end of a long journey since the fire, and it is great to have all our employees located in one building on site.'",
+            x: 48.0, y: 26.0, w: 7.5, h: 14.8
+          },
+          {
+            id: "w2016_matter",
+            year: "2016",
+            month: "July",
+            title: "Acquisition: MatterMachine (Wellington) & 280 Staff",
+            text: "Trimble Buildings, led by the SketchUp Architecture & Design division, acquires Wellington based MatterMachine software engineering to enrich its product line with parametric capabilities. Staff reaches 280.",
+            wallVisual: "3D architectural render of parametric timber frames in SketchUp.",
+            badgeType: "Acquisition",
+            fullStory: "MatterMachine added algorithmic parametric design to SketchUp, making custom architectural timber and steel fabrication seamless.",
+            x: 61.5, y: 27.5, w: 6.0, h: 13.5
+          },
+          {
+            id: "w2017",
+            year: "2017",
+            month: "",
+            title: "Trimble NZ Workforce Reaches 400 Staff",
+            text: "Trimble NZ staff numbers reach 400 across Christchurch, Auckland, Rotorua, and Wellington.",
+            wallVisual: "The large '400' circular milestone bubble on the wall chart ribbon.",
+            badgeType: "Headcount: 400",
+            fullStory: "Solidified Trimble New Zealand as one of the country's most prolific software R&D centers, contributing core code to global construction, agriculture, and geospatial platforms.",
+            x: 68.5, y: 28.0, w: 4.5, h: 12.5
+          },
+          {
+            id: "w2018",
+            year: "2018",
+            month: "July",
+            title: "Trimble Celebrates 40 Years",
+            text: "Trimble celebrates 40 years of commercial leadership (1978–2018).",
+            wallVisual: "The 40 Years globe logo crowning the top left of the #HISTORYWALL.",
+            badgeType: "40 Years",
+            fullStory: "Celebrated across Trimble global offices, commemorating 40 years since HP founders left to start the company and 27 years of pioneering Kiwi development.",
+            x: 73.5, y: 28.5, w: 4.8, h: 11.8
+          }
+        ]
+      }
+    ];
+
+    const madeInNzList = [
+      {
+        name: "Trimble Survey Controller (TSC)",
+        year: "1992 – Present",
+        category: "Field Survey Software",
+        summary: "The cornerstone field data collection software running on generations of rugged handhelds (TSC1, TSC2, TSC3). Architected and developed in Christchurch, it combined GPS/GNSS receiver control, total station interfaces, COGO calculations, and automated digital roading.",
+        techSpecs: "Christchurch R&D • Standard field controller worldwide • Real-time coordinate geometry"
+      },
+      {
+        name: "Trimble 4800 Integrated GPS",
+        year: "1998",
+        category: "Survey Hardware & Firmware",
+        summary: "Developed out of NZ for professional land surveyors, the 4800 revolutionized fieldwork by consolidating the antenna, receiver, and radio into an ultra-compact rover pole unit, eliminating heavy backpack cables.",
+        techSpecs: "Centimeter RTK precision • Cable-free pole design • Christchurch hardware & firmware engineering"
+      },
+      {
+        name: "SDR Map & DSR Survey Suite",
+        year: "1980s – 1990s",
+        category: "Cadastral Software",
+        summary: "Created by Datacom Software Research in Christchurch for Sokkisha/Sokkia SDR data loggers, SDR Map pioneered automated traverse reduction, contouring, and cadastral drafting, winning the 1990 Export Commendation Award.",
+        techSpecs: "Pre-acquisition foundation • Sokkia SDR logger integration • Digital cadastral reduction"
+      },
+      {
+        name: "HYDRO / HYDROpro Marine Suite",
+        year: "1992 – 2010s",
+        category: "Hydrographic Survey",
+        summary: "Developed in Christchurch for coastal dredging, bathymetric mapping, and barge navigation. Deployed in global ports including Lyttelton, Rotterdam, Singapore, and Sydney.",
+        techSpecs: "Echo-sounder integration • Real-time 3D dredge positioning • Tide gauge & heave compensation"
+      },
+      {
+        name: "TrimFlight™ Aerial Topdressing System",
+        year: "1993",
+        category: "Aviation Agritech",
+        summary: "Engineered specifically for New Zealand agricultural aviation, bringing sub-meter satellite guidance into topdressing aircraft cockpits to ensure even distribution across rugged hill country.",
+        techSpecs: "Cockpit lightbar visual guidance • Real-time swath logging • Designed for Fletcher & PAC aircraft"
+      },
+      {
+        name: "Clearwater 3D Machine Guidance",
+        year: "2002",
+        category: "Earthmoving & Heavy Civil",
+        summary: "Trimble NZ played a foundational role in creating Trimble's first machine guidance system, rigorously testing automatic bulldozer and motor grader blade control at Clearwater Resort in Christchurch.",
+        techSpecs: "Direct hydraulic valve automation • Millimeter grade accuracy • Foundation of Cat-Trimble CTCT joint venture"
+      },
+      {
+        name: "FieldGuide GPS Ag Console",
+        year: "1997",
+        category: "Tractor Precision Ag",
+        summary: "Launched by the Trimble NZ development group in Christchurch, FieldGuide brought precision GPS field navigation into tractor cabs for spraying, seeding, and tillage.",
+        techSpecs: "In-cab color graphic display • Sub-meter pass-to-pass accuracy • Variable rate chemical input reduction"
+      },
+      {
+        name: "GPS Pathfinder Office & TerraSync",
+        year: "1995 – 2010s",
+        category: "GIS Asset Mapping",
+        summary: "Developed in Christchurch to provide differential GPS post-processing, attribute dictionary editing, and GIS database export for utility networks, forestry, and environmental mapping.",
+        techSpecs: "Sub-meter & decimeter GIS accuracy • Direct Esri ArcGIS export • Utility infrastructure cataloging"
+      },
+      {
+        name: "LOADRITE Payload Scales",
+        year: "Auckland (Acquired 2013)",
+        category: "Machine Weighing",
+        summary: "Created by Auckland's Actronic Technologies, LOADRITE scales calculate dynamic bucket weights on excavators and front-end loaders without stopping the machine cycle.",
+        techSpecs: "Optical boom angle sensing • Eliminates road truck fines • Transmits directly to Connected Site"
+      },
+      {
+        name: "IQ Irrigation Precision Water Control",
+        year: "Christchurch (Acquired 2013)",
+        category: "Agricultural Water",
+        summary: "Developed in Christchurch to deliver individual nozzle pulse control on center pivot and linear irrigators, varying application depth according to soil electromagnetic mapping.",
+        techSpecs: "Canterbury irrigation testing • Precision variable-rate application • Major water conservation"
+      },
+      {
+        name: "Asset Forestry WSX Logistics",
+        year: "Rotorua (Acquired 2013)",
+        category: "Forestry Software",
+        summary: "Brought Rotorua-developed forestry dispatch and log weighbridge software into Trimble Forestry, managing wood fiber from harvest coupes to export ports.",
+        techSpecs: "Rotorua forestry hub • Log docket barcode tracking • Centralized fleet dispatch"
+      },
+      {
+        name: "MatterMachine Parametric Engine",
+        year: "Wellington (Acquired 2016)",
+        category: "BIM & Architecture",
+        summary: "Developed by Wellington software architects to add generative parametric logic and digital fabrication automation directly into SketchUp and Trimble Buildings.",
+        techSpecs: "Wellington software engineering • Parametric architectural timber • Direct CNC output"
+      },
+      {
+        name: "Pres-Lam Rocking Timber Building",
+        year: "11 Birmingham Drive (Opened 2014)",
+        category: "Structural Seismic Engineering",
+        summary: "Engineered to withstand severe seismic shocks, the 6,000 m² headquarters uses post-tensioned laminated veneer lumber (LVL) rocking frames and shear walls that dissipate quake energy and self-center.",
+        techSpecs: "World-first commercial Pres-Lam design • Replaceable ductile fuses • Embedded Trimble seismic accelerometers"
+      }
+    ];
+
+    const nzAcquisitionsList = [
+      {
+        name: "Datacom Software Research Limited (DSR)",
+        date: "April 1991",
+        location: "Christchurch",
+        founders: "Alan Townsend, Corinne Haines (Finance)",
+        description: "Trimble's first overseas acquisition. DSR had developed world-renowned software for Sokkisha/Sokkia SDR data loggers and SDR Map. The deal established Trimble Navigation New Zealand Limited (TNZ) and turned Christchurch into Trimble's primary global field software research facility.",
+        impact: "Became the headquarters of Trimble NZ, generating Survey Controller, HYDRO, FieldGuide, and the software core for millions of surveyors worldwide."
+      },
+      {
+        name: "Actronic Holdings Limited (LOADRITE)",
+        date: "June 2013",
+        location: "Auckland",
+        founders: "Actronic Technologies Team",
+        description: "Acquired to extend machine monitoring and payload weighing for Trimble's Connected Site. LOADRITE dynamic weighing systems integrate sensors onto wheel loaders, excavators, and haulers to measure bucket loads while moving.",
+        impact: "Anchored Trimble’s presence in Auckland, leading the heavy civil and quarrying payload measurement market."
+      },
+      {
+        name: "IQ Irrigation",
+        date: "August 2013",
+        location: "Christchurch",
+        founders: "Nick Thompson and Canterbury Agritech Partners",
+        description: "Acquired to bring precision variable-rate irrigation (VRI) into Trimble Agriculture. The technology controls individual sprinklers on center-pivot and lateral-move irrigators based on GPS coordinates and soil topography.",
+        impact: "Expanded Trimble's precision agriculture solutions, optimizing water and energy use on farms globally."
+      },
+      {
+        name: "Asset Forestry Limited",
+        date: "September 2013",
+        location: "Rotorua",
+        founders: "Forestry Software Group",
+        description: "Provider of forestry logistics, harvest tracking, and log dispatch software (WSX). Manages log weighbridge ticketing, central dispatch, and haulage optimization across New Zealand and international forestry companies.",
+        impact: "Formed the cornerstone of Trimble's forestry operations in the central North Island."
+      },
+      {
+        name: "MatterMachine",
+        date: "July 2016",
+        location: "Wellington",
+        founders: "Wellington Parametric Engineering Group",
+        description: "Acquired by Trimble Buildings and the SketchUp Architecture & Design division to enrich its 3D modeling toolset with parametric capabilities and automated file-to-factory fabrication scripts.",
+        impact: "Connected SketchUp models with automated timber framing and modular prefabrication machinery."
+      }
+    ];
+
+    const peopleList = [
+      {
+        name: "Corinne Barbara Haines (CNZM)",
+        role: "Managing Director (2003–2021) & Financial Controller",
+        summary: "Dedicated over 36 years to Datacom Software Research and Trimble NZ. She expanded the New Zealand team from 42 to over 400 staff, guided the company through the 2011 Christchurch earthquakes and Building One fire, and managed the construction of the award-winning $23M Pres-Lam timber headquarters. In 2016, she was made a Companion of the New Zealand Order of Merit (CNZM).",
+        quote: "Today marks the end of a long journey since the fire, and it is great to have all our employees located in one building on site."
+      },
+      {
+        name: "Charles 'Charlie' Trimble",
+        role: "Co-Founder & CEO (1978–1998), Trimble Inc.",
+        summary: "Pioneer in commercializing GPS. After leaving Hewlett-Packard with three colleagues in 1978, he recognized the exceptional software engineering capability in Christchurch in 1988/89, completing Trimble's first overseas acquisition in April 1991 and setting the famous 60% compound growth goal.",
+        quote: "Believe you can and you’re halfway there!"
+      },
+      {
+        name: "Alan R. Townsend",
+        role: "Managing Director DSR / TNZ & Global VP Field Solutions",
+        summary: "Led Datacom Software Research from 1986 to 1991, steered the acquisition into Trimble, and served as Managing Director of Trimble NZ during the rollout of Survey Controller and TrimFlight. Later served as Vice President of Global Field Solutions across Silicon Valley and Christchurch.",
+        quote: "Christchurch offered world-class software engineering skills with an agile, problem-solving culture."
+      },
+      {
+        name: "Mark Nichols",
+        role: "General Manager & Heavy Civil Pioneer",
+        summary: "Over 30 years with Trimble leading construction, mining, and machine control systems. Spearheaded the joint ventures with Caterpillar and the Clearwater Resort earthmoving guidance tests, serving as a passionate advocate for Canterbury’s high-tech export ecosystem.",
+        quote: "Christchurch tech firms don't just export products; we build international platforms that reshape global workflows."
+      },
+      {
+        name: "Steve Berglund",
+        role: "Chief Executive Officer (1999–2020), Trimble Inc.",
+        summary: "Joined Trimble from Spectra Precision in 1999, orchestrating an aggressive global acquisition strategy that expanded Trimble's Connected Site vision across surveying, civil construction, agriculture, and building BIM.",
+        quote: "Trimble's transformation was driven by connecting hardware positioning with deep domain software."
+      },
+      {
+        name: "Jason Hill",
+        role: "Vice President & Trimble New Zealand Leader",
+        summary: "Oversees Trimble's modern New Zealand operations and high-tech academic outreach, establishing Trimble Technology Labs at the University of Auckland and the University of Otago to train the next generation of Kiwi spatial engineers.",
+        quote: "This investment empowers students across Aotearoa to develop high-value skills in spatial engineering and digital construction."
+      }
+    ];
+
+    const quizData = [
+      {
+        q: "What was the name of the Christchurch company that Trimble acquired in April 1991 to establish Trimble NZ?",
+        options: [
+          "Datacom Software Research Limited (DSR)",
+          "Tait Communications",
+          "Canterbury Spatial Tech",
+          "Southern Cross GPS"
+        ],
+        answer: 0,
+        explanation: "Datacom Software Research Ltd (DSR) had created the SDR series software and SDR Map before being acquired by Charlie Trimble in 1991."
+      },
+      {
+        q: "What agricultural aviation system did Trimble NZ launch in 1993 for topdressing airplanes?",
+        options: [
+          "TrimFlight™",
+          "AgPilot Pro",
+          "AeroSpread GPS",
+          "Canterbury SkyGuide"
+        ],
+        answer: 0,
+        explanation: "TrimFlight™ brought satellite navigation to agricultural pilots flying Fletcher topdressing aircraft across New Zealand."
+      },
+      {
+        q: "Where in Christchurch did Trimble NZ field test its first automated 3D machine guidance system for Caterpillar bulldozers in 2002?",
+        options: [
+          "Clearwater Resort development",
+          "Lyttelton Port reclamation",
+          "Christchurch Airport runway extension",
+          "Hagley Park oval"
+        ],
+        answer: 0,
+        explanation: "Christchurch engineers fitted bulldozers and motor graders with automated GPS hydraulic blade controls at Clearwater Resort."
+      },
+      {
+        q: "What world-first structural engineering design was used for Trimble's 2014 rebuild at 11 Birmingham Drive?",
+        options: [
+          "Post-tensioned Pres-Lam rocking timber frames and shear walls",
+          "Pneumatic air cushion shock absorbers",
+          "Underground magnetic levitation base isolators",
+          "Solid granite gravity core"
+        ],
+        answer: 0,
+        explanation: "The building was the world's first commercial structure using Pres-Lam post-tensioned rocking timber frames that self-center after quakes."
+      },
+      {
+        q: "Which Auckland-based company did Trimble acquire in June 2013 for dynamic loader payload weighing?",
+        options: [
+          "Actronic Holdings Limited (LOADRITE)",
+          "Gallagher Animal Management",
+          "Navico Marine",
+          "Orion Health"
+        ],
+        answer: 0,
+        explanation: "Actronic Holdings, creators of LOADRITE weighing scales for loaders and excavators, was acquired in June 2013."
+      },
+      {
+        q: "Who was awarded Companion of the New Zealand Order of Merit (CNZM) in 2016 for leading Trimble NZ through the quakes and fire?",
+        options: [
+          "Corinne Barbara Haines",
+          "Alan Townsend",
+          "Charlie Trimble",
+          "Mark Nichols"
+        ],
+        answer: 0,
+        explanation: "Corinne Haines served over 36 years, expanding the team from 42 to over 400 and project managing the new headquarters rebuild."
+      }
+    ];
+
+    /* -----------------------------------------------------------
+       VIEWPORT & PAN-ZOOM ENGINE
+    ----------------------------------------------------------- */
+    const masterCanvas = document.getElementById("masterCanvas");
+    const masterCtx = masterCanvas.getContext("2d");
+    const stageWrap = document.getElementById("stageWrap");
+    const focusReticle = document.getElementById("focusReticle");
+    const targetFocusText = document.getElementById("targetFocusText");
+    const mapTooltip = document.getElementById("mapTooltip");
+
+    let rawMasterImage = null;
+    let viewCamera = { x: 0, y: 0, zoom: 1 };
+    let minFitZoom = 1;
+    let activeMilestone = null;
+
+    const allWallEvents = [];
+    wallBands.forEach(b => b.events.forEach(e => allWallEvents.push(e)));
+
+    const GOOGLE_DRIVE_ID = "1rbf8poYdtzRqqedDVux9kmrvRdQPCWPQ";
+    const sourcesToTry = [
+      `https://lh3.googleusercontent.com/d/${GOOGLE_DRIVE_ID}=s0`,
+      `https://drive.google.com/thumbnail?id=${GOOGLE_DRIVE_ID}&sz=w4400`,
+      "trimble40historywall.jpg",
+      "wallchart.jpg"
+    ];
+
+    function tryLoadImageSources(index = 0) {
+      if (index >= sourcesToTry.length) return;
+      const src = sourcesToTry[index];
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        rawMasterImage = img;
+        initCanvasDimensions();
+        resetMasterView();
+        sliceAllThumbnails();
+      };
+      img.onerror = () => tryLoadImageSources(index + 1);
+      img.src = src;
+    }
+
+    function initCanvasDimensions() {
+      const dpr = window.devicePixelRatio || 1;
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+      masterCanvas.width = Math.round(wrapW * dpr);
+      masterCanvas.height = Math.round(wrapH * dpr);
+      masterCtx.imageSmoothingEnabled = true;
+      masterCtx.imageSmoothingQuality = "high";
+    }
+
+    function renderViewport() {
+      if (!rawMasterImage) return;
+      const dpr = window.devicePixelRatio || 1;
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+
+      if (masterCanvas.width !== Math.round(wrapW * dpr) || masterCanvas.height !== Math.round(wrapH * dpr)) {
+        masterCanvas.width = Math.round(wrapW * dpr);
+        masterCanvas.height = Math.round(wrapH * dpr);
+      }
+
+      masterCtx.clearRect(0, 0, masterCanvas.width, masterCanvas.height);
+      masterCtx.imageSmoothingEnabled = true;
+      masterCtx.imageSmoothingQuality = "high";
+
+      const srcW = wrapW / viewCamera.zoom;
+      const srcH = wrapH / viewCamera.zoom;
+      const srcX = viewCamera.x - srcW / 2;
+      const srcY = viewCamera.y - srcH / 2;
+
+      masterCtx.drawImage(
+        rawMasterImage,
+        srcX, srcY, srcW, srcH,
+        0, 0, masterCanvas.width, masterCanvas.height
+      );
+
+      updateReticlePosition();
+    }
+
+    function clampCamera() {
+      if (!rawMasterImage) return;
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+
+      const srcW = wrapW / viewCamera.zoom;
+      const srcH = wrapH / viewCamera.zoom;
+
+      if (srcW >= rawMasterImage.naturalWidth) {
+        viewCamera.x = rawMasterImage.naturalWidth / 2;
+      } else {
+        viewCamera.x = Math.max(srcW / 2, Math.min(rawMasterImage.naturalWidth - srcW / 2, viewCamera.x));
+      }
+
+      if (srcH >= rawMasterImage.naturalHeight) {
+        viewCamera.y = rawMasterImage.naturalHeight / 2;
+      } else {
+        viewCamera.y = Math.max(srcH / 2, Math.min(rawMasterImage.naturalHeight - srcH / 2, viewCamera.y));
+      }
+    }
+
+    function resetMasterView() {
+      if (!rawMasterImage) return;
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+
+      minFitZoom = Math.min(wrapW / rawMasterImage.naturalWidth, wrapH / rawMasterImage.naturalHeight);
+      viewCamera.zoom = minFitZoom;
+      viewCamera.x = rawMasterImage.naturalWidth / 2;
+      viewCamera.y = rawMasterImage.naturalHeight / 2;
+
+      focusReticle.style.display = "none";
+      activeMilestone = null;
+      targetFocusText.innerText = "(Scroll to zoom, drag to pan, click photo to view card below)";
+
+      clampCamera();
+      renderViewport();
+    }
+
+    function zoomCentered(factor, pivotScreenX, pivotScreenY) {
+      if (!rawMasterImage) return;
+
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+
+      const px = pivotScreenX !== undefined ? pivotScreenX : wrapW / 2;
+      const py = pivotScreenY !== undefined ? pivotScreenY : wrapH / 2;
+
+      const oldZoom = viewCamera.zoom;
+      const maxZoom = minFitZoom * 18.0;
+      const newZoom = Math.max(minFitZoom, Math.min(maxZoom, oldZoom * factor));
+
+      const srcWOld = wrapW / oldZoom;
+      const srcHOld = wrapH / oldZoom;
+      const anchorSrcX = (viewCamera.x - srcWOld / 2) + (px / oldZoom);
+      const anchorSrcY = (viewCamera.y - srcHOld / 2) + (py / oldZoom);
+
+      viewCamera.zoom = newZoom;
+      const srcWNew = wrapW / newZoom;
+      const srcHNew = wrapH / newZoom;
+
+      viewCamera.x = anchorSrcX - (px / newZoom) + (srcWNew / 2);
+      viewCamera.y = anchorSrcY - (py / newZoom) + (srcHNew / 2);
+
+      clampCamera();
+      renderViewport();
+    }
+
+    function updateReticlePosition() {
+      if (!activeMilestone || focusReticle.style.display === "none" || !rawMasterImage) return;
+
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+
+      const srcW = wrapW / viewCamera.zoom;
+      const srcH = wrapH / viewCamera.zoom;
+      const srcLeft = viewCamera.x - srcW / 2;
+      const srcTop = viewCamera.y - srcH / 2;
+
+      const itemPixelX = (activeMilestone.x / 100) * rawMasterImage.naturalWidth;
+      const itemPixelY = (activeMilestone.y / 100) * rawMasterImage.naturalHeight;
+      const itemPixelW = (activeMilestone.w / 100) * rawMasterImage.naturalWidth;
+      const itemPixelH = (activeMilestone.h / 100) * rawMasterImage.naturalHeight;
+
+      const screenX = (itemPixelX - srcLeft) * viewCamera.zoom;
+      const screenY = (itemPixelY - srcTop) * viewCamera.zoom;
+      const screenW = itemPixelW * viewCamera.zoom;
+      const screenH = itemPixelH * viewCamera.zoom;
+
+      focusReticle.style.left = `${screenX}px`;
+      focusReticle.style.top = `${screenY}px`;
+      focusReticle.style.width = `${screenW}px`;
+      focusReticle.style.height = `${screenH}px`;
+    }
+
+    /* -----------------------------------------------------------
+       BIDIRECTIONAL JUMPING (FIXED)
+    ----------------------------------------------------------- */
+
+    // Jump from Card -> Map (Fly camera & focus)
+    function zoomToItem(itemId) {
+      // 1. Ensure we switch to the History Wall tab
+      const wallBtn = document.querySelector('[data-tab="wallTab"]');
+      if (!wallBtn.classList.contains("active")) {
+        wallBtn.click();
+      }
+
+      const target = allWallEvents.find(e => e.id === itemId);
+      if (!target) return;
+
+      activeMilestone = target;
+
+      // 2. Smoothly scroll stage into view so camera fly is visible
+      stageWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // 3. Move camera to center of item
+      if (rawMasterImage) {
+        const itemCenterX = ((target.x + target.w / 2) / 100) * rawMasterImage.naturalWidth;
+        const itemCenterY = ((target.y + target.h / 2) / 100) * rawMasterImage.naturalHeight;
+
+        viewCamera.zoom = minFitZoom * 4.8;
+        viewCamera.x = itemCenterX;
+        viewCamera.y = itemCenterY;
+
+        clampCamera();
+        renderViewport();
+
+        focusReticle.style.display = "block";
+        updateReticlePosition();
+      }
+
+      targetFocusText.innerHTML = `— Focused on: <strong style="color: var(--yellow);">${target.year}: ${target.title}</strong>`;
+    }
+
+    // Helper for Headcount Jump
+    function jumpToYear(milestoneId) {
+      zoomToItem(milestoneId);
+    }
+
+    // Find milestone at normalized percentage (with generous hit margin)
+    function findMilestoneAt(pctX, pctY) {
+      let bestMatch = null;
+      let minDistance = Infinity;
+
+      allWallEvents.forEach(item => {
+        const minX = item.x - 2.5;
+        const maxX = item.x + item.w + 2.5;
+        const minY = item.y - 3.0;
+        const maxY = item.y + item.h + 3.0;
+
+        if (pctX >= minX && pctX <= maxX && pctY >= minY && pctY <= maxY) {
+          const centerX = item.x + item.w / 2;
+          const centerY = item.y + item.h / 2;
+          const dist = Math.hypot(pctX - centerX, pctY - centerY);
+          if (dist < minDistance) {
+            minDistance = dist;
+            bestMatch = item;
+          }
+        }
+      });
+
+      return bestMatch;
+    }
+
+    // Jump from Map -> Card (When user clicks on wall chart)
+    function handleMapClick(e) {
+      if (!rawMasterImage) return;
+      const rect = stageWrap.getBoundingClientRect();
+      const clickScreenX = e.clientX - rect.left;
+      const clickScreenY = e.clientY - rect.top;
+
+      const wrapW = stageWrap.clientWidth;
+      const wrapH = stageWrap.clientHeight;
+      const srcW = wrapW / viewCamera.zoom;
+      const srcH = wrapH / viewCamera.zoom;
+      const srcLeft = viewCamera.x - srcW / 2;
+      const srcTop = viewCamera.y - srcH / 2;
+
+      const clickedSrcX = srcLeft + (clickScreenX / viewCamera.zoom);
+      const clickedSrcY = srcTop + (clickScreenY / viewCamera.zoom);
+
+      const pctX = (clickedSrcX / rawMasterImage.naturalWidth) * 100;
+      const pctY = (clickedSrcY / rawMasterImage.naturalHeight) * 100;
+
+      const hit = findMilestoneAt(pctX, pctY);
+      if (hit) {
+        activeMilestone = hit;
+        focusReticle.style.display = "block";
+        updateReticlePosition();
+
+        targetFocusText.innerHTML = `— Selected on map: <strong style="color: var(--yellow);">${hit.year}: ${hit.title}</strong> (scrolled to card below ↓)`;
+
+        // Reset era filter to 'all' so card is rendered in the DOM
+        if (currentEra !== "all") {
+          currentEra = "all";
+          document.querySelectorAll(".era-pill").forEach(p => {
+            p.classList.toggle("active", p.getAttribute("data-era") === "all");
+          });
+          renderBands("all", wallSearch.value);
+        }
+
+        setTimeout(() => {
+          const targetCard = document.getElementById(`card_${hit.id}`);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.remove('highlight-pulse');
+            void targetCard.offsetWidth; // re-trigger animation
+            targetCard.classList.add('highlight-pulse');
+          }
+        }, 60);
+      }
+    }
+
+    // Scroll Wheel Zoom
+    stageWrap.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const rect = stageWrap.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const factor = e.deltaY < 0 ? 1.18 : 0.85;
+      zoomCentered(factor, mouseX, mouseY);
+    }, { passive: false });
+
+    // Drag-to-Pan + Precise Click Detection
+    let isMouseDown = false;
+    let mouseDownPos = { x: 0, y: 0 };
+    let mouseDownTime = 0;
+    let cameraStartPos = { x: 0, y: 0 };
+
+    stageWrap.addEventListener("mousedown", (e) => {
+      isMouseDown = true;
+      mouseDownPos.x = e.clientX;
+      mouseDownPos.y = e.clientY;
+      mouseDownTime = Date.now();
+      cameraStartPos.x = viewCamera.x;
+      cameraStartPos.y = viewCamera.y;
+      mapTooltip.style.display = "none";
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isMouseDown) {
+        if (rawMasterImage && e.target.closest('#stageWrap')) {
+          const rect = stageWrap.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+
+          const wrapW = stageWrap.clientWidth;
+          const wrapH = stageWrap.clientHeight;
+          const srcW = wrapW / viewCamera.zoom;
+          const srcH = wrapH / viewCamera.zoom;
+          const srcLeft = viewCamera.x - srcW / 2;
+          const srcTop = viewCamera.y - srcH / 2;
+
+          const hoveredSrcX = srcLeft + (mouseX / viewCamera.zoom);
+          const hoveredSrcY = srcTop + (mouseY / viewCamera.zoom);
+
+          const pctX = (hoveredSrcX / rawMasterImage.naturalWidth) * 100;
+          const pctY = (hoveredSrcY / rawMasterImage.naturalHeight) * 100;
+          const hit = findMilestoneAt(pctX, pctY);
+
+          if (hit) {
+            stageWrap.style.cursor = "pointer";
+            mapTooltip.style.display = "block";
+            mapTooltip.style.left = `${mouseX}px`;
+            mapTooltip.style.top = `${mouseY}px`;
+            mapTooltip.innerText = `${hit.year}: ${hit.title} (Click to view card ↓)`;
+          } else {
+            stageWrap.style.cursor = "grab";
+            mapTooltip.style.display = "none";
+          }
+        } else {
+          mapTooltip.style.display = "none";
+        }
+        return;
+      }
+
+      const dx = e.clientX - mouseDownPos.x;
+      const dy = e.clientY - mouseDownPos.y;
+
+      viewCamera.x = cameraStartPos.x - (dx / viewCamera.zoom);
+      viewCamera.y = cameraStartPos.y - (dy / viewCamera.zoom);
+
+      clampCamera();
+      renderViewport();
+    });
+
+    window.addEventListener("mouseup", (e) => {
+      if (!isMouseDown) return;
+      isMouseDown = false;
+
+      const moveDist = Math.hypot(e.clientX - mouseDownPos.x, e.clientY - mouseDownPos.y);
+      const timeElapsed = Date.now() - mouseDownTime;
+
+      // Click threshold: moved < 10px within 450ms
+      if (moveDist < 10 && timeElapsed < 450 && e.target.closest('#stageWrap')) {
+        handleMapClick(e);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      initCanvasDimensions();
+      clampCamera();
+      renderViewport();
+    });
+
+    function sliceAllThumbnails() {
+      if (!rawMasterImage) return;
+
+      allWallEvents.forEach(item => {
+        const thumbCanvas = document.getElementById(`thumb_${item.id}`);
+        if (!thumbCanvas) return;
+
+        const tCtx = thumbCanvas.getContext("2d");
+        thumbCanvas.width = 240;
+        thumbCanvas.height = 240;
+        tCtx.imageSmoothingEnabled = true;
+        tCtx.imageSmoothingQuality = "high";
+
+        const sx = (item.x / 100) * rawMasterImage.naturalWidth;
+        const sy = (item.y / 100) * rawMasterImage.naturalHeight;
+        const sw = (item.w / 100) * rawMasterImage.naturalWidth;
+        const sh = (item.h / 100) * rawMasterImage.naturalHeight;
+
+        tCtx.drawImage(rawMasterImage, sx, sy, sw, sh, 0, 0, 240, 240);
+      });
+    }
+
+    /* -----------------------------------------------------------
+       RENDER DOM CARDS
+    ----------------------------------------------------------- */
+    function renderBands(eraFilter = "all", searchQuery = "") {
+      const container = document.getElementById("bandsContainer");
+      container.innerHTML = "";
+      const query = searchQuery.toLowerCase().trim();
+
+      wallBands.forEach(band => {
+        if (eraFilter !== "all" && band.eraId !== eraFilter) return;
+
+        const matchingEvents = band.events.filter(ev => {
+          if (!query) return true;
+          return ev.title.toLowerCase().includes(query) ||
+                 ev.text.toLowerCase().includes(query) ||
+                 ev.year.includes(query) ||
+                 (ev.month && ev.month.toLowerCase().includes(query)) ||
+                 ev.wallVisual.toLowerCase().includes(query) ||
+                 ev.badgeType.toLowerCase().includes(query);
+        });
+
+        if (matchingEvents.length === 0) return;
+
+        const bandDiv = document.createElement("div");
+        bandDiv.className = "wall-band";
+
+        bandDiv.innerHTML = `
+          <div class="band-header ${band.cssClass}">
+            <div>
+              <h3 class="band-title">${band.title}</h3>
+              <div class="band-subtitle">${band.subtitle}</div>
+            </div>
+            <div style="font-size: 0.8rem; font-weight: 800; opacity: 0.85;">${matchingEvents.length} ARTIFACTS</div>
+          </div>
+          <div class="band-cards-grid">
+            ${matchingEvents.map(ev => `
+              <div class="artifact-card" id="card_${ev.id}" onclick="zoomToItem('${ev.id}')">
+                <div class="artifact-thumb" title="Click to view on wall">
+                  <canvas id="thumb_${ev.id}"></canvas>
+                </div>
+                <div class="artifact-body">
+                  <div class="artifact-topline">
+                    <span class="artifact-year">${ev.month ? ev.month + ' ' : ''}${ev.year}</span>
+                    <span class="artifact-type">${ev.badgeType}</span>
+                  </div>
+                  <h4 class="artifact-title">${ev.title}</h4>
+                  <p class="artifact-desc">${ev.text}</p>
+                  <div class="card-actions">
+                    <button class="locate-btn" onclick="event.stopPropagation(); zoomToItem('${ev.id}')">
+                      <span>🎯 Fly Camera to Wall</span>
+                    </button>
+                    <button class="details-btn" onclick="event.stopPropagation(); openArtifactModal('${band.eraId}', '${ev.id}')">
+                      <span>📖 Story Details</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+        container.appendChild(bandDiv);
+      });
+
+      sliceAllThumbnails();
+    }
+
+    function renderMadeInNz() {
+      const container = document.getElementById("madeInNzGrid");
+      container.innerHTML = "";
+      madeInNzList.forEach(item => {
+        const box = document.createElement("div");
+        box.className = "feature-box";
+        box.innerHTML = `
+          <div>
+            <div class="feature-header">
+              <span class="feature-title">${item.name}</span>
+              <span class="feature-pill">${item.year}</span>
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin-bottom: 0.5rem;">${item.category}</div>
+            <p class="feature-body">${item.summary}</p>
+          </div>
+          <div class="feature-specs">${item.techSpecs}</div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function renderAcquisitions() {
+      const container = document.getElementById("acquisitionsGrid");
+      container.innerHTML = "";
+      nzAcquisitionsList.forEach(acq => {
+        const box = document.createElement("div");
+        box.className = "feature-box";
+        box.innerHTML = `
+          <div>
+            <div class="feature-header">
+              <span class="feature-title">${acq.name}</span>
+              <span class="feature-pill">${acq.date}</span>
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 800; color: var(--orange); text-transform: uppercase; margin-bottom: 0.5rem;">📍 ${acq.location} • Founders: ${acq.founders}</div>
+            <p class="feature-body">${acq.description}</p>
+          </div>
+          <div class="feature-specs"><strong>Global Impact:</strong> ${acq.impact}</div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function renderPeople() {
+      const container = document.getElementById("peopleGrid");
+      container.innerHTML = "";
+      peopleList.forEach(person => {
+        const box = document.createElement("div");
+        box.className = "feature-box";
+        box.innerHTML = `
+          <div>
+            <div class="feature-header">
+              <span class="feature-title">${person.name}</span>
+              <span class="feature-pill" style="color:#ff9e43; background:rgba(243,111,33,0.15); border-color:rgba(243,111,33,0.3);">${person.role}</span>
+            </div>
+            <p class="feature-body">${person.summary}</p>
+          </div>
+          <div class="feature-specs" style="border-left-color: var(--yellow);">
+            <em>"${person.quote}"</em>
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    /* -----------------------------------------------------------
+       QUIZ ENGINE
+    ----------------------------------------------------------- */
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    function loadQuizQuestion() {
+      quizAnswered = false;
+      const qData = quizData[currentQuizIndex];
+      document.getElementById("quizQuestion").innerText = `${currentQuizIndex + 1}. ${qData.q}`;
+      const optContainer = document.getElementById("quizOptions");
+      optContainer.innerHTML = "";
+      const feedback = document.getElementById("quizFeedback");
+      feedback.style.display = "none";
+      document.getElementById("quizNextBtn").style.display = "none";
+
+      qData.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "quiz-option";
+        btn.innerText = opt;
+        btn.onclick = () => selectQuizOption(idx, btn);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function selectQuizOption(index, btnElem) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const qData = quizData[currentQuizIndex];
+      const optButtons = document.querySelectorAll(".quiz-option");
+      const feedback = document.getElementById("quizFeedback");
+
+      if (index === qData.answer) {
+        quizScore++;
+        btnElem.classList.add("correct");
+        feedback.innerText = "✓ Correct! " + qData.explanation;
+        feedback.style.background = "rgba(34, 197, 94, 0.15)";
+        feedback.style.color = "#86efac";
+      } else {
+        btnElem.classList.add("wrong");
+        optButtons[qData.answer].classList.add("correct");
+        feedback.innerText = "✗ Incorrect. " + qData.explanation;
+        feedback.style.background = "rgba(239, 68, 68, 0.15)";
+        feedback.style.color = "#fca5a5";
+      }
+
+      feedback.style.display = "block";
+      const nextBtn = document.getElementById("quizNextBtn");
+      nextBtn.style.display = "inline-block";
+      if (currentQuizIndex === quizData.length - 1) {
+        nextBtn.innerText = "Show Final Results";
+      } else {
+        nextBtn.innerText = "Next Question →";
+      }
+    }
+
+    document.getElementById("quizNextBtn").addEventListener("click", () => {
+      if (currentQuizIndex < quizData.length - 1) {
+        currentQuizIndex++;
+        loadQuizQuestion();
+      } else {
+        document.getElementById("quizBox").style.display = "none";
+        const resBox = document.getElementById("quizResult");
+        resBox.style.display = "block";
+        document.getElementById("quizScoreText").innerText = 
+          `You scored ${quizScore} out of ${quizData.length}! ${quizScore >= 5 ? "Outstanding knowledge of Trimble New Zealand's technology heritage!" : "Great effort exploring Kiwi geospatial history."}`;
+      }
+    });
+
+    document.getElementById("quizRestartBtn").addEventListener("click", () => {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      document.getElementById("quizBox").style.display = "block";
+      document.getElementById("quizResult").style.display = "none";
+      loadQuizQuestion();
+    });
+
+    /* -----------------------------------------------------------
+       MODAL HANDLING
+    ----------------------------------------------------------- */
+    const modalVeil = document.getElementById("modalVeil");
+    const modalContent = document.getElementById("modalContent");
+    const modalClose = document.getElementById("modalClose");
+
+    function openArtifactModal(eraId, eventId) {
+      const band = wallBands.find(b => b.eraId === eraId);
+      const ev = band.events.find(e => e.id === eventId);
+      if (!ev) return;
+
+      modalContent.innerHTML = `
+        <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 0.75rem;">
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 800; color: var(--orange); text-transform: uppercase;">${ev.badgeType}</span>
+            <h3 style="font-size: 1.4rem; color: #fff; line-height: 1.2;">${ev.title}</h3>
+            <span style="font-size: 0.85rem; color: var(--yellow);">${ev.month ? ev.month + ' ' : ''}${ev.year} • ${band.title}</span>
+          </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.35); border-radius: 8px; padding: 1rem; margin-bottom: 1.2rem; border-left: 4px solid #00a8cc;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin-bottom: 4px;">Wall Chart Visual Artifact:</div>
+          <div style="font-size: 0.95rem; color: #e2e8f0; font-style: italic;">${ev.wallVisual}</div>
+        </div>
+
+        <p style="color: var(--text); font-size: 1rem; line-height: 1.6; margin-bottom: 1rem;">${ev.text}</p>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">${ev.fullStory}</p>
+
+        <button class="locate-btn" onclick="modalVeil.classList.remove('show'); zoomToItem('${ev.id}')">
+          <span>🎯 Fly Master Camera to this Item on the Wall</span>
+        </button>
+      `;
+      modalVeil.classList.add("show");
+    }
+
+    modalClose.onclick = () => modalVeil.classList.remove("show");
+    modalVeil.onclick = (e) => { if (e.target === modalVeil) modalVeil.classList.remove("show"); };
+
+    /* -----------------------------------------------------------
+       TAB SWITCHING
+    ----------------------------------------------------------- */
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        navButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const tab = btn.getAttribute("data-tab");
+        tabContents.forEach(tc => tc.classList.remove("active"));
+        
+        const activeSection = document.getElementById(tab);
+        if (activeSection) {
+          activeSection.classList.add("active");
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // If switching to the wall tab, resize viewport properly
+          if (tab === "wallTab") {
+            setTimeout(() => {
+              initCanvasDimensions();
+              clampCamera();
+              renderViewport();
+            }, 50);
+          }
+        }
+      });
+    });
+
+    let currentEra = "all";
+    const eraPills = document.querySelectorAll(".era-pill");
+    eraPills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        eraPills.forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        currentEra = pill.getAttribute("data-era");
+        renderBands(currentEra, wallSearch.value);
+      });
+    });
+
+    const wallSearch = document.getElementById("wallSearch");
+    wallSearch.addEventListener("input", (e) => {
+      renderBands(currentEra, e.target.value);
+    });
+
+    /* -----------------------------------------------------------
+       INITIALIZATION
+    ----------------------------------------------------------- */
+    window.addEventListener("DOMContentLoaded", () => {
+      renderBands();
+      renderMadeInNz();
+      renderAcquisitions();
+      renderPeople();
+      loadQuizQuestion();
+      tryLoadImageSources();
+    });
+  </script>
+</body>
+</html>
