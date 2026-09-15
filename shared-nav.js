@@ -62,6 +62,12 @@
               desc: 'Geographic 2D map of NZ stamps by issue location' 
             }
           ]
+        },
+        { 
+          href: 'trimble.html',
+          icon: '🛰️', 
+          label: 'Trimble NZ History Wall', 
+          desc: 'A bit about Trimble NZ',
         }
       ]
     },
