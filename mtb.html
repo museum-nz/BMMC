@@ -23,6 +23,7 @@
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://services1.arcgis.com" crossorigin>
   <link rel="preconnect" href="https://services.arcgis.com" crossorigin>
+  <link rel="preconnect" href="https://dl.dropboxusercontent.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
   <!-- Inline Mountain Bike Favicon -->
@@ -424,16 +425,6 @@
       border-color: #34d399;
       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
     }
-    .filter-chip.chip-walking {
-      border-color: #f59e0b;
-      color: #fef3c7;
-    }
-    .filter-chip.chip-walking.active {
-      background: #dc2626;
-      border-color: #f87171;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
-    }
 
     /* Floating Status Pill */
     .status-summary-bar {
@@ -490,9 +481,6 @@
       line-height: 1.3;
       color: #0f172a;
     }
-    .dark .trail-popup-card h3 {
-      color: #0f172a;
-    }
 
     /* Track distance under title */
     .trail-distance-sub {
@@ -529,8 +517,6 @@
     .pill-grade-3 { background: #fef3c7; color: #92400e; }
     .pill-grade-4 { background: #ffedd5; color: #9a3412; }
     .pill-grade-5 { background: #fee2e2; color: #991b1b; }
-    .pill-walking { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .pill-walking-ccc { background: #fef9c3; color: #854d0e; border: 1px solid #facc15; }
     .pill-category { background: #f1f5f9; color: #475569; }
 
     .trail-meta-row {
@@ -732,7 +718,7 @@
       </button>
     </div>
 
-    <!-- Quick Filters: Grade & Walking Toggle -->
+    <!-- Quick Filters: Grade Chips (Walking Toggle Removed) -->
     <div class="filter-chips-bar">
       <button class="filter-chip active" data-grade="all">All Grades</button>
       <button class="filter-chip" data-grade="1">Grade 1 (Easiest)</button>
@@ -740,10 +726,6 @@
       <button class="filter-chip" data-grade="3">Grade 3 (Intermediate)</button>
       <button class="filter-chip" data-grade="4">Grade 4 (Advanced)</button>
       <button class="filter-chip" data-grade="5">Grade 5/6 (Expert)</button>
-      <!-- Quick Walking-Only Toggle (Off by default) -->
-      <button id="btnToggleWalking" class="filter-chip chip-walking" title="Show/Hide Walking & Tramping Tracks (No MTB)">
-        <span>🚶 Show Walking / Tramping (Off)</span>
-      </button>
     </div>
   </div>
 
@@ -768,7 +750,7 @@
 
   <script>
     // =========================================================================
-    // CONFIGURATION & DATASET DEFINITIONS
+    // CONFIGURATION & DATASET DEFINITIONS (DIRECT DROPBOX CDN ENABLED)
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
@@ -784,7 +766,7 @@
         weight: 4.5,
         opacity: 0.7,     // stroke-opacity: 0.7
         local: ['data/mtb/nz_great_rides.geojson', './data/mtb/nz_great_rides.geojson', '../data/mtb/nz_great_rides.geojson'],
-        dropbox: 'https://www.dropbox.com/scl/fi/bklc3pcx2tfazrw4s5gts/nz_great_rides.geojson?rlkey=tg5tygn5d288266pzsofn321k&st=0hthuzq0&raw=1',
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/bklc3pcx2tfazrw4s5gts/nz_great_rides.geojson?rlkey=tg5tygn5d288266pzsofn321k&raw=1',
         arcgis: 'https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
         visible: true,
         features: []
@@ -796,7 +778,7 @@
         weight: 3.8,
         opacity: 0.9,
         local: ['data/mtb/heartland_touring.geojson', './data/mtb/heartland_touring.geojson', '../data/mtb/heartland_touring.geojson'],
-        dropbox: 'https://www.dropbox.com/scl/fi/mmvxgogl5aho5fliul3o8/heartland_touring.geojson?rlkey=hideb77zmfdu3dkhj0rssab51&st=qw1bwkz1&raw=1',
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/mmvxgogl5aho5fliul3o8/heartland_touring.geojson?rlkey=hideb77zmfdu3dkhj0rssab51&raw=1',
         arcgis: "https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=trailcategory%20NOT%20LIKE%20'%25Great%20Ride%25'&outFields=*&f=geojson&outSR=4326",
         visible: true,
         features: []
@@ -808,7 +790,7 @@
         weight: 3.5,
         opacity: 0.9,
         local: ['data/mtb/chch_cycleway.geojson', './data/mtb/chch_cycleway.geojson', '../data/mtb/chch_cycleway.geojson'],
-        dropbox: 'https://www.dropbox.com/scl/fi/6owmpsjaxck4xt508ektw/chch_cycleway.geojson?rlkey=972grk4m5qvo21wx4nud30gdq&st=7rf48afd&raw=1',
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/6owmpsjaxck4xt508ektw/chch_cycleway.geojson?rlkey=972grk4m5qvo21wx4nud30gdq&raw=1',
         arcgis: 'https://opendata.arcgis.com/datasets/d9b5a1de32c4418a93b836fa254dfa8b_1.geojson',
         visible: true,
         features: []
@@ -820,7 +802,7 @@
         weight: 3.5,
         opacity: 0.95,
         local: ['data/mtb/chch_council_tracks.geojson', './data/mtb/chch_council_tracks.geojson', '../data/mtb/chch_council_tracks.geojson'],
-        dropbox: 'https://www.dropbox.com/scl/fi/zwttqsxcnpcfbv9lhsm2g/chch_council_tracks.geojson?rlkey=g7zobh6j2hemni4ie3ekbavd1&st=mglmfg7i&raw=1',
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/zwttqsxcnpcfbv9lhsm2g/chch_council_tracks.geojson?rlkey=g7zobh6j2hemni4ie3ekbavd1&raw=1',
         arcgis: 'https://opendata.arcgis.com/datasets/866f1329087d46b4b4bd4b370aea297f_6.geojson',
         visible: true,
         features: []
@@ -832,7 +814,7 @@
         weight: 3.2,
         opacity: 0.9,
         local: ['data/mtb/doc_tracks.geojson', './data/mtb/doc_tracks.geojson', '../data/mtb/doc_tracks.geojson'],
-        dropbox: 'https://www.dropbox.com/scl/fi/6x191friyjd8zgmme386l/doc_tracks.geojson?rlkey=rvva6n536lafip9ds0b83dk4q&st=81ja0zaq&raw=1',
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/6x191friyjd8zgmme386l/doc_tracks.geojson?rlkey=rvva6n536lafip9ds0b83dk4q&raw=1',
         arcgis: 'https://services1.arcgis.com/3JjYDyG3oajxU6HO/arcgis/rest/services/DOC_Tracks/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
         visible: true,
         features: []
@@ -843,7 +825,6 @@
     let map;
     let canvasRenderer;
     let activeGradeFilter = 'all';
-    let isWalkingOnlyVisible = false; // Walking only tracks OFF by default
     let isSavedOnlyVisible = false;
     let totalTrackCount = 0;
 
@@ -942,7 +923,6 @@
       const bounds = geomLayer.getBounds();
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-        // Attempt to open popup
         setTimeout(() => {
           for (const id of Object.keys(layerGroups)) {
             layerGroups[id].eachLayer(layer => {
@@ -1173,7 +1153,7 @@
     // GEOMETRY & LENGTH HELPERS
     // =========================================================================
     function getDistanceKm(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Earth radius in km
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -1209,16 +1189,11 @@
     }
 
     // =========================================================================
-    // FEATURE NORMALISATION (CONNECTING ALL 5 DATASETS)
-    // =========================================================================
-    
-    // =========================================================================
-    // WALKING / TRAMPING CLASSIFICATION HELPER (STRICTLY EXCLUDES MTB)
+    // WALKING / TRAMPING CLASSIFICATION HELPER (STRICTLY EXCLUDES NON-MTB)
     // =========================================================================
     function isWalkingTrampingOnly(p, datasetId) {
       if (!p) return false;
 
-      // Extract all possible activity / use / route properties
       const actRaw = p.activity_type || p.ActivityType || p.activity || p.Activity || 
                      p.Use || p.use || p.RouteType || p.track_type || p.TrackType || 
                      p.permitted_use || p.PermittedUse || '';
@@ -1229,21 +1204,17 @@
       const comment = String(p.Comment || p.comment || p.CharValue7 || '').toLowerCase();
       const name = String(p.RouteName || p.TechObjectName || p.assetName || p.name || '').toLowerCase();
 
-      // Combine text to check for any bike/cycling permission
       const allText = `${act} ${grade} ${desc} ${comment} ${name}`;
 
-      // Strictly check if MTB or cycling is permitted or present
       const hasMtb = allText.includes('bike') || allText.includes('biking') || 
                      allText.includes('mtb') || allText.includes('cycle') || 
                      allText.includes('cycling');
       const isShared = allText.includes('shared') || allText.includes('multi-use') || allText.includes('multi use');
 
-      // If it allows biking or is shared, it is NOT walking-only
       if (hasMtb || isShared) {
         return false;
       }
 
-      // Check specifically for "Walking / Tramping" or pure walking/tramping keywords
       const isWalkingTramping = 
         act === 'walking / tramping' ||
         act === 'walking/tramping' ||
@@ -1259,6 +1230,9 @@
       return isWalkingTramping;
     }
 
+    // =========================================================================
+    // FEATURE NORMALISATION
+    // =========================================================================
     function normaliseGeoFeatures(datasetId, geojson) {
       if (!geojson || !geojson.features) return [];
 
@@ -1280,12 +1254,9 @@
         let isDocMtbPermitted = false;
         let strokeType = 'default';
 
-        // Geometry fallback calculation
         const calcKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
 
-        // ---------------------------------------------------------------------
-        // 1. CHCH COUNCIL TRACKS (chch_council_tracks.geojson)
-        // ---------------------------------------------------------------------
+        // 1. Christchurch Council Tracks
         if (datasetId === 'chch_council') {
           name = p.RouteName || p.name || 'Christchurch Council Track';
           gradeRaw = p.MountainBikeClassification || p.grade || '';
@@ -1307,13 +1278,13 @@
           const actLower = String(activityType).toLowerCase();
 
           if (isWalking) {
-            strokeType = 'chch_walking'; // Yellow dotted line
-            isWalkingOnly = true;        // Off by default
+            strokeType = 'chch_walking';
+            isWalkingOnly = true; // Excluded from MTB view
           } else if (actLower.includes('shared') || actLower.includes('multi')) {
-            strokeType = 'chch_shared';  // Orange dotted line
+            strokeType = 'chch_shared';
             isWalkingOnly = false;
           } else if (actLower.includes('mtb') || actLower.includes('bike') || actLower.includes('cycle')) {
-            strokeType = 'chch_mtb';     // Light green dotted line
+            strokeType = 'chch_mtb';
             isWalkingOnly = false;
           } else {
             const gradeLower = String(gradeRaw).toLowerCase();
@@ -1330,21 +1301,17 @@
           }
         }
 
-        // ---------------------------------------------------------------------
-        // 2. CHCH MAJOR CYCLEWAYS (chch_cycleway.geojson)
-        // ---------------------------------------------------------------------
+        // 2. Christchurch Major Cycleways
         else if (datasetId === 'chch_cycle') {
           name = p.MajorCyclewayName || p.name || 'Christchurch Major Cycleway';
           description = p.Type || p.type || '';
           network = p.Ownership || 'Christchurch City Council';
           area = p.StrategicNetworkCategory || '';
-          strokeType = 'chch_cycle_solid'; // Light blue solid line, on by default
+          strokeType = 'chch_cycle_solid';
           isWalkingOnly = false;
         }
 
-        // ---------------------------------------------------------------------
-        // 3. HEARTLAND TOURING (heartland_touring.geojson)
-        // ---------------------------------------------------------------------
+        // 3. Heartland Touring
         else if (datasetId === 'heartland') {
           category = p.trailcategory || 'Heartland Ride';
           name = p.cycletrail || p.name || 'Heartland Touring Route';
@@ -1359,7 +1326,6 @@
 
           description = p.startfinish || p.description || '';
           
-          // Comment: facilitytype, surfacetype, comments
           const commentParts = [];
           if (p.facilitytype) commentParts.push(`Facility: ${p.facilitytype}`);
           if (p.surfacetype) commentParts.push(`Surface: ${p.surfacetype}`);
@@ -1374,16 +1340,14 @@
           const actLower = String(activityType || '').toLowerCase();
           const catLower = String(category || '').toLowerCase();
           if (actLower.includes('mtb') || actLower.includes('mountain') || catLower.includes('mountain')) {
-            strokeType = 'heartland_mtb';     // Light blue dotted line, on by default
+            strokeType = 'heartland_mtb';
           } else {
-            strokeType = 'heartland_shared';  // Orange dotted line (shared or road touring), on by default
+            strokeType = 'heartland_shared';
           }
           isWalkingOnly = false;
         }
 
-        // ---------------------------------------------------------------------
-        // 4. NZ GREAT RIDES (nz_great_rides.geojson)
-        // ---------------------------------------------------------------------
+        // 4. NZ Great Rides
         else if (datasetId === 'great_rides') {
           category = p.trailcategory || 'Great Ride';
           name = p.cycletrail || p.name || 'NZ Great Ride';
@@ -1398,7 +1362,6 @@
 
           description = p.startfinish || p.description || '';
 
-          // Comment: facilitytype, surfacetype, comments
           const commentParts = [];
           if (p.facilitytype) commentParts.push(`Facility: ${p.facilitytype}`);
           if (p.surfacetype) commentParts.push(`Surface: ${p.surfacetype}`);
@@ -1408,29 +1371,24 @@
           network = p.owner || '';
           area = p.sectioncodenov19 || '';
           website = p.websitelink || '';
-          strokeType = 'great_rides_solid'; // Purple solid line, stroke-opacity: 0.7, on by default
+          strokeType = 'great_rides_solid';
           isWalkingOnly = false;
         }
 
-        // ---------------------------------------------------------------------
-        // 5. DOC TRACKS (doc_tracks.geojson)
-        // ---------------------------------------------------------------------
+        // 5. DOC Tracks
         else if (datasetId === 'doc_tracks') {
           name = p.TechObjectName || p.assetName || p.name || 'DOC Track';
 
-          // Distance: Shape__Length (metres to km)
           if (p.Shape__Length !== undefined && p.Shape__Length !== null && p.Shape__Length !== '') {
             const mLen = parseFloat(p.Shape__Length);
             if (!isNaN(mLen) && mLen > 0) finalKm = mLen / 1000;
           }
 
-          // Description: CharName4, CharValue4 (walking time)
           const descParts = [];
           if (p.CharName4) descParts.push(p.CharName4);
           if (p.CharValue4) descParts.push(p.CharValue4);
           description = descParts.join(': ');
 
-          // Comment: CharValue7
           comment = p.CharValue7 || '';
           area = p.FlocID || '';
           activityType = p.activity_type || p.ActivityType || p.activity || p.Activity || p.Use || '';
@@ -1441,27 +1399,20 @@
 
           if (hasMtb) {
             isDocMtbPermitted = true;
-            strokeType = 'doc_mtb';       // Dark green dotted line, on by default
+            strokeType = 'doc_mtb';
             isWalkingOnly = false;
-          } else if (isWalking) {
-            isDocMtbPermitted = false;
-            strokeType = 'doc_walking';   // Red dotted line, off by default
-            isWalkingOnly = true;
           } else {
-            // Default non-MTB fallback
             isDocMtbPermitted = false;
             strokeType = 'doc_walking';
-            isWalkingOnly = true;
+            isWalkingOnly = true; // Walking/tramping excluded from MTB view
           }
         }
 
-        // Ensure length falls back to geometric calculation if needed
         if (!finalKm || finalKm <= 0) {
           finalKm = calcKm;
         }
         const lengthStr = finalKm > 0 ? `${finalKm.toFixed(1)} km` : '';
 
-        // Detect numerical grade (1-5)
         let gradeNum = 0;
         const gradeTextLower = String(gradeRaw).toLowerCase();
         if (gradeTextLower.includes('1') || gradeTextLower.includes('easiest')) gradeNum = 1;
@@ -1483,7 +1434,7 @@
             lengthStr: lengthStr,
             lengthKm: finalKm,
             gradeNum: gradeNum,
-            gradeText: gradeRaw || (gradeNum ? `Grade ${gradeNum}` : (isDocMtbPermitted ? 'DOC MTB Permitted' : (isWalkingOnly ? 'Walking Track' : 'MTB Track'))),
+            gradeText: gradeRaw || (gradeNum ? `Grade ${gradeNum}` : (isDocMtbPermitted ? 'DOC MTB Permitted' : 'MTB Track')),
             description: description,
             comment: comment,
             network: network,
@@ -1508,7 +1459,6 @@
       const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(props.name + ' New Zealand trail')}`;
       const trailforksSearch = `https://www.trailforks.com/search/?q=${encodeURIComponent(props.name)}`;
 
-      // Badge logic with 125% enlarged typography
       let activityBadgeHtml = '';
       if (props.strokeType === 'chch_mtb' || props.strokeType === 'doc_mtb') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚵 MTB Track</span>';
@@ -1516,10 +1466,6 @@
         activityBadgeHtml = '<span class="trail-pill" style="background:#ffedd5; color:#9a3412; border:1px solid #fdba74; font-weight:800;">🚲🚶 Shared / Touring</span>';
       } else if (props.strokeType === 'heartland_mtb') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; font-weight:800;">🚵 MTB Touring</span>';
-      } else if (props.strokeType === 'chch_walking') {
-        activityBadgeHtml = '<span class="trail-pill pill-walking-ccc">🚶 CCC Walking / Tramping</span>';
-      } else if (props.isWalkingOnly) {
-        activityBadgeHtml = '<span class="trail-pill pill-walking">🚶 Walking / Tramping</span>';
       } else if (props.category) {
         activityBadgeHtml = `<span class="trail-pill pill-category">${escapeHTML(props.category)}</span>`;
       }
@@ -1538,7 +1484,6 @@
 
           <h3>${escapeHTML(props.name)}</h3>
 
-          <!-- Distance moved under title -->
           ${props.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(props.lengthStr)}</div>` : ''}
 
           <div class="trail-meta-row">
@@ -1584,49 +1529,32 @@
           style: (feat) => {
             const p = feat.properties || {};
 
-            // 1. Christchurch Council Tracks
             if (p.strokeType === 'chch_mtb') {
-              return { color: '#22c55e', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // light green dotted
+              return { color: '#22c55e', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
             if (p.strokeType === 'chch_shared') {
-              return { color: '#f97316', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // orange dotted
+              return { color: '#f97316', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
-            if (p.strokeType === 'chch_walking') {
-              return { color: '#eab308', weight: 3.4, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // Yellow dotted (off by default)
-            }
-
-            // 2. Christchurch Major Cycleway
             if (p.strokeType === 'chch_cycle_solid') {
-              return { color: '#38bdf8', weight: 3.8, opacity: 0.9, dashArray: null, lineCap: 'round', lineJoin: 'round' }; // light blue solid
+              return { color: '#38bdf8', weight: 3.8, opacity: 0.9, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
-
-            // 3. Heartland Touring
             if (p.strokeType === 'heartland_mtb') {
-              return { color: '#38bdf8', weight: 3.8, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // light blue dotted
+              return { color: '#38bdf8', weight: 3.8, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
             if (p.strokeType === 'heartland_shared') {
-              return { color: '#f97316', weight: 3.8, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // orange dotted
+              return { color: '#f97316', weight: 3.8, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
-
-            // 4. NZ Great Rides
             if (p.strokeType === 'great_rides_solid') {
-              return { color: '#9333ea', weight: 4.5, opacity: 0.7, dashArray: null, lineCap: 'round', lineJoin: 'round' }; // purple solid line, opacity 0.7
+              return { color: '#9333ea', weight: 4.5, opacity: 0.7, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
-
-            // 5. DOC Tracks
             if (p.strokeType === 'doc_mtb') {
-              return { color: '#15803d', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // dark green dotted
-            }
-            if (p.strokeType === 'doc_walking') {
-              return { color: '#ef4444', weight: 2.8, opacity: 0.9, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' }; // red dotted
+              return { color: '#15803d', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
 
-            // Default fallback
             return {
-              color: p.isWalkingOnly ? '#ef4444' : cfg.color,
+              color: cfg.color,
               weight: cfg.weight,
               opacity: cfg.opacity,
-              dashArray: p.isWalkingOnly ? '3, 6' : null,
               lineCap: 'round',
               lineJoin: 'round'
             };
@@ -1643,18 +1571,17 @@
         });
       }
 
-      // Filter features before passing into Leaflet
       const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
       const savedSet = getSavedSet();
 
       const filteredFeatures = cfg.features.filter(feat => {
         const p = feat.properties;
 
+        // Automatically exclude walking-only tracks (pure cycling & MTB map)
+        if (p.isWalkingOnly) return false;
+
         // Saved filter
         if (isSavedOnlyVisible && !savedSet.has(p.uid)) return false;
-
-        // Walking-only filter (off by default)
-        if (!isWalkingOnlyVisible && p.isWalkingOnly) return false;
 
         // Grade filter
         if (activeGradeFilter !== 'all') {
@@ -1680,7 +1607,6 @@
         map.removeLayer(layerGroups[datasetId]);
       }
 
-      // Update counter pill
       const countPill = document.getElementById(
         datasetId === 'great_rides' ? 'cntGreatRides' :
         datasetId === 'heartland' ? 'cntHeartland' :
@@ -1707,17 +1633,17 @@
     }
 
     // =========================================================================
-    // PIPELINE DATA LOADER: LOCAL -> DROPBOX -> ARCGIS
+    // STREAMLINED DATA LOADER: LOCAL -> DIRECT DROPBOX CDN -> ARCGIS
     // =========================================================================
     async function fetchDatasetData(cfg) {
-      // 1. Check 24-hr IndexedDB Cache
+      // 1. IndexedDB Cache Hit
       const cached = await getCachedGeoJSON(cfg.id);
       if (cached && cached.features && cached.features.length > 0) {
         console.log(`[Cache Hit] ${cfg.label} (${cached.features.length} features)`);
         return cached;
       }
 
-      // 2. Local Candidate Paths
+      // 2. Local Candidate Paths (Instant offline)
       for (const url of cfg.local) {
         try {
           const res = await fetch(url);
@@ -1732,30 +1658,29 @@
         } catch (e) {}
       }
 
-      // 3. Dropbox Direct & Proxied Candidates
+      // 3. Direct Dropbox CDN (dl.dropboxusercontent.com with CORS)
       if (cfg.dropbox) {
-        const candidateRemoteUrls = [
-          cfg.dropbox,
-          `https://corsproxy.io/?url=${encodeURIComponent(cfg.dropbox)}`,
-          `https://api.allorigins.win/raw?url=${encodeURIComponent(cfg.dropbox)}`
-        ];
+        const directUrl = cfg.dropbox
+          .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+          .replace('&st=', '&_st=')
+          .replace('dl=0', 'raw=1');
 
-        for (const remoteUrl of candidateRemoteUrls) {
-          try {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 25000);
-            const res = await fetch(remoteUrl, { signal: controller.signal });
-            clearTimeout(timer);
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 15000); // 15s max
+          const res = await fetch(directUrl, { signal: controller.signal });
+          clearTimeout(timer);
 
-            if (res.ok) {
-              const data = await res.json();
-              if (data && data.features && data.features.length > 0) {
-                console.log(`[Remote Hit] Loaded ${cfg.label} via proxy`);
-                setCachedGeoJSON(cfg.id, data);
-                return data;
-              }
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.features && data.features.length > 0) {
+              console.log(`[Dropbox Hit] Loaded ${cfg.label}`);
+              setCachedGeoJSON(cfg.id, data);
+              return data;
             }
-          } catch (e) {}
+          }
+        } catch (e) {
+          console.warn(`[Dropbox Direct Failed] ${cfg.label}:`, e);
         }
       }
 
@@ -1763,7 +1688,7 @@
       if (cfg.arcgis) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 30000);
+          const timer = setTimeout(() => controller.abort(), 20000);
           const res = await fetch(cfg.arcgis, { signal: controller.signal });
           clearTimeout(timer);
 
@@ -1775,26 +1700,37 @@
               return data;
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          console.warn(`[ArcGIS Failed] ${cfg.label}:`, e);
+        }
       }
 
       console.error(`[Load Failed] Could not retrieve ${cfg.label}`);
       return null;
     }
 
+    // Parallel dataset loader: Non-blocking & fast
     async function loadAllDatasetsPipeline() {
       const loadOrder = ['great_rides', 'heartland', 'chch_cycle', 'chch_council', 'doc_tracks'];
 
-      for (const id of loadOrder) {
-        const cfg = DATASETS[id];
-        document.getElementById('lblDatasetLoading').textContent = `Loading ${cfg.label}...`;
+      document.getElementById('lblDatasetLoading').textContent = 'Loading trail datasets...';
 
-        const geojson = await fetchDatasetData(cfg);
-        if (geojson) {
-          cfg.features = normaliseGeoFeatures(id, geojson);
-          renderDatasetLayer(id);
-        }
-      }
+      // Load all datasets concurrently
+      await Promise.allSettled(
+        loadOrder.map(async (id) => {
+          const cfg = DATASETS[id];
+          try {
+            const geojson = await fetchDatasetData(cfg);
+            if (geojson) {
+              cfg.features = normaliseGeoFeatures(id, geojson);
+              renderDatasetLayer(id);
+              updateTotalStats();
+            }
+          } catch (err) {
+            console.warn(`Error loading dataset ${cfg.label}:`, err);
+          }
+        })
+      );
 
       updateTotalStats();
       renderSavedDropdown();
@@ -1849,10 +1785,8 @@
       canvasRenderer = L.canvas({ padding: 0.5 });
       L.control.zoom({ position: 'topright' }).addTo(map);
 
-      // Default Basemap: Topo
       basemaps.topo.addTo(map);
 
-      // Auto-switch to Topo when zoomed in past level 12 if on NatGeo
       map.on('zoomend', () => {
         const curZoom = map.getZoom();
         const activeBasemapBtn = document.querySelector('.layer-grid .layer-option-btn.active');
@@ -1873,7 +1807,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
 
-      // Expose helpers globally
       window.toggleSaveTrack = toggleSaveTrack;
       window.downloadTrackGPX = downloadTrackGPX;
       window.downloadTrackGeoJSON = downloadTrackGeoJSON;
@@ -1957,20 +1890,6 @@
         });
       });
 
-      // Walking-Only Toggle (Off by default)
-      const btnToggleWalking = document.getElementById('btnToggleWalking');
-      btnToggleWalking?.addEventListener('click', function() {
-        isWalkingOnlyVisible = !isWalkingOnlyVisible;
-        if (isWalkingOnlyVisible) {
-          this.classList.add('active');
-          this.innerHTML = '<span>🚶 Walking / Tramping (Shown)</span>';
-        } else {
-          this.classList.remove('active');
-          this.innerHTML = '<span>🚶 Show Walking / Tramping (Off)</span>';
-        }
-        reapplyFilters();
-      });
-
       // Fit NZ Button
       document.getElementById('btnFitNZ')?.addEventListener('click', () => {
         map.setView(NZ_CENTER, NZ_ZOOM);
@@ -1990,7 +1909,7 @@
         searchInput.focus();
       });
 
-      // Sequential pipeline loading
+      // Non-blocking parallel data fetch
       loadAllDatasetsPipeline();
     });
   </script>
