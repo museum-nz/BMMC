@@ -23,6 +23,7 @@
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://services1.arcgis.com" crossorigin>
   <link rel="preconnect" href="https://services.arcgis.com" crossorigin>
+  <link rel="preconnect" href="https://gis.ccc.govt.nz" crossorigin>
   <link rel="preconnect" href="https://dl.dropboxusercontent.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
@@ -466,7 +467,7 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
 
-    /* Popups & Close Button Fix */
+    /* Popups & Close Button */
     .leaflet-popup-content {
       margin: 14px 16px !important;
       line-height: 1.4 !important;
@@ -507,7 +508,7 @@
       font-family: system-ui, sans-serif;
       min-width: min(405px, 80vw);
       max-width: min(510px, 88vw);
-      padding: 2px 20px 2px 2px; /* Extra right padding prevents close-x overlap */
+      padding: 2px 20px 2px 2px;
       color: #0f172a;
     }
     .trail-popup-card h3 {
@@ -655,7 +656,7 @@
       border-radius: 14px;
       padding: 10px 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      min-width: 205px;
+      min-width: 215px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -755,7 +756,6 @@
       background: transparent !important;
     }
 
-    /* Responsive Wings Menu trigger */
     @media (min-width: 769px) {
       .top-controls-bar .btn-bmmc-menu-trigger {
         order: 999 !important;
@@ -772,8 +772,8 @@
         overflow-y: auto;
       }
     }
-  
-    /* Official Advisory Modal & Disclaimer Styling */
+
+    /* Official Advisory Modal & Disclaimer */
     .advisory-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -830,35 +830,6 @@
     .dark .advisory-modal-body { color: #cbd5e1; }
     .advisory-modal-body strong { color: #0f172a; }
     .dark .advisory-modal-body strong { color: #f8fafc; }
-
-    .trail-popup-advisory {
-      margin-top: 8px;
-      padding-top: 6px;
-      border-top: 1px solid #e2e8f0;
-      font-size: 9.5px;
-      color: #64748b;
-      line-height: 1.35;
-      font-style: italic;
-    }
-    .dark .trail-popup-advisory {
-      border-top-color: #334155;
-      color: #94a3b8;
-    }
-
-    .legend-advisory-note {
-      margin-top: 5px;
-      padding-top: 5px;
-      border-top: 1px solid #e2e8f0;
-      font-size: 9px;
-      color: #64748b;
-      line-height: 1.3;
-      font-style: italic;
-    }
-    .dark .legend-advisory-note {
-      border-top-color: #334155;
-      color: #94a3b8;
-    }
-
   </style>
 </head>
 <body>
@@ -957,12 +928,12 @@
       </button>
       <input type="file" id="gpxFileInput" accept=".gpx" multiple style="display:none;">
 
-            <!-- Official Advisory Trigger -->
+      <!-- Official Advisory Trigger -->
       <button id="btnOpenAdvisory" class="top-action-btn" title="Official Trail Data Advisory &amp; Disclaimer">
         <span>⚠️</span> <span>Advisory</span>
       </button>
 
-      <button id="btnFitNZ"  class="top-action-btn" title="Fit New Zealand In View">
+      <button id="btnFitNZ" class="top-action-btn" title="Fit New Zealand In View">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
     </div>
@@ -1000,7 +971,6 @@
     </div>
   </div>
 
-
   <!-- Bottom-Right Hideable Key / Legend -->
   <div class="legend-wrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
@@ -1029,8 +999,8 @@
           <span>CCC Major Cycleway</span>
         </div>
         <div class="legend-item">
-          <span class="legend-line line-dashed" style="border-top: 3.5px dashed #22c55e;"></span>
-          <span>CCC MTB Tracks</span>
+          <span class="legend-line" style="background:#059669;"></span>
+          <span>CCC MTB Only Tracks</span>
         </div>
         <div class="legend-item">
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #f97316;"></span>
@@ -1071,7 +1041,7 @@
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
-    const CACHE_DB_NAME = 'BMMC_MTB_DB';
+    const CACHE_DB_NAME = 'BMMC_MTB_DB_V2'; // Bumped cache to clear stale/misclassified records
     const CACHE_STORE_NAME = 'geojson_store';
     const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 Hours
 
@@ -1079,7 +1049,7 @@
       great_rides: {
         id: 'great_rides',
         label: 'NZ Great Rides',
-        color: '#9333ea', // Purple solid
+        color: '#9333ea',
         weight: 4.5,
         opacity: 0.7,
         local: ['data/mtb/nz_great_rides.geojson', './data/mtb/nz_great_rides.geojson', '../data/mtb/nz_great_rides.geojson'],
@@ -1103,7 +1073,7 @@
       chch_cycle: {
         id: 'chch_cycle',
         label: 'CCC Major Cycleways',
-        color: '#38bdf8', // Light blue solid (C1 bright green)
+        color: '#38bdf8',
         weight: 3.8,
         opacity: 0.9,
         local: ['data/mtb/chch_cycleway.geojson', './data/mtb/chch_cycleway.geojson', '../data/mtb/chch_cycleway.geojson'],
@@ -1115,19 +1085,20 @@
       chch_council: {
         id: 'chch_council',
         label: 'CCC MTB & Port Hills Tracks',
-        color: '#22c55e',
-        weight: 3.5,
+        color: '#059669',
+        weight: 4.0,
         opacity: 0.95,
         local: ['data/mtb/chch_council_tracks.geojson', './data/mtb/chch_council_tracks.geojson', '../data/mtb/chch_council_tracks.geojson'],
         dropbox: 'https://dl.dropboxusercontent.com/scl/fi/zwttqsxcnpcfbv9lhsm2g/chch_council_tracks.geojson?rlkey=g7zobh6j2hemni4ie3ekbavd1&raw=1',
-        arcgis: 'https://opendata.arcgis.com/datasets/866f1329087d46b4b4bd4b370aea297f_6.geojson',
+        arcgis: 'https://gis.ccc.govt.nz/server/rest/services/OpenData/HardSurface/FeatureServer/6/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
+        fallbackArcgis: 'https://opendata.arcgis.com/datasets/866f1329087d46b4b4bd4b370aea297f_6.geojson',
         visible: true,
         features: []
       },
       doc_tracks: {
         id: 'doc_tracks',
         label: 'DOC Tracks',
-        color: '#15803d', // Dark green dotted
+        color: '#15803d',
         weight: 3.2,
         opacity: 0.9,
         local: ['data/mtb/doc_tracks.geojson', './data/mtb/doc_tracks.geojson', '../data/mtb/doc_tracks.geojson'],
@@ -1138,14 +1109,12 @@
       }
     };
 
-    // State Variables
     let map;
     let canvasRenderer;
     let activeGradeFilter = 'all';
     let isSavedOnlyVisible = false;
     let totalTrackCount = 0;
 
-    // Layer groups stored on map
     const layerGroups = {};
     let importedGpxGroup;
 
@@ -1253,9 +1222,6 @@
       }
     }
 
-    // =========================================================================
-    // GPX & GEOJSON EXPORTERS
-    // =========================================================================
     function escapeXML(str) {
       if (!str) return '';
       return String(str).replace(/[<>&'"]/g, c => {
@@ -1328,10 +1294,6 @@
           geom.coordinates.forEach(lineCoords => {
             gpx += lineToTrkseg(lineCoords);
           });
-        } else if (geom.type === 'Point') {
-          const lon = geom.coordinates[0];
-          const lat = geom.coordinates[1];
-          gpx += `    <trkseg><trkpt lat="${lat}" lon="${lon}"/></trkseg>\n`;
         }
         gpx += `  </trk>\n`;
       });
@@ -1342,10 +1304,7 @@
 
     function downloadTrackGPX(uid) {
       const feat = findFeatureByUid(uid);
-      if (!feat) {
-        alert('Trail data is still loading or not found.');
-        return;
-      }
+      if (!feat) { alert('Trail data is still loading or not found.'); return; }
       const cleanName = (feat.properties.name || 'trail_track').replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') || 'track';
       const gpxContent = convertGeoJSONToGPX(feat, feat.properties.name);
       downloadFile(gpxContent, `${cleanName}.gpx`, 'application/gpx+xml');
@@ -1353,56 +1312,29 @@
 
     function downloadTrackGeoJSON(uid) {
       const feat = findFeatureByUid(uid);
-      if (!feat) {
-        alert('Trail data is still loading or not found.');
-        return;
-      }
+      if (!feat) { alert('Trail data is still loading or not found.'); return; }
       const cleanName = (feat.properties.name || 'trail_track').replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') || 'track';
-      const geojsonContent = JSON.stringify({
-        type: 'FeatureCollection',
-        features: [feat]
-      }, null, 2);
+      const geojsonContent = JSON.stringify({ type: 'FeatureCollection', features: [feat] }, null, 2);
       downloadFile(geojsonContent, `${cleanName}.geojson`, 'application/geo+json');
     }
 
     function downloadAllSavedGPX() {
       const savedSet = getSavedSet();
-      if (savedSet.size === 0) {
-        alert('You have no saved favorite trails yet.');
-        return;
-      }
+      if (savedSet.size === 0) { alert('You have no saved favorite trails yet.'); return; }
       const savedFeatures = [];
-      savedSet.forEach(uid => {
-        const f = findFeatureByUid(uid);
-        if (f) savedFeatures.push(f);
-      });
-      if (savedFeatures.length === 0) {
-        alert('Saved trail coordinates are still loading, please wait a moment.');
-        return;
-      }
+      savedSet.forEach(uid => { const f = findFeatureByUid(uid); if (f) savedFeatures.push(f); });
+      if (savedFeatures.length === 0) { alert('Saved trail coordinates are still loading, please wait.'); return; }
       const gpxContent = convertGeoJSONToGPX(savedFeatures, 'My_Saved_NZ_MTB_Trails');
       downloadFile(gpxContent, 'Saved_NZ_MTB_Trails.gpx', 'application/gpx+xml');
     }
 
     function downloadAllSavedGeoJSON() {
       const savedSet = getSavedSet();
-      if (savedSet.size === 0) {
-        alert('You have no saved favorite trails yet.');
-        return;
-      }
+      if (savedSet.size === 0) { alert('You have no saved favorite trails yet.'); return; }
       const savedFeatures = [];
-      savedSet.forEach(uid => {
-        const f = findFeatureByUid(uid);
-        if (f) savedFeatures.push(f);
-      });
-      if (savedFeatures.length === 0) {
-        alert('Saved trail coordinates are still loading, please wait a moment.');
-        return;
-      }
-      const geojsonContent = JSON.stringify({
-        type: 'FeatureCollection',
-        features: savedFeatures
-      }, null, 2);
+      savedSet.forEach(uid => { const f = findFeatureByUid(uid); if (f) savedFeatures.push(f); });
+      if (savedFeatures.length === 0) { alert('Saved trail coordinates are still loading, please wait.'); return; }
+      const geojsonContent = JSON.stringify({ type: 'FeatureCollection', features: savedFeatures }, null, 2);
       downloadFile(geojsonContent, 'Saved_NZ_MTB_Trails.geojson', 'application/geo+json');
     }
 
@@ -1502,7 +1434,25 @@
     function isWalkingTrampingOnly(p, datasetId) {
       if (!p) return false;
 
-      const actRaw = p.activity_type || p.ActivityType || p.activity || p.Activity || 
+      // Christchurch City Council specific attributes
+      if (datasetId === 'chch_council') {
+        const traffic = String(p.RouteTraffic || '').trim().toLowerCase();
+        const mtbClass = String(p.MountainBikeClassification || '').trim().toLowerCase();
+        const sharedUse = String(p.RouteSharedUse || '').trim().toLowerCase();
+
+        // Any track marked Mountain Bike or having a valid MTB grade is NEVER walking-only!
+        if (traffic.includes('bike') || traffic.includes('mtb') || traffic.includes('cycle')) {
+          return false;
+        }
+        if (mtbClass && !['none', 'n/a', 'na', 'null', 'undefined', ''].includes(mtbClass)) {
+          return false;
+        }
+        if (sharedUse === 'yes' || traffic.includes('shared')) {
+          return false;
+        }
+      }
+
+      const actRaw = p.RouteTraffic || p.activity_type || p.ActivityType || p.activity || p.Activity || 
                      p.Use || p.use || p.RouteType || p.track_type || p.TrackType || 
                      p.permitted_use || p.PermittedUse || '';
       const act = String(actRaw).trim().toLowerCase();
@@ -1516,7 +1466,8 @@
 
       const hasMtb = allText.includes('bike') || allText.includes('biking') || 
                      allText.includes('mtb') || allText.includes('cycle') || 
-                     allText.includes('cycling');
+                     allText.includes('cycling') || allText.includes('singletrack') ||
+                     allText.includes('downhill') || allText.includes('rider');
       const isShared = allText.includes('shared') || allText.includes('multi-use') || allText.includes('multi use');
 
       if (hasMtb || isShared) {
@@ -1527,6 +1478,8 @@
         act === 'walking / tramping' ||
         act === 'walking/tramping' ||
         act === 'walking & tramping' ||
+        act === 'walking' ||
+        act === 'pedestrian' ||
         act.includes('walking / tramping') ||
         act.includes('walking/tramping') ||
         act.includes('walk') ||
@@ -1539,7 +1492,7 @@
     }
 
     // =========================================================================
-    // FEATURE NORMALISATION (INCLUDES CCC CYCLEWAY C1 BRIGHT GREEN LOGIC)
+    // FEATURE NORMALISATION
     // =========================================================================
     function normaliseGeoFeatures(datasetId, geojson) {
       if (!geojson || !geojson.features) return [];
@@ -1558,6 +1511,7 @@
         let area = '';
         let website = '';
         let activityType = '';
+        let sharedUse = '';
         let isWalkingOnly = false;
         let isDocMtbPermitted = false;
         let strokeType = 'default';
@@ -1580,31 +1534,36 @@
           comment = p.Comment || '';
           network = p.RouteLandOwnership || 'Christchurch City Council';
           area = p.RouteArea || '';
-          activityType = p.activity_type || p.ActivityType || p.activity || p.Activity || p.Use || p.RouteType || '';
+          
+          const routeTraffic = String(p.RouteTraffic || '').trim();
+          const routeSharedUse = String(p.RouteSharedUse || '').trim();
+          sharedUse = routeSharedUse;
+          activityType = routeTraffic || p.activity_type || p.ActivityType || p.activity || p.Activity || p.Use || p.RouteType || '';
 
           const isWalking = isWalkingTrampingOnly(p, 'chch_council');
-          const actLower = String(activityType).toLowerCase();
+          const trafficLower = routeTraffic.toLowerCase();
+          const sharedLower = routeSharedUse.toLowerCase();
+          const gradeLower = String(gradeRaw).toLowerCase();
+          const hasValidGrade = gradeLower && !['none', 'n/a', 'na', 'null', 'undefined', ''].includes(gradeLower);
 
           if (isWalking) {
             strokeType = 'chch_walking';
             isWalkingOnly = true;
-          } else if (actLower.includes('shared') || actLower.includes('multi')) {
-            strokeType = 'chch_shared';
-            isWalkingOnly = false;
-          } else if (actLower.includes('mtb') || actLower.includes('bike') || actLower.includes('cycle')) {
-            strokeType = 'chch_mtb';
-            isWalkingOnly = false;
           } else {
-            const gradeLower = String(gradeRaw).toLowerCase();
-            if (gradeLower && !gradeLower.includes('none') && !gradeLower.includes('n/a')) {
-              strokeType = 'chch_mtb';
-              isWalkingOnly = false;
-            } else if (isWalking) {
-              strokeType = 'chch_walking';
-              isWalkingOnly = true;
+            isWalkingOnly = false;
+            const isMtbTraffic = trafficLower.includes('mountain bike') || trafficLower.includes('mtb') || trafficLower.includes('bike');
+            const isExplicitShared = sharedLower === 'yes' || trafficLower.includes('shared');
+
+            if (isMtbTraffic && (sharedLower === 'no' || !isExplicitShared)) {
+              strokeType = 'chch_mtb_only'; // Dedicated Mountain Bike Only Track
+            } else if (hasValidGrade && sharedLower === 'no') {
+              strokeType = 'chch_mtb_only';
+            } else if (isExplicitShared) {
+              strokeType = 'chch_shared';
+            } else if (isMtbTraffic || hasValidGrade) {
+              strokeType = 'chch_mtb_only';
             } else {
               strokeType = 'chch_shared';
-              isWalkingOnly = false;
             }
           }
         }
@@ -1703,7 +1662,6 @@
           area = p.FlocID || '';
           activityType = p.activity_type || p.ActivityType || p.activity || p.Activity || p.Use || '';
 
-          const isWalking = isWalkingTrampingOnly(p, 'doc_tracks');
           const actType = String(activityType).trim().toLowerCase();
           const hasMtb = actType.includes('mountain biking') || actType.includes('mtb') || actType.includes('bike') || actType === 'doc mountain biking permitted';
 
@@ -1751,6 +1709,7 @@
             area: area,
             website: website,
             activity_type: activityType,
+            sharedUse: sharedUse,
             strokeType: strokeType,
             isWalkingOnly: isWalkingOnly,
             isDocMtbPermitted: isDocMtbPermitted,
@@ -1770,14 +1729,18 @@
       const trailforksSearch = `https://www.trailforks.com/search/?q=${encodeURIComponent(props.name)}`;
 
       let activityBadgeHtml = '';
-      if (props.strokeType === 'chch_cycle_c1') {
+      if (props.strokeType === 'chch_mtb_only') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚵 CCC Dedicated MTB (MTB Only)</span>';
+      } else if (props.strokeType === 'chch_shared') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#ffedd5; color:#9a3412; border:1px solid #fdba74; font-weight:800;">🚲🚶 CCC Shared Track</span>';
+      } else if (props.strokeType === 'chch_cycle_c1') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🏙️ Major Cycleway (C1)</span>';
-      } else if (props.strokeType === 'chch_mtb' || props.strokeType === 'doc_mtb') {
-        activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚵 MTB Track</span>';
-      } else if (props.strokeType === 'chch_shared' || props.strokeType === 'heartland_shared') {
-        activityBadgeHtml = '<span class="trail-pill" style="background:#ffedd5; color:#9a3412; border:1px solid #fdba74; font-weight:800;">🚲🚶 Shared / Touring</span>';
+      } else if (props.strokeType === 'doc_mtb') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🌿 DOC MTB Permitted</span>';
       } else if (props.strokeType === 'heartland_mtb') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; font-weight:800;">🚵 MTB Touring</span>';
+      } else if (props.strokeType === 'heartland_shared') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#ffedd5; color:#9a3412; border:1px solid #fdba74; font-weight:800;">🚲🚶 Shared / Touring</span>';
       } else if (props.category) {
         activityBadgeHtml = `<span class="trail-pill pill-category">${escapeHTML(props.category)}</span>`;
       }
@@ -1799,6 +1762,7 @@
           ${props.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(props.lengthStr)}</div>` : ''}
 
           <div class="trail-meta-row">
+            ${props.sharedUse ? `<div>👥 <strong>Access Mode:</strong> ${props.sharedUse.toLowerCase() === 'no' ? 'Dedicated Mountain Bike Only (No Walkers)' : 'Shared (Cyclists &amp; Walkers)'}</div>` : ''}
             ${props.category ? `<div>🏷️ <strong>Category:</strong> ${escapeHTML(props.category)}</div>` : ''}
             ${props.area ? `<div>📍 <strong>Area:</strong> ${escapeHTML(props.area)}</div>` : ''}
             ${props.network ? `<div>🏛️ <strong>Network:</strong> ${escapeHTML(props.network)}</div>` : `<div>🏷️ <strong>Network:</strong> ${escapeHTML(DATASETS[props.datasetId]?.label || 'NZ Trails')}</div>`}
@@ -1841,15 +1805,17 @@
           style: (feat) => {
             const p = feat.properties || {};
 
-            // StrategicNetworkCategory C1 is rendered in bright green!
+            // StrategicNetworkCategory C1 is rendered in bright green
             if (p.strokeType === 'chch_cycle_c1') {
               return { color: '#00e676', weight: 4.2, opacity: 0.95, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
-            if (p.strokeType === 'chch_mtb') {
-              return { color: '#22c55e', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
+            // CCC Dedicated MTB Only Tracks
+            if (p.strokeType === 'chch_mtb_only' || p.strokeType === 'chch_mtb') {
+              return { color: '#059669', weight: 4.0, opacity: 0.95, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
+            // CCC Shared Tracks
             if (p.strokeType === 'chch_shared') {
-              return { color: '#f97316', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
+              return { color: '#f97316', weight: 3.5, opacity: 0.95, dashArray: '4, 6', lineCap: 'round', lineJoin: 'round' };
             }
             if (p.strokeType === 'chch_cycle_solid') {
               return { color: '#38bdf8', weight: 3.8, opacity: 0.9, dashArray: null, lineCap: 'round', lineJoin: 'round' };
@@ -1907,7 +1873,8 @@
 
         // Search text
         if (search) {
-          const hay = `${p.name} ${p.category} ${p.area} ${p.network} ${p.description} ${p.comment} ${p.gradeText} ${p.activity_type}`.toLowerCase();
+          const accessText = p.sharedUse && p.sharedUse.toLowerCase() === 'no' ? 'mtb only dedicated' : 'shared';
+          const hay = `${p.name} ${p.category} ${p.area} ${p.network} ${p.description} ${p.comment} ${p.gradeText} ${p.activity_type} ${accessText}`.toLowerCase();
           if (!hay.includes(search)) return false;
         }
 
@@ -2020,6 +1987,24 @@
         }
       }
 
+      if (cfg.fallbackArcgis) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 20000);
+          const res = await fetch(cfg.fallbackArcgis, { signal: controller.signal });
+          clearTimeout(timer);
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.features && data.features.length > 0) {
+              console.log(`[Fallback ArcGIS Hit] Loaded ${cfg.label}`);
+              setCachedGeoJSON(cfg.id, data);
+              return data;
+            }
+          }
+        } catch (e) {}
+      }
+
       console.error(`[Load Failed] Could not retrieve ${cfg.label}`);
       return null;
     }
@@ -2049,14 +2034,13 @@
     }
 
     // =========================================================================
-    // GPX IMPORT ENGINE (SOLID PINK LINE)
+    // GPX IMPORT ENGINE
     // =========================================================================
     function parseGPXToGeoJSON(gpxXmlText, fileName) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(gpxXmlText, 'text/xml');
       const features = [];
 
-      // 1. Tracks (<trk>)
       const trkNodes = xmlDoc.querySelectorAll('trk');
       trkNodes.forEach((trk, tIdx) => {
         const trkName = trk.querySelector('name')?.textContent?.trim() || `${fileName} (Track ${tIdx + 1})`;
@@ -2094,35 +2078,6 @@
         }
       });
 
-      // 2. Routes (<rte>) if present
-      const rteNodes = xmlDoc.querySelectorAll('rte');
-      rteNodes.forEach((rte, rIdx) => {
-        const rteName = rte.querySelector('name')?.textContent?.trim() || `${fileName} (Route ${rIdx + 1})`;
-        const pts = rte.querySelectorAll('rtept');
-        const line = [];
-        pts.forEach(pt => {
-          const lat = parseFloat(pt.getAttribute('lat'));
-          const lon = parseFloat(pt.getAttribute('lon'));
-          if (!isNaN(lat) && !isNaN(lon)) line.push([lon, lat]);
-        });
-
-        if (line.length > 0) {
-          const geom = { type: 'LineString', coordinates: line };
-          const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
-          features.push({
-            type: 'Feature',
-            geometry: geom,
-            properties: {
-              name: rteName,
-              fileName: fileName,
-              lengthKm: distKm,
-              lengthStr: distKm > 0 ? `${distKm.toFixed(2)} km` : '',
-              isImported: true
-            }
-          });
-        }
-      });
-
       return features;
     }
 
@@ -2145,7 +2100,6 @@
               importedGpxGroup.addData(feat);
             });
 
-            // Zoom map to the newly imported GPX bounds
             const bounds = importedGpxGroup.getBounds();
             if (bounds.isValid()) {
               map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
@@ -2243,10 +2197,9 @@
 
       basemaps.topo.addTo(map);
 
-      // GPX Layer Group (Solid Pink Line: #ff2d87)
       importedGpxGroup = L.geoJSON(null, {
         style: {
-          color: '#ff2d87', // Pink solid line
+          color: '#ff2d87',
           weight: 4.8,
           opacity: 0.95,
           dashArray: null,
@@ -2260,7 +2213,6 @@
         }
       }).addTo(map);
 
-      // FIX: Explicitly bind close button on any opened popup
       map.on('popupopen', (e) => {
         const container = e.popup._container;
         if (!container) return;
@@ -2271,22 +2223,6 @@
             evt.stopPropagation();
             map.closePopup(e.popup);
           };
-        }
-      });
-
-      map.on('zoomend', () => {
-        const curZoom = map.getZoom();
-        const activeBasemapBtn = document.querySelector('.layer-grid .layer-option-btn.active');
-        if (activeBasemapBtn && activeBasemapBtn.id === 'btnLayerNatGeo' && curZoom > 12) {
-          if (!map.hasLayer(basemaps.topo)) {
-            map.removeLayer(basemaps.natgeo);
-            basemaps.topo.addTo(map);
-          }
-        } else if (activeBasemapBtn && activeBasemapBtn.id === 'btnLayerNatGeo' && curZoom <= 12) {
-          if (!map.hasLayer(basemaps.natgeo)) {
-            map.removeLayer(basemaps.topo);
-            basemaps.topo.addTo(map);
-          }
         }
       });
     }
@@ -2320,7 +2256,6 @@
         layerDropdownCard?.classList.toggle('show');
       });
 
-      // Saved Favorites Dropdown Toggle
       btnToggleSaved?.addEventListener('click', (e) => {
         e.stopPropagation();
         layerDropdownCard?.classList.remove('show');
@@ -2328,7 +2263,6 @@
         savedDropdownCard?.classList.toggle('show');
       });
 
-      // Close dropdowns when clicking outside
       document.addEventListener('click', (e) => {
         if (!e.target.closest('.layer-switcher-container')) {
           layerDropdownCard?.classList.remove('show');
@@ -2351,7 +2285,7 @@
         reapplyFilters();
       });
 
-      // GPX File Input Integration
+      // GPX File Input
       const btnImportGPX = document.getElementById('btnImportGPX');
       const gpxFileInput = document.getElementById('gpxFileInput');
       btnImportGPX?.addEventListener('click', () => gpxFileInput?.click());
@@ -2360,7 +2294,7 @@
         gpxFileInput.value = '';
       });
 
-      // Bottom-Right Legend Toggle Logic
+      // Bottom-Right Legend
       const trailLegendCard = document.getElementById('trailLegendCard');
       const btnCloseLegend = document.getElementById('btnCloseLegend');
       const btnOpenLegend = document.getElementById('btnOpenLegend');
@@ -2401,7 +2335,7 @@
         });
       });
 
-            // Official Advisory Modal Event Handlers
+      // Advisory Modal
       const advisoryModal = document.getElementById('advisoryModal');
       const btnOpenAdvisory = document.getElementById('btnOpenAdvisory');
       const btnCloseAdvisory = document.getElementById('btnCloseAdvisory');
@@ -2436,7 +2370,7 @@
         searchInput.focus();
       });
 
-      // Load remote/local datasets concurrently
+      // Load remote/local datasets
       loadAllDatasetsPipeline();
     });
   </script>
