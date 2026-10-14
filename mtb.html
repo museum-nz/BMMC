@@ -466,12 +466,48 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
 
-    /* Popups */
+    /* Popups & Close Button Fix */
+    .leaflet-popup-content {
+      margin: 14px 16px !important;
+      line-height: 1.4 !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+      top: 8px !important;
+      right: 8px !important;
+      width: 24px !important;
+      height: 24px !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      color: #64748b !important;
+      background: rgba(241, 245, 249, 0.85) !important;
+      border-radius: 50% !important;
+      text-decoration: none !important;
+      z-index: 2100 !important;
+      cursor: pointer !important;
+      transition: all 0.15s ease !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button:hover {
+      color: #0f172a !important;
+      background: #e2e8f0 !important;
+    }
+    .dark .leaflet-container a.leaflet-popup-close-button {
+      color: #94a3b8 !important;
+      background: rgba(30, 41, 59, 0.85) !important;
+    }
+    .dark .leaflet-container a.leaflet-popup-close-button:hover {
+      color: #f8fafc !important;
+      background: #334155 !important;
+    }
+
     .trail-popup-card {
       font-family: system-ui, sans-serif;
-      min-width: 270px;
-      max-width: 340px;
-      padding: 4px;
+      min-width: min(405px, 80vw);
+      max-width: min(510px, 88vw);
+      padding: 2px 20px 2px 2px; /* Extra right padding prevents close-x overlap */
       color: #0f172a;
     }
     .trail-popup-card h3 {
@@ -493,7 +529,7 @@
       margin-bottom: 8px;
     }
 
-    /* Tag badges enlarged to 125% */
+    /* Tag badges */
     .trail-badge-row {
       display: flex;
       flex-wrap: wrap;
@@ -502,7 +538,7 @@
       align-items: center;
     }
     .trail-pill {
-      font-size: 12px; /* 125% of original 9.5px */
+      font-size: 12px;
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 7px;
@@ -602,6 +638,121 @@
       background: #ffe4e6 !important;
       border-color: #f43f5e !important;
       color: #be123c !important;
+    }
+
+    /* Hideable Bottom-Right Trail Types Key / Legend */
+    .legend-wrapper {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      pointer-events: auto;
+    }
+    .legend-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      min-width: 205px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .dark .legend-card {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+    }
+    .legend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-bottom: 2px;
+    }
+    .dark .legend-header { border-bottom-color: #334155; }
+    .legend-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+    }
+    .dark .legend-title { color: #94a3b8; }
+    .legend-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: bold;
+      color: #64748b;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    .legend-close-btn:hover { color: #0f172a; background: #e2e8f0; }
+    .dark .legend-close-btn:hover { color: #f8fafc; background: #334155; }
+    .legend-open-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      color: #0f172a;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: all 0.15s ease;
+    }
+    .legend-open-pill:hover {
+      background: #ffffff;
+      border-color: #10b981;
+      color: #10b981;
+    }
+    .dark .legend-open-pill {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      color: #f8fafc;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+    }
+    .dark .legend-open-pill:hover {
+      background: #1e293b;
+      border-color: #34d399;
+      color: #34d399;
+    }
+    .legend-items {
+      display: flex;
+      flex-direction: column;
+      gap: 5.5px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .dark .legend-item { color: #e2e8f0; }
+    .legend-line {
+      display: inline-block;
+      width: 22px;
+      height: 4px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .legend-line.line-dashed {
+      height: 0px;
+      background: transparent !important;
     }
 
     /* Responsive Wings Menu trigger */
@@ -713,12 +864,18 @@
         </div>
       </div>
 
+      <!-- Import GPX from Drive -->
+      <button id="btnImportGPX" class="top-action-btn" title="Import GPX track from your drive">
+        <span>📥</span> <span>Import GPX</span>
+      </button>
+      <input type="file" id="gpxFileInput" accept=".gpx" multiple style="display:none;">
+
       <button id="btnFitNZ" class="top-action-btn" title="Fit New Zealand In View">
         <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
     </div>
 
-    <!-- Quick Filters: Grade Chips (Walking Toggle Removed) -->
+    <!-- Quick Filters: Grade Chips -->
     <div class="filter-chips-bar">
       <button class="filter-chip active" data-grade="all">All Grades</button>
       <button class="filter-chip" data-grade="1">Grade 1 (Easiest)</button>
@@ -730,6 +887,53 @@
   </div>
 
   <div id="map"></div>
+
+  <!-- Bottom-Right Hideable Key / Legend -->
+  <div class="legend-wrapper">
+    <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
+      <span>🗺️</span> <span>Trail Key</span>
+    </button>
+    <div id="trailLegendCard" class="legend-card">
+      <div class="legend-header">
+        <span class="legend-title">🗺️ Trail Key</span>
+        <button id="btnCloseLegend" class="legend-close-btn" title="Hide Key">✕</button>
+      </div>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="legend-line" style="background:#9333ea;"></span>
+          <span>NZ Great Rides</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line" style="background:#0ea5e9;"></span>
+          <span>Heartland Touring</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line" style="background:#00e676;"></span>
+          <span>CCC Cycleway (C1)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line" style="background:#38bdf8;"></span>
+          <span>CCC Major Cycleway</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line line-dashed" style="border-top: 3.5px dashed #22c55e;"></span>
+          <span>CCC MTB Tracks</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line line-dashed" style="border-top: 3.5px dashed #f97316;"></span>
+          <span>CCC Shared Tracks</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span>
+          <span>DOC MTB Permitted</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-line" style="background:#ff2d87;"></span>
+          <span>Imported GPX</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bottom Floating Status Bar -->
   <div class="status-summary-bar">
@@ -750,7 +954,7 @@
 
   <script>
     // =========================================================================
-    // CONFIGURATION & DATASET DEFINITIONS (DIRECT DROPBOX CDN ENABLED)
+    // CONFIGURATION & DATASET DEFINITIONS
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
@@ -764,7 +968,7 @@
         label: 'NZ Great Rides',
         color: '#9333ea', // Purple solid
         weight: 4.5,
-        opacity: 0.7,     // stroke-opacity: 0.7
+        opacity: 0.7,
         local: ['data/mtb/nz_great_rides.geojson', './data/mtb/nz_great_rides.geojson', '../data/mtb/nz_great_rides.geojson'],
         dropbox: 'https://dl.dropboxusercontent.com/scl/fi/bklc3pcx2tfazrw4s5gts/nz_great_rides.geojson?rlkey=tg5tygn5d288266pzsofn321k&raw=1',
         arcgis: 'https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
@@ -786,8 +990,8 @@
       chch_cycle: {
         id: 'chch_cycle',
         label: 'CCC Major Cycleways',
-        color: '#38bdf8', // Light blue solid
-        weight: 3.5,
+        color: '#38bdf8', // Light blue solid (C1 bright green)
+        weight: 3.8,
         opacity: 0.9,
         local: ['data/mtb/chch_cycleway.geojson', './data/mtb/chch_cycleway.geojson', '../data/mtb/chch_cycleway.geojson'],
         dropbox: 'https://dl.dropboxusercontent.com/scl/fi/6owmpsjaxck4xt508ektw/chch_cycleway.geojson?rlkey=972grk4m5qvo21wx4nud30gdq&raw=1',
@@ -830,6 +1034,7 @@
 
     // Layer groups stored on map
     const layerGroups = {};
+    let importedGpxGroup;
 
     // =========================================================================
     // INDEXED-DB 24-HOUR CACHE ENGINE
@@ -1014,16 +1219,6 @@
           const lon = geom.coordinates[0];
           const lat = geom.coordinates[1];
           gpx += `    <trkseg><trkpt lat="${lat}" lon="${lon}"/></trkseg>\n`;
-        } else if (geom.type === 'Polygon') {
-          geom.coordinates.forEach(ring => {
-            gpx += lineToTrkseg(ring);
-          });
-        } else if (geom.type === 'MultiPolygon') {
-          geom.coordinates.forEach(poly => {
-            poly.forEach(ring => {
-              gpx += lineToTrkseg(ring);
-            });
-          });
         }
         gpx += `  </trk>\n`;
       });
@@ -1189,7 +1384,7 @@
     }
 
     // =========================================================================
-    // WALKING / TRAMPING CLASSIFICATION HELPER (STRICTLY EXCLUDES NON-MTB)
+    // WALKING / TRAMPING CLASSIFICATION HELPER
     // =========================================================================
     function isWalkingTrampingOnly(p, datasetId) {
       if (!p) return false;
@@ -1231,7 +1426,7 @@
     }
 
     // =========================================================================
-    // FEATURE NORMALISATION
+    // FEATURE NORMALISATION (INCLUDES CCC CYCLEWAY C1 BRIGHT GREEN LOGIC)
     // =========================================================================
     function normaliseGeoFeatures(datasetId, geojson) {
       if (!geojson || !geojson.features) return [];
@@ -1279,7 +1474,7 @@
 
           if (isWalking) {
             strokeType = 'chch_walking';
-            isWalkingOnly = true; // Excluded from MTB view
+            isWalkingOnly = true;
           } else if (actLower.includes('shared') || actLower.includes('multi')) {
             strokeType = 'chch_shared';
             isWalkingOnly = false;
@@ -1301,13 +1496,15 @@
           }
         }
 
-        // 2. Christchurch Major Cycleways
+        // 2. Christchurch Major Cycleways (C1 mapped to bright green)
         else if (datasetId === 'chch_cycle') {
           name = p.MajorCyclewayName || p.name || 'Christchurch Major Cycleway';
           description = p.Type || p.type || '';
           network = p.Ownership || 'Christchurch City Council';
           area = p.StrategicNetworkCategory || '';
-          strokeType = 'chch_cycle_solid';
+
+          const isC1 = String(p.StrategicNetworkCategory || '').trim().toUpperCase() === 'C1';
+          strokeType = isC1 ? 'chch_cycle_c1' : 'chch_cycle_solid';
           isWalkingOnly = false;
         }
 
@@ -1404,7 +1601,7 @@
           } else {
             isDocMtbPermitted = false;
             strokeType = 'doc_walking';
-            isWalkingOnly = true; // Walking/tramping excluded from MTB view
+            isWalkingOnly = true;
           }
         }
 
@@ -1460,7 +1657,9 @@
       const trailforksSearch = `https://www.trailforks.com/search/?q=${encodeURIComponent(props.name)}`;
 
       let activityBadgeHtml = '';
-      if (props.strokeType === 'chch_mtb' || props.strokeType === 'doc_mtb') {
+      if (props.strokeType === 'chch_cycle_c1') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🏙️ Major Cycleway (C1)</span>';
+      } else if (props.strokeType === 'chch_mtb' || props.strokeType === 'doc_mtb') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚵 MTB Track</span>';
       } else if (props.strokeType === 'chch_shared' || props.strokeType === 'heartland_shared') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#ffedd5; color:#9a3412; border:1px solid #fdba74; font-weight:800;">🚲🚶 Shared / Touring</span>';
@@ -1478,7 +1677,7 @@
               ${props.gradeNum ? `<span class="trail-pill ${gradeBadgeClass}">Grade ${props.gradeNum}</span>` : (props.gradeText ? `<span class="trail-pill pill-category">${escapeHTML(props.gradeText)}</span>` : '')}
             </div>
             <button class="top-action-btn" style="height:26px; padding:0 8px; font-size:11px;" onclick="window.toggleSaveTrack('${props.uid}', event);">
-              <span>${isSaved ? '❤️ Saved' : '🤍 Save'}</span>
+              <span>${isSaved ? '❤️' : '🤍'}</span>
             </button>
           </div>
 
@@ -1529,6 +1728,10 @@
           style: (feat) => {
             const p = feat.properties || {};
 
+            // StrategicNetworkCategory C1 is rendered in bright green!
+            if (p.strokeType === 'chch_cycle_c1') {
+              return { color: '#00e676', weight: 4.2, opacity: 0.95, dashArray: null, lineCap: 'round', lineJoin: 'round' };
+            }
             if (p.strokeType === 'chch_mtb') {
               return { color: '#22c55e', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
@@ -1560,7 +1763,7 @@
             };
           },
           onEachFeature: (feat, layer) => {
-            layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 340 });
+            layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 510 });
             layer.on('mouseover', function() {
               this.setStyle({ weight: (cfg.weight || 3.5) + 2 });
             });
@@ -1577,7 +1780,7 @@
       const filteredFeatures = cfg.features.filter(feat => {
         const p = feat.properties;
 
-        // Automatically exclude walking-only tracks (pure cycling & MTB map)
+        // Exclude walking-only tracks
         if (p.isWalkingOnly) return false;
 
         // Saved filter
@@ -1589,7 +1792,7 @@
           if (p.gradeNum !== reqGrade) return false;
         }
 
-        // Search text across all connected fields
+        // Search text
         if (search) {
           const hay = `${p.name} ${p.category} ${p.area} ${p.network} ${p.description} ${p.comment} ${p.gradeText} ${p.activity_type}`.toLowerCase();
           if (!hay.includes(search)) return false;
@@ -1628,22 +1831,23 @@
           count += layerGroups[id].getLayers().length;
         }
       });
+      if (importedGpxGroup) {
+        count += importedGpxGroup.getLayers().length;
+      }
       totalTrackCount = count;
       document.getElementById('lblDatasetLoading').textContent = `${count.toLocaleString()} trail segments displayed`;
     }
 
     // =========================================================================
-    // STREAMLINED DATA LOADER: LOCAL -> DIRECT DROPBOX CDN -> ARCGIS
+    // STREAMLINED DATA LOADER
     // =========================================================================
     async function fetchDatasetData(cfg) {
-      // 1. IndexedDB Cache Hit
       const cached = await getCachedGeoJSON(cfg.id);
       if (cached && cached.features && cached.features.length > 0) {
         console.log(`[Cache Hit] ${cfg.label} (${cached.features.length} features)`);
         return cached;
       }
 
-      // 2. Local Candidate Paths (Instant offline)
       for (const url of cfg.local) {
         try {
           const res = await fetch(url);
@@ -1658,7 +1862,6 @@
         } catch (e) {}
       }
 
-      // 3. Direct Dropbox CDN (dl.dropboxusercontent.com with CORS)
       if (cfg.dropbox) {
         const directUrl = cfg.dropbox
           .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
@@ -1667,7 +1870,7 @@
 
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 15000); // 15s max
+          const timer = setTimeout(() => controller.abort(), 15000);
           const res = await fetch(directUrl, { signal: controller.signal });
           clearTimeout(timer);
 
@@ -1684,7 +1887,6 @@
         }
       }
 
-      // 4. Live ArcGIS Fallback
       if (cfg.arcgis) {
         try {
           const controller = new AbortController();
@@ -1709,13 +1911,10 @@
       return null;
     }
 
-    // Parallel dataset loader: Non-blocking & fast
     async function loadAllDatasetsPipeline() {
       const loadOrder = ['great_rides', 'heartland', 'chch_cycle', 'chch_council', 'doc_tracks'];
-
       document.getElementById('lblDatasetLoading').textContent = 'Loading trail datasets...';
 
-      // Load all datasets concurrently
       await Promise.allSettled(
         loadOrder.map(async (id) => {
           const cfg = DATASETS[id];
@@ -1735,6 +1934,150 @@
       updateTotalStats();
       renderSavedDropdown();
     }
+
+    // =========================================================================
+    // GPX IMPORT ENGINE (SOLID PINK LINE)
+    // =========================================================================
+    function parseGPXToGeoJSON(gpxXmlText, fileName) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(gpxXmlText, 'text/xml');
+      const features = [];
+
+      // 1. Tracks (<trk>)
+      const trkNodes = xmlDoc.querySelectorAll('trk');
+      trkNodes.forEach((trk, tIdx) => {
+        const trkName = trk.querySelector('name')?.textContent?.trim() || `${fileName} (Track ${tIdx + 1})`;
+        const trksegs = trk.querySelectorAll('trkseg');
+        const multiLine = [];
+
+        trksegs.forEach(seg => {
+          const pts = seg.querySelectorAll('trkpt');
+          const line = [];
+          pts.forEach(pt => {
+            const lat = parseFloat(pt.getAttribute('lat'));
+            const lon = parseFloat(pt.getAttribute('lon'));
+            if (!isNaN(lat) && !isNaN(lon)) line.push([lon, lat]);
+          });
+          if (line.length > 0) multiLine.push(line);
+        });
+
+        if (multiLine.length > 0) {
+          const geom = multiLine.length === 1
+            ? { type: 'LineString', coordinates: multiLine[0] }
+            : { type: 'MultiLineString', coordinates: multiLine };
+          const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
+
+          features.push({
+            type: 'Feature',
+            geometry: geom,
+            properties: {
+              name: trkName,
+              fileName: fileName,
+              lengthKm: distKm,
+              lengthStr: distKm > 0 ? `${distKm.toFixed(2)} km` : '',
+              isImported: true
+            }
+          });
+        }
+      });
+
+      // 2. Routes (<rte>) if present
+      const rteNodes = xmlDoc.querySelectorAll('rte');
+      rteNodes.forEach((rte, rIdx) => {
+        const rteName = rte.querySelector('name')?.textContent?.trim() || `${fileName} (Route ${rIdx + 1})`;
+        const pts = rte.querySelectorAll('rtept');
+        const line = [];
+        pts.forEach(pt => {
+          const lat = parseFloat(pt.getAttribute('lat'));
+          const lon = parseFloat(pt.getAttribute('lon'));
+          if (!isNaN(lat) && !isNaN(lon)) line.push([lon, lat]);
+        });
+
+        if (line.length > 0) {
+          const geom = { type: 'LineString', coordinates: line };
+          const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
+          features.push({
+            type: 'Feature',
+            geometry: geom,
+            properties: {
+              name: rteName,
+              fileName: fileName,
+              lengthKm: distKm,
+              lengthStr: distKm > 0 ? `${distKm.toFixed(2)} km` : '',
+              isImported: true
+            }
+          });
+        }
+      });
+
+      return features;
+    }
+
+    function handleGPXFiles(files) {
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const text = e.target.result;
+            const features = parseGPXToGeoJSON(text, file.name);
+
+            if (features.length === 0) {
+              alert(`Could not extract valid track coordinates from "${file.name}".`);
+              return;
+            }
+
+            features.forEach(feat => {
+              importedGpxGroup.addData(feat);
+            });
+
+            // Zoom map to the newly imported GPX bounds
+            const bounds = importedGpxGroup.getBounds();
+            if (bounds.isValid()) {
+              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            }
+
+            updateTotalStats();
+            document.getElementById('lblDatasetLoading').textContent = `Imported: ${file.name} (${features.length} track${features.length > 1 ? 's' : ''})`;
+          } catch (err) {
+            console.error('GPX parse error:', err);
+            alert(`Error parsing GPX file "${file.name}": ${err.message}`);
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function buildImportedPopup(props, layer) {
+      return `
+        <div class="trail-popup-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <span class="trail-pill" style="background:#fce7f3; color:#be185d; border:1px solid #f472b6;">
+              📂 Imported GPX (Pink Line)
+            </span>
+          </div>
+          <h3>${escapeHTML(props.name || 'Imported GPX Track')}</h3>
+          ${props.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(props.lengthStr)}</div>` : ''}
+          <div class="trail-meta-row">
+            <div>📁 <strong>File:</strong> ${escapeHTML(props.fileName || 'Local Drive GPX')}</div>
+          </div>
+          <button class="btn-trail-action" style="margin-top:6px; color:#e11d48;" onclick="window.removeImportedTrack('${layer._leaflet_id}')">
+            <span>🗑️</span> Remove Imported Track
+          </button>
+        </div>
+      `;
+    }
+
+    window.removeImportedTrack = function(leafletId) {
+      if (!importedGpxGroup) return;
+      const layer = importedGpxGroup.getLayer(leafletId);
+      if (layer) {
+        map.closePopup();
+        importedGpxGroup.removeLayer(layer);
+        updateTotalStats();
+      }
+    };
 
     // =========================================================================
     // BASEMAP MANAGEMENT
@@ -1786,6 +2129,37 @@
       L.control.zoom({ position: 'topright' }).addTo(map);
 
       basemaps.topo.addTo(map);
+
+      // GPX Layer Group (Solid Pink Line: #ff2d87)
+      importedGpxGroup = L.geoJSON(null, {
+        style: {
+          color: '#ff2d87', // Pink solid line
+          weight: 4.8,
+          opacity: 0.95,
+          dashArray: null,
+          lineCap: 'round',
+          lineJoin: 'round'
+        },
+        onEachFeature: (feat, layer) => {
+          layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 480 });
+          layer.on('mouseover', function() { this.setStyle({ weight: 6.8 }); });
+          layer.on('mouseout', function() { this.setStyle({ weight: 4.8 }); });
+        }
+      }).addTo(map);
+
+      // FIX: Explicitly bind close button on any opened popup
+      map.on('popupopen', (e) => {
+        const container = e.popup._container;
+        if (!container) return;
+        const closeBtn = container.querySelector('.leaflet-popup-close-button');
+        if (closeBtn) {
+          closeBtn.onclick = (evt) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+            map.closePopup(e.popup);
+          };
+        }
+      });
 
       map.on('zoomend', () => {
         const curZoom = map.getZoom();
@@ -1864,6 +2238,30 @@
         reapplyFilters();
       });
 
+      // GPX File Input Integration
+      const btnImportGPX = document.getElementById('btnImportGPX');
+      const gpxFileInput = document.getElementById('gpxFileInput');
+      btnImportGPX?.addEventListener('click', () => gpxFileInput?.click());
+      gpxFileInput?.addEventListener('change', (e) => {
+        handleGPXFiles(e.target.files);
+        gpxFileInput.value = '';
+      });
+
+      // Bottom-Right Legend Toggle Logic
+      const trailLegendCard = document.getElementById('trailLegendCard');
+      const btnCloseLegend = document.getElementById('btnCloseLegend');
+      const btnOpenLegend = document.getElementById('btnOpenLegend');
+
+      btnCloseLegend?.addEventListener('click', () => {
+        trailLegendCard.style.display = 'none';
+        btnOpenLegend.style.display = 'inline-flex';
+      });
+
+      btnOpenLegend?.addEventListener('click', () => {
+        btnOpenLegend.style.display = 'none';
+        trailLegendCard.style.display = 'flex';
+      });
+
       // Dataset Overlay Toggles
       const toggleLayer = (datasetId, btnId) => {
         DATASETS[datasetId].visible = !DATASETS[datasetId].visible;
@@ -1909,7 +2307,7 @@
         searchInput.focus();
       });
 
-      // Non-blocking parallel data fetch
+      // Load remote/local datasets concurrently
       loadAllDatasetsPipeline();
     });
   </script>

@@ -67,7 +67,13 @@
           href: 'trimble.html',
           icon: '🛰️', 
           label: 'Trimble NZ History Wall', 
-          desc: 'A bit about Trimble NZ',
+          desc: 'A bit about Trimble NZ'
+        },
+        { 
+          href: 'mtb.html', 
+          icon: '🚵', 
+          label: 'NZ MTB & Cycle Trails', 
+          desc: 'Interactive Great Rides, Heartland, CCC & DOC network' 
         }
       ]
     },
@@ -123,7 +129,7 @@
       if (!toast) {
         toast = document.createElement('div');
         toast.id = 'bmmcUniversalToast';
-        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(15,23,42,0.95);color:#fff;padding:10px 20px;border-radius:9999px;box-shadow:0 12px 30px rgba(0,0,0,0.4);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;transition:opacity 0.3s ease;pointer-events:none;opacity:0;';
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(15,23,42,0.95);color:#fff;padding:10px 20px;border-radius:99999px;box-shadow:0 12px 30px rgba(0,0,0,0.4);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;transition:opacity 0.3s ease;pointer-events:none;opacity:0;';
         toast.innerHTML = '<span id="bmmcToastIcon">✨</span><span id="bmmcToastMsg">Notification</span>';
         document.body.appendChild(toast);
       }
@@ -207,7 +213,7 @@
               <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;margin-top:3px;">Hub &amp; Directory</div>
             </div>
           </a>
-          <button id="btnCloseDrawer" style="width:32px;height:32px;border-radius:50%;border:none;background:none;font-size:16px;font-weight:bold;cursor:pointer;color:#64748b;" aria-label="Close menu">✕</button>
+          <button id="btnCloseDrawer" style="width:32px;height:32px;border-radius:50%;border:none;background:none;font-size:16px;font-weight:bold;cursor:color:#64748b;" aria-label="Close menu">✕</button>
         </div>
 
         <div style="flex:1;overflow-y:auto;padding:12px;" class="custom-scrollbar dark:bg-slate-900">
@@ -230,7 +236,6 @@
     let drawer = document.getElementById('bmmcDrawer');
     let backdrop = document.getElementById('bmmcBackdrop');
 
-    // On-demand DOM assembly if not yet initialized
     if (!drawer || !backdrop) {
       buildDrawerDOM();
       drawer = document.getElementById('bmmcDrawer');
