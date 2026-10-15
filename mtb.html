@@ -650,7 +650,7 @@
       border-radius: 14px;
       padding: 10px 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      min-width: 220px;
+      min-width: 230px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -678,6 +678,14 @@
       color: #475569;
     }
     .dark .legend-title { color: #94a3b8; }
+    .legend-hint {
+      font-size: 9px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: none;
+      letter-spacing: normal;
+      margin-left: 4px;
+    }
     .legend-close-btn {
       background: transparent;
       border: none;
@@ -727,7 +735,7 @@
     .legend-items {
       display: flex;
       flex-direction: column;
-      gap: 5.5px;
+      gap: 3px;
     }
     .legend-item {
       display: flex;
@@ -736,8 +744,25 @@
       font-size: 11px;
       font-weight: 700;
       color: #1e293b;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .legend-item:hover {
+      background: rgba(16, 185, 129, 0.08);
+      color: #059669;
     }
     .dark .legend-item { color: #e2e8f0; }
+    .dark .legend-item:hover {
+      background: rgba(52, 211, 153, 0.12);
+      color: #6ee7b7;
+    }
+    .legend-item.layer-muted {
+      opacity: 0.38;
+      text-decoration: line-through;
+    }
     .legend-line {
       display: inline-block;
       width: 22px;
@@ -867,6 +892,10 @@
               <span class="layer-opt-left"><span>🚴</span><span>Heartland Touring</span><span id="cntHeartland" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
+            <button id="btnToggleNzOsm" class="layer-option-btn active" title="NZ OpenStreetMap MTB Tracks">
+              <span class="layer-opt-left"><span>🚵</span><span>NZ OpenStreetMap MTB</span><span id="cntNzOsm" class="track-count-pill">0</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
             <button id="btnToggleChchCycle" class="layer-option-btn active" title="Christchurch City Major Cycleways">
               <span class="layer-opt-left"><span>🏙️</span><span>CCC Major Cycleways</span><span id="cntChchCycle" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
@@ -967,50 +996,54 @@
     </div>
   </div>
 
-  <!-- Legend -->
+  <!-- Interactive Legend -->
   <div class="legend-wrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
       <span>🗺️</span> <span>Trail Key</span>
     </button>
     <div id="trailLegendCard" class="legend-card">
       <div class="legend-header">
-        <span class="legend-title">🗺️ Trail Key</span>
+        <span class="legend-title">🗺️ Trail Key <span class="legend-hint">(Click to Toggle)</span></span>
         <button id="btnCloseLegend" class="legend-close-btn" title="Hide Key">✕</button>
       </div>
       <div class="legend-items">
-        <div class="legend-item">
-          <span class="legend-line" style="background:#9333ea;"></span>
+        <div class="legend-item" data-layer-key="great_rides" title="Click to toggle NZ Great Rides">
+          <span class="legend-line" style="background:#9333ea; height:5.5px;"></span>
           <span>NZ Great Rides</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="nz_osm" title="Click to toggle NZ OpenStreetMap MTB">
+          <span class="legend-line" style="background:#1d4ed8;"></span>
+          <span>NZ OSM MTB</span>
+        </div>
+        <div class="legend-item" data-layer-key="heartland" title="Click to toggle Heartland Touring">
           <span class="legend-line" style="background:#0ea5e9;"></span>
           <span>Heartland Touring</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="chch_cycle" title="Click to toggle CCC Major Cycleways">
           <span class="legend-line" style="background:#00e676;"></span>
           <span>CCC Cycleway (C1)</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="chch_cycle" title="Click to toggle CCC Major Cycleways">
           <span class="legend-line" style="background:#38bdf8;"></span>
           <span>CCC Major Cycleway</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="chch_council" title="Click to toggle CCC MTB & Hills Tracks">
           <span class="legend-line" style="background:#059669;"></span>
           <span>CCC MTB Only Tracks</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="chch_council" title="Click to toggle CCC MTB & Hills Tracks">
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #f97316;"></span>
           <span>CCC Shared Tracks</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="cap_plus" title="Click to toggle CAP & Adventure Trails">
           <span class="legend-line line-dashed" style="border-top: 3.5px dotted #4ade80;"></span>
           <span>CAP &amp; Adventure Trails</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="doc_tracks" title="Click to toggle DOC MTB Tracks">
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span>
           <span>DOC MTB Permitted</span>
         </div>
-        <div class="legend-item">
+        <div class="legend-item" data-layer-key="imported" title="Click to toggle Imported GPX / GeoJSON">
           <span class="legend-line" style="background:#ff2d87;"></span>
           <span>Imported GPX / GeoJSON</span>
         </div>
@@ -1028,7 +1061,7 @@
   <script src="shared-nav.js" onerror="this.onerror=null;"></script>
 
   <!-- Leaflet CDN with Asynchronous Local Fallback -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
   <script>
     if (!window.L) {
       const fbScript = document.createElement('script');
@@ -1043,7 +1076,7 @@
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
-    const CACHE_DB_NAME = 'BMMC_MTB_DB_V3';
+    const CACHE_DB_NAME = 'BMMC_MTB_DB_V4';
     const CACHE_STORE_NAME = 'geojson_store';
     const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
@@ -1052,11 +1085,22 @@
         id: 'great_rides',
         label: 'NZ Great Rides',
         color: '#9333ea',
-        weight: 4.5,
-        opacity: 0.7,
+        weight: 5.65, // 125% thicker
+        opacity: 0.85,
         local: ['data/mtb/nz_great_rides.geojson', './data/mtb/nz_great_rides.geojson', '../data/mtb/nz_great_rides.geojson'],
         dropbox: 'https://dl.dropboxusercontent.com/scl/fi/bklc3pcx2tfazrw4s5gts/nz_great_rides.geojson?rlkey=tg5tygn5d288266pzsofn321k&raw=1',
         arcgis: 'https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
+        visible: true,
+        features: []
+      },
+      nz_osm: {
+        id: 'nz_osm',
+        label: 'NZ OpenStreetMap MTB',
+        color: '#1d4ed8', // Dark blue solid line
+        weight: 4.0,
+        opacity: 0.95,
+        local: ['data/mtb/nz_osm.geojson', './data/mtb/nz_osm.geojson', '../data/mtb/nz_osm.geojson'],
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/om13urev73bu6dl3e8w5d/nz_osm.geojson?rlkey=pay45z01mlc7x12b0ygv4w5z4&st=yqg6z0x3&raw=1',
         visible: true,
         features: []
       },
@@ -1130,6 +1174,7 @@
 
     const layerGroups = {};
     let importedGpxGroup;
+    let selectedHighlightLayer = null;
 
     // =========================================================================
     // INDEXED-DB CACHE ENGINE
@@ -1220,6 +1265,43 @@
       return null;
     }
 
+    function highlightSelectedFeature(feature) {
+      if (selectedHighlightLayer) {
+        map.removeLayer(selectedHighlightLayer);
+        selectedHighlightLayer = null;
+      }
+      if (!feature) return;
+
+      selectedHighlightLayer = L.geoJSON(feature, {
+        pane: 'highlightPane',
+        interactive: false,
+        renderer: canvasRenderer,
+        style: {
+          color: '#ffffff',
+          weight: 9.5,
+          opacity: 0.9,
+          lineCap: 'round',
+          lineJoin: 'round'
+        }
+      });
+
+      const innerHighlight = L.geoJSON(feature, {
+        pane: 'highlightPane',
+        interactive: false,
+        renderer: canvasRenderer,
+        style: {
+          color: '#fbbf24',
+          weight: 6.5,
+          opacity: 1,
+          lineCap: 'round',
+          lineJoin: 'round'
+        }
+      });
+
+      selectedHighlightLayer.addLayer(innerHighlight);
+      selectedHighlightLayer.addTo(map);
+    }
+
     function zoomToTrack(uid) {
       const feat = findFeatureByUid(uid);
       if (!feat || !feat.geometry) return;
@@ -1227,6 +1309,7 @@
       const bounds = geomLayer.getBounds();
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+        highlightSelectedFeature(feat);
         setTimeout(() => {
           for (const id of Object.keys(layerGroups)) {
             layerGroups[id].eachLayer(layer => {
@@ -1447,7 +1530,7 @@
 
     function isWalkingTrampingOnly(p, datasetId) {
       if (!p) return false;
-      if (datasetId === 'cap_plus') return false;
+      if (datasetId === 'cap_plus' || datasetId === 'nz_osm') return false;
 
       if (datasetId === 'chch_council') {
         const traffic = String(p.RouteTraffic || '').trim().toLowerCase();
@@ -1512,7 +1595,34 @@
 
         const calcKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
 
-        if (datasetId === 'chch_council') {
+        if (datasetId === 'nz_osm') {
+          name = p.name || p.ref || 'NZ OSM MTB Track';
+          gradeRaw = p.tracktype || p['mtb:scale'] || p.grade || '';
+          finalKm = calcKm;
+
+          const descParts = [];
+          if (p.smoothness) descParts.push(`Smoothness: ${p.smoothness}`);
+          if (p.surface) descParts.push(`Surface: ${p.surface}`);
+          description = descParts.join(' • ');
+
+          const commentParts = [];
+          if (p.trail_visibility) commentParts.push(`Trail Visibility: ${p.trail_visibility}`);
+          if (p.oneway) commentParts.push(`One Way: ${p.oneway}`);
+          if (p.operator) commentParts.push(`Operator: ${p.operator}`);
+          if (p.incline) commentParts.push(`Incline: ${p.incline}`);
+          if (p.access) commentParts.push(`Access: ${p.access}`);
+          if (p['mtb:scale:imba']) commentParts.push(`IMBA Grade: ${p['mtb:scale:imba']}`);
+          if (p.note) commentParts.push(`Note: ${p.note}`);
+          comment = commentParts.join(' • ');
+
+          area = p.ref || '';
+          network = p.operator || 'OpenStreetMap MTB';
+          activityType = p['mtb:type'] || 'Mountain Bike';
+          website = p.website || p.url || '';
+          strokeType = 'nz_osm_darkblue';
+          isWalkingOnly = false;
+        }
+        else if (datasetId === 'chch_council') {
           name = p.RouteName || p.name || 'Christchurch Council Track';
           gradeRaw = p.MountainBikeClassification || p.grade || '';
           
@@ -1743,7 +1853,9 @@
       const trailforksSearch = `https://www.trailforks.com/search/?q=${encodeURIComponent(props.name)}`;
 
       let activityBadgeHtml = '';
-      if (props.strokeType === 'cap_plus_dotted') {
+      if (props.strokeType === 'nz_osm_darkblue') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#dbeafe; color:#1e40af; border:1px solid #93c5fd; font-weight:800;">🚵 NZ OSM MTB Track</span>';
+      } else if (props.strokeType === 'cap_plus_dotted') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚠 CAP &amp; Port Hills MTB</span>';
       } else if (props.strokeType === 'chch_mtb_only') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚵 CCC Dedicated MTB (MTB Only)</span>';
@@ -1813,14 +1925,27 @@
       `;
     }
 
+    function bringGreatRidesToFront() {
+      if (layerGroups['great_rides'] && map && map.hasLayer(layerGroups['great_rides'])) {
+        layerGroups['great_rides'].bringToFront();
+      }
+      if (importedGpxGroup && map && map.hasLayer(importedGpxGroup)) {
+        importedGpxGroup.bringToFront();
+      }
+    }
+
     function renderDatasetLayer(datasetId) {
       const cfg = DATASETS[datasetId];
+
       if (!layerGroups[datasetId]) {
         layerGroups[datasetId] = L.geoJSON(null, {
           renderer: canvasRenderer,
           style: (feat) => {
             const p = feat.properties || {};
 
+            if (p.strokeType === 'nz_osm_darkblue') {
+              return { color: '#1d4ed8', weight: 4.0, opacity: 0.95, dashArray: null, lineCap: 'round', lineJoin: 'round' };
+            }
             if (p.strokeType === 'cap_plus_dotted') {
               return { color: '#4ade80', weight: 3.8, opacity: 0.95, dashArray: '2, 6', lineCap: 'round', lineJoin: 'round' };
             }
@@ -1843,7 +1968,7 @@
               return { color: '#f97316', weight: 3.8, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
             }
             if (p.strokeType === 'great_rides_solid') {
-              return { color: '#9333ea', weight: 4.5, opacity: 0.7, dashArray: null, lineCap: 'round', lineJoin: 'round' };
+              return { color: '#9333ea', weight: 5.65, opacity: 0.85, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
             if (p.strokeType === 'doc_mtb') {
               return { color: '#15803d', weight: 3.5, opacity: 0.95, dashArray: '3, 6', lineCap: 'round', lineJoin: 'round' };
@@ -1859,9 +1984,12 @@
           },
           onEachFeature: (feat, layer) => {
             layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 510 });
+            layer.on('click', () => {
+              highlightSelectedFeature(feat);
+            });
             layer.on('mouseover', function() {
               if (typeof this.setStyle === 'function') {
-                this.setStyle({ weight: (cfg.weight || 3.5) + 2 });
+                this.setStyle({ weight: (cfg.weight || 4.0) + 2.5 });
               }
             });
             layer.on('mouseout', function() {
@@ -1904,8 +2032,11 @@
         map.removeLayer(layerGroups[datasetId]);
       }
 
+      bringGreatRidesToFront();
+
       const countPill = document.getElementById(
         datasetId === 'great_rides' ? 'cntGreatRides' :
+        datasetId === 'nz_osm' ? 'cntNzOsm' :
         datasetId === 'heartland' ? 'cntHeartland' :
         datasetId === 'chch_cycle' ? 'cntChchCycle' :
         datasetId === 'chch_council' ? 'cntChchCouncil' :
@@ -1926,7 +2057,7 @@
           count += layerGroups[id].getLayers().length;
         }
       });
-      if (importedGpxGroup) {
+      if (importedGpxGroup && map.hasLayer(importedGpxGroup)) {
         count += importedGpxGroup.getLayers().length;
       }
       totalTrackCount = count;
@@ -2038,7 +2169,8 @@
     }
 
     async function loadAllDatasetsPipeline() {
-      const loadOrder = ['great_rides', 'heartland', 'chch_cycle', 'chch_council', 'cap_plus', 'doc_tracks'];
+      // Put great_rides and nz_osm high in load priority
+      const loadOrder = ['great_rides', 'nz_osm', 'heartland', 'chch_cycle', 'chch_council', 'cap_plus', 'doc_tracks'];
       document.getElementById('lblDatasetLoading').textContent = 'Loading trail datasets...';
 
       await Promise.allSettled(
@@ -2058,6 +2190,7 @@
       );
 
       updateTotalStats();
+      bringGreatRidesToFront();
       renderSavedDropdown();
     }
 
@@ -2284,7 +2417,17 @@
         zoomControl: false
       });
 
+      // Dedicated pane for Great Rides to ensure they are on top of other trail overlays
+      map.createPane('greatRidesPane');
+      map.getPane('greatRidesPane').style.zIndex = 450;
+
+      // Topmost pane for selected/highlighted line
+      map.createPane('highlightPane');
+      map.getPane('highlightPane').style.zIndex = 650;
+
       canvasRenderer = L.canvas({ padding: 0.5 });
+      greatRidesRenderer = L.canvas({ padding: 0.5, });
+
       L.control.zoom({ position: 'topright' }).addTo(map);
 
       basemaps.topo.addTo(map);
@@ -2300,7 +2443,8 @@
         },
         onEachFeature: (feat, layer) => {
           layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 480 });
-          layer.on('mouseover', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 6.8 }); });
+          layer.on('click', () => { highlightSelectedFeature(feat); });
+          layer.on('mouseover', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 7.2 }); });
           layer.on('mouseout', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 4.8 }); });
         }
       }).addTo(map);
@@ -2315,6 +2459,57 @@
             evt.stopPropagation();
             map.closePopup(e.popup);
           };
+        }
+      });
+
+      map.on('popupclose', () => {
+        if (selectedHighlightLayer) {
+          map.removeLayer(selectedHighlightLayer);
+          selectedHighlightLayer = null;
+        }
+      });
+    }
+
+    function toggleDatasetById(datasetId) {
+      if (datasetId === 'imported') {
+        if (map.hasLayer(importedGpxGroup)) {
+          map.removeLayer(importedGpxGroup);
+        } else {
+          importedGpxGroup.addTo(map);
+        }
+        updateLegendActiveStates();
+        updateTotalStats();
+        return;
+      }
+
+      if (!DATASETS[datasetId]) return;
+
+      DATASETS[datasetId].visible = !DATASETS[datasetId].visible;
+      
+      // Sync Layer Menu Button
+      const btnId = datasetId === 'great_rides' ? 'btnToggleGreatRides' :
+                    datasetId === 'nz_osm' ? 'btnToggleNzOsm' :
+                    datasetId === 'heartland' ? 'btnToggleHeartland' :
+                    datasetId === 'chch_cycle' ? 'btnToggleChchCycle' :
+                    datasetId === 'chch_council' ? 'btnToggleChchCouncil' :
+                    datasetId === 'cap_plus' ? 'btnToggleCapPlus' : 'btnToggleDocTracks';
+
+      const btn = document.getElementById(btnId);
+      if (DATASETS[datasetId].visible) btn?.classList.add('active');
+      else btn?.classList.remove('active');
+
+      renderDatasetLayer(datasetId);
+      updateLegendActiveStates();
+      updateTotalStats();
+    }
+
+    function updateLegendActiveStates() {
+      document.querySelectorAll('#trailLegendCard .legend-item[data-layer-key]').forEach(item => {
+        const key = item.getAttribute('data-layer-key');
+        if (key === 'imported') {
+          item.classList.toggle('layer-muted', !map.hasLayer(importedGpxGroup));
+        } else if (DATASETS[key]) {
+          item.classList.toggle('layer-muted', !DATASETS[key].visible);
         }
       });
     }
@@ -2391,7 +2586,7 @@
         gpxFileInput.value = '';
       });
 
-      // Legend
+      // Legend Toggle Button
       const trailLegendCard = document.getElementById('trailLegendCard');
       const btnCloseLegend = document.getElementById('btnCloseLegend');
       const btnOpenLegend = document.getElementById('btnOpenLegend');
@@ -2406,22 +2601,22 @@
         trailLegendCard.style.display = 'flex';
       });
 
-      // Dataset Overlay Toggles
-      const toggleLayer = (datasetId, btnId) => {
-        DATASETS[datasetId].visible = !DATASETS[datasetId].visible;
-        const btn = document.getElementById(btnId);
-        if (DATASETS[datasetId].visible) btn?.classList.add('active');
-        else btn?.classList.remove('active');
-        renderDatasetLayer(datasetId);
-        updateTotalStats();
-      };
+      // Interactive Legend Items (Click to toggle layers)
+      document.querySelectorAll('#trailLegendCard .legend-item[data-layer-key]').forEach(item => {
+        item.addEventListener('click', () => {
+          const key = item.getAttribute('data-layer-key');
+          if (key) toggleDatasetById(key);
+        });
+      });
 
-      document.getElementById('btnToggleGreatRides')?.addEventListener('click', () => toggleLayer('great_rides', 'btnToggleGreatRides'));
-      document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleLayer('heartland', 'btnToggleHeartland'));
-      document.getElementById('btnToggleChchCycle')?.addEventListener('click', () => toggleLayer('chch_cycle', 'btnToggleChchCycle'));
-      document.getElementById('btnToggleChchCouncil')?.addEventListener('click', () => toggleLayer('chch_council', 'btnToggleChchCouncil'));
-      document.getElementById('btnToggleCapPlus')?.addEventListener('click', () => toggleLayer('cap_plus', 'btnToggleCapPlus'));
-      document.getElementById('btnToggleDocTracks')?.addEventListener('click', () => toggleLayer('doc_tracks', 'btnToggleDocTracks'));
+      // Dataset Overlay Toggles (Top Menu)
+      document.getElementById('btnToggleGreatRides')?.addEventListener('click', () => toggleDatasetById('great_rides'));
+      document.getElementById('btnToggleNzOsm')?.addEventListener('click', () => toggleDatasetById('nz_osm'));
+      document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleDatasetById('heartland'));
+      document.getElementById('btnToggleChchCycle')?.addEventListener('click', () => toggleDatasetById('chch_cycle'));
+      document.getElementById('btnToggleChchCouncil')?.addEventListener('click', () => toggleDatasetById('chch_council'));
+      document.getElementById('btnToggleCapPlus')?.addEventListener('click', () => toggleDatasetById('cap_plus'));
+      document.getElementById('btnToggleDocTracks')?.addEventListener('click', () => toggleDatasetById('doc_tracks'));
 
       // Grade Filter Chips
       document.querySelectorAll('.filter-chip[data-grade]').forEach(chip => {
@@ -2467,6 +2662,8 @@
         reapplyFilters();
         searchInput.focus();
       });
+
+      updateLegendActiveStates();
 
       // Load remote & local datasets
       loadAllDatasetsPipeline();
