@@ -19,19 +19,19 @@
     })();
   </script>
 
-  <!-- Preconnect for Tile & CDN Performance -->
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://services1.arcgis.com" crossorigin>
   <link rel="preconnect" href="https://services.arcgis.com" crossorigin>
   <link rel="preconnect" href="https://gis.ccc.govt.nz" crossorigin>
   <link rel="preconnect" href="https://dl.dropboxusercontent.com" crossorigin>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
   <!-- Inline Mountain Bike Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚵</text></svg>">
 
-  <!-- Leaflet & Plugins CSS with CDN Fallbacks -->
-  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';" />
+  <!-- Leaflet CSS via CDN with Local Fallback -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" onerror="this.onerror=null;this.href='../vendor/leaflet/leaflet.css';" />
 
   <!-- Master Stylesheet & Offline Adapter -->
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
@@ -323,7 +323,7 @@
       color: #94a3b8;
     }
 
-    /* Saved Trails Items inside Dropdown */
+    /* Saved Trails Items */
     .saved-track-card {
       display: flex;
       flex-direction: column;
@@ -467,7 +467,7 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
 
-    /* Popups & Close Button */
+    /* Popups */
     .leaflet-popup-content {
       margin: 14px 16px !important;
       line-height: 1.4 !important;
@@ -519,7 +519,6 @@
       color: #0f172a;
     }
 
-    /* Track distance under title */
     .trail-distance-sub {
       display: flex;
       align-items: center;
@@ -529,8 +528,6 @@
       color: #059669;
       margin-bottom: 8px;
     }
-
-    /* Tag badges */
     .trail-badge-row {
       display: flex;
       flex-wrap: wrap;
@@ -562,9 +559,7 @@
       line-height: 1.55;
       margin-bottom: 10px;
     }
-    .trail-meta-row strong {
-      color: #1e293b;
-    }
+    .trail-meta-row strong { color: #1e293b; }
     .trail-comment-box {
       margin-top: 6px;
       padding: 6px 8px;
@@ -620,7 +615,6 @@
       color: #ffffff;
     }
 
-    /* Saved Button */
     .btn-saved-toggle .saved-pill-count {
       display: inline-flex;
       align-items: center;
@@ -641,7 +635,7 @@
       color: #be123c !important;
     }
 
-    /* Hideable Bottom-Right Trail Types Key / Legend */
+    /* Legend */
     .legend-wrapper {
       position: absolute;
       bottom: 20px;
@@ -656,7 +650,7 @@
       border-radius: 14px;
       padding: 10px 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      min-width: 215px;
+      min-width: 220px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -773,7 +767,7 @@
       }
     }
 
-    /* Official Advisory Modal & Disclaimer */
+    /* Modal */
     .advisory-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -834,7 +828,7 @@
 </head>
 <body>
 
-  <!-- Top Floating Controls Wrapper -->
+  <!-- Top Controls -->
   <div class="top-controls-wrapper">
     <div class="top-controls-bar">
       <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
@@ -848,7 +842,7 @@
         <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
       </div>
 
-      <!-- Unified Layers Switcher (Basemaps & Overlays) -->
+      <!-- Layers Switcher -->
       <div class="layer-switcher-container">
         <button id="btnLayersToggle" class="top-action-btn" title="Toggle Basemaps &amp; Trail Datasets">
           <span>🗺️</span> <span>Layers ▾</span>
@@ -881,6 +875,10 @@
               <span class="layer-opt-left"><span>🌲</span><span>CCC MTB &amp; Hills</span><span id="cntChchCouncil" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
+            <button id="btnToggleCapPlus" class="layer-option-btn active" title="Christchurch Adventure Park &amp; Port Hills Network">
+              <span class="layer-opt-left"><span>🚠</span><span>CAP &amp; Adventure Park+</span><span id="cntCapPlus" class="track-count-pill">0</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
             <button id="btnToggleDocTracks" class="layer-option-btn active" title="Department of Conservation Tracks Network">
               <span class="layer-opt-left"><span>🌿</span><span>DOC Tracks (NZ-wide)</span><span id="cntDocTracks" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
@@ -889,7 +887,7 @@
         </div>
       </div>
 
-      <!-- Saved Favorites Switcher & Downloads -->
+      <!-- Saved Favorites Switcher -->
       <div class="saved-switcher-container">
         <button id="btnToggleSaved" class="top-action-btn btn-saved-toggle" title="Saved Favorites &amp; Downloads">
           <span class="heart-icon">❤️</span>
@@ -898,7 +896,6 @@
           <span style="font-size: 10px; margin-left: 2px;">▾</span>
         </button>
 
-        <!-- Saved Favorites Dropdown & Download Hub -->
         <div id="savedDropdownCard" class="saved-dropdown-card">
           <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:4px; border-bottom:1px solid #e2e8f0;">
             <span class="layer-section-title" style="padding:0;">Favorite Trails</span>
@@ -917,18 +914,17 @@
           </div>
 
           <div id="savedListContainer" style="display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto; margin-top:2px;">
-            <!-- Populated via renderSavedDropdown() -->
           </div>
         </div>
       </div>
 
-      <!-- Import GPX from Drive -->
-      <button id="btnImportGPX" class="top-action-btn" title="Import GPX track from your drive">
-        <span>📥</span> <span>Import GPX</span>
+      <!-- Import Track (GPX / GeoJSON) -->
+      <button id="btnImportGPX" class="top-action-btn" title="Import GPX or GeoJSON track from your drive">
+        <span>📥</span> <span>Import Track</span>
       </button>
-      <input type="file" id="gpxFileInput" accept=".gpx" multiple style="display:none;">
+      <input type="file" id="gpxFileInput" accept=".gpx,.geojson,.json" multiple style="display:none;">
 
-      <!-- Official Advisory Trigger -->
+      <!-- Advisory & Fit NZ -->
       <button id="btnOpenAdvisory" class="top-action-btn" title="Official Trail Data Advisory &amp; Disclaimer">
         <span>⚠️</span> <span>Advisory</span>
       </button>
@@ -938,7 +934,7 @@
       </button>
     </div>
 
-    <!-- Quick Filters: Grade Chips -->
+    <!-- Quick Grade Filter Chips -->
     <div class="filter-chips-bar">
       <button class="filter-chip active" data-grade="all">All Grades</button>
       <button class="filter-chip" data-grade="1">Grade 1 (Easiest)</button>
@@ -951,7 +947,7 @@
 
   <div id="map"></div>
 
-  <!-- Official Advisory Modal Dialog -->
+  <!-- Advisory Modal -->
   <div id="advisoryModal" class="advisory-modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="advisoryTitle">
     <div class="advisory-modal-card">
       <div class="advisory-modal-header">
@@ -961,7 +957,7 @@
       <div class="advisory-modal-body">
         <p><strong>Reference Purposes Only:</strong> Geospatial trail alignments, classifications, grades, and distance metrics presented in this application are compiled for general reference and informational guidance only, based on records available at the time of publication.</p>
         <p><strong>Not for Critical Navigation:</strong> Users must not rely solely upon this digital map for route-finding, backcountry navigation, or safety-critical decisions. Trail geometry may deviate from actual ground truth due to slips, forestry works, natural realignment, or environmental changes.</p>
-        <p><strong>Verify Current Status:</strong> Track conditions, legal access permissions, seasonal closures, and safety warnings are subject to frequent alteration without notice. Always verify current track status and regional alerts directly with the responsible land manager—including the Department of Conservation (DOC), Christchurch City Council (CCC), New Zealand Cycle Trails (Ngā Haerenga), or local trail trusts—prior to departure.</p>
+        <p><strong>Verify Current Status:</strong> Track conditions, legal access permissions, seasonal closures, and safety warnings are subject to frequent alteration without notice. Always verify current track status and regional alerts directly with the responsible land manager—including the Department of Conservation (DOC), Christchurch City Council (CCC), Christchurch Adventure Park (CAP), New Zealand Cycle Trails (Ngā Haerenga), or local trail trusts—prior to departure.</p>
       </div>
       <div style="display:flex; justify-content:flex-end; margin-top:4px;">
         <button id="btnDismissAdvisory" class="top-action-btn" style="height:30px; padding:0 14px; font-size:11px;">
@@ -971,7 +967,7 @@
     </div>
   </div>
 
-  <!-- Bottom-Right Hideable Key / Legend -->
+  <!-- Legend -->
   <div class="legend-wrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
       <span>🗺️</span> <span>Trail Key</span>
@@ -1007,12 +1003,16 @@
           <span>CCC Shared Tracks</span>
         </div>
         <div class="legend-item">
+          <span class="legend-line line-dashed" style="border-top: 3.5px dotted #4ade80;"></span>
+          <span>CAP &amp; Adventure Trails</span>
+        </div>
+        <div class="legend-item">
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span>
           <span>DOC MTB Permitted</span>
         </div>
         <div class="legend-item">
           <span class="legend-line" style="background:#ff2d87;"></span>
-          <span>Imported GPX</span>
+          <span>Imported GPX / GeoJSON</span>
         </div>
       </div>
     </div>
@@ -1027,11 +1027,13 @@
   <!-- Universal Navigation Drawer Script -->
   <script src="shared-nav.js" onerror="this.onerror=null;"></script>
 
-  <!-- Leaflet & CDN Fallback -->
-  <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;"></script>
+  <!-- Leaflet CDN with Asynchronous Local Fallback -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
     if (!window.L) {
-      document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+      const fbScript = document.createElement('script');
+      fbScript.src = '../vendor/leaflet/leaflet.js';
+      document.head.appendChild(fbScript);
     }
   </script>
 
@@ -1041,9 +1043,9 @@
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
-    const CACHE_DB_NAME = 'BMMC_MTB_DB_V2'; // Bumped cache to clear stale/misclassified records
+    const CACHE_DB_NAME = 'BMMC_MTB_DB_V3';
     const CACHE_STORE_NAME = 'geojson_store';
-    const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 Hours
+    const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
     const DATASETS = {
       great_rides: {
@@ -1095,6 +1097,17 @@
         visible: true,
         features: []
       },
+      cap_plus: {
+        id: 'cap_plus',
+        label: 'CAP & Port Hills+',
+        color: '#4ade80',
+        weight: 3.8,
+        opacity: 0.95,
+        local: ['data/mtb/CAP_plus.geojson', './data/mtb/CAP_plus.geojson', '../data/mtb/CAP_plus.geojson'],
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/f9t7zt3khxompsa7al7tb/CAP_plus.geojson?rlkey=3z65x8iomh8x7x8i1s69t4v9m&st=l4js70k1&raw=1',
+        visible: true,
+        features: []
+      },
       doc_tracks: {
         id: 'doc_tracks',
         label: 'DOC Tracks',
@@ -1119,19 +1132,23 @@
     let importedGpxGroup;
 
     // =========================================================================
-    // INDEXED-DB 24-HOUR CACHE ENGINE
+    // INDEXED-DB CACHE ENGINE
     // =========================================================================
     function openCacheDB() {
       return new Promise((resolve, reject) => {
-        const req = indexedDB.open(CACHE_DB_NAME, 1);
-        req.onupgradeneeded = (e) => {
-          const db = e.target.result;
-          if (!db.objectStoreNames.contains(CACHE_STORE_NAME)) {
-            db.createObjectStore(CACHE_STORE_NAME, { keyPath: 'id' });
-          }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+        try {
+          const req = indexedDB.open(CACHE_DB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(CACHE_STORE_NAME)) {
+              db.createObjectStore(CACHE_STORE_NAME, { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (e) {
+          reject(e);
+        }
       });
     }
 
@@ -1167,7 +1184,7 @@
     }
 
     // =========================================================================
-    // SAVED TRAILS / FAVORITES & EXPORT LOGIC
+    // SAVED TRAILS / FAVORITES & EXPORT
     // =========================================================================
     const SAVED_STORAGE_KEY = 'bMMC_nz_mtb_saved_ids';
 
@@ -1428,28 +1445,18 @@
       }[m]));
     }
 
-    // =========================================================================
-    // WALKING / TRAMPING CLASSIFICATION HELPER
-    // =========================================================================
     function isWalkingTrampingOnly(p, datasetId) {
       if (!p) return false;
+      if (datasetId === 'cap_plus') return false;
 
-      // Christchurch City Council specific attributes
       if (datasetId === 'chch_council') {
         const traffic = String(p.RouteTraffic || '').trim().toLowerCase();
         const mtbClass = String(p.MountainBikeClassification || '').trim().toLowerCase();
         const sharedUse = String(p.RouteSharedUse || '').trim().toLowerCase();
 
-        // Any track marked Mountain Bike or having a valid MTB grade is NEVER walking-only!
-        if (traffic.includes('bike') || traffic.includes('mtb') || traffic.includes('cycle')) {
-          return false;
-        }
-        if (mtbClass && !['none', 'n/a', 'na', 'null', 'undefined', ''].includes(mtbClass)) {
-          return false;
-        }
-        if (sharedUse === 'yes' || traffic.includes('shared')) {
-          return false;
-        }
+        if (traffic.includes('bike') || traffic.includes('mtb') || traffic.includes('cycle')) return false;
+        if (mtbClass && !['none', 'n/a', 'na', 'null', 'undefined', ''].includes(mtbClass)) return false;
+        if (sharedUse === 'yes' || traffic.includes('shared')) return false;
       }
 
       const actRaw = p.RouteTraffic || p.activity_type || p.ActivityType || p.activity || p.Activity || 
@@ -1457,7 +1464,7 @@
                      p.permitted_use || p.PermittedUse || '';
       const act = String(actRaw).trim().toLowerCase();
       
-      const grade = String(p.MountainBikeClassification || p.grade || '').toLowerCase();
+      const grade = String(p.MountainBikeClassification || p.grade || p.tracktype || '').toLowerCase();
       const desc = String(p.Description || p.description || '').toLowerCase();
       const comment = String(p.Comment || p.comment || p.CharValue7 || '').toLowerCase();
       const name = String(p.RouteName || p.TechObjectName || p.assetName || p.name || '').toLowerCase();
@@ -1470,25 +1477,12 @@
                      allText.includes('downhill') || allText.includes('rider');
       const isShared = allText.includes('shared') || allText.includes('multi-use') || allText.includes('multi use');
 
-      if (hasMtb || isShared) {
-        return false;
-      }
+      if (hasMtb || isShared) return false;
 
-      const isWalkingTramping = 
-        act === 'walking / tramping' ||
-        act === 'walking/tramping' ||
-        act === 'walking & tramping' ||
-        act === 'walking' ||
-        act === 'pedestrian' ||
-        act.includes('walking / tramping') ||
-        act.includes('walking/tramping') ||
-        act.includes('walk') ||
-        act.includes('tramp') ||
-        allText.includes('walking / tramping') ||
-        allText.includes('tramping track') ||
-        allText.includes('walking track');
-
-      return isWalkingTramping;
+      return (
+        act.includes('walking') || act.includes('tramp') ||
+        allText.includes('tramping track') || allText.includes('walking track')
+      );
     }
 
     // =========================================================================
@@ -1518,16 +1512,13 @@
 
         const calcKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
 
-        // 1. Christchurch Council Tracks
         if (datasetId === 'chch_council') {
           name = p.RouteName || p.name || 'Christchurch Council Track';
           gradeRaw = p.MountainBikeClassification || p.grade || '';
           
           if (p.RouteDistance !== undefined && p.RouteDistance !== null && p.RouteDistance !== '') {
             const numDist = parseFloat(String(p.RouteDistance).replace(/[^0-9.]/g, ''));
-            if (!isNaN(numDist) && numDist > 0) {
-              finalKm = numDist > 50 ? numDist / 1000 : numDist;
-            }
+            if (!isNaN(numDist) && numDist > 0) finalKm = numDist > 50 ? numDist / 1000 : numDist;
           }
           
           description = p.Description || '';
@@ -1538,7 +1529,7 @@
           const routeTraffic = String(p.RouteTraffic || '').trim();
           const routeSharedUse = String(p.RouteSharedUse || '').trim();
           sharedUse = routeSharedUse;
-          activityType = routeTraffic || p.activity_type || p.ActivityType || p.activity || p.Activity || p.Use || p.RouteType || '';
+          activityType = routeTraffic || p.activity_type || '';
 
           const isWalking = isWalkingTrampingOnly(p, 'chch_council');
           const trafficLower = routeTraffic.toLowerCase();
@@ -1555,7 +1546,7 @@
             const isExplicitShared = sharedLower === 'yes' || trafficLower.includes('shared');
 
             if (isMtbTraffic && (sharedLower === 'no' || !isExplicitShared)) {
-              strokeType = 'chch_mtb_only'; // Dedicated Mountain Bike Only Track
+              strokeType = 'chch_mtb_only';
             } else if (hasValidGrade && sharedLower === 'no') {
               strokeType = 'chch_mtb_only';
             } else if (isExplicitShared) {
@@ -1567,8 +1558,6 @@
             }
           }
         }
-
-        // 2. Christchurch Major Cycleways (C1 mapped to bright green)
         else if (datasetId === 'chch_cycle') {
           name = p.MajorCyclewayName || p.name || 'Christchurch Major Cycleway';
           description = p.Type || p.type || '';
@@ -1579,8 +1568,47 @@
           strokeType = isC1 ? 'chch_cycle_c1' : 'chch_cycle_solid';
           isWalkingOnly = false;
         }
+        else if (datasetId === 'cap_plus') {
+          name = p.name || p.RouteName || 'CAP Adventure Trail';
+          gradeRaw = p.tracktype || p['mtb:scale'] || p.grade || '';
+          finalKm = calcKm;
 
-        // 3. Heartland Touring
+          const descParts = [];
+          if (p.smoothness) descParts.push(`Smoothness: ${p.smoothness}`);
+          if (p.surface) descParts.push(`Surface: ${p.surface}`);
+          description = descParts.join(' • ');
+
+          const commentParts = [];
+          if (p.trail_visibility) commentParts.push(`Trail Visibility: ${p.trail_visibility}`);
+          if (p.oneway) commentParts.push(`One Way: ${p.oneway}`);
+          if (p.operator) commentParts.push(`Operator: ${p.operator}`);
+          if (p.incline) commentParts.push(`Incline: ${p.incline}`);
+          if (p.access) commentParts.push(`Access: ${p.access}`);
+          if (p['mtb:scale:imba']) commentParts.push(`IMBA Grade: ${p['mtb:scale:imba']}`);
+          if (p.lit) commentParts.push(`Lit: ${p.lit}`);
+          if (p.description && p.description !== description) commentParts.push(p.description);
+          if (p.note) commentParts.push(`Note: ${p.note}`);
+
+          const handledKeys = new Set([
+            'name', 'tracktype', 'smoothness', 'surface', 'trail_visibility', 
+            'oneway', 'ref', 'mtb:type', 'website', 'url', 'operator', 
+            'incline', 'access', 'mtb:scale:imba', 'mtb:scale', 'lit', 
+            'description', 'note', 'comment', 'geometry', 'type', 'id', 'OBJECTID'
+          ]);
+          for (const [k, v] of Object.entries(p)) {
+            if (!handledKeys.has(k) && v !== null && v !== undefined && v !== '' && typeof v !== 'object') {
+              commentParts.push(`${k}: ${v}`);
+            }
+          }
+          comment = commentParts.join(' • ');
+
+          area = p.ref || 'Christchurch Adventure Park';
+          network = p.operator || 'Christchurch Adventure Park';
+          activityType = p['mtb:type'] || 'Mountain Bike (CAP)';
+          website = p.website || p.url || 'https://christchurchadventurepark.com/';
+          strokeType = 'cap_plus_dotted';
+          isWalkingOnly = false;
+        }
         else if (datasetId === 'heartland') {
           category = p.trailcategory || 'Heartland Ride';
           name = p.cycletrail || p.name || 'Heartland Touring Route';
@@ -1588,9 +1616,7 @@
           
           if (p.Length !== undefined && p.Length !== null && p.Length !== '') {
             const numLen = parseFloat(String(p.Length).replace(/[^0-9.]/g, ''));
-            if (!isNaN(numLen) && numLen > 0) {
-              finalKm = numLen > 500 ? numLen / 1000 : numLen;
-            }
+            if (!isNaN(numLen) && numLen > 0) finalKm = numLen > 500 ? numLen / 1000 : numLen;
           }
 
           description = p.startfinish || p.description || '';
@@ -1608,15 +1634,9 @@
 
           const actLower = String(activityType || '').toLowerCase();
           const catLower = String(category || '').toLowerCase();
-          if (actLower.includes('mtb') || actLower.includes('mountain') || catLower.includes('mountain')) {
-            strokeType = 'heartland_mtb';
-          } else {
-            strokeType = 'heartland_shared';
-          }
+          strokeType = (actLower.includes('mtb') || catLower.includes('mountain')) ? 'heartland_mtb' : 'heartland_shared';
           isWalkingOnly = false;
         }
-
-        // 4. NZ Great Rides
         else if (datasetId === 'great_rides') {
           category = p.trailcategory || 'Great Ride';
           name = p.cycletrail || p.name || 'NZ Great Ride';
@@ -1624,9 +1644,7 @@
 
           if (p.Length !== undefined && p.Length !== null && p.Length !== '') {
             const numLen = parseFloat(String(p.Length).replace(/[^0-9.]/g, ''));
-            if (!isNaN(numLen) && numLen > 0) {
-              finalKm = numLen > 500 ? numLen / 1000 : numLen;
-            }
+            if (!isNaN(numLen) && numLen > 0) finalKm = numLen > 500 ? numLen / 1000 : numLen;
           }
 
           description = p.startfinish || p.description || '';
@@ -1643,8 +1661,6 @@
           strokeType = 'great_rides_solid';
           isWalkingOnly = false;
         }
-
-        // 5. DOC Tracks
         else if (datasetId === 'doc_tracks') {
           name = p.TechObjectName || p.assetName || p.name || 'DOC Track';
 
@@ -1676,18 +1692,16 @@
           }
         }
 
-        if (!finalKm || finalKm <= 0) {
-          finalKm = calcKm;
-        }
+        if (!finalKm || finalKm <= 0) finalKm = calcKm;
         const lengthStr = finalKm > 0 ? `${finalKm.toFixed(1)} km` : '';
 
         let gradeNum = 0;
         const gradeTextLower = String(gradeRaw).toLowerCase();
-        if (gradeTextLower.includes('1') || gradeTextLower.includes('easiest')) gradeNum = 1;
-        else if (gradeTextLower.includes('2') || gradeTextLower.includes('easy')) gradeNum = 2;
-        else if (gradeTextLower.includes('3') || gradeTextLower.includes('intermediate')) gradeNum = 3;
-        else if (gradeTextLower.includes('4') || gradeTextLower.includes('advanced')) gradeNum = 4;
-        else if (gradeTextLower.includes('5') || gradeTextLower.includes('expert') || gradeTextLower.includes('6')) gradeNum = 5;
+        if (gradeTextLower.includes('1') || gradeTextLower.includes('easiest') || gradeTextLower === 'grade1') gradeNum = 1;
+        else if (gradeTextLower.includes('2') || gradeTextLower.includes('easy') || gradeTextLower === 'grade2') gradeNum = 2;
+        else if (gradeTextLower.includes('3') || gradeTextLower.includes('intermediate') || gradeTextLower === 'grade3') gradeNum = 3;
+        else if (gradeTextLower.includes('4') || gradeTextLower.includes('advanced') || gradeTextLower === 'grade4') gradeNum = 4;
+        else if (gradeTextLower.includes('5') || gradeTextLower.includes('expert') || gradeTextLower.includes('6') || gradeTextLower === 'grade5') gradeNum = 5;
 
         const trackUid = `${datasetId}_${p.OBJECTID || p.id || index}_${name.slice(0, 16).replace(/[^a-zA-Z0-9]/g, '_')}`;
 
@@ -1702,7 +1716,7 @@
             lengthStr: lengthStr,
             lengthKm: finalKm,
             gradeNum: gradeNum,
-            gradeText: gradeRaw || (gradeNum ? `Grade ${gradeNum}` : (isDocMtbPermitted ? 'DOC MTB Permitted' : 'MTB Track')),
+            gradeText: gradeRaw ? (gradeNum ? `Grade ${gradeNum} (${gradeRaw})` : gradeRaw) : (isDocMtbPermitted ? 'DOC MTB Permitted' : 'MTB Track'),
             description: description,
             comment: comment,
             network: network,
@@ -1720,7 +1734,7 @@
     }
 
     // =========================================================================
-    // LAYER RENDERING & POPUPS
+    // POPUPS & RENDERING
     // =========================================================================
     function buildTrailPopup(props) {
       const isSaved = getSavedSet().has(props.uid);
@@ -1729,7 +1743,9 @@
       const trailforksSearch = `https://www.trailforks.com/search/?q=${encodeURIComponent(props.name)}`;
 
       let activityBadgeHtml = '';
-      if (props.strokeType === 'chch_mtb_only') {
+      if (props.strokeType === 'cap_plus_dotted') {
+        activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚠 CAP &amp; Port Hills MTB</span>';
+      } else if (props.strokeType === 'chch_mtb_only') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:800;">🚵 CCC Dedicated MTB (MTB Only)</span>';
       } else if (props.strokeType === 'chch_shared') {
         activityBadgeHtml = '<span class="trail-pill" style="background:#ffedd5; color:#9a3412; border:1px solid #fdba74; font-weight:800;">🚲🚶 CCC Shared Track</span>';
@@ -1805,15 +1821,15 @@
           style: (feat) => {
             const p = feat.properties || {};
 
-            // StrategicNetworkCategory C1 is rendered in bright green
+            if (p.strokeType === 'cap_plus_dotted') {
+              return { color: '#4ade80', weight: 3.8, opacity: 0.95, dashArray: '2, 6', lineCap: 'round', lineJoin: 'round' };
+            }
             if (p.strokeType === 'chch_cycle_c1') {
               return { color: '#00e676', weight: 4.2, opacity: 0.95, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
-            // CCC Dedicated MTB Only Tracks
             if (p.strokeType === 'chch_mtb_only' || p.strokeType === 'chch_mtb') {
               return { color: '#059669', weight: 4.0, opacity: 0.95, dashArray: null, lineCap: 'round', lineJoin: 'round' };
             }
-            // CCC Shared Tracks
             if (p.strokeType === 'chch_shared') {
               return { color: '#f97316', weight: 3.5, opacity: 0.95, dashArray: '4, 6', lineCap: 'round', lineJoin: 'round' };
             }
@@ -1844,10 +1860,14 @@
           onEachFeature: (feat, layer) => {
             layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 510 });
             layer.on('mouseover', function() {
-              this.setStyle({ weight: (cfg.weight || 3.5) + 2 });
+              if (typeof this.setStyle === 'function') {
+                this.setStyle({ weight: (cfg.weight || 3.5) + 2 });
+              }
             });
             layer.on('mouseout', function() {
-              layerGroups[datasetId].resetStyle(this);
+              if (typeof layerGroups[datasetId].resetStyle === 'function') {
+                layerGroups[datasetId].resetStyle(this);
+              }
             });
           }
         });
@@ -1858,20 +1878,14 @@
 
       const filteredFeatures = cfg.features.filter(feat => {
         const p = feat.properties;
-
-        // Exclude walking-only tracks
         if (p.isWalkingOnly) return false;
-
-        // Saved filter
         if (isSavedOnlyVisible && !savedSet.has(p.uid)) return false;
 
-        // Grade filter
         if (activeGradeFilter !== 'all') {
           const reqGrade = parseInt(activeGradeFilter, 10);
           if (p.gradeNum !== reqGrade) return false;
         }
 
-        // Search text
         if (search) {
           const accessText = p.sharedUse && p.sharedUse.toLowerCase() === 'no' ? 'mtb only dedicated' : 'shared';
           const hay = `${p.name} ${p.category} ${p.area} ${p.network} ${p.description} ${p.comment} ${p.gradeText} ${p.activity_type} ${accessText}`.toLowerCase();
@@ -1894,7 +1908,8 @@
         datasetId === 'great_rides' ? 'cntGreatRides' :
         datasetId === 'heartland' ? 'cntHeartland' :
         datasetId === 'chch_cycle' ? 'cntChchCycle' :
-        datasetId === 'chch_council' ? 'cntChchCouncil' : 'cntDocTracks'
+        datasetId === 'chch_council' ? 'cntChchCouncil' :
+        datasetId === 'cap_plus' ? 'cntCapPlus' : 'cntDocTracks'
       );
       if (countPill) countPill.textContent = filteredFeatures.length;
     }
@@ -1919,7 +1934,7 @@
     }
 
     // =========================================================================
-    // STREAMLINED DATA LOADER
+    // ROBUST DATASET LOADER WITH CORS FALLBACK
     // =========================================================================
     async function fetchDatasetData(cfg) {
       const cached = await getCachedGeoJSON(cfg.id);
@@ -1943,14 +1958,14 @@
       }
 
       if (cfg.dropbox) {
-        const directUrl = cfg.dropbox
-          .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-          .replace('&st=', '&_st=')
-          .replace('dl=0', 'raw=1');
+        let directUrl = cfg.dropbox.replace('www.dropbox.com', 'dl.dropboxusercontent.com');
+        if (!directUrl.includes('raw=1')) {
+          directUrl += (directUrl.includes('?') ? '&' : '?') + 'raw=1';
+        }
 
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 15000);
+          const timer = setTimeout(() => controller.abort(), 12000);
           const res = await fetch(directUrl, { signal: controller.signal });
           clearTimeout(timer);
 
@@ -1963,14 +1978,29 @@
             }
           }
         } catch (e) {
-          console.warn(`[Dropbox Direct Failed] ${cfg.label}:`, e);
+          console.warn(`[Dropbox Direct Failed] ${cfg.label}, trying proxy...`);
+          try {
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`;
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 12000);
+            const res = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timer);
+            if (res.ok) {
+              const data = await res.json();
+              if (data && data.features && data.features.length > 0) {
+                console.log(`[Proxy Hit] Loaded ${cfg.label}`);
+                setCachedGeoJSON(cfg.id, data);
+                return data;
+              }
+            }
+          } catch (pe) {}
         }
       }
 
       if (cfg.arcgis) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 20000);
+          const timer = setTimeout(() => controller.abort(), 15000);
           const res = await fetch(cfg.arcgis, { signal: controller.signal });
           clearTimeout(timer);
 
@@ -1982,15 +2012,13 @@
               return data;
             }
           }
-        } catch (e) {
-          console.warn(`[ArcGIS Failed] ${cfg.label}:`, e);
-        }
+        } catch (e) {}
       }
 
       if (cfg.fallbackArcgis) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 20000);
+          const timer = setTimeout(() => controller.abort(), 15000);
           const res = await fetch(cfg.fallbackArcgis, { signal: controller.signal });
           clearTimeout(timer);
 
@@ -2005,12 +2033,12 @@
         } catch (e) {}
       }
 
-      console.error(`[Load Failed] Could not retrieve ${cfg.label}`);
+      console.warn(`[Load Incomplete] Could not retrieve ${cfg.label}`);
       return null;
     }
 
     async function loadAllDatasetsPipeline() {
-      const loadOrder = ['great_rides', 'heartland', 'chch_cycle', 'chch_council', 'doc_tracks'];
+      const loadOrder = ['great_rides', 'heartland', 'chch_cycle', 'chch_council', 'cap_plus', 'doc_tracks'];
       document.getElementById('lblDatasetLoading').textContent = 'Loading trail datasets...';
 
       await Promise.allSettled(
@@ -2024,7 +2052,7 @@
               updateTotalStats();
             }
           } catch (err) {
-            console.warn(`Error loading dataset ${cfg.label}:`, err);
+            console.warn(`Error rendering dataset ${cfg.label}:`, err);
           }
         })
       );
@@ -2034,8 +2062,56 @@
     }
 
     // =========================================================================
-    // GPX IMPORT ENGINE
+    // IMPORT ENGINE (GPX & GEOJSON)
     // =========================================================================
+    function parseGeoJSONText(jsonText, fileName) {
+      const data = JSON.parse(jsonText);
+      let rawFeatures = [];
+
+      if (data.type === 'FeatureCollection' && Array.isArray(data.features)) {
+        rawFeatures = data.features;
+      } else if (data.type === 'Feature') {
+        rawFeatures = [data];
+      } else if (data.type === 'GeometryCollection' && Array.isArray(data.geometries)) {
+        rawFeatures = data.geometries.map((g, idx) => ({
+          type: 'Feature',
+          geometry: g,
+          properties: { name: `${fileName} (Geom ${idx + 1})` }
+        }));
+      } else if (data.coordinates) {
+        rawFeatures = [{
+          type: 'Feature',
+          geometry: data,
+          properties: { name: fileName }
+        }];
+      }
+
+      const validFeatures = [];
+      rawFeatures.forEach((feat, idx) => {
+        if (!feat || !feat.geometry) return;
+        const geom = feat.geometry;
+        const props = feat.properties || {};
+        const name = props.name || props.RouteName || props.cycletrail || props.TechObjectName || `${fileName} (Track ${idx + 1})`;
+        const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
+        const lengthStr = distKm > 0 ? `${distKm.toFixed(2)} km` : (props.lengthStr || '');
+
+        validFeatures.push({
+          type: 'Feature',
+          geometry: geom,
+          properties: {
+            ...props,
+            name: name,
+            fileName: fileName,
+            fileType: 'GeoJSON',
+            lengthKm: distKm || props.lengthKm || 0,
+            lengthStr: lengthStr,
+            isImported: true
+          }
+        });
+      });
+      return validFeatures;
+    }
+
     function parseGPXToGeoJSON(gpxXmlText, fileName) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(gpxXmlText, 'text/xml');
@@ -2070,6 +2146,7 @@
             properties: {
               name: trkName,
               fileName: fileName,
+              fileType: 'GPX',
               lengthKm: distKm,
               lengthStr: distKm > 0 ? `${distKm.toFixed(2)} km` : '',
               isImported: true
@@ -2089,9 +2166,23 @@
         reader.onload = (e) => {
           try {
             const text = e.target.result;
-            const features = parseGPXToGeoJSON(text, file.name);
+            const ext = (file.name.split('.').pop() || '').toLowerCase();
+            let features = [];
 
-            if (features.length === 0) {
+            if (ext === 'geojson' || ext === 'json') {
+              features = parseGeoJSONText(text, file.name);
+            } else if (ext === 'gpx') {
+              features = parseGPXToGeoJSON(text, file.name);
+            } else {
+              const trimmed = text.trim();
+              if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+                features = parseGeoJSONText(text, file.name);
+              } else if (trimmed.includes('<gpx') || trimmed.startsWith('<?xml')) {
+                features = parseGPXToGeoJSON(text, file.name);
+              }
+            }
+
+            if (!features || features.length === 0) {
               alert(`Could not extract valid track coordinates from "${file.name}".`);
               return;
             }
@@ -2106,10 +2197,10 @@
             }
 
             updateTotalStats();
-            document.getElementById('lblDatasetLoading').textContent = `Imported: ${file.name} (${features.length} track${features.length > 1 ? 's' : ''})`;
+            document.getElementById('lblDatasetLoading').textContent = `Imported: ${file.name} (${features.length} segment${features.length > 1 ? 's' : ''})`;
           } catch (err) {
-            console.error('GPX parse error:', err);
-            alert(`Error parsing GPX file "${file.name}": ${err.message}`);
+            console.error('Import file error:', err);
+            alert(`Error parsing file "${file.name}": ${err.message}`);
           }
         };
         reader.readAsText(file);
@@ -2117,17 +2208,18 @@
     }
 
     function buildImportedPopup(props, layer) {
+      const typeLabel = props.fileType ? props.fileType : (props.fileName && (props.fileName.endsWith('.geojson') || props.fileName.endsWith('.json')) ? 'GeoJSON' : 'GPX');
       return `
         <div class="trail-popup-card">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
             <span class="trail-pill" style="background:#fce7f3; color:#be185d; border:1px solid #f472b6;">
-              📂 Imported GPX (Pink Line)
+              📂 Imported ${escapeHTML(typeLabel)} (Pink Line)
             </span>
           </div>
-          <h3>${escapeHTML(props.name || 'Imported GPX Track')}</h3>
+          <h3>${escapeHTML(props.name || 'Imported Track')}</h3>
           ${props.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(props.lengthStr)}</div>` : ''}
           <div class="trail-meta-row">
-            <div>📁 <strong>File:</strong> ${escapeHTML(props.fileName || 'Local Drive GPX')}</div>
+            <div>📁 <strong>File:</strong> ${escapeHTML(props.fileName || 'Imported File')}</div>
           </div>
           <button class="btn-trail-action" style="margin-top:6px; color:#e11d48;" onclick="window.removeImportedTrack('${layer._leaflet_id}')">
             <span>🗑️</span> Remove Imported Track
@@ -2208,8 +2300,8 @@
         },
         onEachFeature: (feat, layer) => {
           layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 480 });
-          layer.on('mouseover', function() { this.setStyle({ weight: 6.8 }); });
-          layer.on('mouseout', function() { this.setStyle({ weight: 4.8 }); });
+          layer.on('mouseover', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 6.8 }); });
+          layer.on('mouseout', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 4.8 }); });
         }
       }).addTo(map);
 
@@ -2227,7 +2319,12 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function startApp() {
+      if (!window.L) {
+        setTimeout(startApp, 100);
+        return;
+      }
+
       initMap();
 
       window.toggleSaveTrack = toggleSaveTrack;
@@ -2285,7 +2382,7 @@
         reapplyFilters();
       });
 
-      // GPX File Input
+      // Track Import Input
       const btnImportGPX = document.getElementById('btnImportGPX');
       const gpxFileInput = document.getElementById('gpxFileInput');
       btnImportGPX?.addEventListener('click', () => gpxFileInput?.click());
@@ -2294,7 +2391,7 @@
         gpxFileInput.value = '';
       });
 
-      // Bottom-Right Legend
+      // Legend
       const trailLegendCard = document.getElementById('trailLegendCard');
       const btnCloseLegend = document.getElementById('btnCloseLegend');
       const btnOpenLegend = document.getElementById('btnOpenLegend');
@@ -2323,6 +2420,7 @@
       document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleLayer('heartland', 'btnToggleHeartland'));
       document.getElementById('btnToggleChchCycle')?.addEventListener('click', () => toggleLayer('chch_cycle', 'btnToggleChchCycle'));
       document.getElementById('btnToggleChchCouncil')?.addEventListener('click', () => toggleLayer('chch_council', 'btnToggleChchCouncil'));
+      document.getElementById('btnToggleCapPlus')?.addEventListener('click', () => toggleLayer('cap_plus', 'btnToggleCapPlus'));
       document.getElementById('btnToggleDocTracks')?.addEventListener('click', () => toggleLayer('doc_tracks', 'btnToggleDocTracks'));
 
       // Grade Filter Chips
@@ -2370,9 +2468,15 @@
         searchInput.focus();
       });
 
-      // Load remote/local datasets
+      // Load remote & local datasets
       loadAllDatasetsPipeline();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startApp);
+    } else {
+      startApp();
+    }
   </script>
 </body>
 </html>
