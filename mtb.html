@@ -882,32 +882,40 @@
 
           <div class="layer-section-divider"></div>
 
+          <!-- Trail Datasets Ordered Top-to-Bottom by Layer Stacking -->
           <div class="layer-section-title">Trail Datasets</div>
           <div class="layer-overlay-col">
+            <!-- 1. NZ Great Rides (Top) -->
             <button id="btnToggleGreatRides" class="layer-option-btn active" title="NZ 23 Great Rides (Nga Haerenga)">
               <span class="layer-opt-left"><span>⭐</span><span>NZ Great Rides</span><span id="cntGreatRides" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <button id="btnToggleHeartland" class="layer-option-btn active" title="Heartland Touring Routes">
-              <span class="layer-opt-left"><span>🚴</span><span>Heartland Touring</span><span id="cntHeartland" class="track-count-pill">0</span></span>
-              <span class="layer-status-indicator">✓</span>
-            </button>
-            <button id="btnToggleNzOsm" class="layer-option-btn active" title="NZ OpenStreetMap MTB Tracks">
-              <span class="layer-opt-left"><span>🚵</span><span>NZ OpenStreetMap MTB</span><span id="cntNzOsm" class="track-count-pill">0</span></span>
-              <span class="layer-status-indicator">✓</span>
-            </button>
+            <!-- 2. CCC Major Cycleways -->
             <button id="btnToggleChchCycle" class="layer-option-btn active" title="Christchurch City Major Cycleways">
               <span class="layer-opt-left"><span>🏙️</span><span>CCC Major Cycleways</span><span id="cntChchCycle" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
+            <!-- 3. Heartland Touring Routes -->
+            <button id="btnToggleHeartland" class="layer-option-btn active" title="Heartland Touring Routes">
+              <span class="layer-opt-left"><span>🚴</span><span>Heartland Touring</span><span id="cntHeartland" class="track-count-pill">0</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+            <!-- 4. Christchurch Council MTB & Port Hills Tracks -->
             <button id="btnToggleChchCouncil" class="layer-option-btn active" title="Christchurch Council MTB &amp; Port Hills Tracks">
               <span class="layer-opt-left"><span>🌲</span><span>CCC MTB &amp; Hills</span><span id="cntChchCouncil" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
+            <!-- 5. NZ OpenStreetMap MTB Tracks -->
+            <button id="btnToggleNzOsm" class="layer-option-btn active" title="NZ OpenStreetMap MTB Tracks">
+              <span class="layer-opt-left"><span>🚵</span><span>NZ OpenStreetMap MTB</span><span id="cntNzOsm" class="track-count-pill">0</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+            <!-- 6. Christchurch Adventure Park & Port Hills Network -->
             <button id="btnToggleCapPlus" class="layer-option-btn active" title="Christchurch Adventure Park &amp; Port Hills Network">
               <span class="layer-opt-left"><span>🚠</span><span>CAP &amp; Adventure Park+</span><span id="cntCapPlus" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
+            <!-- 7. Department of Conservation Tracks Network (Bottom) -->
             <button id="btnToggleDocTracks" class="layer-option-btn active" title="Department of Conservation Tracks Network">
               <span class="layer-opt-left"><span>🌿</span><span>DOC Tracks (NZ-wide)</span><span id="cntDocTracks" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
@@ -996,7 +1004,7 @@
     </div>
   </div>
 
-  <!-- Interactive Legend -->
+  <!-- Interactive Legend: Ordered Top-to-Bottom to match Layer Stacking -->
   <div class="legend-wrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
       <span>🗺️</span> <span>Trail Key</span>
@@ -1007,18 +1015,12 @@
         <button id="btnCloseLegend" class="legend-close-btn" title="Hide Key">✕</button>
       </div>
       <div class="legend-items">
+        <!-- 1. NZ Great Rides -->
         <div class="legend-item" data-layer-key="great_rides" title="Click to toggle NZ Great Rides">
           <span class="legend-line" style="background:#9333ea; height:5.5px;"></span>
           <span>NZ Great Rides</span>
         </div>
-        <div class="legend-item" data-layer-key="nz_osm" title="Click to toggle NZ OpenStreetMap MTB">
-          <span class="legend-line" style="background:#1d4ed8;"></span>
-          <span>NZ OSM MTB</span>
-        </div>
-        <div class="legend-item" data-layer-key="heartland" title="Click to toggle Heartland Touring">
-          <span class="legend-line" style="background:#0ea5e9;"></span>
-          <span>Heartland Touring</span>
-        </div>
+        <!-- 2. CCC Major Cycleways -->
         <div class="legend-item" data-layer-key="chch_cycle" title="Click to toggle CCC Major Cycleways">
           <span class="legend-line" style="background:#00e676;"></span>
           <span>CCC Cycleway (C1)</span>
@@ -1027,6 +1029,12 @@
           <span class="legend-line" style="background:#38bdf8;"></span>
           <span>CCC Major Cycleway</span>
         </div>
+        <!-- 3. Heartland Touring -->
+        <div class="legend-item" data-layer-key="heartland" title="Click to toggle Heartland Touring">
+          <span class="legend-line" style="background:#0ea5e9;"></span>
+          <span>Heartland Touring</span>
+        </div>
+        <!-- 4. CCC MTB & Hills Tracks -->
         <div class="legend-item" data-layer-key="chch_council" title="Click to toggle CCC MTB & Hills Tracks">
           <span class="legend-line" style="background:#059669;"></span>
           <span>CCC MTB Only Tracks</span>
@@ -1035,14 +1043,22 @@
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #f97316;"></span>
           <span>CCC Shared Tracks</span>
         </div>
+        <!-- 5. NZ OpenStreetMap MTB -->
+        <div class="legend-item" data-layer-key="nz_osm" title="Click to toggle NZ OpenStreetMap MTB">
+          <span class="legend-line" style="background:#1d4ed8;"></span>
+          <span>NZ OSM MTB</span>
+        </div>
+        <!-- 6. CAP & Adventure Trails -->
         <div class="legend-item" data-layer-key="cap_plus" title="Click to toggle CAP & Adventure Trails">
           <span class="legend-line line-dashed" style="border-top: 3.5px dotted #4ade80;"></span>
           <span>CAP &amp; Adventure Trails</span>
         </div>
+        <!-- 7. DOC MTB Tracks -->
         <div class="legend-item" data-layer-key="doc_tracks" title="Click to toggle DOC MTB Tracks">
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span>
           <span>DOC MTB Permitted</span>
         </div>
+        <!-- User Imported Tracks -->
         <div class="legend-item" data-layer-key="imported" title="Click to toggle Imported GPX / GeoJSON">
           <span class="legend-line" style="background:#ff2d87;"></span>
           <span>Imported GPX / GeoJSON</span>
@@ -1073,6 +1089,14 @@
   <script>
     // =========================================================================
     // CONFIGURATION & DATASET DEFINITIONS
+    // Layer Stacking (Top to Bottom):
+    // 1. nz_great_rides.geojson (Top, z-index: 470)
+    // 2. chch_cycleway.geojson (z-index: 460)
+    // 3. heartland_touring.geojson (z-index: 450)
+    // 4. chch_council_tracks.geojson (z-index: 440)
+    // 5. nz_osm.geojson (z-index: 430)
+    // 6. CAP_plus.geojson (z-index: 420)
+    // 7. doc_tracks.geojson (Bottom, z-index: 410)
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
@@ -1080,39 +1104,28 @@
     const CACHE_STORE_NAME = 'geojson_store';
     const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
+    const PANE_CONFIG = {
+      imported:     { pane: 'pane_imported',     zIndex: 480 },
+      great_rides:  { pane: 'pane_great_rides',  zIndex: 470 },
+      chch_cycle:   { pane: 'pane_chch_cycle',   zIndex: 460 },
+      heartland:    { pane: 'pane_heartland',    zIndex: 450 },
+      chch_council: { pane: 'pane_chch_council', zIndex: 440 },
+      cap_plus:     { pane: 'pane_cap_plus',     zIndex: 430 },
+      nz_osm:       { pane: 'pane_nz_osm',       zIndex: 420 },
+      doc_tracks:   { pane: 'pane_doc_tracks',   zIndex: 410 },
+      highlight:    { pane: 'highlightPane',     zIndex: 650 }
+    };
+
     const DATASETS = {
       great_rides: {
         id: 'great_rides',
         label: 'NZ Great Rides',
         color: '#9333ea',
-        weight: 5.65, // 125% thicker
+        weight: 5.65,
         opacity: 0.85,
         local: ['data/mtb/nz_great_rides.geojson', './data/mtb/nz_great_rides.geojson', '../data/mtb/nz_great_rides.geojson'],
         dropbox: 'https://dl.dropboxusercontent.com/scl/fi/bklc3pcx2tfazrw4s5gts/nz_great_rides.geojson?rlkey=tg5tygn5d288266pzsofn321k&raw=1',
         arcgis: 'https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
-        visible: true,
-        features: []
-      },
-      nz_osm: {
-        id: 'nz_osm',
-        label: 'NZ OpenStreetMap MTB',
-        color: '#1d4ed8', // Dark blue solid line
-        weight: 4.0,
-        opacity: 0.95,
-        local: ['data/mtb/nz_osm.geojson', './data/mtb/nz_osm.geojson', '../data/mtb/nz_osm.geojson'],
-        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/om13urev73bu6dl3e8w5d/nz_osm.geojson?rlkey=pay45z01mlc7x12b0ygv4w5z4&st=yqg6z0x3&raw=1',
-        visible: true,
-        features: []
-      },
-      heartland: {
-        id: 'heartland',
-        label: 'Heartland Touring',
-        color: '#0ea5e9',
-        weight: 3.8,
-        opacity: 0.9,
-        local: ['data/mtb/heartland_touring.geojson', './data/mtb/heartland_touring.geojson', '../data/mtb/heartland_touring.geojson'],
-        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/mmvxgogl5aho5fliul3o8/heartland_touring.geojson?rlkey=hideb77zmfdu3dkhj0rssab51&raw=1',
-        arcgis: "https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=trailcategory%20NOT%20LIKE%20'%25Great%20Ride%25'&outFields=*&f=geojson&outSR=4326",
         visible: true,
         features: []
       },
@@ -1128,6 +1141,18 @@
         visible: true,
         features: []
       },
+      heartland: {
+        id: 'heartland',
+        label: 'Heartland Touring',
+        color: '#0ea5e9',
+        weight: 3.8,
+        opacity: 0.9,
+        local: ['data/mtb/heartland_touring.geojson', './data/mtb/heartland_touring.geojson', '../data/mtb/heartland_touring.geojson'],
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/mmvxgogl5aho5fliul3o8/heartland_touring.geojson?rlkey=hideb77zmfdu3dkhj0rssab51&raw=1',
+        arcgis: "https://services.arcgis.com/CXBb7LAjgIIdcsPt/ArcGIS/rest/services/TIO_NZCycleTrail/FeatureServer/0/query?where=trailcategory%20NOT%20LIKE%20'%25Great%20Ride%25'&outFields=*&f=geojson&outSR=4326",
+        visible: true,
+        features: []
+      },
       chch_council: {
         id: 'chch_council',
         label: 'CCC MTB & Port Hills Tracks',
@@ -1138,6 +1163,17 @@
         dropbox: 'https://dl.dropboxusercontent.com/scl/fi/zwttqsxcnpcfbv9lhsm2g/chch_council_tracks.geojson?rlkey=g7zobh6j2hemni4ie3ekbavd1&raw=1',
         arcgis: 'https://gis.ccc.govt.nz/server/rest/services/OpenData/HardSurface/FeatureServer/6/query?where=1%3D1&outFields=*&f=geojson&outSR=4326',
         fallbackArcgis: 'https://opendata.arcgis.com/datasets/866f1329087d46b4b4bd4b370aea297f_6.geojson',
+        visible: true,
+        features: []
+      },
+      nz_osm: {
+        id: 'nz_osm',
+        label: 'NZ OpenStreetMap MTB',
+        color: '#1d4ed8',
+        weight: 4.0,
+        opacity: 0.95,
+        local: ['data/mtb/nz_osm.geojson', './data/mtb/nz_osm.geojson', '../data/mtb/nz_osm.geojson'],
+        dropbox: 'https://dl.dropboxusercontent.com/scl/fi/om13urev73bu6dl3e8w5d/nz_osm.geojson?rlkey=pay45z01mlc7x12b0ygv4w5z4&st=yqg6z0x3&raw=1',
         visible: true,
         features: []
       },
@@ -1167,10 +1203,11 @@
     };
 
     let map;
-    let canvasRenderer;
+    const paneRenderers = {};
     let activeGradeFilter = 'all';
     let isSavedOnlyVisible = false;
     let totalTrackCount = 0;
+    let lastPopupOpenTime = 0;
 
     const layerGroups = {};
     let importedGpxGroup;
@@ -1275,7 +1312,7 @@
       selectedHighlightLayer = L.geoJSON(feature, {
         pane: 'highlightPane',
         interactive: false,
-        renderer: canvasRenderer,
+        renderer: paneRenderers.highlight,
         style: {
           color: '#ffffff',
           weight: 9.5,
@@ -1288,7 +1325,7 @@
       const innerHighlight = L.geoJSON(feature, {
         pane: 'highlightPane',
         interactive: false,
-        renderer: canvasRenderer,
+        renderer: paneRenderers.highlight,
         style: {
           color: '#fbbf24',
           weight: 6.5,
@@ -1528,6 +1565,20 @@
       }[m]));
     }
 
+    // 2D distance helper for mobile proximity snap
+    function sqr(x) { return x * x; }
+    function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y); }
+    function distToSegmentSquared(p, v, w) {
+      const l2 = dist2(v, w);
+      if (l2 === 0) return dist2(p, v);
+      let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+      t = Math.max(0, Math.min(1, t));
+      return dist2(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) });
+    }
+    function distToSegment(p, v, w) {
+      return Math.sqrt(distToSegmentSquared(p, v, w));
+    }
+
     function isWalkingTrampingOnly(p, datasetId) {
       if (!p) return false;
       if (datasetId === 'cap_plus' || datasetId === 'nz_osm') return false;
@@ -1569,12 +1620,12 @@
     }
 
     // =========================================================================
-    // FEATURE NORMALISATION
+    // FEATURE NORMALISATION & TRACK LINKING ENGINE
     // =========================================================================
     function normaliseGeoFeatures(datasetId, geojson) {
       if (!geojson || !geojson.features) return [];
 
-      return geojson.features.map((feat, index) => {
+      const initialFeatures = geojson.features.map((feat, index) => {
         const p = feat.properties || {};
         const geom = feat.geometry || {};
 
@@ -1620,6 +1671,44 @@
           activityType = p['mtb:type'] || 'Mountain Bike';
           website = p.website || p.url || '';
           strokeType = 'nz_osm_darkblue';
+          isWalkingOnly = false;
+        }
+        else if (datasetId === 'chch_cycle') {
+          name = p.MajorCyclewayName || p.name || 'Christchurch Major Cycleway';
+          description = p.Type || p.type || '';
+          network = p.Ownership || 'Christchurch City Council';
+          area = p.StrategicNetworkCategory || '';
+
+          const isC1 = String(p.StrategicNetworkCategory || '').trim().toUpperCase() === 'C1';
+          strokeType = isC1 ? 'chch_cycle_c1' : 'chch_cycle_solid';
+          isWalkingOnly = false;
+        }
+        else if (datasetId === 'heartland') {
+          category = p.trailcategory || 'Heartland Ride';
+          name = p.cycletrail || p.name || 'Heartland Touring Route';
+          gradeRaw = p.grade || '';
+          
+          if (p.Length !== undefined && p.Length !== null && p.Length !== '') {
+            const numLen = parseFloat(String(p.Length).replace(/[^0-9.]/g, ''));
+            if (!isNaN(numLen) && numLen > 0) finalKm = numLen > 500 ? numLen / 1000 : numLen;
+          }
+
+          description = p.startfinish || p.description || '';
+          
+          const commentParts = [];
+          if (p.facilitytype) commentParts.push(`Facility: ${p.facilitytype}`);
+          if (p.surfacetype) commentParts.push(`Surface: ${p.surfacetype}`);
+          if (p.comments) commentParts.push(p.comments);
+          comment = commentParts.join(' • ');
+
+          network = p.owner || '';
+          area = p.sectioncodenov19 || '';
+          website = p.websitelink || '';
+          activityType = p.activity_type || '';
+
+          const actLower = String(activityType || '').toLowerCase();
+          const catLower = String(category || '').toLowerCase();
+          strokeType = (actLower.includes('mtb') || catLower.includes('mountain')) ? 'heartland_mtb' : 'heartland_shared';
           isWalkingOnly = false;
         }
         else if (datasetId === 'chch_council') {
@@ -1668,16 +1757,6 @@
             }
           }
         }
-        else if (datasetId === 'chch_cycle') {
-          name = p.MajorCyclewayName || p.name || 'Christchurch Major Cycleway';
-          description = p.Type || p.type || '';
-          network = p.Ownership || 'Christchurch City Council';
-          area = p.StrategicNetworkCategory || '';
-
-          const isC1 = String(p.StrategicNetworkCategory || '').trim().toUpperCase() === 'C1';
-          strokeType = isC1 ? 'chch_cycle_c1' : 'chch_cycle_solid';
-          isWalkingOnly = false;
-        }
         else if (datasetId === 'cap_plus') {
           name = p.name || p.RouteName || 'CAP Adventure Trail';
           gradeRaw = p.tracktype || p['mtb:scale'] || p.grade || '';
@@ -1717,34 +1796,6 @@
           activityType = p['mtb:type'] || 'Mountain Bike (CAP)';
           website = p.website || p.url || 'https://christchurchadventurepark.com/';
           strokeType = 'cap_plus_dotted';
-          isWalkingOnly = false;
-        }
-        else if (datasetId === 'heartland') {
-          category = p.trailcategory || 'Heartland Ride';
-          name = p.cycletrail || p.name || 'Heartland Touring Route';
-          gradeRaw = p.grade || '';
-          
-          if (p.Length !== undefined && p.Length !== null && p.Length !== '') {
-            const numLen = parseFloat(String(p.Length).replace(/[^0-9.]/g, ''));
-            if (!isNaN(numLen) && numLen > 0) finalKm = numLen > 500 ? numLen / 1000 : numLen;
-          }
-
-          description = p.startfinish || p.description || '';
-          
-          const commentParts = [];
-          if (p.facilitytype) commentParts.push(`Facility: ${p.facilitytype}`);
-          if (p.surfacetype) commentParts.push(`Surface: ${p.surfacetype}`);
-          if (p.comments) commentParts.push(p.comments);
-          comment = commentParts.join(' • ');
-
-          network = p.owner || '';
-          area = p.sectioncodenov19 || '';
-          website = p.websitelink || '';
-          activityType = p.activity_type || '';
-
-          const actLower = String(activityType || '').toLowerCase();
-          const catLower = String(category || '').toLowerCase();
-          strokeType = (actLower.includes('mtb') || catLower.includes('mountain')) ? 'heartland_mtb' : 'heartland_shared';
           isWalkingOnly = false;
         }
         else if (datasetId === 'great_rides') {
@@ -1841,6 +1892,117 @@
           }
         };
       });
+
+      // =======================================================================
+      // TRACK LINKING: Merge segments with identical track names for nz_osm & doc_tracks
+      // =======================================================================
+      if (datasetId === 'nz_osm' || datasetId === 'doc_tracks') {
+        const genericNames = datasetId === 'nz_osm'
+          ? new Set(['', 'nz osm mtb track', 'unnamed', 'track', 'trail', 'path', 'cycleway', 'mountain bike track', 'mtb track', 'footpath', 'bridleway', 'service road'])
+          : new Set(['', 'doc track', 'unnamed', 'track', 'walking track', 'tramping track', 'mountain biking track', 'route', '4wd track']);
+
+        const groups = new Map();
+        const unmerged = [];
+
+        initialFeatures.forEach(feat => {
+          const rawName = (feat.properties && feat.properties.name) ? feat.properties.name.trim() : '';
+          const normKey = rawName.toLowerCase();
+
+          if (genericNames.has(normKey) || normKey.length < 2) {
+            unmerged.push(feat);
+          } else {
+            if (!groups.has(normKey)) {
+              groups.set(normKey, []);
+            }
+            groups.get(normKey).push(feat);
+          }
+        });
+
+        const mergedFeatures = [];
+
+        groups.forEach((featList, key) => {
+          if (featList.length === 1) {
+            mergedFeatures.push(featList[0]);
+            return;
+          }
+
+          const multiCoords = [];
+          let bestFeat = featList[0];
+          let maxSubLen = 0;
+          let anyDocMtb = false;
+          let bestGradeNum = 0;
+          let bestGradeText = '';
+          const descriptions = new Set();
+          const comments = new Set();
+          const websites = new Set();
+
+          featList.forEach(f => {
+            const g = f.geometry;
+            if (!g || !g.coordinates) return;
+
+            if (g.type === 'LineString') {
+              multiCoords.push(g.coordinates);
+            } else if (g.type === 'MultiLineString') {
+              g.coordinates.forEach(c => multiCoords.push(c));
+            }
+
+            if (f.properties.isDocMtbPermitted) anyDocMtb = true;
+            if (f.properties.gradeNum && f.properties.gradeNum > bestGradeNum) {
+              bestGradeNum = f.properties.gradeNum;
+              bestGradeText = f.properties.gradeText;
+            } else if (!bestGradeText && f.properties.gradeText) {
+              bestGradeText = f.properties.gradeText;
+            }
+
+            if (f.properties.description) descriptions.add(f.properties.description);
+            if (f.properties.comment) comments.add(f.properties.comment);
+            if (f.properties.website) websites.add(f.properties.website);
+
+            if (f.properties.lengthKm > maxSubLen) {
+              maxSubLen = f.properties.lengthKm;
+              bestFeat = f;
+            }
+          });
+
+          const totalKm = calculateCoordsLengthKm(multiCoords, 'MultiLineString');
+          const lengthStr = totalKm > 0 ? `${totalKm.toFixed(1)} km` : '';
+
+          const mergedProps = {
+            ...bestFeat.properties,
+            uid: `${datasetId}_merged_${key.replace(/[^a-z0-9]/g, '_')}`,
+            name: bestFeat.properties.name,
+            lengthKm: totalKm,
+            lengthStr: lengthStr,
+            description: Array.from(descriptions).join(' • '),
+            comment: Array.from(comments).join(' • '),
+            website: Array.from(websites)[0] || bestFeat.properties.website
+          };
+
+          if (bestGradeNum > 0) {
+            mergedProps.gradeNum = bestGradeNum;
+            mergedProps.gradeText = bestGradeText || `Grade ${bestGradeNum}`;
+          }
+
+          if (datasetId === 'doc_tracks' && anyDocMtb) {
+            mergedProps.isDocMtbPermitted = true;
+            mergedProps.isWalkingOnly = false;
+            mergedProps.strokeType = 'doc_mtb';
+          }
+
+          mergedFeatures.push({
+            type: 'Feature',
+            geometry: {
+              type: 'MultiLineString',
+              coordinates: multiCoords
+            },
+            properties: mergedProps
+          });
+        });
+
+        return [...mergedFeatures, ...unmerged];
+      }
+
+      return initialFeatures;
     }
 
     // =========================================================================
@@ -1925,21 +2087,15 @@
       `;
     }
 
-    function bringGreatRidesToFront() {
-      if (layerGroups['great_rides'] && map && map.hasLayer(layerGroups['great_rides'])) {
-        layerGroups['great_rides'].bringToFront();
-      }
-      if (importedGpxGroup && map && map.hasLayer(importedGpxGroup)) {
-        importedGpxGroup.bringToFront();
-      }
-    }
-
     function renderDatasetLayer(datasetId) {
       const cfg = DATASETS[datasetId];
+      const targetPane = PANE_CONFIG[datasetId].pane;
+      const targetRenderer = paneRenderers[datasetId];
 
       if (!layerGroups[datasetId]) {
         layerGroups[datasetId] = L.geoJSON(null, {
-          renderer: canvasRenderer,
+          pane: targetPane,
+          renderer: targetRenderer,
           style: (feat) => {
             const p = feat.properties || {};
 
@@ -2032,14 +2188,12 @@
         map.removeLayer(layerGroups[datasetId]);
       }
 
-      bringGreatRidesToFront();
-
       const countPill = document.getElementById(
         datasetId === 'great_rides' ? 'cntGreatRides' :
-        datasetId === 'nz_osm' ? 'cntNzOsm' :
-        datasetId === 'heartland' ? 'cntHeartland' :
         datasetId === 'chch_cycle' ? 'cntChchCycle' :
+        datasetId === 'heartland' ? 'cntHeartland' :
         datasetId === 'chch_council' ? 'cntChchCouncil' :
+        datasetId === 'nz_osm' ? 'cntNzOsm' :
         datasetId === 'cap_plus' ? 'cntCapPlus' : 'cntDocTracks'
       );
       if (countPill) countPill.textContent = filteredFeatures.length;
@@ -2169,8 +2323,8 @@
     }
 
     async function loadAllDatasetsPipeline() {
-      // Put great_rides and nz_osm high in load priority
-      const loadOrder = ['great_rides', 'nz_osm', 'heartland', 'chch_cycle', 'chch_council', 'cap_plus', 'doc_tracks'];
+      // Load order strictly follows the required hierarchy: Great Rides down to DOC
+      const loadOrder = ['great_rides', 'chch_cycle', 'heartland', 'chch_council', 'nz_osm', 'cap_plus', 'doc_tracks'];
       document.getElementById('lblDatasetLoading').textContent = 'Loading trail datasets...';
 
       await Promise.allSettled(
@@ -2190,7 +2344,6 @@
       );
 
       updateTotalStats();
-      bringGreatRidesToFront();
       renderSavedDropdown();
     }
 
@@ -2417,22 +2570,25 @@
         zoomControl: false
       });
 
-      // Dedicated pane for Great Rides to ensure they are on top of other trail overlays
-      map.createPane('greatRidesPane');
-      map.getPane('greatRidesPane').style.zIndex = 450;
-
-      // Topmost pane for selected/highlighted line
-      map.createPane('highlightPane');
-      map.getPane('highlightPane').style.zIndex = 650;
-
-      canvasRenderer = L.canvas({ padding: 0.5 });
-      greatRidesRenderer = L.canvas({ padding: 0.5, });
+      // Configure separate Leaflet panes for strict Z-index order
+      // Higher z-index renders on top; canvas tolerance 22 for easy mobile tapping
+      Object.entries(PANE_CONFIG).forEach(([key, cfg]) => {
+        map.createPane(cfg.pane);
+        map.getPane(cfg.pane).style.zIndex = cfg.zIndex;
+        paneRenderers[key] = L.canvas({
+          pane: cfg.pane,
+          padding: 0.5,
+          tolerance: 22
+        });
+      });
 
       L.control.zoom({ position: 'topright' }).addTo(map);
 
       basemaps.topo.addTo(map);
 
       importedGpxGroup = L.geoJSON(null, {
+        pane: 'pane_imported',
+        renderer: paneRenderers.imported,
         style: {
           color: '#ff2d87',
           weight: 4.8,
@@ -2450,6 +2606,7 @@
       }).addTo(map);
 
       map.on('popupopen', (e) => {
+        lastPopupOpenTime = Date.now();
         const container = e.popup._container;
         if (!container) return;
         const closeBtn = container.querySelector('.leaflet-popup-close-button');
@@ -2466,6 +2623,70 @@
         if (selectedHighlightLayer) {
           map.removeLayer(selectedHighlightLayer);
           selectedHighlightLayer = null;
+        }
+      });
+
+      // =======================================================================
+      // MOBILE PROXIMITY TAP-ASSIST
+      // Snaps tap events to the closest visible trail within 28px
+      // =======================================================================
+      map.on('click', (e) => {
+        if (Date.now() - lastPopupOpenTime < 140) return;
+
+        const clickPoint = map.latLngToLayerPoint(e.latlng);
+        const maxPixelDistance = 28;
+        let closestLayer = null;
+        let closestDist = Infinity;
+        let closestFeat = null;
+
+        const priorityOrder = ['great_rides', 'chch_cycle', 'heartland', 'chch_council', 'nz_osm', 'cap_plus', 'doc_tracks'];
+        if (importedGpxGroup && map.hasLayer(importedGpxGroup)) {
+          priorityOrder.unshift('imported');
+        }
+
+        for (const dsKey of priorityOrder) {
+          const grp = dsKey === 'imported' ? importedGpxGroup : layerGroups[dsKey];
+          if (!grp || !map.hasLayer(grp)) continue;
+
+          grp.eachLayer(layer => {
+            if (!layer.feature || !layer.feature.geometry) return;
+            const geom = layer.feature.geometry;
+
+            if (typeof layer.getBounds === 'function') {
+              const bounds = layer.getBounds();
+              if (bounds.isValid() && !bounds.pad(0.04).contains(e.latlng)) {
+                return;
+              }
+            }
+
+            const coordsList = geom.type === 'LineString' ? [geom.coordinates] : (geom.type === 'MultiLineString' ? geom.coordinates : []);
+            for (const line of coordsList) {
+              for (let i = 0; i < line.length - 1; i++) {
+                const p1 = map.latLngToLayerPoint([line[i][1], line[i][0]]);
+                const p2 = map.latLngToLayerPoint([line[i+1][1], line[i+1][0]]);
+                const d = distToSegment(clickPoint, p1, p2);
+                if (d < closestDist && d <= maxPixelDistance) {
+                  closestDist = d;
+                  closestLayer = layer;
+                  closestFeat = layer.feature;
+                }
+              }
+            }
+          });
+
+          if (closestLayer && closestDist <= 16) break;
+        }
+
+        if (closestLayer && closestFeat) {
+          highlightSelectedFeature(closestFeat);
+          if (typeof closestLayer.openPopup === 'function') {
+            closestLayer.openPopup(e.latlng);
+          } else {
+            L.popup({ maxWidth: 510 })
+              .setLatLng(e.latlng)
+              .setContent(buildTrailPopup(closestFeat.properties))
+              .openOn(map);
+          }
         }
       });
     }
@@ -2486,12 +2707,11 @@
 
       DATASETS[datasetId].visible = !DATASETS[datasetId].visible;
       
-      // Sync Layer Menu Button
       const btnId = datasetId === 'great_rides' ? 'btnToggleGreatRides' :
-                    datasetId === 'nz_osm' ? 'btnToggleNzOsm' :
-                    datasetId === 'heartland' ? 'btnToggleHeartland' :
                     datasetId === 'chch_cycle' ? 'btnToggleChchCycle' :
+                    datasetId === 'heartland' ? 'btnToggleHeartland' :
                     datasetId === 'chch_council' ? 'btnToggleChchCouncil' :
+                    datasetId === 'nz_osm' ? 'btnToggleNzOsm' :
                     datasetId === 'cap_plus' ? 'btnToggleCapPlus' : 'btnToggleDocTracks';
 
       const btn = document.getElementById(btnId);
@@ -2609,12 +2829,12 @@
         });
       });
 
-      // Dataset Overlay Toggles (Top Menu)
+      // Dataset Overlay Toggles (Ordered Top-to-Bottom by Layer Stacking)
       document.getElementById('btnToggleGreatRides')?.addEventListener('click', () => toggleDatasetById('great_rides'));
-      document.getElementById('btnToggleNzOsm')?.addEventListener('click', () => toggleDatasetById('nz_osm'));
-      document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleDatasetById('heartland'));
       document.getElementById('btnToggleChchCycle')?.addEventListener('click', () => toggleDatasetById('chch_cycle'));
+      document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleDatasetById('heartland'));
       document.getElementById('btnToggleChchCouncil')?.addEventListener('click', () => toggleDatasetById('chch_council'));
+      document.getElementById('btnToggleNzOsm')?.addEventListener('click', () => toggleDatasetById('nz_osm'));
       document.getElementById('btnToggleCapPlus')?.addEventListener('click', () => toggleDatasetById('cap_plus'));
       document.getElementById('btnToggleDocTracks')?.addEventListener('click', () => toggleDatasetById('doc_tracks'));
 
@@ -2665,7 +2885,7 @@
 
       updateLegendActiveStates();
 
-      // Load remote & local datasets
+      // Load remote & local datasets in order
       loadAllDatasetsPipeline();
     }
 
