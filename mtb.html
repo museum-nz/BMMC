@@ -26,6 +26,7 @@
   <link rel="preconnect" href="https://services.arcgis.com" crossorigin>
   <link rel="preconnect" href="https://gis.ccc.govt.nz" crossorigin>
   <link rel="preconnect" href="https://dl.dropboxusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://api.open-meteo.com" crossorigin>
 
   <!-- Inline Mountain Bike Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚵</text></svg>">
@@ -446,6 +447,7 @@
       font-weight: 800;
       color: #0f172a;
       pointer-events: auto;
+      transition: bottom 0.22s ease;
     }
     .dark .status-summary-bar {
       background: rgba(15, 23, 42, 0.94);
@@ -614,6 +616,16 @@
       border-color: #2563eb;
       color: #ffffff;
     }
+    .btn-trail-action.btn-elevation {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #047857;
+    }
+    .btn-trail-action.btn-elevation:hover {
+      background: #10b981;
+      border-color: #10b981;
+      color: #ffffff;
+    }
 
     .btn-saved-toggle .saved-pill-count {
       display: inline-flex;
@@ -642,6 +654,7 @@
       right: 20px;
       z-index: 1000;
       pointer-events: auto;
+      transition: bottom 0.22s ease;
     }
     .legend-card {
       background: rgba(255, 255, 255, 0.95);
@@ -775,6 +788,100 @@
       background: transparent !important;
     }
 
+    /* Elevation Profile Bottom Drawer */
+    .elevation-drawer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 230px;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(203, 213, 225, 0.95);
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
+      z-index: 2500;
+      display: flex;
+      flex-direction: column;
+      transition: height 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+    .elevation-drawer.expanded {
+      height: min(450px, 62vh);
+    }
+    .dark .elevation-drawer {
+      background: rgba(15, 23, 42, 0.97);
+      border-top-color: #334155;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.65);
+    }
+    .elevation-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      flex-shrink: 0;
+      gap: 10px;
+    }
+    .dark .elevation-drawer-header { border-bottom-color: #334155; }
+    .elevation-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .elevation-title {
+      font-size: 12.5px;
+      font-weight: 900;
+      color: #0f172a;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .dark .elevation-title { color: #f8fafc; }
+    .elevation-stats {
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      display: inline-flex;
+      gap: 8px;
+    }
+    .dark .elevation-stats { color: #94a3b8; }
+    .elevation-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .elevation-canvas-container {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      padding: 4px 14px 8px 14px;
+    }
+    #elevationCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+    .elevation-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.94);
+      color: #ffffff;
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      transform: translate(-50%, -125%);
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 2600;
+    }
+
     @media (min-width: 769px) {
       .top-controls-bar .btn-bmmc-menu-trigger {
         order: 999 !important;
@@ -789,6 +896,17 @@
       .filter-chips-bar {
         max-height: 80px;
         overflow-y: auto;
+      }
+      .elevation-title-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+      }
+      .elevation-drawer {
+        height: 220px;
+      }
+      .elevation-drawer.expanded {
+        height: 75vh;
       }
     }
 
@@ -1005,7 +1123,7 @@
   </div>
 
   <!-- Interactive Legend: Ordered Top-to-Bottom to match Layer Stacking -->
-  <div class="legend-wrapper">
+  <div class="legend-wrapper" id="legendWrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
       <span>🗺️</span> <span>Trail Key</span>
     </button>
@@ -1068,21 +1186,54 @@
   </div>
 
   <!-- Bottom Floating Status Bar -->
-  <div class="status-summary-bar">
+  <div class="status-summary-bar" id="statusBar">
     <span class="status-dot"></span>
     <span id="lblDatasetLoading">Initialising MTB network...</span>
+  </div>
+
+  <!-- Elevation Profile Bottom Drawer -->
+  <div id="elevationDrawer" class="elevation-drawer" style="display:none;" role="region" aria-label="Track Elevation Profile">
+    <div class="elevation-drawer-header">
+      <div class="elevation-title-group">
+        <span class="elevation-title" id="elevTrackTitle">📈 Elevation Profile</span>
+        <span class="elevation-stats" id="elevTrackStats">Sampling topography...</span>
+      </div>
+      <div class="elevation-controls">
+        <button id="btnElevExportPNG" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px; background:#f0fdf4; border-color:#86efac; color:#15803d;" title="Download High-Resolution PNG with Full Stats">
+          <span>🖼️ PNG Profile</span>
+        </button>
+        <button id="btnElevExportCSV" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Export Profile &amp; Stats as CSV">
+          <span>📥 Stats CSV</span>
+        </button>
+        <button id="btnElevExportGPX" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Export 3D Track with DEM Elevations as GPX">
+          <span>📥 3D GPX</span>
+        </button>
+        <button id="btnElevExpand" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Toggle Drawer Height">
+          <span id="lblElevExpand">⛶ Expand</span>
+        </button>
+        <button id="btnElevClose" class="legend-close-btn" style="font-size:14px; padding:2px 6px;" title="Close Profile">✕</button>
+      </div>
+    </div>
+    <div class="elevation-canvas-container" id="elevCanvasContainer">
+      <canvas id="elevationCanvas"></canvas>
+      <div id="elevTooltip" class="elevation-tooltip" style="display:none;"></div>
+    </div>
   </div>
 
   <!-- Universal Navigation Drawer Script -->
   <script src="shared-nav.js" onerror="this.onerror=null;"></script>
 
   <!-- Leaflet CDN with Asynchronous Local Fallback -->
+  <!-- Leaflet CDN with Multi-CDN and Local Fallback -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
   <script>
     if (!window.L) {
-      const fbScript = document.createElement('script');
-      fbScript.src = '../vendor/leaflet/leaflet.js';
-      document.head.appendChild(fbScript);
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"><\/script>');
+    }
+  </script>
+  <script>
+    if (!window.L) {
+      document.write('<script src="../vendor/leaflet/leaflet.js"><\/script>');
     }
   </script>
 
@@ -1211,7 +1362,112 @@
 
     const layerGroups = {};
     let importedGpxGroup;
-    let selectedHighlightLayer = null;
+    let selectedFeatures = [];
+    let selectedHighlightLayers = [];
+
+    // Elevation State
+    let currentElevationData = null;
+    let elevScrubMarker = null;
+
+    // =========================================================================
+    // MULTI-TRACK HIGHLIGHT & SELECTION ENGINE (Ctrl/Cmd Multi-Select)
+    // =========================================================================
+    function clearAllHighlights() {
+      selectedHighlightLayers.forEach(l => {
+        if (map.hasLayer(l)) map.removeLayer(l);
+      });
+      selectedHighlightLayers = [];
+    }
+
+    function highlightSelectedFeatures(features) {
+      clearAllHighlights();
+      if (!features) return;
+      const featList = Array.isArray(features) ? features : [features];
+      if (featList.length === 0) return;
+
+      featList.forEach(feat => {
+        const outer = L.geoJSON(feat, {
+          pane: 'highlightPane',
+          interactive: false,
+          renderer: paneRenderers.highlight,
+          style: {
+            color: '#ffffff',
+            weight: 9.5,
+            opacity: 0.9,
+            lineCap: 'round',
+            lineJoin: 'round'
+          }
+        });
+
+        const inner = L.geoJSON(feat, {
+          pane: 'highlightPane',
+          interactive: false,
+          renderer: paneRenderers.highlight,
+          style: {
+            color: '#fbbf24',
+            weight: 6.5,
+            opacity: 1,
+            lineCap: 'round',
+            lineJoin: 'round'
+          }
+        });
+
+        outer.addLayer(inner);
+        outer.addTo(map);
+        selectedHighlightLayers.push(outer);
+      });
+    }
+
+    function handleTrackSelection(feat, mouseEvent, layer, latlng) {
+      const isCtrl = mouseEvent && (mouseEvent.ctrlKey || mouseEvent.metaKey);
+      const uid = feat.properties && feat.properties.uid;
+
+      if (isCtrl) {
+        if (mouseEvent && mouseEvent.preventDefault) mouseEvent.preventDefault();
+        map.closePopup();
+
+        const existingIdx = selectedFeatures.findIndex(f => f.properties && f.properties.uid === uid);
+        if (existingIdx >= 0) {
+          selectedFeatures.splice(existingIdx, 1);
+        } else {
+          selectedFeatures.push(feat);
+        }
+
+        highlightSelectedFeatures(selectedFeatures);
+
+        if (selectedFeatures.length === 0) {
+          updateTotalStats();
+          closeElevationDrawer();
+        } else {
+          document.getElementById('lblDatasetLoading').textContent = `${selectedFeatures.length} tracks selected (Ctrl+Click to add/remove)`;
+          const drawer = document.getElementById('elevationDrawer');
+          if (drawer && drawer.style.display !== 'none') {
+            openTrackElevationProfile(selectedFeatures);
+          }
+        }
+      } else {
+        selectedFeatures = [feat];
+        highlightSelectedFeatures(selectedFeatures);
+
+        if (latlng) {
+          if (layer && typeof layer.openPopup === 'function') {
+            layer.openPopup(latlng);
+          } else {
+            L.popup({ maxWidth: 510 })
+              .setLatLng(latlng)
+              .setContent(buildTrailPopup(feat.properties))
+              .openOn(map);
+          }
+        } else if (layer && typeof layer.openPopup === 'function') {
+          layer.openPopup();
+        }
+
+        const drawer = document.getElementById('elevationDrawer');
+        if (drawer && drawer.style.display !== 'none') {
+          openTrackElevationProfile(feat);
+        }
+      }
+    }
 
     // =========================================================================
     // INDEXED-DB CACHE ENGINE
@@ -1299,44 +1555,16 @@
         const feat = DATASETS[dsId].features.find(f => f.properties && f.properties.uid === uid);
         if (feat) return feat;
       }
-      return null;
-    }
-
-    function highlightSelectedFeature(feature) {
-      if (selectedHighlightLayer) {
-        map.removeLayer(selectedHighlightLayer);
-        selectedHighlightLayer = null;
+      if (importedGpxGroup) {
+        let found = null;
+        importedGpxGroup.eachLayer(layer => {
+          if (layer.feature && layer.feature.properties && (layer.feature.properties.uid === uid || String(layer._leaflet_id) === String(uid))) {
+            found = layer.feature;
+          }
+        });
+        if (found) return found;
       }
-      if (!feature) return;
-
-      selectedHighlightLayer = L.geoJSON(feature, {
-        pane: 'highlightPane',
-        interactive: false,
-        renderer: paneRenderers.highlight,
-        style: {
-          color: '#ffffff',
-          weight: 9.5,
-          opacity: 0.9,
-          lineCap: 'round',
-          lineJoin: 'round'
-        }
-      });
-
-      const innerHighlight = L.geoJSON(feature, {
-        pane: 'highlightPane',
-        interactive: false,
-        renderer: paneRenderers.highlight,
-        style: {
-          color: '#fbbf24',
-          weight: 6.5,
-          opacity: 1,
-          lineCap: 'round',
-          lineJoin: 'round'
-        }
-      });
-
-      selectedHighlightLayer.addLayer(innerHighlight);
-      selectedHighlightLayer.addTo(map);
+      return null;
     }
 
     function zoomToTrack(uid) {
@@ -1346,11 +1574,18 @@
       const bounds = geomLayer.getBounds();
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-        highlightSelectedFeature(feat);
+        highlightSelectedFeatures([feat]);
         setTimeout(() => {
           for (const id of Object.keys(layerGroups)) {
             layerGroups[id].eachLayer(layer => {
               if (layer.feature && layer.feature.properties && layer.feature.properties.uid === uid) {
+                layer.openPopup();
+              }
+            });
+          }
+          if (importedGpxGroup) {
+            importedGpxGroup.eachLayer(layer => {
+              if (layer.feature && layer.feature.properties && (layer.feature.properties.uid === uid || String(layer._leaflet_id) === String(uid))) {
                 layer.openPopup();
               }
             });
@@ -1366,7 +1601,7 @@
           case '<': return '&lt;';
           case '>': return '&gt;';
           case '&': return '&amp;';
-          case '\'': return '&apos;';
+          case "'": return '&apos;';
           case '"': return '&quot;';
         }
       });
@@ -1509,6 +1744,9 @@
               <button class="btn-saved-action" onclick="window.zoomToTrack('${uid}');" title="Zoom to trail on map">
                 <span>🔍 Zoom</span>
               </button>
+              <button class="btn-saved-action" onclick="window.openTrackElevationProfile('${uid}');" title="View Elevation Profile">
+                <span>📈 Elev</span>
+              </button>
               <button class="btn-saved-action" onclick="window.downloadTrackGPX('${uid}');" title="Download GPX file">
                 <span>📥 GPX</span>
               </button>
@@ -1565,7 +1803,6 @@
       }[m]));
     }
 
-    // 2D distance helper for mobile proximity snap
     function sqr(x) { return x * x; }
     function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y); }
     function distToSegmentSquared(p, v, w) {
@@ -2006,6 +2243,687 @@
     }
 
     // =========================================================================
+    // ELEVATION ENGINE (Multi-Track, Incline & Decline, Safe Batching & Exports)
+    // =========================================================================
+    function extractFlatCoordinates(input) {
+      if (!input) return [];
+      const features = Array.isArray(input) ? input : [input];
+      let allCoords = [];
+
+      features.forEach(feat => {
+        if (!feat || !feat.geometry) return;
+        const g = feat.geometry;
+        if (g.type === 'LineString') {
+          allCoords = allCoords.concat(g.coordinates);
+        } else if (g.type === 'MultiLineString') {
+          allCoords = allCoords.concat(g.coordinates.reduce((acc, part) => acc.concat(part), []));
+        }
+      });
+      return allCoords;
+    }
+
+    function sampleCoordinatesEvenly(coords, maxPoints = 80) {
+      if (!coords || coords.length <= maxPoints) return coords || [];
+      const sampled = [coords[0]];
+      const step = (coords.length - 1) / (maxPoints - 1);
+      for (let i = 1; i < maxPoints - 1; i++) {
+        sampled.push(coords[Math.round(i * step)]);
+      }
+      sampled.push(coords[coords.length - 1]);
+      return sampled;
+    }
+
+    async function fetchElevationForTrack(input) {
+      const allCoords = extractFlatCoordinates(input);
+      if (!allCoords || allCoords.length < 2) {
+        throw new Error("Track geometry has insufficient points.");
+      }
+
+      const validCoords = allCoords.filter(c => 
+        Array.isArray(c) && 
+        typeof c[0] === 'number' && !isNaN(c[0]) && c[0] >= -180 && c[0] <= 180 &&
+        typeof c[1] === 'number' && !isNaN(c[1]) && c[1] >= -90 && c[1] <= 90
+      );
+
+      if (validCoords.length < 2) {
+        throw new Error("No valid coordinates found for elevation sampling.");
+      }
+
+      // Sample up to 140 points for smooth profiles
+      const sampled = sampleCoordinatesEvenly(validCoords, 140);
+
+      // Open-Meteo enforces a strict limit of 100 coordinates per request.
+      // Batch into chunks of 70 coordinates to strictly prevent 400 errors.
+      const CHUNK_SIZE = 70;
+      const chunks = [];
+      for (let i = 0; i < sampled.length; i += CHUNK_SIZE) {
+        chunks.push(sampled.slice(i, i + CHUNK_SIZE));
+      }
+
+      const chunkResults = await Promise.all(chunks.map(async (chunk) => {
+        const lats = chunk.map(c => Number(c[1]).toFixed(5)).join(',');
+        const lons = chunk.map(c => Number(c[0]).toFixed(5)).join(',');
+        const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lons}`;
+        
+        const res = await fetch(url);
+        if (!res.ok) {
+          let reason = '';
+          try {
+            const errData = await res.json();
+            if (errData && errData.reason) reason = `: ${errData.reason}`;
+          } catch(e) {}
+          throw new Error(`Elevation API returned status ${res.status}${reason}`);
+        }
+        const data = await res.json();
+        return data.elevation || [];
+      }));
+
+      const elevations = chunkResults.flat();
+
+      let runningDist = 0;
+      let minEle = Infinity;
+      let maxEle = -Infinity;
+      let gain = 0;
+      let loss = 0;
+      const points = [];
+
+      for (let i = 0; i < sampled.length; i++) {
+        const ele = Math.round(elevations[i] !== undefined && elevations[i] !== null ? elevations[i] : 0);
+        if (i > 0) {
+          const segDist = getDistanceKm(sampled[i-1][1], sampled[i-1][0], sampled[i][1], sampled[i][0]);
+          runningDist += segDist;
+          const eleDiff = ele - points[i-1].ele;
+          if (eleDiff > 0) gain += eleDiff;
+          else loss += Math.abs(eleDiff);
+        }
+        minEle = Math.min(minEle, ele);
+        maxEle = Math.max(maxEle, ele);
+
+        points.push({
+          lat: sampled[i][1],
+          lon: sampled[i][0],
+          distKm: runningDist,
+          ele: ele,
+          gradePct: 0
+        });
+      }
+
+      // Compute local slope gradient (%) with separate Incline and Decline extremes
+      let maxIncline = 0;
+      let maxDecline = 0;
+
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[Math.max(0, i - 1)];
+        const p2 = points[Math.min(points.length - 1, i + 1)];
+        const distM = (p2.distKm - p1.distKm) * 1000;
+        let slope = 0;
+        if (distM > 0) {
+          slope = ((p2.ele - p1.ele) / distM) * 100;
+        }
+        slope = Math.max(-45, Math.min(45, slope));
+        const roundedSlope = Math.round(slope * 10) / 10;
+        points[i].gradePct = roundedSlope;
+
+        if (roundedSlope > maxIncline) maxIncline = roundedSlope;
+        if (roundedSlope < maxDecline) maxDecline = roundedSlope;
+      }
+
+      let trackTitle = 'Trail Profile';
+      if (Array.isArray(input)) {
+        if (input.length === 1) {
+          trackTitle = (input[0].properties && input[0].properties.name) || 'Trail';
+        } else {
+          trackTitle = `Combined Route (${input.length} Tracks)`;
+        }
+      } else if (input && input.properties) {
+        trackTitle = input.properties.name || 'Trail';
+      }
+
+      return {
+        trackName: trackTitle,
+        points: points,
+        totalDist: runningDist,
+        minEle: minEle === Infinity ? 0 : minEle,
+        maxEle: maxEle === -Infinity ? 0 : maxEle,
+        gain: gain,
+        loss: loss,
+        maxIncline: maxIncline,
+        maxDecline: maxDecline
+      };
+    }
+
+    function renderElevationProfileCanvas(data) {
+      const canvas = document.getElementById('elevationCanvas');
+      const container = document.getElementById('elevCanvasContainer');
+      if (!canvas || !container || !data || !data.points || data.points.length === 0) return;
+
+      const rect = container.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      const ctx = canvas.getContext('2d');
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      const padLeft = 48;
+      const padRight = 20;
+      const padTop = 14;
+      const padBottom = 26;
+
+      const w = Math.max(10, rect.width - padLeft - padRight);
+      const h = Math.max(10, rect.height - padTop - padBottom);
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const minE = Math.max(0, data.minEle - 15);
+      const maxE = data.maxEle + 15;
+      const rangeE = Math.max(1, maxE - minE);
+      const totalD = Math.max(0.01, data.totalDist);
+
+      // Horizontal Elevation Grid Lines
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = isDark ? '#334155' : '#e2e8f0';
+      ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+
+      const gridSteps = 4;
+      for (let i = 0; i <= gridSteps; i++) {
+        const yVal = minE + (rangeE / gridSteps) * i;
+        const yPos = padTop + h - (h / gridSteps) * i;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, yPos);
+        ctx.lineTo(padLeft + w, yPos);
+        ctx.stroke();
+        ctx.fillText(`${Math.round(yVal)}m`, padLeft - 6, yPos);
+      }
+
+      // Vertical Distance Grid Lines & Markers
+      const numDistSteps = Math.min(8, Math.max(4, Math.floor(w / 85)));
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      for (let i = 0; i <= numDistSteps; i++) {
+        const dVal = (totalD / numDistSteps) * i;
+        const xPos = padLeft + (w / numDistSteps) * i;
+
+        ctx.strokeStyle = isDark ? 'rgba(51, 65, 85, 0.45)' : 'rgba(226, 232, 240, 0.75)';
+        ctx.beginPath();
+        ctx.setLineDash([3, 4]);
+        ctx.moveTo(xPos, padTop);
+        ctx.lineTo(xPos, padTop + h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.fillText(`${dVal.toFixed(1)} km`, xPos, padTop + h + 8);
+      }
+
+      // Elevation Curve
+      ctx.beginPath();
+      data.points.forEach((pt, i) => {
+        const x = padLeft + (pt.distKm / totalD) * w;
+        const y = padTop + h - ((pt.ele - minE) / rangeE) * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2.8;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      ctx.lineTo(padLeft + w, padTop + h);
+      ctx.lineTo(padLeft, padTop + h);
+      ctx.closePath();
+
+      const grad = ctx.createLinearGradient(0, padTop, 0, padTop + h);
+      grad.addColorStop(0, isDark ? 'rgba(52, 211, 153, 0.40)' : 'rgba(16, 185, 129, 0.35)');
+      grad.addColorStop(1, isDark ? 'rgba(52, 211, 153, 0.02)' : 'rgba(16, 185, 129, 0.02)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    async function openTrackElevationProfile(target) {
+      let featsToProfile = [];
+
+      if (Array.isArray(target) && target.length > 0) {
+        featsToProfile = target;
+      } else if (typeof target === 'string') {
+        const f = findFeatureByUid(target);
+        if (f) featsToProfile = [f];
+      } else if (target && target.geometry) {
+        featsToProfile = [target];
+      } else if (selectedFeatures.length > 0) {
+        featsToProfile = selectedFeatures;
+      }
+
+      if (featsToProfile.length === 0) {
+        alert('Trail coordinates are still loading or no track is selected. Please click a track first.');
+        return;
+      }
+
+      const drawer = document.getElementById('elevationDrawer');
+      const title = document.getElementById('elevTrackTitle');
+      const stats = document.getElementById('elevTrackStats');
+      const legendWrapper = document.getElementById('legendWrapper');
+      const statusBar = document.getElementById('statusBar');
+
+      drawer.style.display = 'flex';
+      const offsetBottom = drawer.classList.contains('expanded') ? 'min(465px, 64vh)' : '245px';
+      if (legendWrapper) legendWrapper.style.bottom = offsetBottom;
+      if (statusBar) statusBar.style.bottom = offsetBottom;
+
+      const trackTitle = featsToProfile.length > 1
+        ? `📈 Combined (${featsToProfile.length} Trails Selected)`
+        : `📈 ${featsToProfile[0].properties.name || 'Trail Profile'}`;
+
+      title.textContent = trackTitle;
+      stats.textContent = 'Sampling Copernicus DEM topography...';
+
+      const canvas = document.getElementById('elevationCanvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      try {
+        const data = await fetchElevationForTrack(featsToProfile);
+        currentElevationData = data;
+
+        const incStr = data.maxIncline > 0 ? `+${data.maxIncline}%` : '0%';
+        const decStr = data.maxDecline < 0 ? `${data.maxDecline}%` : '0%';
+
+        stats.innerHTML = `
+          <span>📏 <strong>${data.totalDist.toFixed(1)} km</strong></span>
+          <span>⛰️ <strong>${data.minEle}m – ${data.maxEle}m</strong></span>
+          <span>↗️ <strong>+${Math.round(data.gain)}m</strong></span>
+          <span>↘️ <strong>-${Math.round(data.loss)}m</strong></span>
+          <span>📈 <strong>Max Incline: ${incStr}</strong></span>
+          <span>📉 <strong>Max Decline: ${decStr}</strong></span>
+        `;
+        renderElevationProfileCanvas(data);
+      } catch (err) {
+        console.warn('Elevation fetch error:', err);
+        stats.textContent = `Could not retrieve elevation: ${err.message}`;
+      }
+    }
+
+    function closeElevationDrawer() {
+      const drawer = document.getElementById('elevationDrawer');
+      const legendWrapper = document.getElementById('legendWrapper');
+      const statusBar = document.getElementById('statusBar');
+      const tooltip = document.getElementById('elevTooltip');
+
+      if (drawer) drawer.style.display = 'none';
+      if (legendWrapper) legendWrapper.style.bottom = '20px';
+      if (statusBar) statusBar.style.bottom = '20px';
+      if (tooltip) tooltip.style.display = 'none';
+
+      if (elevScrubMarker) {
+        map.removeLayer(elevScrubMarker);
+        elevScrubMarker = null;
+      }
+      currentElevationData = null;
+    }
+
+    // =========================================================================
+    // ELEVATION EXPORT ENGINE (PNG with Incline & Decline, CSV & 3D GPX)
+    // =========================================================================
+    function downloadElevationProfilePNG() {
+      if (!currentElevationData || !currentElevationData.points || !currentElevationData.points.length) {
+        alert('Please open an elevation profile first before downloading.');
+        return;
+      }
+      const data = currentElevationData;
+      const name = data.trackName || 'Trail';
+      const cleanName = name.replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') || 'track';
+
+      const exportCanvas = document.createElement('canvas');
+      const W = 1600;
+      const H = 900;
+      exportCanvas.width = W;
+      exportCanvas.height = H;
+      const ctx = exportCanvas.getContext('2d');
+
+      const isDark = document.documentElement.classList.contains('dark');
+      ctx.fillStyle = isDark ? '#0b1329' : '#f8fafc';
+      ctx.fillRect(0, 0, W, H);
+
+      // Top Title Bar Card
+      ctx.fillStyle = isDark ? '#0f172a' : '#ffffff';
+      ctx.fillRect(40, 30, W - 80, 140);
+      ctx.strokeStyle = isDark ? '#334155' : '#e2e8f0';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(40, 30, W - 80, 140);
+
+      // Title
+      ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+      ctx.font = 'bold 30px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`🚵 ${name}`, 65, 48);
+
+      // 6 Metric Cards Including BOTH Max Incline and Max Decline Grades
+      const incStr = data.maxIncline > 0 ? `+${data.maxIncline}%` : '0%';
+      const decStr = data.maxDecline < 0 ? `${data.maxDecline}%` : '0%';
+
+      const statsList = [
+        { label: 'Distance', val: `${data.totalDist.toFixed(1)} km`, color: '#0ea5e9' },
+        { label: 'Elevation Range', val: `${data.minEle}m – ${data.maxEle}m`, color: '#8b5cf6' },
+        { label: 'Total Ascent', val: `+${Math.round(data.gain)} m`, color: '#10b981' },
+        { label: 'Total Descent', val: `-${Math.round(data.loss)} m`, color: '#f59e0b' },
+        { label: 'Max Incline Grade', val: incStr, color: '#10b981' },
+        { label: 'Max Decline Grade', val: decStr, color: '#ef4444' }
+      ];
+
+      let statX = 65;
+      const stepX = (W - 130) / statsList.length;
+      statsList.forEach(st => {
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.fillText(st.label.toUpperCase(), statX, 98);
+        ctx.fillStyle = st.color;
+        ctx.font = 'bold 20px system-ui, sans-serif';
+        ctx.fillText(st.val, statX, 118);
+        statX += stepX;
+      });
+
+      // Chart Dimensions
+      const cX = 100;
+      const cY = 220;
+      const cW = W - 160;
+      const cH = H - 320;
+
+      const minE = Math.max(0, data.minEle - 15);
+      const maxE = data.maxEle + 15;
+      const rangeE = Math.max(1, maxE - minE);
+      const totalD = Math.max(0.01, data.totalDist);
+
+      // Horizontal Elevation Gridlines
+      const elevSteps = 5;
+      ctx.lineWidth = 1;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i <= elevSteps; i++) {
+        const yVal = minE + (rangeE / elevSteps) * i;
+        const yPos = cY + cH - (cH / elevSteps) * i;
+        ctx.strokeStyle = isDark ? '#1e293b' : '#e2e8f0';
+        ctx.beginPath();
+        ctx.moveTo(cX, yPos);
+        ctx.lineTo(cX + cW, yPos);
+        ctx.stroke();
+
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.font = '16px system-ui, sans-serif';
+        ctx.fillText(`${Math.round(yVal)} m`, cX - 16, yPos);
+      }
+
+      // Vertical Distance Gridlines & Markers
+      const distSteps = Math.min(10, Math.max(5, Math.floor(cW / 140)));
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      for (let i = 0; i <= distSteps; i++) {
+        const dVal = (totalD / distSteps) * i;
+        const xPos = cX + (cW / distSteps) * i;
+
+        ctx.strokeStyle = isDark ? 'rgba(51, 65, 85, 0.45)' : 'rgba(226, 232, 240, 0.8)';
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(xPos, cY);
+        ctx.lineTo(xPos, cY + cH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.font = '15px system-ui, sans-serif';
+        ctx.fillText(`${dVal.toFixed(1)} km`, xPos, cY + cH + 12);
+      }
+
+      // Profile Curve & Gradient Fill
+      ctx.beginPath();
+      data.points.forEach((pt, i) => {
+        const x = cX + (pt.distKm / totalD) * cW;
+        const y = cY + cH - ((pt.ele - minE) / rangeE) * cH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      ctx.lineTo(cX + cW, cY + cH);
+      ctx.lineTo(cX, cY + cH);
+      ctx.closePath();
+
+      const fillGrad = ctx.createLinearGradient(0, cY, 0, cY + cH);
+      fillGrad.addColorStop(0, isDark ? 'rgba(16, 185, 129, 0.45)' : 'rgba(16, 185, 129, 0.35)');
+      fillGrad.addColorStop(1, isDark ? 'rgba(16, 185, 129, 0.02)' : 'rgba(16, 185, 129, 0.02)');
+      ctx.fillStyle = fillGrad;
+      ctx.fill();
+
+      // Footer Citation
+      ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
+      ctx.font = '13.5px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('Aotearoa NZ Mountain Bike & Cycle Trails — BMMC • Topography: Copernicus DEM 30m', 40, H - 20);
+
+      ctx.textAlign = 'right';
+      ctx.fillText(new Date().toLocaleDateString('en-NZ', { dateStyle: 'medium' }), W - 40, H - 20);
+
+      exportCanvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${cleanName}_elevation_profile.png`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 150);
+      }, 'image/png');
+    }
+
+    function exportElevationProfileCSV() {
+      if (!currentElevationData || !currentElevationData.points || !currentElevationData.points.length) {
+        alert('Please open an elevation profile first before exporting.');
+        return;
+      }
+      const data = currentElevationData;
+      const name = data.trackName || 'trail_elevation';
+      const cleanName = name.replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') || 'track';
+
+      const incStr = data.maxIncline > 0 ? `+${data.maxIncline}%` : '0%';
+      const decStr = data.maxDecline < 0 ? `${data.maxDecline}%` : '0%';
+
+      let csv = `# ========================================================\n`;
+      csv += `# Aotearoa NZ Mountain Bike Trail Profile Report\n`;
+      csv += `# Trail Name: ${name}\n`;
+      csv += `# Generated: ${new Date().toISOString()}\n`;
+      csv += `# Total Distance: ${data.totalDist.toFixed(2)} km\n`;
+      csv += `# Elevation Range: ${data.minEle} m to ${data.maxEle} m (Net Δ: ${data.maxEle - data.minEle} m)\n`;
+      csv += `# Total Ascent (Climb): +${Math.round(data.gain)} m\n`;
+      csv += `# Total Descent: -${Math.round(data.loss)} m\n`;
+      csv += `# Maximum Incline Grade: ${incStr}\n`;
+      csv += `# Maximum Decline Grade: ${decStr}\n`;
+      csv += `# ========================================================\n`;
+      csv += `Distance_km,Elevation_m,Grade_pct,Latitude,Longitude\n`;
+
+      data.points.forEach(pt => {
+        csv += `${pt.distKm.toFixed(3)},${pt.ele},${pt.gradePct},${pt.lat.toFixed(6)},${pt.lon.toFixed(6)}\n`;
+      });
+
+      downloadFile(csv, `${cleanName}_elevation_profile.csv`, 'text/csv;charset=utf-8;');
+    }
+
+    function exportElevationProfileGPX() {
+      if (!currentElevationData || !currentElevationData.points || !currentElevationData.points.length) {
+        alert('Please open an elevation profile first before exporting.');
+        return;
+      }
+      const data = currentElevationData;
+      const name = data.trackName || 'trail_track';
+      const cleanName = name.replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') || 'track';
+
+      const incStr = data.maxIncline > 0 ? `+${data.maxIncline}%` : '0%';
+      const decStr = data.maxDecline < 0 ? `${data.maxDecline}%` : '0%';
+
+      let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      gpx += `<gpx version="1.1" creator="BMMC Aotearoa NZ MTB" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">\n`;
+      gpx += `  <metadata>\n`;
+      gpx += `    <name>${escapeXML(name)} (3D Profile)</name>\n`;
+      gpx += `    <desc>Distance: ${data.totalDist.toFixed(2)}km | Min: ${data.minEle}m | Max: ${data.maxEle}m | Ascent: +${Math.round(data.gain)}m | Descent: -${Math.round(data.loss)}m | Maximum Incline Grade: ${incStr} | Maximum Decline Grade: ${decStr}</desc>\n`;
+      gpx += `    <time>${new Date().toISOString()}</time>\n`;
+      gpx += `  </metadata>\n`;
+      gpx += `  <trk>\n`;
+      gpx += `    <name>${escapeXML(name)}</name>\n`;
+      gpx += `    <trkseg>\n`;
+      data.points.forEach(pt => {
+        gpx += `      <trkpt lat="${pt.lat.toFixed(6)}" lon="${pt.lon.toFixed(6)}"><ele>${pt.ele}</ele></trkpt>\n`;
+      });
+      gpx += `    </trkseg>\n`;
+      gpx += `  </trk>\n`;
+      gpx += `</gpx>\n`;
+
+      downloadFile(gpx, `${cleanName}_3D_elevation.gpx`, 'application/gpx+xml;charset=utf-8;');
+    }
+
+    // =========================================================================
+    // ELEVATION SCRUBBING & CANVAS INTERACTION
+    // =========================================================================
+    function handleElevationScrub(clientX, clientY) {
+      if (!currentElevationData || !currentElevationData.points || currentElevationData.points.length === 0) return;
+
+      const canvas = document.getElementById('elevationCanvas');
+      const tooltip = document.getElementById('elevTooltip');
+      if (!canvas || !tooltip) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const padLeft = 48;
+      const padRight = 20;
+      const w = Math.max(10, rect.width - padLeft - padRight);
+
+      const mouseX = clientX - rect.left - padLeft;
+      if (mouseX < 0 || mouseX > w) {
+        tooltip.style.display = 'none';
+        if (elevScrubMarker) {
+          map.removeLayer(elevScrubMarker);
+          elevScrubMarker = null;
+        }
+        return;
+      }
+
+      const fraction = Math.max(0, Math.min(1, mouseX / w));
+      const targetDist = fraction * currentElevationData.totalDist;
+
+      let bestPt = currentElevationData.points[0];
+      let minDiff = Infinity;
+      for (const pt of currentElevationData.points) {
+        const diff = Math.abs(pt.distKm - targetDist);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestPt = pt;
+        }
+      }
+
+      const containerRect = document.getElementById('elevCanvasContainer').getBoundingClientRect();
+      const relX = clientX - containerRect.left;
+      const relY = clientY - containerRect.top;
+
+      const grade = bestPt.gradePct || 0;
+      const gradeSign = grade > 0 ? `+${grade}%` : `${grade}%`;
+      const gradeColor = Math.abs(grade) >= 15 ? '#f43f5e' : (Math.abs(grade) >= 8 ? '#f59e0b' : '#34d399');
+
+      tooltip.style.display = 'block';
+      tooltip.style.left = `${relX}px`;
+      tooltip.style.top = `${Math.max(18, relY)}px`;
+      tooltip.innerHTML = `
+        <div style="font-weight:900; font-size:11px;">${bestPt.distKm.toFixed(1)} km &bull; ${bestPt.ele}m elev</div>
+        <div style="font-size:10px; font-weight:800; color:${gradeColor}; margin-top:2px;">Grade: ${gradeSign}</div>
+      `;
+
+      if (!elevScrubMarker) {
+        elevScrubMarker = L.circleMarker([bestPt.lat, bestPt.lon], {
+          radius: 7.5,
+          fillColor: '#3b82f6',
+          fillOpacity: 1,
+          color: '#ffffff',
+          weight: 2.5,
+          interactive: false
+        }).addTo(map);
+      } else {
+        elevScrubMarker.setLatLng([bestPt.lat, bestPt.lon]);
+      }
+    }
+
+    function initElevationEvents() {
+      const canvas = document.getElementById('elevationCanvas');
+      const tooltip = document.getElementById('elevTooltip');
+
+      canvas?.addEventListener('mousemove', (e) => handleElevationScrub(e.clientX, e.clientY));
+      canvas?.addEventListener('mouseleave', () => {
+        if (tooltip) tooltip.style.display = 'none';
+        if (elevScrubMarker) {
+          map.removeLayer(elevScrubMarker);
+          elevScrubMarker = null;
+        }
+      });
+
+      canvas?.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 0) {
+          e.preventDefault();
+          handleElevationScrub(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      canvas?.addEventListener('touchend', () => {
+        if (tooltip) tooltip.style.display = 'none';
+        if (elevScrubMarker) {
+          map.removeLayer(elevScrubMarker);
+          elevScrubMarker = null;
+        }
+      });
+
+      document.getElementById('btnElevExpand')?.addEventListener('click', () => {
+        const drawer = document.getElementById('elevationDrawer');
+        const isExp = drawer.classList.toggle('expanded');
+        document.getElementById('lblElevExpand').textContent = isExp ? 'Collapse' : '⛶ Expand';
+
+        const legendWrapper = document.getElementById('legendWrapper');
+        const statusBar = document.getElementById('statusBar');
+        const newBottom = isExp ? 'min(465px, 64vh)' : '245px';
+        if (legendWrapper) legendWrapper.style.bottom = newBottom;
+        if (statusBar) statusBar.style.bottom = newBottom;
+
+        setTimeout(() => {
+          if (currentElevationData) renderElevationProfileCanvas(currentElevationData);
+        }, 240);
+      });
+
+      document.getElementById('btnElevClose')?.addEventListener('click', closeElevationDrawer);
+
+      document.getElementById('btnElevExportPNG')?.addEventListener('click', downloadElevationProfilePNG);
+      document.getElementById('btnElevExportCSV')?.addEventListener('click', exportElevationProfileCSV);
+      document.getElementById('btnElevExportGPX')?.addEventListener('click', exportElevationProfileGPX);
+
+      window.addEventListener('resize', () => {
+        if (currentElevationData && document.getElementById('elevationDrawer').style.display !== 'none') {
+          renderElevationProfileCanvas(currentElevationData);
+        }
+      });
+    }
+
+    // =========================================================================
     // POPUPS & RENDERING
     // =========================================================================
     function buildTrailPopup(props) {
@@ -2060,6 +2978,10 @@
             ${props.description ? `<div style="margin-top:4px; line-height:1.4;"><strong>Description:</strong> ${escapeHTML(props.description)}</div>` : ''}
             ${props.comment ? `<div class="trail-comment-box">💬 ${escapeHTML(props.comment)}</div>` : ''}
           </div>
+
+          <button class="btn-trail-action btn-elevation" onclick="window.openTrackElevationProfile('${props.uid}');" title="Show Elevation Profile across full width">
+            <span>📈</span> Elevation Profile (Full Width)
+          </button>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:4px;">
             <button class="btn-trail-action btn-download-gpx" style="margin-top:0;" onclick="window.downloadTrackGPX('${props.uid}');" title="Download GPX file for GPS &amp; biking computers">
@@ -2140,8 +3062,8 @@
           },
           onEachFeature: (feat, layer) => {
             layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 510 });
-            layer.on('click', () => {
-              highlightSelectedFeature(feat);
+            layer.on('click', (e) => {
+              handleTrackSelection(feat, e.originalEvent, layer);
             });
             layer.on('mouseover', function() {
               if (typeof this.setStyle === 'function') {
@@ -2323,7 +3245,6 @@
     }
 
     async function loadAllDatasetsPipeline() {
-      // Load order strictly follows the required hierarchy: Great Rides down to DOC
       const loadOrder = ['great_rides', 'chch_cycle', 'heartland', 'chch_council', 'nz_osm', 'cap_plus', 'doc_tracks'];
       document.getElementById('lblDatasetLoading').textContent = 'Loading trail datasets...';
 
@@ -2380,12 +3301,14 @@
         const name = props.name || props.RouteName || props.cycletrail || props.TechObjectName || `${fileName} (Track ${idx + 1})`;
         const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
         const lengthStr = distKm > 0 ? `${distKm.toFixed(2)} km` : (props.lengthStr || '');
+        const trackUid = `imported_${Date.now()}_${idx}_${name.slice(0, 14).replace(/[^a-zA-Z0-9]/g, '_')}`;
 
         validFeatures.push({
           type: 'Feature',
           geometry: geom,
           properties: {
             ...props,
+            uid: trackUid,
             name: name,
             fileName: fileName,
             fileType: 'GeoJSON',
@@ -2425,11 +3348,13 @@
             ? { type: 'LineString', coordinates: multiLine[0] }
             : { type: 'MultiLineString', coordinates: multiLine };
           const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
+          const trackUid = `imported_${Date.now()}_${tIdx}_${trkName.slice(0, 14).replace(/[^a-zA-Z0-9]/g, '_')}`;
 
           features.push({
             type: 'Feature',
             geometry: geom,
             properties: {
+              uid: trackUid,
               name: trkName,
               fileName: fileName,
               fileType: 'GPX',
@@ -2507,6 +3432,9 @@
           <div class="trail-meta-row">
             <div>📁 <strong>File:</strong> ${escapeHTML(props.fileName || 'Imported File')}</div>
           </div>
+          <button class="btn-trail-action btn-elevation" onclick="window.openTrackElevationProfile('${props.uid}');" title="Show Elevation Profile across full width">
+            <span>📈</span> Elevation Profile (Full Width)
+          </button>
           <button class="btn-trail-action" style="margin-top:6px; color:#e11d48;" onclick="window.removeImportedTrack('${layer._leaflet_id}')">
             <span>🗑️</span> Remove Imported Track
           </button>
@@ -2570,8 +3498,6 @@
         zoomControl: false
       });
 
-      // Configure separate Leaflet panes for strict Z-index order
-      // Higher z-index renders on top; canvas tolerance 22 for easy mobile tapping
       Object.entries(PANE_CONFIG).forEach(([key, cfg]) => {
         map.createPane(cfg.pane);
         map.getPane(cfg.pane).style.zIndex = cfg.zIndex;
@@ -2599,7 +3525,9 @@
         },
         onEachFeature: (feat, layer) => {
           layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 480 });
-          layer.on('click', () => { highlightSelectedFeature(feat); });
+          layer.on('click', (e) => {
+            handleTrackSelection(feat, e.originalEvent, layer);
+          });
           layer.on('mouseover', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 7.2 }); });
           layer.on('mouseout', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 4.8 }); });
         }
@@ -2620,16 +3548,13 @@
       });
 
       map.on('popupclose', () => {
-        if (selectedHighlightLayer) {
-          map.removeLayer(selectedHighlightLayer);
-          selectedHighlightLayer = null;
+        if (selectedFeatures.length <= 1) {
+          clearAllHighlights();
+          selectedFeatures = [];
         }
       });
 
-      // =======================================================================
-      // MOBILE PROXIMITY TAP-ASSIST
-      // Snaps tap events to the closest visible trail within 28px
-      // =======================================================================
+      // Mobile Proximity Snap
       map.on('click', (e) => {
         if (Date.now() - lastPopupOpenTime < 140) return;
 
@@ -2678,15 +3603,7 @@
         }
 
         if (closestLayer && closestFeat) {
-          highlightSelectedFeature(closestFeat);
-          if (typeof closestLayer.openPopup === 'function') {
-            closestLayer.openPopup(e.latlng);
-          } else {
-            L.popup({ maxWidth: 510 })
-              .setLatLng(e.latlng)
-              .setContent(buildTrailPopup(closestFeat.properties))
-              .openOn(map);
-          }
+          handleTrackSelection(closestFeat, e.originalEvent, closestLayer, e.latlng);
         }
       });
     }
@@ -2734,13 +3651,21 @@
       });
     }
 
+    let _leafletWaitAttempts = 0;
     function startApp() {
       if (!window.L) {
+        _leafletWaitAttempts++;
+        if (_leafletWaitAttempts > 50) {
+          const status = document.getElementById('lblDatasetLoading');
+          if (status) status.textContent = 'Leaflet map library could not be loaded. Please check your internet connection.';
+          return;
+        }
         setTimeout(startApp, 100);
         return;
       }
 
       initMap();
+      initElevationEvents();
 
       window.toggleSaveTrack = toggleSaveTrack;
       window.downloadTrackGPX = downloadTrackGPX;
@@ -2748,6 +3673,13 @@
       window.downloadAllSavedGPX = downloadAllSavedGPX;
       window.downloadAllSavedGeoJSON = downloadAllSavedGeoJSON;
       window.zoomToTrack = zoomToTrack;
+      window.openTrackElevationProfile = openTrackElevationProfile;
+      window.closeElevationDrawer = closeElevationDrawer;
+      window.downloadElevationProfilePNG = downloadElevationProfilePNG;
+      window.exportElevationProfileCSV = exportElevationProfileCSV;
+      window.exportElevationProfileGPX = exportElevationProfileGPX;
+      window.clearAllHighlights = clearAllHighlights;
+      window.handleTrackSelection = handleTrackSelection;
 
       updateSavedBadge();
 
@@ -2821,7 +3753,7 @@
         trailLegendCard.style.display = 'flex';
       });
 
-      // Interactive Legend Items (Click to toggle layers)
+      // Interactive Legend Items
       document.querySelectorAll('#trailLegendCard .legend-item[data-layer-key]').forEach(item => {
         item.addEventListener('click', () => {
           const key = item.getAttribute('data-layer-key');
@@ -2829,7 +3761,7 @@
         });
       });
 
-      // Dataset Overlay Toggles (Ordered Top-to-Bottom by Layer Stacking)
+      // Dataset Overlay Toggles
       document.getElementById('btnToggleGreatRides')?.addEventListener('click', () => toggleDatasetById('great_rides'));
       document.getElementById('btnToggleChchCycle')?.addEventListener('click', () => toggleDatasetById('chch_cycle'));
       document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleDatasetById('heartland'));
