@@ -157,6 +157,19 @@
       color: #6ee7b7;
     }
 
+    /* GPS & Record Buttons Styling */
+    .btn-record-active {
+      background: #ffe4e6 !important;
+      border-color: #f43f5e !important;
+      color: #be123c !important;
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.4) !important;
+    }
+    .dark .btn-record-active {
+      background: #4c0519 !important;
+      border-color: #f43f5e !important;
+      color: #fda4af !important;
+    }
+
     /* Search Box */
     .map-search-box {
       position: relative;
@@ -468,6 +481,161 @@
       50% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(0.9); opacity: 0.8; }
     }
+
+    /* GPS User Marker & Pulse */
+    .user-location-marker {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #2563eb;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 14px rgba(37, 99, 235, 0.9);
+      position: relative;
+    }
+    .user-location-marker::after {
+      content: '';
+      position: absolute;
+      top: -8px; left: -8px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.35);
+      animation: pulse-ring 1.8s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+
+    /* Live Ride Recording HUD Card */
+    .recording-hud-card {
+      position: absolute;
+      top: 104px;
+      right: 16px;
+      z-index: 1500;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.55);
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 330px;
+      max-width: calc(100vw - 32px);
+      pointer-events: auto;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    .rec-hud-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+      padding-bottom: 6px;
+    }
+    .rec-hud-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: #fda4af;
+    }
+    .rec-blip {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #f43f5e;
+      display: inline-block;
+      animation: rec-pulse 1.1s infinite;
+    }
+    @keyframes rec-pulse {
+      0% { transform: scale(0.85); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.85); opacity: 0.7; }
+    }
+    .rec-hud-timer-badge {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(30, 41, 59, 0.8);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .rec-stats-grid-6 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+    .rec-stat-box {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 9px;
+      padding: 6px 4px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .rec-stat-val {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 14px;
+      font-weight: 900;
+      color: #f8fafc;
+      line-height: 1.15;
+    }
+    .rec-stat-lbl {
+      font-size: 9px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .rec-actions-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .btn-rec-hud {
+      flex: 1;
+      height: 30px;
+      padding: 0 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .btn-rec-hud-pause {
+      background: #334155;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+    .btn-rec-hud-pause:hover { background: #475569; }
+    .btn-rec-hud-save {
+      background: #059669;
+      color: #ffffff;
+      border-color: #34d399;
+    }
+    .btn-rec-hud-save:hover { background: #10b981; }
+    .btn-rec-hud-discard {
+      flex: 0 0 auto;
+      background: #4c0519;
+      color: #fda4af;
+      border-color: #e11d48;
+    }
+    .btn-rec-hud-discard:hover { background: #881337; color: #ffffff; }
 
     /* Popups */
     .leaflet-popup-content {
@@ -908,6 +1076,13 @@
       .elevation-drawer.expanded {
         height: 75vh;
       }
+      .recording-hud-card {
+        top: auto;
+        bottom: 84px;
+        right: 14px;
+        left: 14px;
+        width: auto;
+      }
     }
 
     /* Modal */
@@ -967,6 +1142,41 @@
     .dark .advisory-modal-body { color: #cbd5e1; }
     .advisory-modal-body strong { color: #0f172a; }
     .dark .advisory-modal-body strong { color: #f8fafc; }
+  
+    /* Grade Select inside Layers Dropdown */
+    .layer-grade-select {
+      width: 100%;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+    .layer-grade-select:focus {
+      border-color: #10b981;
+    }
+    .dark .layer-grade-select {
+      background: #1e293b;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+    .dark .layer-grade-select:focus {
+      border-color: #34d399;
+    }
+
+    /* Zoom All Button in Leaflet Stack */
+    .leaflet-control-zoom a.leaflet-control-zoom-all {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 30px !important;
+    }
   </style>
 </head>
 <body>
@@ -1001,6 +1211,21 @@
           <div class="layer-section-divider"></div>
 
           <!-- Trail Datasets Ordered Top-to-Bottom by Layer Stacking -->
+          
+          <div class="layer-section-divider"></div>
+
+          <div class="layer-section-title">Filter by Grade</div>
+          <div style="padding: 2px 0 4px;">
+            <select id="gradeSelect" class="layer-grade-select" aria-label="Filter trails by grade">
+              <option value="all" selected>All Grades (1 – 6)</option>
+              <option value="1">Grade 1 (Easiest)</option>
+              <option value="2">Grade 2 (Easy)</option>
+              <option value="3">Grade 3 (Intermediate)</option>
+              <option value="4">Grade 4 (Advanced)</option>
+              <option value="5">Grade 5/6 (Expert)</option>
+            </select>
+          </div>
+
           <div class="layer-section-title">Trail Datasets</div>
           <div class="layer-overlay-col">
             <!-- 1. NZ Great Rides (Top) -->
@@ -1079,28 +1304,71 @@
       </button>
       <input type="file" id="gpxFileInput" accept=".gpx,.geojson,.json" multiple style="display:none;">
 
+      <!-- GPS Locate / Follow Button -->
+      <button id="btnLocateMe" class="top-action-btn" title="Track &amp; Follow My GPS Location">
+        <span>📍</span> <span id="lblLocate">Find Me</span>
+      </button>
+
+      <!-- Record Ride Button -->
+      <button id="btnRecordRide" class="top-action-btn" title="Start / Stop Recording MTB Ride">
+        <span id="iconRecord">⏺️</span> <span id="lblRecord">Record</span>
+      </button>
+
       <!-- Advisory & Fit NZ -->
       <button id="btnOpenAdvisory" class="top-action-btn" title="Official Trail Data Advisory &amp; Disclaimer">
         <span>⚠️</span> <span>Advisory</span>
       </button>
 
-      <button id="btnFitNZ" class="top-action-btn" title="Fit New Zealand In View">
-        <span>🇳🇿</span> <span>Fit NZ</span>
-      </button>
-    </div>
-
-    <!-- Quick Grade Filter Chips -->
-    <div class="filter-chips-bar">
-      <button class="filter-chip active" data-grade="all">All Grades</button>
-      <button class="filter-chip" data-grade="1">Grade 1 (Easiest)</button>
-      <button class="filter-chip" data-grade="2">Grade 2 (Easy)</button>
-      <button class="filter-chip" data-grade="3">Grade 3 (Intermediate)</button>
-      <button class="filter-chip" data-grade="4">Grade 4 (Advanced)</button>
-      <button class="filter-chip" data-grade="5">Grade 5/6 (Expert)</button>
+      
     </div>
   </div>
 
   <div id="map"></div>
+
+  <!-- Live Ride Recording Floating Stats Box / HUD -->
+  <div id="recordingHud" class="recording-hud-card" style="display:none;" role="region" aria-label="Live Ride Stats">
+    <div class="rec-hud-header">
+      <div class="rec-hud-status">
+        <span class="rec-blip"></span>
+        <span id="recHudStatusLabel">Recording Ride</span>
+      </div>
+      <span id="recTotalDuration" class="rec-hud-timer-badge">00:00:00</span>
+    </div>
+
+    <!-- 6 Live Metric Tiles -->
+    <div class="rec-stats-grid-6">
+      <div class="rec-stat-box">
+        <span class="rec-stat-val" id="recCurSpeed">0.0</span>
+        <span class="rec-stat-lbl">Speed (km/h)</span>
+      </div>
+      <div class="rec-stat-box">
+        <span class="rec-stat-val" id="recAvgSpeed">0.0</span>
+        <span class="rec-stat-lbl">Avg (km/h)</span>
+      </div>
+      <div class="rec-stat-box">
+        <span class="rec-stat-val" id="recDistKm">0.00</span>
+        <span class="rec-stat-lbl">Distance (km)</span>
+      </div>
+      <div class="rec-stat-box">
+        <span class="rec-stat-val" id="recTotalClimb">+0m</span>
+        <span class="rec-stat-lbl">Total Climb</span>
+      </div>
+      <div class="rec-stat-box">
+        <span class="rec-stat-val" id="recActiveTime">00:00:00</span>
+        <span class="rec-stat-lbl">Active Time</span>
+      </div>
+      <div class="rec-stat-box">
+        <span class="rec-stat-val" id="recCurEle">--</span>
+        <span class="rec-stat-lbl">Elev (m)</span>
+      </div>
+    </div>
+
+    <div class="rec-actions-bar">
+      <button id="btnPauseResumeRec" class="btn-rec-hud btn-rec-hud-pause">⏸️ Pause</button>
+      <button id="btnFinishRec" class="btn-rec-hud btn-rec-hud-save">💾 Finish &amp; Save</button>
+      <button id="btnDiscardRec" class="btn-rec-hud btn-rec-hud-discard">✕</button>
+    </div>
+  </div>
 
   <!-- Advisory Modal -->
   <div id="advisoryModal" class="advisory-modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="advisoryTitle">
@@ -1176,10 +1444,10 @@
           <span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span>
           <span>DOC MTB Permitted</span>
         </div>
-        <!-- User Imported Tracks -->
-        <div class="legend-item" data-layer-key="imported" title="Click to toggle Imported GPX / GeoJSON">
+        <!-- User Recorded or Imported Tracks -->
+        <div class="legend-item" data-layer-key="imported" title="Click to toggle Imported / Recorded GPS">
           <span class="legend-line" style="background:#ff2d87;"></span>
-          <span>Imported GPX / GeoJSON</span>
+          <span>Recorded / Imported GPS</span>
         </div>
       </div>
     </div>
@@ -1223,7 +1491,6 @@
   <!-- Universal Navigation Drawer Script -->
   <script src="shared-nav.js" onerror="this.onerror=null;"></script>
 
-  <!-- Leaflet CDN with Asynchronous Local Fallback -->
   <!-- Leaflet CDN with Multi-CDN and Local Fallback -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
   <script>
@@ -1253,7 +1520,8 @@
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
     const CACHE_DB_NAME = 'BMMC_MTB_DB_V4';
     const CACHE_STORE_NAME = 'geojson_store';
-    const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000;
+    // Extended to 365 days for remote backcountry offline persistence
+    const CACHE_EXPIRY_MS = 365 * 24 * 60 * 60 * 1000;
 
     const PANE_CONFIG = {
       imported:     { pane: 'pane_imported',     zIndex: 480 },
@@ -1369,12 +1637,32 @@
     let currentElevationData = null;
     let elevScrubMarker = null;
 
+    // GPS & Recorder State
+    let userMarker = null;
+    let userCircle = null;
+    let isFollowingUser = false;
+    let watchId = null;
+    let wakeLock = null;
+
+    let isRecording = false;
+    let isPaused = false;
+    let recordedPoints = [];
+    let recordedPolyline = null;
+    let recStartTime = null;
+    let recPausedDurationMs = 0;
+    let recPauseStartTime = null;
+    let recTimerInterval = null;
+    let totalRecordedClimbMeters = 0;
+
+    const REC_STORAGE_BACKUP_KEY = 'bMMC_active_recorded_track_v2';
+    const SAVED_STORAGE_KEY = 'bMMC_nz_mtb_saved_ids';
+
     // =========================================================================
     // MULTI-TRACK HIGHLIGHT & SELECTION ENGINE (Ctrl/Cmd Multi-Select)
     // =========================================================================
     function clearAllHighlights() {
       selectedHighlightLayers.forEach(l => {
-        if (map.hasLayer(l)) map.removeLayer(l);
+        if (map && map.hasLayer(l)) map.removeLayer(l);
       });
       selectedHighlightLayers = [];
     }
@@ -1524,8 +1812,6 @@
     // =========================================================================
     // SAVED TRAILS / FAVORITES & EXPORT
     // =========================================================================
-    const SAVED_STORAGE_KEY = 'bMMC_nz_mtb_saved_ids';
-
     function getSavedSet() {
       try {
         const raw = localStorage.getItem(SAVED_STORAGE_KEY);
@@ -2130,9 +2416,7 @@
         };
       });
 
-      // =======================================================================
-      // TRACK LINKING: Merge segments with identical track names for nz_osm & doc_tracks
-      // =======================================================================
+      // Track Linking: Merge segments with identical track names for nz_osm & doc_tracks
       if (datasetId === 'nz_osm' || datasetId === 'doc_tracks') {
         const genericNames = datasetId === 'nz_osm'
           ? new Set(['', 'nz osm mtb track', 'unnamed', 'track', 'trail', 'path', 'cycleway', 'mountain bike track', 'mtb track', 'footpath', 'bridleway', 'service road'])
@@ -2289,11 +2573,7 @@
         throw new Error("No valid coordinates found for elevation sampling.");
       }
 
-      // Sample up to 140 points for smooth profiles
       const sampled = sampleCoordinatesEvenly(validCoords, 140);
-
-      // Open-Meteo enforces a strict limit of 100 coordinates per request.
-      // Batch into chunks of 70 coordinates to strictly prevent 400 errors.
       const CHUNK_SIZE = 70;
       const chunks = [];
       for (let i = 0; i < sampled.length; i += CHUNK_SIZE) {
@@ -2348,7 +2628,6 @@
         });
       }
 
-      // Compute local slope gradient (%) with separate Incline and Decline extremes
       let maxIncline = 0;
       let maxDecline = 0;
 
@@ -2573,7 +2852,7 @@
     }
 
     // =========================================================================
-    // ELEVATION EXPORT ENGINE (PNG with Incline & Decline, CSV & 3D GPX)
+    // ELEVATION EXPORT ENGINE
     // =========================================================================
     function downloadElevationProfilePNG() {
       if (!currentElevationData || !currentElevationData.points || !currentElevationData.points.length) {
@@ -2595,21 +2874,18 @@
       ctx.fillStyle = isDark ? '#0b1329' : '#f8fafc';
       ctx.fillRect(0, 0, W, H);
 
-      // Top Title Bar Card
       ctx.fillStyle = isDark ? '#0f172a' : '#ffffff';
       ctx.fillRect(40, 30, W - 80, 140);
       ctx.strokeStyle = isDark ? '#334155' : '#e2e8f0';
       ctx.lineWidth = 2;
       ctx.strokeRect(40, 30, W - 80, 140);
 
-      // Title
       ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
       ctx.font = 'bold 30px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillText(`🚵 ${name}`, 65, 48);
 
-      // 6 Metric Cards Including BOTH Max Incline and Max Decline Grades
       const incStr = data.maxIncline > 0 ? `+${data.maxIncline}%` : '0%';
       const decStr = data.maxDecline < 0 ? `${data.maxDecline}%` : '0%';
 
@@ -2634,7 +2910,6 @@
         statX += stepX;
       });
 
-      // Chart Dimensions
       const cX = 100;
       const cY = 220;
       const cW = W - 160;
@@ -2645,7 +2920,6 @@
       const rangeE = Math.max(1, maxE - minE);
       const totalD = Math.max(0.01, data.totalDist);
 
-      // Horizontal Elevation Gridlines
       const elevSteps = 5;
       ctx.lineWidth = 1;
       ctx.textAlign = 'right';
@@ -2664,7 +2938,6 @@
         ctx.fillText(`${Math.round(yVal)} m`, cX - 16, yPos);
       }
 
-      // Vertical Distance Gridlines & Markers
       const distSteps = Math.min(10, Math.max(5, Math.floor(cW / 140)));
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
@@ -2685,7 +2958,6 @@
         ctx.fillText(`${dVal.toFixed(1)} km`, xPos, cY + cH + 12);
       }
 
-      // Profile Curve & Gradient Fill
       ctx.beginPath();
       data.points.forEach((pt, i) => {
         const x = cX + (pt.distKm / totalD) * cW;
@@ -2710,7 +2982,6 @@
       ctx.fillStyle = fillGrad;
       ctx.fill();
 
-      // Footer Citation
       ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
       ctx.font = '13.5px system-ui, sans-serif';
       ctx.textAlign = 'left';
@@ -3338,7 +3609,12 @@
           pts.forEach(pt => {
             const lat = parseFloat(pt.getAttribute('lat'));
             const lon = parseFloat(pt.getAttribute('lon'));
-            if (!isNaN(lat) && !isNaN(lon)) line.push([lon, lat]);
+            const eleNode = pt.querySelector('ele');
+            const ele = eleNode ? parseFloat(eleNode.textContent) : undefined;
+            if (!isNaN(lat) && !isNaN(lon)) {
+              if (ele !== undefined && !isNaN(ele)) line.push([lon, lat, ele]);
+              else line.push([lon, lat]);
+            }
           });
           if (line.length > 0) multiLine.push(line);
         });
@@ -3424,19 +3700,19 @@
         <div class="trail-popup-card">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
             <span class="trail-pill" style="background:#fce7f3; color:#be185d; border:1px solid #f472b6;">
-              📂 Imported ${escapeHTML(typeLabel)} (Pink Line)
+              📂 ${escapeHTML(typeLabel)} Track (Pink Line)
             </span>
           </div>
           <h3>${escapeHTML(props.name || 'Imported Track')}</h3>
           ${props.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(props.lengthStr)}</div>` : ''}
           <div class="trail-meta-row">
-            <div>📁 <strong>File:</strong> ${escapeHTML(props.fileName || 'Imported File')}</div>
+            <div>📁 <strong>Source:</strong> ${escapeHTML(props.fileName || 'Imported File')}</div>
           </div>
           <button class="btn-trail-action btn-elevation" onclick="window.openTrackElevationProfile('${props.uid}');" title="Show Elevation Profile across full width">
             <span>📈</span> Elevation Profile (Full Width)
           </button>
           <button class="btn-trail-action" style="margin-top:6px; color:#e11d48;" onclick="window.removeImportedTrack('${layer._leaflet_id}')">
-            <span>🗑️</span> Remove Imported Track
+            <span>🗑️</span> Remove Track
           </button>
         </div>
       `;
@@ -3451,6 +3727,409 @@
         updateTotalStats();
       }
     };
+
+    // =========================================================================
+    // GPS TRACKING, WAKE LOCK & LIVE RIDE RECORDER ENGINE
+    // =========================================================================
+    async function requestScreenWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        }
+      } catch (err) {
+        console.log('Wake Lock denied or unavailable:', err);
+      }
+    }
+
+    function releaseScreenWakeLock() {
+      if (wakeLock) {
+        wakeLock.release().catch(() => {});
+        wakeLock = null;
+      }
+    }
+
+    function initGpsAndRecorder() {
+      const btnLocate = document.getElementById('btnLocateMe');
+      const lblLocate = document.getElementById('lblLocate');
+      const btnRecord = document.getElementById('btnRecordRide');
+      const hud = document.getElementById('recordingHud');
+
+      // Gracefully release auto-follow if user manually moves the map
+      map.on('dragstart', () => {
+        if (isFollowingUser) {
+          isFollowingUser = false;
+          btnLocate?.classList.remove('active');
+          if (lblLocate) lblLocate.textContent = 'Find Me';
+        }
+      });
+
+      // Find Me / Follow Location Button
+      btnLocate?.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          alert('Geolocation is not supported by your browser.');
+          return;
+        }
+
+        if (watchId) {
+          if (isFollowingUser) {
+            isFollowingUser = false;
+            btnLocate.classList.remove('active');
+            lblLocate.textContent = 'Find Me';
+          } else {
+            isFollowingUser = true;
+            btnLocate.classList.add('active');
+            lblLocate.textContent = 'Tracking';
+            if (userMarker) {
+              map.setView(userMarker.getLatLng(), Math.max(map.getZoom(), 15));
+            }
+          }
+          return;
+        }
+
+        lblLocate.textContent = 'Locating...';
+        startGpsWatcher();
+      });
+
+      function startGpsWatcher() {
+        watchId = navigator.geolocation.watchPosition(
+          handleGpsPosition,
+          handleGpsError,
+          {
+            enableHighAccuracy: true,
+            maximumAge: 2000,
+            timeout: 15000
+          }
+        );
+      }
+
+      function handleGpsPosition(pos) {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const accuracy = pos.coords.accuracy;
+        const ele = pos.coords.altitude !== null ? Math.round(pos.coords.altitude) : null;
+        const speedMs = pos.coords.speed;
+        const speedKmh = (speedMs !== null && speedMs >= 0) ? (speedMs * 3.6).toFixed(1) : '0.0';
+        const userLatLng = [lat, lng];
+
+        if (!userMarker) {
+          const userIcon = L.divIcon({
+            className: 'user-location-marker',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          });
+          userMarker = L.marker(userLatLng, { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+          userCircle = L.circle(userLatLng, {
+            radius: accuracy,
+            color: '#2563eb',
+            fillColor: '#93c5fd',
+            fillOpacity: 0.16,
+            weight: 1
+          }).addTo(map);
+
+          map.setView(userLatLng, Math.max(map.getZoom(), 15));
+          isFollowingUser = true;
+          btnLocate.classList.add('active');
+          lblLocate.textContent = 'Tracking';
+        } else {
+          userMarker.setLatLng(userLatLng);
+          userCircle.setLatLng(userLatLng);
+          userCircle.setRadius(accuracy);
+
+          if (isFollowingUser) {
+            map.panTo(userLatLng);
+          }
+        }
+
+        if (isRecording && !isPaused) {
+          appendRecordedPoint({
+            lat: lat,
+            lon: lng,
+            ele: ele,
+            accuracy: accuracy,
+            speed: parseFloat(speedKmh) || 0,
+            time: new Date().toISOString()
+          });
+        }
+      }
+
+      function handleGpsError(err) {
+        console.warn('GPS signal warning:', err.message);
+        if (lblLocate) {
+          lblLocate.textContent = 'GPS Err';
+          setTimeout(() => { lblLocate.textContent = 'Find Me'; }, 3500);
+        }
+      }
+
+      // Record Ride Button
+      btnRecord?.addEventListener('click', () => {
+        if (!isRecording) {
+          startRideRecording();
+        } else {
+          hud.style.display = 'flex';
+        }
+      });
+
+      // HUD Pause / Resume
+      document.getElementById('btnPauseResumeRec')?.addEventListener('click', () => {
+        const btn = document.getElementById('btnPauseResumeRec');
+        const statusLbl = document.getElementById('recHudStatusLabel');
+        if (!isPaused) {
+          isPaused = true;
+          recPauseStartTime = Date.now();
+          btn.textContent = '▶️ Resume';
+          btn.style.background = '#059669';
+          btn.style.borderColor = '#34d399';
+          if (statusLbl) statusLbl.textContent = 'Paused';
+        } else {
+          isPaused = false;
+          if (recPauseStartTime) {
+            recPausedDurationMs += (Date.now() - recPauseStartTime);
+            recPauseStartTime = null;
+          }
+          btn.textContent = '⏸️ Pause';
+          btn.style.background = '#334155';
+          btn.style.borderColor = '#475569';
+          if (statusLbl) statusLbl.textContent = 'Recording Ride';
+        }
+      });
+
+      // HUD Finish & Discard
+      document.getElementById('btnFinishRec')?.addEventListener('click', finishAndSaveRecording);
+      document.getElementById('btnDiscardRec')?.addEventListener('click', discardRecording);
+
+      // Check for unclosed recorded ride
+      restoreUnfinishedRecording();
+    }
+
+    function startRideRecording() {
+      if (!navigator.geolocation) {
+        alert('Geolocation is required to record mountain bike trails.');
+        return;
+      }
+
+      isRecording = true;
+      isPaused = false;
+      recordedPoints = [];
+      totalRecordedClimbMeters = 0;
+      recStartTime = Date.now();
+      recPausedDurationMs = 0;
+      recPauseStartTime = null;
+
+      document.getElementById('recordingHud').style.display = 'flex';
+      const btnRec = document.getElementById('btnRecordRide');
+      btnRec.classList.add('active', 'btn-record-active');
+      document.getElementById('lblRecord').textContent = 'Rec Active';
+
+      if (recordedPolyline && map.hasLayer(recordedPolyline)) map.removeLayer(recordedPolyline);
+      recordedPolyline = L.polyline([], {
+        color: '#f43f5e',
+        weight: 5.5,
+        opacity: 0.95,
+        lineCap: 'round',
+        lineJoin: 'round',
+        pane: 'highlightPane'
+      }).addTo(map);
+
+      requestScreenWakeLock();
+
+      if (recTimerInterval) clearInterval(recTimerInterval);
+      recTimerInterval = setInterval(updateRecTimerAndHud, 1000);
+
+      if (!watchId) {
+        document.getElementById('btnLocateMe')?.click();
+      }
+    }
+
+    function appendRecordedPoint(pt) {
+      if (pt.accuracy && pt.accuracy > 35) return;
+
+      const count = recordedPoints.length;
+      if (count > 0) {
+        const prev = recordedPoints[count - 1];
+        const distM = getDistanceKm(prev.lat, prev.lon, pt.lat, pt.lon) * 1000;
+        // Jitter suppression threshold
+        if (distM < 3.2) return;
+
+        // Cumulative climb calculation with noise filter (> 1.5m)
+        if (pt.ele !== null && prev.ele !== null) {
+          const eleDelta = pt.ele - prev.ele;
+          if (eleDelta >= 1.5) {
+            totalRecordedClimbMeters += eleDelta;
+          }
+        }
+      }
+
+      recordedPoints.push(pt);
+      recordedPolyline.addLatLng([pt.lat, pt.lon]);
+
+      try {
+        localStorage.setItem(REC_STORAGE_BACKUP_KEY, JSON.stringify({
+          startTime: recStartTime,
+          pausedMs: recPausedDurationMs,
+          totalClimb: totalRecordedClimbMeters,
+          points: recordedPoints
+        }));
+      } catch (e) {}
+
+      updateRecTimerAndHud();
+    }
+
+    function formatDuration(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const s = totalSec % 60;
+      const m = Math.floor(totalSec / 60) % 60;
+      const h = Math.floor(totalSec / 3600);
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(h)}:${pad(m)}:${pad(s)}`;
+    }
+
+    function updateRecTimerAndHud() {
+      if (!isRecording) return;
+
+      const now = Date.now();
+      const totalElapsedMs = now - recStartTime;
+      const currentPauseExtra = isPaused && recPauseStartTime ? (now - recPauseStartTime) : 0;
+      const activeMs = Math.max(0, totalElapsedMs - recPausedDurationMs - currentPauseExtra);
+
+      document.getElementById('recTotalDuration').textContent = formatDuration(totalElapsedMs);
+      document.getElementById('recActiveTime').textContent = formatDuration(activeMs);
+
+      let totalKm = 0;
+      for (let i = 1; i < recordedPoints.length; i++) {
+        totalKm += getDistanceKm(recordedPoints[i-1].lat, recordedPoints[i-1].lon, recordedPoints[i].lat, recordedPoints[i].lon);
+      }
+
+      document.getElementById('recDistKm').textContent = totalKm.toFixed(2);
+      document.getElementById('recTotalClimb').textContent = `+${Math.round(totalRecordedClimbMeters)}m`;
+
+      const activeHours = activeMs / 3600000;
+      const avgKmh = activeHours > 0 ? (totalKm / activeHours).toFixed(1) : '0.0';
+      document.getElementById('recAvgSpeed').textContent = avgKmh;
+
+      if (recordedPoints.length > 0) {
+        const latest = recordedPoints[recordedPoints.length - 1];
+        document.getElementById('recCurSpeed').textContent = isPaused ? '0.0' : (latest.speed || 0).toFixed(1);
+        document.getElementById('recCurEle').textContent = latest.ele !== null ? latest.ele : '--';
+      }
+    }
+
+    function finishAndSaveRecording() {
+      if (recordedPoints.length < 2) {
+        alert('Trail too short to save. Please ride a bit further.');
+        return;
+      }
+
+      const defaultName = `NZ MTB Ride ${new Date().toLocaleDateString('en-NZ')}`;
+      const trackName = prompt('Enter a title for this recorded ride:', defaultName) || defaultName;
+
+      const coords = recordedPoints.map(p => [p.lon, p.lat, p.ele || 0]);
+      const totalKm = calculateCoordsLengthKm(coords, 'LineString');
+      const trackUid = `recorded_${Date.now()}`;
+
+      const feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: coords
+        },
+        properties: {
+          uid: trackUid,
+          name: trackName,
+          fileType: 'Recorded GPS',
+          fileName: 'Live GPS Ride',
+          lengthKm: totalKm,
+          lengthStr: `${totalKm.toFixed(2)} km`,
+          comment: `Total Climb: +${Math.round(totalRecordedClimbMeters)}m • Points: ${recordedPoints.length}`,
+          isRecorded: true,
+          pointsMeta: recordedPoints
+        }
+      };
+
+      if (importedGpxGroup) {
+        importedGpxGroup.addData(feature);
+      }
+
+      const set = getSavedSet();
+      set.add(trackUid);
+      try { localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify([...set])); } catch (e) {}
+      updateSavedBadge();
+
+      // Export GPX with full time & elevation tags
+      const gpxData = exportRecordedToGPX(trackName, recordedPoints);
+      const cleanName = trackName.replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') || 'my_ride';
+      downloadFile(gpxData, `${cleanName}.gpx`, 'application/gpx+xml');
+
+      teardownRecording();
+      alert(`Ride "${trackName}" saved to Favorites & downloaded as GPX!`);
+    }
+
+    function discardRecording() {
+      if (!confirm('Are you sure you want to discard this recorded ride?')) return;
+      teardownRecording();
+    }
+
+    function teardownRecording() {
+      isRecording = false;
+      isPaused = false;
+      if (recTimerInterval) clearInterval(recTimerInterval);
+      releaseScreenWakeLock();
+      localStorage.removeItem(REC_STORAGE_BACKUP_KEY);
+
+      document.getElementById('recordingHud').style.display = 'none';
+      const btnRec = document.getElementById('btnRecordRide');
+      btnRec.classList.remove('active', 'btn-record-active');
+      document.getElementById('lblRecord').textContent = 'Record';
+
+      if (recordedPolyline && map.hasLayer(recordedPolyline)) {
+        map.removeLayer(recordedPolyline);
+        recordedPolyline = null;
+      }
+      recordedPoints = [];
+      totalRecordedClimbMeters = 0;
+    }
+
+    function exportRecordedToGPX(trackName, points) {
+      let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      gpx += `<gpx version="1.1" creator="BMMC Aotearoa NZ MTB Recorder" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">\n`;
+      gpx += `  <metadata>\n`;
+      gpx += `    <name>${escapeXML(trackName)}</name>\n`;
+      gpx += `    <time>${new Date().toISOString()}</time>\n`;
+      gpx += `  </metadata>\n`;
+      gpx += `  <trk>\n`;
+      gpx += `    <name>${escapeXML(trackName)}</name>\n`;
+      gpx += `    <trkseg>\n`;
+
+      points.forEach(p => {
+        const eleTag = p.ele !== null && !isNaN(p.ele) ? `<ele>${p.ele}</ele>` : '';
+        const timeTag = p.time ? `<time>${p.time}</time>` : '';
+        gpx += `      <trkpt lat="${p.lat.toFixed(6)}" lon="${p.lon.toFixed(6)}">${eleTag}${timeTag}</trkpt>\n`;
+      });
+
+      gpx += `    </trkseg>\n`;
+      gpx += `  </trk>\n`;
+      gpx += `</gpx>\n`;
+      return gpx;
+    }
+
+    function restoreUnfinishedRecording() {
+      try {
+        const saved = localStorage.getItem(REC_STORAGE_BACKUP_KEY);
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        if (data && data.points && data.points.length > 2) {
+          if (confirm(`Resume unfinished MTB ride from ${new Date(data.startTime).toLocaleTimeString()} (${data.points.length} points)?`)) {
+            startRideRecording();
+            recStartTime = data.startTime;
+            recPausedDurationMs = data.pausedMs || 0;
+            totalRecordedClimbMeters = data.totalClimb || 0;
+            data.points.forEach(p => appendRecordedPoint(p));
+          } else {
+            localStorage.removeItem(REC_STORAGE_BACKUP_KEY);
+          }
+        }
+      } catch (e) {}
+    }
 
     // =========================================================================
     // BASEMAP MANAGEMENT
@@ -3508,7 +4187,21 @@
         });
       });
 
-      L.control.zoom({ position: 'topright' }).addTo(map);
+            const zoomCtrl = L.control.zoom({ position: 'topright' }).addTo(map);
+      const zoomContainer = zoomCtrl.getContainer();
+      if (zoomContainer) {
+        const zoomAllBtn = L.DomUtil.create('a', 'leaflet-control-zoom-all', zoomContainer);
+        zoomAllBtn.href = '#';
+        zoomAllBtn.title = 'Fit All / Reset View (New Zealand)';
+        zoomAllBtn.setAttribute('role', 'button');
+        zoomAllBtn.setAttribute('aria-label', 'Fit All (New Zealand)');
+        zoomAllBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+        L.DomEvent.disableClickPropagation(zoomAllBtn);
+        L.DomEvent.on(zoomAllBtn, 'click', (e) => {
+          L.DomEvent.preventDefault(e);
+          map.setView(NZ_CENTER, NZ_ZOOM);
+        });
+      }
 
       basemaps.topo.addTo(map);
 
@@ -3666,6 +4359,7 @@
 
       initMap();
       initElevationEvents();
+      initGpsAndRecorder();
 
       window.toggleSaveTrack = toggleSaveTrack;
       window.downloadTrackGPX = downloadTrackGPX;
@@ -3770,14 +4464,11 @@
       document.getElementById('btnToggleCapPlus')?.addEventListener('click', () => toggleDatasetById('cap_plus'));
       document.getElementById('btnToggleDocTracks')?.addEventListener('click', () => toggleDatasetById('doc_tracks'));
 
-      // Grade Filter Chips
-      document.querySelectorAll('.filter-chip[data-grade]').forEach(chip => {
-        chip.addEventListener('click', function() {
-          document.querySelectorAll('.filter-chip[data-grade]').forEach(c => c.classList.remove('active'));
-          this.classList.add('active');
-          activeGradeFilter = this.dataset.grade;
-          reapplyFilters();
-        });
+      // Grade Selection inside Layers Tab
+      const gradeSelect = document.getElementById('gradeSelect');
+      gradeSelect?.addEventListener('change', (e) => {
+        activeGradeFilter = e.target.value;
+        reapplyFilters();
       });
 
       // Advisory Modal
@@ -3796,10 +4487,7 @@
         if (e.target === advisoryModal) closeAdvisoryModal();
       });
 
-      // Fit NZ Button
-      document.getElementById('btnFitNZ')?.addEventListener('click', () => {
-        map.setView(NZ_CENTER, NZ_ZOOM);
-      });
+      
 
       // Search Box
       const searchInput = document.getElementById('mapSearchInput');
