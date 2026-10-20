@@ -157,13 +157,13 @@
       color: #6ee7b7;
     }
 
-    /* Wings Button: Anchored firmly to the Right */
+    /* Wings Button */
     .top-controls-bar .btn-bmmc-menu-trigger {
       order: 999 !important;
       margin-left: auto !important;
     }
 
-    /* GPS & Record Buttons Styling */
+    /* GPS & Record Active State */
     .btn-record-active {
       background: #ffe4e6 !important;
       border-color: #f43f5e !important;
@@ -225,7 +225,7 @@
     }
     .dark .clear-search-btn { background: #334155; color: #cbd5e1; }
 
-    /* Unified Layers Switcher & Saved Favorites Switcher */
+    /* Dropdowns */
     .layer-switcher-container,
     .saved-switcher-container { 
       position: relative; 
@@ -238,7 +238,7 @@
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      width: 340px;
+      width: 360px;
       max-width: calc(100vw - 28px);
       max-height: calc(100vh - 120px);
       overflow-y: auto;
@@ -253,9 +253,7 @@
       gap: 8px;
     }
     .layer-dropdown-card.show,
-    .saved-dropdown-card.show { 
-      display: flex; 
-    }
+    .saved-dropdown-card.show { display: flex; }
     .dark .layer-dropdown-card,
     .dark .saved-dropdown-card {
       background: rgba(15, 23, 42, 0.97);
@@ -343,7 +341,6 @@
       color: #94a3b8;
     }
 
-    /* Grade Select inside Layers Dropdown */
     .layer-grade-select {
       width: 100%;
       height: 34px;
@@ -358,33 +355,20 @@
       outline: none;
       transition: all 0.15s ease;
     }
-    .layer-grade-select:focus {
-      border-color: #10b981;
-    }
+    .layer-grade-select:focus { border-color: #10b981; }
     .dark .layer-grade-select {
       background: #1e293b;
       border-color: #334155;
       color: #f8fafc;
     }
-    .dark .layer-grade-select:focus {
-      border-color: #34d399;
-    }
 
-    /* Zoom All Button in Leaflet Stack */
-    .leaflet-control-zoom a.leaflet-control-zoom-all {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      line-height: 30px !important;
-    }
-
-    /* Saved Trails Items */
+    /* Saved Cards */
     .saved-track-card {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      padding: 8px 10px;
-      border-radius: 10px;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 12px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       transition: all 0.15s ease;
@@ -394,21 +378,42 @@
       border-color: #334155;
     }
     .saved-track-title {
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 800;
       color: #0f172a;
       line-height: 1.3;
     }
     .dark .saved-track-title { color: #f8fafc; }
-    .saved-track-sub {
-      font-size: 11px;
-      color: #64748b;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-wrap: wrap;
+    
+    .saved-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      background: rgba(226, 232, 240, 0.45);
+      border-radius: 8px;
+      padding: 6px;
     }
-    .dark .saved-track-sub { color: #94a3b8; }
+    .dark .saved-stats-grid { background: rgba(15, 23, 42, 0.6); }
+    .saved-stat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .saved-stat-lbl {
+      font-size: 8px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    .dark .saved-stat-lbl { color: #94a3b8; }
+    .saved-stat-val {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+    .dark .saved-stat-val { color: #f8fafc; }
+
     .saved-track-actions {
       display: flex;
       gap: 5px;
@@ -441,13 +446,8 @@
       border-color: #475569;
       color: #f8fafc;
     }
-    .dark .btn-saved-action:hover {
-      background: #064e3b;
-      border-color: #34d399;
-      color: #6ee7b7;
-    }
 
-    /* Floating Status Pill */
+    /* Floating Status Bar */
     .status-summary-bar {
       position: absolute;
       bottom: 20px;
@@ -488,7 +488,7 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
 
-    /* GPS User Marker & Pulse */
+    /* GPS User Marker */
     .user-location-marker {
       width: 18px;
       height: 18px;
@@ -512,7 +512,7 @@
       100% { transform: scale(1.7); opacity: 0; }
     }
 
-    /* Live Ride Recording HUD Card (Dockable & Draggable) */
+    /* Live Recording HUD Card */
     .recording-hud-card {
       position: absolute;
       bottom: 260px;
@@ -543,9 +543,7 @@
       cursor: grab;
       touch-action: none;
     }
-    .rec-hud-header:active {
-      cursor: grabbing;
-    }
+    .rec-hud-header:active { cursor: grabbing; }
     .rec-hud-status {
       display: flex;
       align-items: center;
@@ -633,73 +631,33 @@
       color: #f8fafc;
       border-color: #475569;
     }
-    .btn-rec-hud-pause:hover { background: #475569; }
     .btn-rec-hud-save {
       background: #059669;
       color: #ffffff;
       border-color: #34d399;
     }
-    .btn-rec-hud-save:hover { background: #10b981; }
     .btn-rec-hud-discard {
       flex: 0 0 auto;
       background: #4c0519;
       color: #fda4af;
       border-color: #e11d48;
     }
-    .btn-rec-hud-discard:hover { background: #881337; color: #ffffff; }
 
     /* Popups */
-    .leaflet-popup-content {
-      margin: 14px 16px !important;
-      line-height: 1.4 !important;
-    }
-    .leaflet-container a.leaflet-popup-close-button {
-      top: 8px !important;
-      right: 8px !important;
-      width: 24px !important;
-      height: 24px !important;
-      padding: 0 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      font-size: 18px !important;
-      font-weight: 700 !important;
-      color: #64748b !important;
-      background: rgba(241, 245, 249, 0.85) !important;
-      border-radius: 50% !important;
-      text-decoration: none !important;
-      z-index: 2100 !important;
-      cursor: pointer !important;
-      transition: all 0.15s ease !important;
-    }
-    .leaflet-container a.leaflet-popup-close-button:hover {
-      color: #0f172a !important;
-      background: #e2e8f0 !important;
-    }
-    .dark .leaflet-container a.leaflet-popup-close-button {
-      color: #94a3b8 !important;
-      background: rgba(30, 41, 59, 0.85) !important;
-    }
-    .dark .leaflet-container a.leaflet-popup-close-button:hover {
-      color: #f8fafc !important;
-      background: #334155 !important;
-    }
-
     .trail-popup-card {
       font-family: system-ui, sans-serif;
       min-width: min(405px, 80vw);
-      max-width: min(510px, 88vw);
+      max-width: min(520px, 88vw);
       padding: 2px 20px 2px 2px;
       color: #0f172a;
     }
     .trail-popup-card h3 {
-      margin: 0 0 2px 0;
-      font-size: 15px;
+      margin: 0 0 4px 0;
+      font-size: 16px;
       font-weight: 900;
       line-height: 1.3;
       color: #0f172a;
     }
-
     .trail-distance-sub {
       display: flex;
       align-items: center;
@@ -717,7 +675,7 @@
       align-items: center;
     }
     .trail-pill {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 7px;
@@ -734,13 +692,39 @@
     .pill-grade-5 { background: #fee2e2; color: #991b1b; }
     .pill-category { background: #f1f5f9; color: #475569; }
 
+    .popup-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+      padding: 8px;
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    .popup-stat-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .popup-stat-lbl {
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    .popup-stat-val {
+      font-size: 12px;
+      font-weight: 900;
+      color: #0f172a;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+
     .trail-meta-row {
       font-size: 11.5px;
       color: #475569;
       line-height: 1.55;
       margin-bottom: 10px;
     }
-    .trail-meta-row strong { color: #1e293b; }
     .trail-comment-box {
       margin-top: 6px;
       padding: 6px 8px;
@@ -780,30 +764,15 @@
       border-color: #86efac;
       color: #15803d;
     }
-    .btn-trail-action.btn-website:hover {
-      background: #16a34a;
-      color: #ffffff;
-      border-color: #16a34a;
-    }
     .btn-trail-action.btn-download-gpx {
       background: #eff6ff;
       border-color: #bfdbfe;
       color: #1d4ed8;
     }
-    .btn-trail-action.btn-download-gpx:hover {
-      background: #2563eb;
-      border-color: #2563eb;
-      color: #ffffff;
-    }
     .btn-trail-action.btn-elevation {
       background: #ecfdf5;
       border-color: #86efac;
       color: #047857;
-    }
-    .btn-trail-action.btn-elevation:hover {
-      background: #10b981;
-      border-color: #10b981;
-      color: #ffffff;
     }
 
     /* Legend */
@@ -841,22 +810,12 @@
       padding-bottom: 5px;
       margin-bottom: 2px;
     }
-    .dark .legend-header { border-bottom-color: #334155; }
     .legend-title {
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #475569;
-    }
-    .dark .legend-title { color: #94a3b8; }
-    .legend-hint {
-      font-size: 9px;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: none;
-      letter-spacing: normal;
-      margin-left: 4px;
     }
     .legend-close-btn {
       background: transparent;
@@ -869,8 +828,6 @@
       line-height: 1;
       border-radius: 4px;
     }
-    .legend-close-btn:hover { color: #0f172a; background: #e2e8f0; }
-    .dark .legend-close-btn:hover { color: #f8fafc; background: #334155; }
     .legend-open-pill {
       display: inline-flex;
       align-items: center;
@@ -887,22 +844,6 @@
       cursor: pointer;
       box-shadow: 0 4px 14px rgba(0,0,0,0.15);
       transition: all 0.15s ease;
-    }
-    .legend-open-pill:hover {
-      background: #ffffff;
-      border-color: #10b981;
-      color: #10b981;
-    }
-    .dark .legend-open-pill {
-      background: rgba(15, 23, 42, 0.94);
-      border-color: rgba(51, 65, 85, 0.9);
-      color: #f8fafc;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.45);
-    }
-    .dark .legend-open-pill:hover {
-      background: #1e293b;
-      border-color: #34d399;
-      color: #34d399;
     }
     .legend-items {
       display: flex;
@@ -922,15 +863,7 @@
       user-select: none;
       transition: all 0.15s ease;
     }
-    .legend-item:hover {
-      background: rgba(16, 185, 129, 0.08);
-      color: #059669;
-    }
     .dark .legend-item { color: #e2e8f0; }
-    .dark .legend-item:hover {
-      background: rgba(52, 211, 153, 0.12);
-      color: #6ee7b7;
-    }
     .legend-item.layer-muted {
       opacity: 0.38;
       text-decoration: line-through;
@@ -947,28 +880,31 @@
       background: transparent !important;
     }
 
-    /* Elevation Profile Bottom Drawer */
+    /* =========================================================================
+       ELEVATION PROFILE DRAWER & EXPANDED DASHBOARD
+       ========================================================================= */
     .elevation-drawer {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 230px;
-      background: rgba(255, 255, 255, 0.97);
+      height: 325px;
+      background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(16px);
       border-top: 1px solid rgba(203, 213, 225, 0.95);
       box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
       z-index: 2500;
       display: flex;
       flex-direction: column;
-      transition: height 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: height 0.24s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
+      overflow: hidden;
     }
     .elevation-drawer.expanded {
-      height: min(450px, 62vh);
+      height: min(680px, 86vh);
     }
     .dark .elevation-drawer {
-      background: rgba(15, 23, 42, 0.97);
+      background: rgba(15, 23, 42, 0.98);
       border-top-color: #334155;
       box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.65);
     }
@@ -976,48 +912,66 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 7px 16px;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 18px 4px 18px;
       flex-shrink: 0;
-      gap: 10px;
-    }
-    .dark .elevation-drawer-header { border-bottom-color: #334155; }
-    .elevation-title-group {
-      display: flex;
-      align-items: center;
       gap: 12px;
-      overflow: hidden;
-      white-space: nowrap;
     }
     .elevation-title {
-      font-size: 12.5px;
+      font-size: 17px;
       font-weight: 900;
       color: #0f172a;
       text-overflow: ellipsis;
       overflow: hidden;
+      white-space: nowrap;
     }
     .dark .elevation-title { color: #f8fafc; }
-    .elevation-stats {
-      font-size: 11px;
-      font-weight: 700;
-      color: #475569;
-      display: inline-flex;
-      gap: 8px;
-    }
-    .dark .elevation-stats { color: #94a3b8; }
-    .elevation-controls {
+
+    /* 6 Stats Banners */
+    .elevation-stats-banner {
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: flex-start;
+      gap: 24px;
+      padding: 6px 18px 10px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      overflow-x: auto;
       flex-shrink: 0;
     }
+    .dark .elevation-stats-banner { border-bottom-color: #334155; }
+    .elev-stat-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      white-space: nowrap;
+    }
+    .elev-stat-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .dark .elev-stat-label { color: #94a3b8; }
+    .elev-stat-val {
+      font-size: 15px;
+      font-weight: 900;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .elev-stat-val.val-blue { color: #0284c7; }
+    .elev-stat-val.val-purple { color: #9333ea; }
+    .elev-stat-val.val-green { color: #10b981; }
+    .elev-stat-val.val-amber { color: #f59e0b; }
+    .elev-stat-val.val-red { color: #ef4444; }
+    .elev-stat-val.val-teal { color: #0d9488; }
+
     .elevation-canvas-container {
       position: relative;
-      flex: 1;
+      flex: 1 1 auto;
+      min-height: 140px;
+      max-height: 250px;
       width: 100%;
-      height: 100%;
       overflow: hidden;
-      padding: 4px 14px 8px 14px;
+      padding: 0 16px 4px 16px;
     }
     #elevationCanvas {
       width: 100%;
@@ -1025,6 +979,124 @@
       display: block;
       cursor: crosshair;
     }
+
+    /* Slope Ribbon Legend Bar */
+    .slope-ribbon-legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 3px 18px 6px 18px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748b;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .dark .slope-ribbon-legend { color: #94a3b8; }
+    .slope-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .slope-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* Secondary Expanded Analysis Dashboard */
+    .expanded-analysis-dashboard {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 8px 18px 14px 18px;
+      overflow-y: auto;
+      border-top: 1px solid #e2e8f0;
+      background: rgba(248, 250, 252, 0.7);
+      flex: 1 1 auto;
+    }
+    .dark .expanded-analysis-dashboard {
+      background: rgba(15, 23, 42, 0.6);
+      border-top-color: #334155;
+    }
+    .elevation-drawer.expanded .expanded-analysis-dashboard {
+      display: flex;
+    }
+
+    /* Terrain Classification Pills */
+    .terrain-summary-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .terrain-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+    .pill-terrain-flat { background: #dcfce7; color: #166534; }
+    .pill-terrain-climb { background: #ffedd5; color: #9a3412; }
+    .pill-terrain-desc { background: #ede9fe; color: #5b21b6; }
+    .dark .pill-terrain-flat { background: #064e3b; color: #6ee7b7; }
+    .dark .pill-terrain-climb { background: #7c2d12; color: #fdba74; }
+    .dark .pill-terrain-desc { background: #4c1d95; color: #c4b5fd; }
+
+    /* Splits Table */
+    .splits-table-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .dark .splits-table-card {
+      background: #1e293b;
+      border-color: #334155;
+    }
+    .splits-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: left;
+    }
+    .splits-table th {
+      background: #f1f5f9;
+      padding: 7px 10px;
+      font-weight: 800;
+      color: #475569;
+      text-transform: uppercase;
+      font-size: 9.5px;
+      letter-spacing: 0.4px;
+    }
+    .dark .splits-table th {
+      background: #0f172a;
+      color: #94a3b8;
+    }
+    .splits-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+    .dark .splits-table td {
+      border-bottom-color: #334155;
+      color: #f8fafc;
+    }
+    .splits-table tr:hover td {
+      background: #f8fafc;
+      cursor: pointer;
+    }
+    .dark .splits-table tr:hover td {
+      background: #334155;
+    }
+
     .elevation-tooltip {
       position: absolute;
       pointer-events: none;
@@ -1041,80 +1113,22 @@
       z-index: 2600;
     }
 
-    /* Mobile Unified Compact Tabs (Matches Status Bar Footprint) */
+    /* Mobile */
     @media (max-width: 768px) {
-      .top-controls-wrapper {
-        top: 8px;
-        left: 8px;
-        right: 8px;
-        gap: 4px;
-      }
-      .top-controls-bar {
-        gap: 4px;
-      }
-      .top-action-btn {
-        height: 28px !important;
-        padding: 0 8px !important;
-        font-size: 11px !important;
-        font-weight: 700 !important;
-        border-radius: 10px !important;
-        gap: 4px !important;
-      }
-      .map-search-box {
-        height: 28px !important;
-        min-width: 110px !important;
-        max-width: 155px !important;
-        padding: 0 6px !important;
-        border-radius: 10px !important;
-      }
-      .map-search-box input {
-        font-size: 11px !important;
-        padding-left: 3px !important;
-      }
-      .search-icon {
-        font-size: 11px !important;
-      }
-      .clear-search-btn {
-        width: 15px !important;
-        height: 15px !important;
-        font-size: 9px !important;
-      }
-      .status-summary-bar {
-        bottom: 12px !important;
-        left: 12px !important;
-        padding: 5px 10px !important;
-        font-size: 10.5px !important;
-        border-radius: 10px !important;
-        gap: 6px !important;
-      }
-      .legend-wrapper {
-        bottom: 12px !important;
-        right: 12px !important;
-      }
-      .legend-open-pill {
-        height: 28px !important;
-        padding: 0 8px !important;
-        font-size: 11px !important;
-        border-radius: 10px !important;
-      }
-      .elevation-title-group {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-      }
-      .elevation-drawer {
-        height: 220px;
-      }
-      .elevation-drawer.expanded {
-        height: 75vh;
-      }
-      .recording-hud-card {
-        right: 12px;
-        width: min(320px, calc(100vw - 24px));
-      }
+      .top-controls-wrapper { top: 8px; left: 8px; right: 8px; gap: 4px; }
+      .top-controls-bar { gap: 4px; }
+      .top-action-btn { height: 28px !important; padding: 0 8px !important; font-size: 11px !important; }
+      .map-search-box { height: 28px !important; min-width: 110px !important; max-width: 155px !important; }
+      .status-summary-bar { bottom: 12px !important; left: 12px !important; padding: 5px 10px !important; }
+      .legend-wrapper { bottom: 12px !important; right: 12px !important; }
+      .elevation-drawer { height: 320px; }
+      .elevation-drawer.expanded { height: 86vh; }
+      .elevation-stats-banner { gap: 14px; padding: 4px 12px 8px 12px; }
+      .elev-stat-val { font-size: 13.5px; }
+      .recording-hud-card { right: 12px; width: min(320px, calc(100vw - 24px)); }
     }
 
-    /* Modal */
+    /* Advisory Modal */
     .advisory-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -1154,11 +1168,6 @@
       padding-bottom: 8px;
       font-size: 13.5px;
       font-weight: 900;
-      color: #0f172a;
-    }
-    .dark .advisory-modal-header {
-      border-bottom-color: #334155;
-      color: #f8fafc;
     }
     .advisory-modal-body {
       font-size: 11.5px;
@@ -1169,8 +1178,6 @@
       gap: 8px;
     }
     .dark .advisory-modal-body { color: #cbd5e1; }
-    .advisory-modal-body strong { color: #0f172a; }
-    .dark .advisory-modal-body strong { color: #f8fafc; }
   </style>
 </head>
 <body>
@@ -1213,40 +1220,32 @@
 
           <div class="layer-section-divider"></div>
 
-          <!-- Trail Datasets Ordered Top-to-Bottom by Layer Stacking -->
           <div class="layer-section-title">Trail Datasets</div>
           <div class="layer-overlay-col">
-            <!-- 1. NZ Great Rides (Top) -->
             <button id="btnToggleGreatRides" class="layer-option-btn active" title="NZ 23 Great Rides (Nga Haerenga)">
               <span class="layer-opt-left"><span>⭐</span><span>NZ Great Rides</span><span id="cntGreatRides" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- 2. CCC Major Cycleways -->
             <button id="btnToggleChchCycle" class="layer-option-btn active" title="Christchurch City Major Cycleways">
               <span class="layer-opt-left"><span>🏙️</span><span>CCC Major Cycleways</span><span id="cntChchCycle" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- 3. Heartland Touring Routes -->
             <button id="btnToggleHeartland" class="layer-option-btn active" title="Heartland Touring Routes">
               <span class="layer-opt-left"><span>🚴</span><span>Heartland Touring</span><span id="cntHeartland" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- 4. Christchurch Council MTB & Port Hills Tracks -->
             <button id="btnToggleChchCouncil" class="layer-option-btn active" title="Christchurch Council MTB &amp; Port Hills Tracks">
               <span class="layer-opt-left"><span>🌲</span><span>CCC MTB &amp; Hills</span><span id="cntChchCouncil" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- 5. NZ OpenStreetMap MTB Tracks -->
             <button id="btnToggleNzOsm" class="layer-option-btn active" title="NZ OpenStreetMap MTB Tracks">
               <span class="layer-opt-left"><span>🚵</span><span>NZ OpenStreetMap MTB</span><span id="cntNzOsm" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- 6. Christchurch Adventure Park & Port Hills Network -->
             <button id="btnToggleCapPlus" class="layer-option-btn active" title="Christchurch Adventure Park &amp; Port Hills Network">
               <span class="layer-opt-left"><span>🚠</span><span>CAP &amp; Adventure Park+</span><span id="cntCapPlus" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- 7. Department of Conservation Tracks Network (Bottom) -->
             <button id="btnToggleDocTracks" class="layer-option-btn active" title="Department of Conservation Tracks Network">
               <span class="layer-opt-left"><span>🌿</span><span>DOC Tracks (NZ-wide)</span><span id="cntDocTracks" class="track-count-pill">0</span></span>
               <span class="layer-status-indicator">✓</span>
@@ -1255,7 +1254,7 @@
         </div>
       </div>
 
-      <!-- Saved Favorites Switcher (No Counter) -->
+      <!-- Saved Favorites Switcher -->
       <div class="saved-switcher-container">
         <button id="btnToggleSaved" class="top-action-btn btn-saved-toggle" title="Saved Favorites &amp; Downloads">
           <span class="heart-icon">❤️</span>
@@ -1265,7 +1264,7 @@
 
         <div id="savedDropdownCard" class="saved-dropdown-card">
           <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:4px; border-bottom:1px solid #e2e8f0;">
-            <span class="layer-section-title" style="padding:0;">Favorite Trails</span>
+            <span class="layer-section-title" style="padding:0;">Saved Trails &amp; Rides</span>
             <button id="btnSavedFilterToggle" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Toggle filtering map to favorites only">
               <span id="lblSavedFilterState">Show All on Map</span>
             </button>
@@ -1280,12 +1279,12 @@
             </button>
           </div>
 
-          <div id="savedListContainer" style="display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto; margin-top:2px;">
+          <div id="savedListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto; margin-top:4px;">
           </div>
         </div>
       </div>
 
-      <!-- Import Track (GPX / GeoJSON) -->
+      <!-- Import Track -->
       <button id="btnImportGPX" class="top-action-btn" title="Import GPX or GeoJSON track from your drive">
         <span>📥</span> <span>Import Track</span>
       </button>
@@ -1306,7 +1305,7 @@
         <span>⚠️</span> <span>Advisory</span>
       </button>
 
-      <!-- Wings Button: Anchored Right -->
+      <!-- Wings Button -->
       <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
         <span style="font-size: 14px;">☰</span>
         <span>Wings</span>
@@ -1316,7 +1315,7 @@
 
   <div id="map"></div>
 
-  <!-- Live Ride Recording Floating Stats Box / HUD -->
+  <!-- Live Recording HUD Card -->
   <div id="recordingHud" class="recording-hud-card" style="display:none;" role="region" aria-label="Live Ride Stats">
     <div class="rec-hud-header">
       <div class="rec-hud-status">
@@ -1327,7 +1326,6 @@
       <span id="recTotalDuration" class="rec-hud-timer-badge">00:00:00</span>
     </div>
 
-    <!-- 6 Live Metric Tiles -->
     <div class="rec-stats-grid-6">
       <div class="rec-stat-box">
         <span class="rec-stat-val" id="recCurSpeed">0.0</span>
@@ -1363,16 +1361,16 @@
   </div>
 
   <!-- Advisory Modal -->
-  <div id="advisoryModal" class="advisory-modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="advisoryTitle">
+  <div id="advisoryModal" class="advisory-modal-backdrop" style="display:none;" role="dialog" aria-modal="true">
     <div class="advisory-modal-card">
       <div class="advisory-modal-header">
-        <span id="advisoryTitle">⚖️ Official Trail Data Advisory</span>
-        <button id="btnCloseAdvisory" class="legend-close-btn" style="font-size:14px; padding:2px 6px;" title="Close Advisory">✕</button>
+        <span>⚖️ Official Trail Data Advisory</span>
+        <button id="btnCloseAdvisory" class="legend-close-btn" style="font-size:14px; padding:2px 6px;">✕</button>
       </div>
       <div class="advisory-modal-body">
-        <p><strong>Reference Purposes Only:</strong> Geospatial trail alignments, classifications, grades, and distance metrics presented in this application are compiled for general reference and informational guidance only, based on records available at the time of publication.</p>
-        <p><strong>Not for Critical Navigation:</strong> Users must not rely solely upon this digital map for route-finding, backcountry navigation, or safety-critical decisions. Trail geometry may deviate from actual ground truth due to slips, forestry works, natural realignment, or environmental changes.</p>
-        <p><strong>Verify Current Status:</strong> Track conditions, legal access permissions, seasonal closures, and safety warnings are subject to frequent alteration without notice. Always verify current track status and regional alerts directly with the responsible land manager—including the Department of Conservation (DOC), Christchurch City Council (CCC), Christchurch Adventure Park (CAP), New Zealand Cycle Trails (Ngā Haerenga), or local trail trusts—prior to departure.</p>
+        <p><strong>Reference Purposes Only:</strong> Geospatial trail alignments, classifications, grades, and distance metrics presented in this application are compiled for general reference only.</p>
+        <p><strong>Not for Critical Navigation:</strong> Trail geometry may deviate from actual ground truth due to slips, forestry works, natural realignment, or environmental changes.</p>
+        <p><strong>Verify Current Status:</strong> Always verify current track status directly with the responsible land manager (DOC, CCC, CAP, NZ Cycle Trails) prior to departure.</p>
       </div>
       <div style="display:flex; justify-content:flex-end; margin-top:4px;">
         <button id="btnDismissAdvisory" class="top-action-btn" style="height:30px; padding:0 14px; font-size:11px;">
@@ -1382,7 +1380,7 @@
     </div>
   </div>
 
-  <!-- Interactive Legend: Ordered Top-to-Bottom to match Layer Stacking -->
+  <!-- Interactive Legend -->
   <div class="legend-wrapper" id="legendWrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
       <span>🗺️</span> <span>Trail Key</span>
@@ -1390,73 +1388,34 @@
     <div id="trailLegendCard" class="legend-card">
       <div class="legend-header">
         <span class="legend-title">🗺️ Trail Key <span class="legend-hint">(Click to Toggle)</span></span>
-        <button id="btnCloseLegend" class="legend-close-btn" title="Hide Key">✕</button>
+        <button id="btnCloseLegend" class="legend-close-btn">✕</button>
       </div>
       <div class="legend-items">
-        <!-- 1. NZ Great Rides -->
-        <div class="legend-item" data-layer-key="great_rides" title="Click to toggle NZ Great Rides">
-          <span class="legend-line" style="background:#9333ea; height:5.5px;"></span>
-          <span>NZ Great Rides</span>
-        </div>
-        <!-- 2. CCC Major Cycleways -->
-        <div class="legend-item" data-layer-key="chch_cycle" title="Click to toggle CCC Major Cycleways">
-          <span class="legend-line" style="background:#00e676;"></span>
-          <span>CCC Cycleway (C1)</span>
-        </div>
-        <div class="legend-item" data-layer-key="chch_cycle" title="Click to toggle CCC Major Cycleways">
-          <span class="legend-line" style="background:#38bdf8;"></span>
-          <span>CCC Major Cycleway</span>
-        </div>
-        <!-- 3. Heartland Touring -->
-        <div class="legend-item" data-layer-key="heartland" title="Click to toggle Heartland Touring">
-          <span class="legend-line" style="background:#0ea5e9;"></span>
-          <span>Heartland Touring</span>
-        </div>
-        <!-- 4. CCC MTB & Hills Tracks -->
-        <div class="legend-item" data-layer-key="chch_council" title="Click to toggle CCC MTB & Hills Tracks">
-          <span class="legend-line" style="background:#059669;"></span>
-          <span>CCC MTB Only Tracks</span>
-        </div>
-        <div class="legend-item" data-layer-key="chch_council" title="Click to toggle CCC MTB & Hills Tracks">
-          <span class="legend-line line-dashed" style="border-top: 3.5px dashed #f97316;"></span>
-          <span>CCC Shared Tracks</span>
-        </div>
-        <!-- 5. NZ OpenStreetMap MTB -->
-        <div class="legend-item" data-layer-key="nz_osm" title="Click to toggle NZ OpenStreetMap MTB">
-          <span class="legend-line" style="background:#1d4ed8;"></span>
-          <span>NZ OSM MTB</span>
-        </div>
-        <!-- 6. CAP & Adventure Trails -->
-        <div class="legend-item" data-layer-key="cap_plus" title="Click to toggle CAP & Adventure Trails">
-          <span class="legend-line line-dashed" style="border-top: 3.5px dotted #4ade80;"></span>
-          <span>CAP &amp; Adventure Trails</span>
-        </div>
-        <!-- 7. DOC MTB Tracks -->
-        <div class="legend-item" data-layer-key="doc_tracks" title="Click to toggle DOC MTB Tracks">
-          <span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span>
-          <span>DOC MTB Permitted</span>
-        </div>
-        <!-- User Recorded or Imported Tracks -->
-        <div class="legend-item" data-layer-key="imported" title="Click to toggle Imported / Recorded GPS">
-          <span class="legend-line" style="background:#ff2d87;"></span>
-          <span>Recorded / Imported GPS</span>
-        </div>
+        <div class="legend-item" data-layer-key="great_rides"><span class="legend-line" style="background:#9333ea; height:5.5px;"></span><span>NZ Great Rides</span></div>
+        <div class="legend-item" data-layer-key="chch_cycle"><span class="legend-line" style="background:#00e676;"></span><span>CCC Cycleway (C1)</span></div>
+        <div class="legend-item" data-layer-key="chch_cycle"><span class="legend-line" style="background:#38bdf8;"></span><span>CCC Major Cycleway</span></div>
+        <div class="legend-item" data-layer-key="heartland"><span class="legend-line" style="background:#0ea5e9;"></span><span>Heartland Touring</span></div>
+        <div class="legend-item" data-layer-key="chch_council"><span class="legend-line" style="background:#059669;"></span><span>CCC MTB Only Tracks</span></div>
+        <div class="legend-item" data-layer-key="chch_council"><span class="legend-line line-dashed" style="border-top: 3.5px dashed #f97316;"></span><span>CCC Shared Tracks</span></div>
+        <div class="legend-item" data-layer-key="nz_osm"><span class="legend-line" style="background:#1d4ed8;"></span><span>NZ OSM MTB</span></div>
+        <div class="legend-item" data-layer-key="cap_plus"><span class="legend-line line-dashed" style="border-top: 3.5px dotted #4ade80;"></span><span>CAP &amp; Adventure Trails</span></div>
+        <div class="legend-item" data-layer-key="doc_tracks"><span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span><span>DOC MTB Permitted</span></div>
+        <div class="legend-item" data-layer-key="imported"><span class="legend-line" style="background:#ff2d87;"></span><span>Recorded / Imported GPS</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Floating Status Bar -->
+  <!-- Bottom Status Bar -->
   <div class="status-summary-bar" id="statusBar">
     <span class="status-dot"></span>
     <span id="lblDatasetLoading">Initialising MTB network...</span>
   </div>
 
-  <!-- Elevation Profile Bottom Drawer -->
+  <!-- Elevation Profile Bottom Drawer & Complete Expanded Dashboard -->
   <div id="elevationDrawer" class="elevation-drawer" style="display:none;" role="region" aria-label="Track Elevation Profile">
     <div class="elevation-drawer-header">
       <div class="elevation-title-group">
-        <span class="elevation-title" id="elevTrackTitle">📈 Elevation Profile</span>
-        <span class="elevation-stats" id="elevTrackStats">Sampling topography...</span>
+        <span class="elevation-title" id="elevTrackTitle">🚵 West Coast Wilderness Trail</span>
       </div>
       <div class="elevation-controls">
         <button id="btnElevExportPNG" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px; background:#f0fdf4; border-color:#86efac; color:#15803d;" title="Download High-Resolution PNG with Full Stats">
@@ -1468,15 +1427,96 @@
         <button id="btnElevExportGPX" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Export 3D Track with DEM Elevations as GPX">
           <span>📥 3D GPX</span>
         </button>
-        <button id="btnElevExpand" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Toggle Drawer Height">
+        <button id="btnElevExpand" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px;" title="Toggle Drawer Height &amp; Analysis Dashboard">
           <span id="lblElevExpand">⛶ Expand</span>
         </button>
         <button id="btnElevClose" class="legend-close-btn" style="font-size:14px; padding:2px 6px;" title="Close Profile">✕</button>
       </div>
     </div>
+
+    <!-- 6 Primary Metric Cards Matching Screenshot -->
+    <div class="elevation-stats-banner" id="elevStatsBanner">
+      <div class="elev-stat-col">
+        <span class="elev-stat-label">DISTANCE</span>
+        <span class="elev-stat-val val-blue" id="elevStatDistance">--</span>
+      </div>
+      <div class="elev-stat-col">
+        <span class="elev-stat-label">ELEVATION RANGE</span>
+        <span class="elev-stat-val val-purple" id="elevStatRange">--</span>
+      </div>
+      <div class="elev-stat-col">
+        <span class="elev-stat-label">TOTAL ASCENT</span>
+        <span class="elev-stat-val val-green" id="elevStatAscent">--</span>
+      </div>
+      <div class="elev-stat-col">
+        <span class="elev-stat-label">TOTAL DESCENT</span>
+        <span class="elev-stat-val val-amber" id="elevStatDescent">--</span>
+      </div>
+      <div class="elev-stat-col">
+        <span class="elev-stat-label">MAX INCLINE GRADE</span>
+        <span class="elev-stat-val val-green" id="elevStatIncline">--</span>
+      </div>
+      <div class="elev-stat-col">
+        <span class="elev-stat-label">MAX DECLINE GRADE</span>
+        <span class="elev-stat-val val-red" id="elevStatDecline">--</span>
+      </div>
+      <div class="elev-stat-col" id="elevExtraTimeCol" style="display:none;">
+        <span class="elev-stat-label">TIME / ACTIVE TIME</span>
+        <span class="elev-stat-val val-teal" id="elevStatTime">--</span>
+      </div>
+      <div class="elev-stat-col" id="elevExtraSpeedCol" style="display:none;">
+        <span class="elev-stat-label">AVG SPEED</span>
+        <span class="elev-stat-val val-blue" id="elevStatSpeed">--</span>
+      </div>
+    </div>
+
+    <!-- Canvas Container with Fixed Aspect Ratio / Balanced Exaggeration -->
     <div class="elevation-canvas-container" id="elevCanvasContainer">
       <canvas id="elevationCanvas"></canvas>
       <div id="elevTooltip" class="elevation-tooltip" style="display:none;"></div>
+    </div>
+
+    <!-- Continuous Slope Ribbon Legend Bar -->
+    <div class="slope-ribbon-legend" id="slopeLegendBar">
+      <span>Gradient Ribbon:</span>
+      <span class="slope-tag"><span class="slope-dot" style="background:#10b981;"></span> 0–4% Flat</span>
+      <span class="slope-tag"><span class="slope-dot" style="background:#eab308;"></span> 5–8% Moderate</span>
+      <span class="slope-tag"><span class="slope-dot" style="background:#f97316;"></span> 9–14% Steep</span>
+      <span class="slope-tag"><span class="slope-dot" style="background:#ef4444;"></span> 15%+ Severe</span>
+      <span class="slope-tag"><span class="slope-dot" style="background:#8b5cf6;"></span> Steep Descent</span>
+    </div>
+
+    <!-- Expanded View Analysis Dashboard (Terrain Classification & Interval Splits) -->
+    <div class="expanded-analysis-dashboard" id="expandedDashboard">
+      <div class="terrain-summary-row" id="terrainSummaryRow">
+        <div class="terrain-pill pill-terrain-flat">
+          <span>🟢 Rolling / Flat (0–4%):</span> <strong id="valFlatDist">0.0 km (0%)</strong>
+        </div>
+        <div class="terrain-pill pill-terrain-climb">
+          <span>🟠 Climbing (5%+):</span> <strong id="valClimbDist">0.0 km (0%)</strong>
+        </div>
+        <div class="terrain-pill pill-terrain-desc">
+          <span>🟣 Technical Descent:</span> <strong id="valDescDist">0.0 km (0%)</strong>
+        </div>
+      </div>
+
+      <div class="splits-table-card">
+        <table class="splits-table">
+          <thead>
+            <tr>
+              <th>Interval Split</th>
+              <th>Distance</th>
+              <th>Ascent</th>
+              <th>Descent</th>
+              <th>Max Slope</th>
+              <th>Est. Moving Time</th>
+            </tr>
+          </thead>
+          <tbody id="splitsTableBody">
+            <tr><td colspan="6" style="text-align:center; color:#64748b;">Loading splits...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1498,24 +1538,17 @@
 
   <script>
     // =========================================================================
-    // CONFIGURATION & DATASET DEFINITIONS
-    // Layer Stacking (Top to Bottom):
-    // 1. nz_great_rides.geojson (Top, z-index: 470)
-    // 2. chch_cycleway.geojson (z-index: 460)
-    // 3. heartland_touring.geojson (z-index: 450)
-    // 4. chch_council_tracks.geojson (z-index: 440)
-    // 5. nz_osm.geojson (z-index: 430)
-    // 6. CAP_plus.geojson (z-index: 420)
-    // 7. doc_tracks.geojson (Bottom, z-index: 410)
+    // CONFIGURATION & 7-DAY CACHE EXPIRY (7 x 24hrs)
     // =========================================================================
     const NZ_CENTER = [-41.5, 172.8];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
-    const CACHE_DB_NAME = 'BMMC_MTB_DB_V4';
+    const CACHE_DB_NAME = 'BMMC_MTB_DB_V5';
     const CACHE_STORE_NAME = 'geojson_store';
-    // Extended to 365 days for remote backcountry offline persistence
-    const CACHE_EXPIRY_MS = 365 * 24 * 60 * 60 * 1000;
+    // 7 Days x 24 Hours Cache Expiry
+    const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
     const SAVED_STORAGE_KEY = 'bMMC_nz_mtb_saved_ids';
     const REC_STORAGE_BACKUP_KEY = 'bMMC_active_recorded_track_v2';
+    const PERSISTED_TRACKS_KEY = 'bMMC_persisted_user_tracks_v3';
 
     const PANE_CONFIG = {
       imported:     { pane: 'pane_imported',     zIndex: 480 },
@@ -1627,31 +1660,113 @@
     let selectedFeatures = [];
     let selectedHighlightLayers = [];
 
-    // Elevation State
+    // Elevation & Analysis State
     let currentElevationData = null;
     let elevScrubMarker = null;
 
-    // GPS & Recorder State (Clean single declarations)
+    // GPS & Recorder State
     let userMarker = null;
     let userCircle = null;
     let isTrackingActive = false;
     let isFollowingUser = false;
     let watchId = null;
     let wakeLock = null;
+    let bgSilentAudio = null;
+    let workerTimer = null;
 
+    // Recording Variables with 6s stationary & 5m movement restart
     let isRecording = false;
     let isPaused = false;
     let recordedPoints = [];
     let recordedPolyline = null;
     let recStartTime = null;
-    let recPausedDurationMs = 0;
+    let recManualPausedMs = 0;
     let recPauseStartTime = null;
-    let recTimerInterval = null;
+    let recActiveTimeMs = 0;
+    let lastActiveTickTime = null;
+    let isStationary = false;
+    let lastMovementTime = null;
+    let lastMovementPos = null;
     let totalRecordedClimbMeters = 0;
+    let totalRecordedDescentMeters = 0;
     let isHudManuallyPositioned = false;
 
     // =========================================================================
-    // MULTI-TRACK HIGHLIGHT & SELECTION ENGINE
+    // BACKGROUND KEEP-ALIVE (ALLOW TRACK LOGGING WITH SCREEN OFF)
+    // =========================================================================
+    function startBgKeepAlive() {
+      try {
+        if (!bgSilentAudio) {
+          bgSilentAudio = new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA');
+          bgSilentAudio.loop = true;
+          bgSilentAudio.volume = 0.01;
+        }
+        bgSilentAudio.play().catch(() => {});
+      } catch (e) {}
+
+      try {
+        if (!workerTimer) {
+          const blob = new Blob([`
+            let t = null;
+            self.onmessage = function(e) {
+              if (e.data === 'start') {
+                if (t) clearInterval(t);
+                t = setInterval(() => self.postMessage('tick'), 1000);
+              } else if (e.data === 'stop') {
+                if (t) clearInterval(t);
+                t = null;
+              }
+            };
+          `], { type: 'application/javascript' });
+          workerTimer = new Worker(URL.createObjectURL(blob));
+          workerTimer.onmessage = () => {
+            if (isRecording) updateRecTimerAndHud();
+          };
+          workerTimer.postMessage('start');
+        }
+      } catch (e) {}
+
+      requestScreenWakeLock();
+    }
+
+    function stopBgKeepAlive() {
+      if (bgSilentAudio) {
+        try { bgSilentAudio.pause(); } catch(e) {}
+      }
+      if (workerTimer) {
+        try {
+          workerTimer.postMessage('stop');
+          workerTimer.terminate();
+        } catch(e) {}
+        workerTimer = null;
+      }
+      releaseScreenWakeLock();
+    }
+
+    async function requestScreenWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        }
+      } catch (e) {}
+    }
+
+    function releaseScreenWakeLock() {
+      if (wakeLock) {
+        wakeLock.release().catch(() => {});
+        wakeLock = null;
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && isRecording) {
+        requestScreenWakeLock();
+      }
+    });
+
+    // =========================================================================
+    // MULTI-TRACK HIGHLIGHT & SELECTION
     // =========================================================================
     function clearAllHighlights() {
       selectedHighlightLayers.forEach(l => {
@@ -1734,7 +1849,7 @@
           if (layer && typeof layer.openPopup === 'function') {
             layer.openPopup(latlng);
           } else {
-            L.popup({ maxWidth: 510 })
+            L.popup({ maxWidth: 520 })
               .setLatLng(latlng)
               .setContent(buildTrailPopup(feat.properties))
               .openOn(map);
@@ -1751,7 +1866,7 @@
     }
 
     // =========================================================================
-    // INDEXED-DB CACHE ENGINE
+    // INDEXED-DB CACHE (7 x 24hrs)
     // =========================================================================
     function openCacheDB() {
       return new Promise((resolve, reject) => {
@@ -1765,9 +1880,7 @@
           };
           req.onsuccess = () => resolve(req.result);
           req.onerror = () => reject(req.error);
-        } catch (e) {
-          reject(e);
-        }
+        } catch (e) { reject(e); }
       });
     }
 
@@ -1788,9 +1901,7 @@
           };
           req.onerror = () => resolve(null);
         });
-      } catch (e) {
-        return null;
-      }
+      } catch (e) { return null; }
     }
 
     async function setCachedGeoJSON(key, data) {
@@ -1803,8 +1914,34 @@
     }
 
     // =========================================================================
-    // SAVED TRAILS / FAVORITES & EXPORT
+    // PERSISTED TRACK STORAGE & SAVED FAVORITES
     // =========================================================================
+    function getPersistedUserTracks() {
+      try {
+        const raw = localStorage.getItem(PERSISTED_TRACKS_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return [];
+    }
+
+    function savePersistedUserTrack(feat) {
+      try {
+        const list = getPersistedUserTracks();
+        const uid = feat.properties && feat.properties.uid;
+        const idx = list.findIndex(f => f.properties && f.properties.uid === uid);
+        if (idx >= 0) list[idx] = feat;
+        else list.push(feat);
+        localStorage.setItem(PERSISTED_TRACKS_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function removePersistedUserTrack(uid) {
+      try {
+        const list = getPersistedUserTracks().filter(f => f.properties && f.properties.uid !== uid);
+        localStorage.setItem(PERSISTED_TRACKS_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
     function getSavedSet() {
       try {
         const raw = localStorage.getItem(SAVED_STORAGE_KEY);
@@ -1837,6 +1974,8 @@
         });
         if (found) return found;
       }
+      const persisted = getPersistedUserTracks().find(f => f.properties && f.properties.uid === uid);
+      if (persisted) return persisted;
       return null;
     }
 
@@ -1990,8 +2129,8 @@
       const savedSet = getSavedSet();
       if (savedSet.size === 0) {
         container.innerHTML = `
-          <div style="padding: 12px 8px; text-align: center; color: #64748b; font-size: 11.5px; line-height: 1.5;">
-            🤍 No saved trails yet.<br>Click <strong>Save</strong> on any trail popup to add it to your favorites.
+          <div style="padding: 16px 8px; text-align: center; color: #64748b; font-size: 11.5px; line-height: 1.5;">
+            🤍 No saved trails yet.<br>Click <strong>Save Favorite</strong> on any trail popup or finish a ride recording.
           </div>
         `;
         return;
@@ -2000,19 +2139,59 @@
       let html = '';
       savedSet.forEach(uid => {
         const feat = findFeatureByUid(uid);
-        const name = feat ? feat.properties.name : 'Trail ' + uid;
-        const lengthStr = feat && feat.properties.lengthStr ? feat.properties.lengthStr : '';
-        const gradeText = feat && feat.properties.gradeText ? feat.properties.gradeText : '';
-        const network = feat && feat.properties.network ? feat.properties.network : '';
+        const p = (feat && feat.properties) ? feat.properties : {};
+        const s = p.stats || {};
+        const name = p.name || 'Trail ' + uid;
+        const distStr = s.distKm ? `${s.distKm.toFixed(1)} km` : (p.lengthStr || '--');
+        const rangeStr = (s.minEle !== undefined && s.maxEle !== undefined) ? `${s.minEle}m – ${s.maxEle}m` : '--';
+        const ascStr = s.totalAscent !== undefined ? `+${Math.round(s.totalAscent)} m` : '--';
+        const descStr = s.totalDescent !== undefined ? `-${Math.round(Math.abs(s.totalDescent))} m` : '--';
+        const incStr = s.maxIncline !== undefined ? `+${s.maxIncline.toFixed(1)}%` : '--';
+        const decStr = s.maxDecline !== undefined ? `${s.maxDecline.toFixed(1)}%` : '--';
 
         html += `
           <div class="saved-track-card">
             <div class="saved-track-title">${escapeHTML(name)}</div>
-            <div class="saved-track-sub">
-              ${lengthStr ? `<span>📏 ${escapeHTML(lengthStr)}</span>` : ''}
-              ${gradeText ? `<span>• ${escapeHTML(gradeText)}</span>` : ''}
-              ${network ? `<span>• ${escapeHTML(network)}</span>` : ''}
+
+            <div class="saved-stats-grid">
+              <div class="saved-stat-box">
+                <span class="saved-stat-lbl">DISTANCE</span>
+                <span class="saved-stat-val" style="color:#0284c7;">${distStr}</span>
+              </div>
+              <div class="saved-stat-box">
+                <span class="saved-stat-lbl">ELEV RANGE</span>
+                <span class="saved-stat-val" style="color:#9333ea;">${rangeStr}</span>
+              </div>
+              <div class="saved-stat-box">
+                <span class="saved-stat-lbl">TOTAL ASC</span>
+                <span class="saved-stat-val" style="color:#10b981;">${ascStr}</span>
+              </div>
+              <div class="saved-stat-box">
+                <span class="saved-stat-lbl">TOTAL DESC</span>
+                <span class="saved-stat-val" style="color:#f59e0b;">${descStr}</span>
+              </div>
+              <div class="saved-stat-box">
+                <span class="saved-stat-lbl">MAX INCLINE</span>
+                <span class="saved-stat-val" style="color:#10b981;">${incStr}</span>
+              </div>
+              <div class="saved-stat-box">
+                <span class="saved-stat-lbl">MAX DECLINE</span>
+                <span class="saved-stat-val" style="color:#ef4444;">${decStr}</span>
+              </div>
+              ${s.activeTimeStr || s.totalTimeStr ? `
+                <div class="saved-stat-box">
+                  <span class="saved-stat-lbl">ACTIVE TIME</span>
+                  <span class="saved-stat-val" style="color:#0d9488;">${s.activeTimeStr || s.totalTimeStr}</span>
+                </div>
+              ` : ''}
+              ${s.avgSpeedKmh ? `
+                <div class="saved-stat-box">
+                  <span class="saved-stat-lbl">AVG SPEED</span>
+                  <span class="saved-stat-val" style="color:#0284c7;">${s.avgSpeedKmh} km/h</span>
+                </div>
+              ` : ''}
             </div>
+
             <div class="saved-track-actions">
               <button class="btn-saved-action" onclick="window.zoomToTrack('${uid}');" title="Zoom to trail on map">
                 <span>🔍 Zoom</span>
@@ -2107,14 +2286,12 @@
                      p.Use || p.use || p.RouteType || p.track_type || p.TrackType || 
                      p.permitted_use || p.PermittedUse || '';
       const act = String(actRaw).trim().toLowerCase();
-      
       const grade = String(p.MountainBikeClassification || p.grade || p.tracktype || '').toLowerCase();
       const desc = String(p.Description || p.description || '').toLowerCase();
       const comment = String(p.Comment || p.comment || p.CharValue7 || '').toLowerCase();
       const name = String(p.RouteName || p.TechObjectName || p.assetName || p.name || '').toLowerCase();
 
       const allText = `${act} ${grade} ${desc} ${comment} ${name}`;
-
       const hasMtb = allText.includes('bike') || allText.includes('biking') || 
                      allText.includes('mtb') || allText.includes('cycle') || 
                      allText.includes('cycling') || allText.includes('singletrack') ||
@@ -2127,6 +2304,30 @@
         act.includes('walking') || act.includes('tramp') ||
         allText.includes('tramping track') || allText.includes('walking track')
       );
+    }
+
+    function calculateMaxGrades(pts) {
+      let maxIncline = 0;
+      let maxDecline = 0;
+      if (!pts || pts.length < 2) return { maxIncline: 0, maxDecline: 0 };
+
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dDistM = (pts[j].distKm - pts[i].distKm) * 1000;
+          if (dDistM >= 25 || j === pts.length - 1) {
+            if (dDistM >= 15) {
+              const dEle = pts[j].ele - pts[i].ele;
+              const grade = (dEle / dDistM) * 100;
+              if (grade > maxIncline) maxIncline = grade;
+              if (grade < maxDecline) maxDecline = grade;
+            }
+            break;
+          }
+        }
+      }
+      maxIncline = Math.min(45, Math.max(0, maxIncline));
+      maxDecline = Math.max(-45, Math.min(0, maxDecline));
+      return { maxIncline, maxDecline };
     }
 
     // =========================================================================
@@ -2288,19 +2489,7 @@
           if (p.description && p.description !== description) commentParts.push(p.description);
           if (p.note) commentParts.push(`Note: ${p.note}`);
 
-          const handledKeys = new Set([
-            'name', 'tracktype', 'smoothness', 'surface', 'trail_visibility', 
-            'oneway', 'ref', 'mtb:type', 'website', 'url', 'operator', 
-            'incline', 'access', 'mtb:scale:imba', 'mtb:scale', 'lit', 
-            'description', 'note', 'comment', 'geometry', 'type', 'id', 'OBJECTID'
-          ]);
-          for (const [k, v] of Object.entries(p)) {
-            if (!handledKeys.has(k) && v !== null && v !== undefined && v !== '' && typeof v !== 'object') {
-              commentParts.push(`${k}: ${v}`);
-            }
-          }
           comment = commentParts.join(' • ');
-
           area = p.ref || 'Christchurch Adventure Park';
           network = p.operator || 'Christchurch Adventure Park';
           activityType = p['mtb:type'] || 'Mountain Bike (CAP)';
@@ -2403,7 +2592,6 @@
         };
       });
 
-      // Track Linking: Merge segments with identical track names for nz_osm & doc_tracks
       if (datasetId === 'nz_osm' || datasetId === 'doc_tracks') {
         const genericNames = datasetId === 'nz_osm'
           ? new Set(['', 'nz osm mtb track', 'unnamed', 'track', 'trail', 'path', 'cycleway', 'mountain bike track', 'mtb track', 'footpath', 'bridleway', 'service road'])
@@ -2514,7 +2702,7 @@
     }
 
     // =========================================================================
-    // GPS TRACKING, WAKE LOCK & LIVE RIDE RECORDER (ON-DEMAND GPS)
+    // GPS TRACKING & LIVE RIDE RECORDER WITH 6s STATIONARY & 5m RESUMPTION
     // =========================================================================
     function updateGpsState() {
       const needGps = isTrackingActive || isRecording;
@@ -2540,8 +2728,8 @@
         handleGpsError,
         {
           enableHighAccuracy: true,
-          maximumAge: 2000,
-          timeout: 15000
+          maximumAge: 1000,
+          timeout: 10000
         }
       );
     }
@@ -2558,24 +2746,6 @@
       if (userCircle && map.hasLayer(userCircle)) {
         map.removeLayer(userCircle);
         userCircle = null;
-      }
-    }
-
-    async function requestScreenWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLock = await navigator.wakeLock.request('screen');
-          wakeLock.addEventListener('release', () => { wakeLock = null; });
-        }
-      } catch (err) {
-        console.log('Wake Lock denied or unavailable:', err);
-      }
-    }
-
-    function releaseScreenWakeLock() {
-      if (wakeLock) {
-        wakeLock.release().catch(() => {});
-        wakeLock = null;
       }
     }
 
@@ -2643,7 +2813,7 @@
     }
 
     // =========================================================================
-    // RECORDING HUD DRAGGING & DYNAMIC DOCKING ENGINE
+    // RECORDING HUD DRAGGING & POSITIONING
     // =========================================================================
     function positionRecordingHudAboveLegend() {
       if (isHudManuallyPositioned) return;
@@ -2717,11 +2887,9 @@
         hud.style.transition = '';
       }
 
-      // Mouse drag
       header.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
         onDragStart(e.clientX, e.clientY, e.target);
-
         const moveHandler = (ev) => onDragMove(ev.clientX, ev.clientY);
         const upHandler = () => {
           onDragEnd();
@@ -2732,7 +2900,6 @@
         window.addEventListener('mouseup', upHandler);
       });
 
-      // Touch drag for mobile / handlebars
       header.addEventListener('touchstart', (e) => {
         if (e.touches.length !== 1) return;
         const t = e.touches[0];
@@ -2756,14 +2923,10 @@
       const btnRecord = document.getElementById('btnRecordRide');
       const hud = document.getElementById('recordingHud');
 
-      // Manual drag releases auto-follow without stopping GPS
       map.on('dragstart', () => {
-        if (isFollowingUser) {
-          isFollowingUser = false;
-        }
+        if (isFollowingUser) isFollowingUser = false;
       });
 
-      // Find Me / Tracking Toggle
       btnLocate?.addEventListener('click', () => {
         if (!navigator.geolocation) {
           alert('Geolocation is not supported by your browser.');
@@ -2790,7 +2953,6 @@
         }
       });
 
-      // Record Ride Toggle Button
       btnRecord?.addEventListener('click', () => {
         if (!isRecording) {
           startRideRecording();
@@ -2800,7 +2962,6 @@
         }
       });
 
-      // HUD Controls
       document.getElementById('btnPauseResumeRec')?.addEventListener('click', () => {
         const btn = document.getElementById('btnPauseResumeRec');
         const statusLbl = document.getElementById('recHudStatusLabel');
@@ -2814,13 +2975,14 @@
         } else {
           isPaused = false;
           if (recPauseStartTime) {
-            recPausedDurationMs += (Date.now() - recPauseStartTime);
+            recManualPausedMs += (Date.now() - recPauseStartTime);
             recPauseStartTime = null;
           }
+          lastActiveTickTime = Date.now();
           btn.textContent = '⏸️ Pause';
           btn.style.background = '#334155';
           btn.style.borderColor = '#475569';
-          if (statusLbl) statusLbl.textContent = 'Recording Ride';
+          if (statusLbl) statusLbl.textContent = isStationary ? 'Stationary (Idle)' : 'Recording Ride';
         }
       });
 
@@ -2840,12 +3002,18 @@
 
       isRecording = true;
       isPaused = false;
+      isStationary = false;
       isHudManuallyPositioned = false;
       recordedPoints = [];
       totalRecordedClimbMeters = 0;
+      totalRecordedDescentMeters = 0;
       recStartTime = Date.now();
-      recPausedDurationMs = 0;
+      recManualPausedMs = 0;
       recPauseStartTime = null;
+      recActiveTimeMs = 0;
+      lastActiveTickTime = Date.now();
+      lastMovementTime = Date.now();
+      lastMovementPos = null;
 
       document.getElementById('recordingHud').style.display = 'flex';
       positionRecordingHudAboveLegend();
@@ -2864,28 +3032,42 @@
         pane: 'highlightPane'
       }).addTo(map);
 
-      requestScreenWakeLock();
-
-      if (recTimerInterval) clearInterval(recTimerInterval);
-      recTimerInterval = setInterval(updateRecTimerAndHud, 1000);
-
+      startBgKeepAlive();
       updateGpsState();
     }
 
     function appendRecordedPoint(pt) {
       if (pt.accuracy && pt.accuracy > 35) return;
 
+      const now = Date.now();
       const count = recordedPoints.length;
+
+      if (!lastMovementPos) {
+        lastMovementPos = { lat: pt.lat, lon: pt.lon };
+        lastMovementTime = now;
+      } else {
+        const dMeters = getDistanceKm(lastMovementPos.lat, lastMovementPos.lon, pt.lat, pt.lon) * 1000;
+        if (dMeters >= 5.0) {
+          if (isStationary) {
+            isStationary = false;
+            lastActiveTickTime = now;
+            const statusLbl = document.getElementById('recHudStatusLabel');
+            if (statusLbl && !isPaused) statusLbl.textContent = 'Recording Ride';
+          }
+          lastMovementPos = { lat: pt.lat, lon: pt.lon };
+          lastMovementTime = now;
+        }
+      }
+
       if (count > 0) {
         const prev = recordedPoints[count - 1];
         const distM = getDistanceKm(prev.lat, prev.lon, pt.lat, pt.lon) * 1000;
-        if (distM < 3.2) return;
+        if (distM < 2.5) return;
 
         if (pt.ele !== null && prev.ele !== null) {
           const eleDelta = pt.ele - prev.ele;
-          if (eleDelta >= 1.5) {
-            totalRecordedClimbMeters += eleDelta;
-          }
+          if (eleDelta >= 1.5) totalRecordedClimbMeters += eleDelta;
+          else if (eleDelta <= -1.5) totalRecordedDescentMeters += Math.abs(eleDelta);
         }
       }
 
@@ -2895,8 +3077,10 @@
       try {
         localStorage.setItem(REC_STORAGE_BACKUP_KEY, JSON.stringify({
           startTime: recStartTime,
-          pausedMs: recPausedDurationMs,
+          manualPausedMs: recManualPausedMs,
+          activeTimeMs: recActiveTimeMs,
           totalClimb: totalRecordedClimbMeters,
+          totalDescent: totalRecordedDescentMeters,
           points: recordedPoints
         }));
       } catch (e) {}
@@ -2917,12 +3101,25 @@
       if (!isRecording) return;
 
       const now = Date.now();
-      const totalElapsedMs = now - recStartTime;
-      const currentPauseExtra = isPaused && recPauseStartTime ? (now - recPauseStartTime) : 0;
-      const activeMs = Math.max(0, totalElapsedMs - recPausedDurationMs - currentPauseExtra);
+      const currentManualPauseExtra = isPaused && recPauseStartTime ? (now - recPauseStartTime) : 0;
+      const totalElapsedMs = Math.max(0, now - recStartTime - recManualPausedMs - currentManualPauseExtra);
+
+      if (!isPaused) {
+        if (!isStationary && lastMovementTime && (now - lastMovementTime >= 6000)) {
+          isStationary = true;
+          const statusLbl = document.getElementById('recHudStatusLabel');
+          if (statusLbl) statusLbl.textContent = 'Stationary (Idle)';
+        }
+
+        if (!isStationary) {
+          const dt = now - (lastActiveTickTime || now);
+          recActiveTimeMs += Math.max(0, dt);
+        }
+        lastActiveTickTime = now;
+      }
 
       document.getElementById('recTotalDuration').textContent = formatDuration(totalElapsedMs);
-      document.getElementById('recActiveTime').textContent = formatDuration(activeMs);
+      document.getElementById('recActiveTime').textContent = formatDuration(recActiveTimeMs);
 
       let totalKm = 0;
       for (let i = 1; i < recordedPoints.length; i++) {
@@ -2932,13 +3129,13 @@
       document.getElementById('recDistKm').textContent = totalKm.toFixed(2);
       document.getElementById('recTotalClimb').textContent = `+${Math.round(totalRecordedClimbMeters)}m`;
 
-      const activeHours = activeMs / 3600000;
+      const activeHours = recActiveTimeMs / 3600000;
       const avgKmh = activeHours > 0 ? (totalKm / activeHours).toFixed(1) : '0.0';
       document.getElementById('recAvgSpeed').textContent = avgKmh;
 
       if (recordedPoints.length > 0) {
         const latest = recordedPoints[recordedPoints.length - 1];
-        document.getElementById('recCurSpeed').textContent = isPaused ? '0.0' : (latest.speed || 0).toFixed(1);
+        document.getElementById('recCurSpeed').textContent = (isPaused || isStationary) ? '0.0' : (latest.speed || 0).toFixed(1);
         document.getElementById('recCurEle').textContent = latest.ele !== null ? latest.ele : '--';
       }
     }
@@ -2956,6 +3153,41 @@
       const totalKm = calculateCoordsLengthKm(coords, 'LineString');
       const trackUid = `recorded_${Date.now()}`;
 
+      let minEle = Infinity;
+      let maxEle = -Infinity;
+      let distAcc = 0;
+      const ptsForGrades = [];
+
+      for (let i = 0; i < recordedPoints.length; i++) {
+        const p = recordedPoints[i];
+        if (i > 0) {
+          distAcc += getDistanceKm(recordedPoints[i-1].lat, recordedPoints[i-1].lon, p.lat, p.lon);
+        }
+        const ele = p.ele !== null ? p.ele : 0;
+        if (ele < minEle) minEle = ele;
+        if (ele > maxEle) maxEle = ele;
+        ptsForGrades.push({ distKm: distAcc, ele: ele });
+      }
+
+      if (minEle === Infinity) { minEle = 0; maxEle = 0; }
+      const { maxIncline, maxDecline } = calculateMaxGrades(ptsForGrades);
+
+      const activeHours = recActiveTimeMs / 3600000;
+      const avgKmh = activeHours > 0 ? (totalKm / activeHours).toFixed(1) : '0.0';
+
+      const statsObj = {
+        distKm: totalKm,
+        minEle: Math.round(minEle),
+        maxEle: Math.round(maxEle),
+        totalAscent: Math.round(totalRecordedClimbMeters),
+        totalDescent: Math.round(totalRecordedDescentMeters),
+        maxIncline: maxIncline,
+        maxDecline: maxDecline,
+        totalTimeStr: formatDuration(Date.now() - recStartTime - recManualPausedMs),
+        activeTimeStr: formatDuration(recActiveTimeMs),
+        avgSpeedKmh: avgKmh
+      };
+
       const feature = {
         type: 'Feature',
         geometry: {
@@ -2969,7 +3201,8 @@
           fileName: 'Live GPS Ride',
           lengthKm: totalKm,
           lengthStr: `${totalKm.toFixed(2)} km`,
-          comment: `Total Climb: +${Math.round(totalRecordedClimbMeters)}m • Points: ${recordedPoints.length}`,
+          comment: `Total Climb: +${Math.round(totalRecordedClimbMeters)}m • Active Time: ${statsObj.activeTimeStr}`,
+          stats: statsObj,
           isRecorded: true,
           pointsMeta: recordedPoints
         }
@@ -2978,6 +3211,7 @@
       if (importedGpxGroup) {
         importedGpxGroup.addData(feature);
       }
+      savePersistedUserTrack(feature);
 
       const set = getSavedSet();
       set.add(trackUid);
@@ -2988,7 +3222,10 @@
       downloadFile(gpxData, `${cleanName}.gpx`, 'application/gpx+xml');
 
       teardownRecording();
-      alert(`Ride "${trackName}" saved to Favorites & downloaded as GPX!`);
+      renderSavedDropdown();
+      updateTotalStats();
+
+      openTrackElevationProfile(feature);
     }
 
     function discardRecording() {
@@ -2999,8 +3236,8 @@
     function teardownRecording() {
       isRecording = false;
       isPaused = false;
-      if (recTimerInterval) clearInterval(recTimerInterval);
-      releaseScreenWakeLock();
+      isStationary = false;
+      stopBgKeepAlive();
       localStorage.removeItem(REC_STORAGE_BACKUP_KEY);
 
       document.getElementById('recordingHud').style.display = 'none';
@@ -3014,6 +3251,7 @@
       }
       recordedPoints = [];
       totalRecordedClimbMeters = 0;
+      totalRecordedDescentMeters = 0;
 
       updateGpsState();
     }
@@ -3050,8 +3288,10 @@
           if (confirm(`Resume unfinished MTB ride from ${new Date(data.startTime).toLocaleTimeString()} (${data.points.length} points)?`)) {
             startRideRecording();
             recStartTime = data.startTime;
-            recPausedDurationMs = data.pausedMs || 0;
-            totalRecordedClimbMeters = data.totalClimb || 0;
+            recManualPausedMs = data.manualPausedMs || 0;
+            recActiveTimeMs = data.activeTimeMs || 0;
+            totalRecordedClimbMeters = 0;
+            totalRecordedDescentMeters = 0;
             data.points.forEach(p => appendRecordedPoint(p));
           } else {
             localStorage.removeItem(REC_STORAGE_BACKUP_KEY);
@@ -3116,7 +3356,6 @@
         });
       });
 
-      // Zoom Control with Zoom All (⛶)
       const zoomCtrl = L.control.zoom({ position: 'topright' }).addTo(map);
       const zoomContainer = zoomCtrl.getContainer();
       if (zoomContainer) {
@@ -3124,8 +3363,7 @@
         zoomAllBtn.href = '#';
         zoomAllBtn.title = 'Fit All / Reset View (New Zealand)';
         zoomAllBtn.setAttribute('role', 'button');
-        zoomAllBtn.setAttribute('aria-label', 'Fit All (New Zealand)');
-        zoomAllBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+        zoomAllBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
         L.DomEvent.disableClickPropagation(zoomAllBtn);
         L.DomEvent.on(zoomAllBtn, 'click', (e) => {
           L.DomEvent.preventDefault(e);
@@ -3147,7 +3385,7 @@
           lineJoin: 'round'
         },
         onEachFeature: (feat, layer) => {
-          layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 480 });
+          layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 510 });
           layer.on('click', (e) => {
             handleTrackSelection(feat, e.originalEvent, layer);
           });
@@ -3155,6 +3393,9 @@
           layer.on('mouseout', function() { if (typeof this.setStyle === 'function') this.setStyle({ weight: 4.8 }); });
         }
       }).addTo(map);
+
+      const persisted = getPersistedUserTracks();
+      persisted.forEach(f => importedGpxGroup.addData(f));
 
       map.on('popupopen', (e) => {
         lastPopupOpenTime = Date.now();
@@ -3177,7 +3418,6 @@
         }
       });
 
-      // Mobile Proximity Snap
       map.on('click', (e) => {
         if (Date.now() - lastPopupOpenTime < 140) return;
 
@@ -3326,7 +3566,7 @@
             };
           },
           onEachFeature: (feat, layer) => {
-            layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 510 });
+            layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 520 });
             layer.on('click', (e) => {
               handleTrackSelection(feat, e.originalEvent, layer);
             });
@@ -3406,12 +3646,11 @@
     }
 
     // =========================================================================
-    // ROBUST DATASET LOADER WITH CORS FALLBACK
+    // ROBUST DATASET LOADER
     // =========================================================================
     async function fetchDatasetData(cfg) {
       const cached = await getCachedGeoJSON(cfg.id);
       if (cached && cached.features && cached.features.length > 0) {
-        console.log(`[Cache Hit] ${cfg.label} (${cached.features.length} features)`);
         return cached;
       }
 
@@ -3421,7 +3660,6 @@
           if (res.ok) {
             const data = await res.json();
             if (data && data.features && data.features.length > 0) {
-              console.log(`[Local Hit] Loaded ${cfg.label} from ${url}`);
               setCachedGeoJSON(cfg.id, data);
               return data;
             }
@@ -3444,13 +3682,11 @@
           if (res.ok) {
             const data = await res.json();
             if (data && data.features && data.features.length > 0) {
-              console.log(`[Dropbox Hit] Loaded ${cfg.label}`);
               setCachedGeoJSON(cfg.id, data);
               return data;
             }
           }
         } catch (e) {
-          console.warn(`[Dropbox Direct Failed] ${cfg.label}, trying proxy...`);
           try {
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`;
             const controller = new AbortController();
@@ -3460,7 +3696,6 @@
             if (res.ok) {
               const data = await res.json();
               if (data && data.features && data.features.length > 0) {
-                console.log(`[Proxy Hit] Loaded ${cfg.label}`);
                 setCachedGeoJSON(cfg.id, data);
                 return data;
               }
@@ -3479,7 +3714,6 @@
           if (res.ok) {
             const data = await res.json();
             if (data && data.features && data.features.length > 0) {
-              console.log(`[ArcGIS Hit] Loaded ${cfg.label}`);
               setCachedGeoJSON(cfg.id, data);
               return data;
             }
@@ -3497,7 +3731,6 @@
           if (res.ok) {
             const data = await res.json();
             if (data && data.features && data.features.length > 0) {
-              console.log(`[Fallback ArcGIS Hit] Loaded ${cfg.label}`);
               setCachedGeoJSON(cfg.id, data);
               return data;
             }
@@ -3505,7 +3738,6 @@
         } catch (e) {}
       }
 
-      console.warn(`[Load Incomplete] Could not retrieve ${cfg.label}`);
       return null;
     }
 
@@ -3534,7 +3766,7 @@
     }
 
     // =========================================================================
-    // IMPORT ENGINE (GPX & GEOJSON)
+    // GPX STATS EXTRACTION ENGINE
     // =========================================================================
     function parseGeoJSONText(jsonText, fileName) {
       const data = JSON.parse(jsonText);
@@ -3550,12 +3782,6 @@
           geometry: g,
           properties: { name: `${fileName} (Geom ${idx + 1})` }
         }));
-      } else if (data.coordinates) {
-        rawFeatures = [{
-          type: 'Feature',
-          geometry: data,
-          properties: { name: fileName }
-        }];
       }
 
       const validFeatures = [];
@@ -3565,7 +3791,7 @@
         const props = feat.properties || {};
         const name = props.name || props.RouteName || props.cycletrail || props.TechObjectName || `${fileName} (Track ${idx + 1})`;
         const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
-        const lengthStr = distKm > 0 ? `${distKm.toFixed(2)} km` : (props.lengthStr || '');
+        const lengthStr = distKm > 0 ? `${distKm.toFixed(1)} km` : (props.lengthStr || '');
         const trackUid = `imported_${Date.now()}_${idx}_${name.slice(0, 14).replace(/[^a-zA-Z0-9]/g, '_')}`;
 
         validFeatures.push({
@@ -3596,6 +3822,7 @@
         const trkName = trk.querySelector('name')?.textContent?.trim() || `${fileName} (Track ${tIdx + 1})`;
         const trksegs = trk.querySelectorAll('trkseg');
         const multiLine = [];
+        const ptsMeta = [];
 
         trksegs.forEach(seg => {
           const pts = seg.querySelectorAll('trkpt');
@@ -3604,10 +3831,20 @@
             const lat = parseFloat(pt.getAttribute('lat'));
             const lon = parseFloat(pt.getAttribute('lon'));
             const eleNode = pt.querySelector('ele');
+            const timeNode = pt.querySelector('time');
             const ele = eleNode ? parseFloat(eleNode.textContent) : undefined;
+            const timeStr = timeNode ? timeNode.textContent.trim() : null;
+
             if (!isNaN(lat) && !isNaN(lon)) {
               if (ele !== undefined && !isNaN(ele)) line.push([lon, lat, ele]);
               else line.push([lon, lat]);
+
+              ptsMeta.push({
+                lat: lat,
+                lon: lon,
+                ele: (ele !== undefined && !isNaN(ele)) ? ele : null,
+                time: timeStr ? new Date(timeStr).getTime() : null
+              });
             }
           });
           if (line.length > 0) multiLine.push(line);
@@ -3620,6 +3857,80 @@
           const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
           const trackUid = `imported_${Date.now()}_${tIdx}_${trkName.slice(0, 14).replace(/[^a-zA-Z0-9]/g, '_')}`;
 
+          let minEle = Infinity;
+          let maxEle = -Infinity;
+          let totalAscent = 0;
+          let totalDescent = 0;
+          let totalDurationMs = 0;
+          let activeDurationMs = 0;
+          let lastMovePos = null;
+          let lastMoveTime = null;
+          let isMoving = true;
+          const ptsForGrades = [];
+          let distAcc = 0;
+
+          if (ptsMeta.length > 0 && ptsMeta[0].time && ptsMeta[ptsMeta.length - 1].time) {
+            totalDurationMs = Math.max(0, ptsMeta[ptsMeta.length - 1].time - ptsMeta[0].time);
+          }
+
+          ptsMeta.forEach((pt, pIdx) => {
+            if (pIdx > 0) {
+              const prev = ptsMeta[pIdx - 1];
+              const segD = getDistanceKm(prev.lat, prev.lon, pt.lat, pt.lon);
+              distAcc += segD;
+
+              if (pt.ele !== null && prev.ele !== null) {
+                const dE = pt.ele - prev.ele;
+                if (dE > 0) totalAscent += dE;
+                else totalDescent += Math.abs(dE);
+              }
+
+              if (pt.time && prev.time) {
+                const dt = pt.time - prev.time;
+                if (!lastMovePos) {
+                  lastMovePos = { lat: pt.lat, lon: pt.lon };
+                  lastMoveTime = pt.time;
+                } else {
+                  const mDist = getDistanceKm(lastMovePos.lat, lastMovePos.lon, pt.lat, pt.lon) * 1000;
+                  if (mDist >= 5.0) {
+                    isMoving = true;
+                    lastMovePos = { lat: pt.lat, lon: pt.lon };
+                    lastMoveTime = pt.time;
+                  } else if (pt.time - lastMoveTime >= 6000) {
+                    isMoving = false;
+                  }
+                }
+                if (isMoving && dt > 0 && dt < 120000) {
+                  activeDurationMs += dt;
+                }
+              }
+            }
+            if (pt.ele !== null) {
+              if (pt.ele < minEle) minEle = pt.ele;
+              if (pt.ele > maxEle) maxEle = pt.ele;
+              ptsForGrades.push({ distKm: distAcc, ele: pt.ele });
+            }
+          });
+
+          if (minEle === Infinity) { minEle = 0; maxEle = 0; }
+          const { maxIncline, maxDecline } = calculateMaxGrades(ptsForGrades);
+
+          const activeHours = activeDurationMs > 0 ? (activeDurationMs / 3600000) : (totalDurationMs / 3600000);
+          const avgKmh = activeHours > 0 ? (distKm / activeHours).toFixed(1) : '0.0';
+
+          const statsObj = {
+            distKm: distKm,
+            minEle: Math.round(minEle),
+            maxEle: Math.round(maxEle),
+            totalAscent: Math.round(totalAscent),
+            totalDescent: Math.round(totalDescent),
+            maxIncline: maxIncline,
+            maxDecline: maxDecline,
+            totalTimeStr: totalDurationMs > 0 ? formatDuration(totalDurationMs) : null,
+            activeTimeStr: activeDurationMs > 0 ? formatDuration(activeDurationMs) : null,
+            avgSpeedKmh: parseFloat(avgKmh) > 0 ? avgKmh : null
+          };
+
           features.push({
             type: 'Feature',
             geometry: geom,
@@ -3629,7 +3940,8 @@
               fileName: fileName,
               fileType: 'GPX',
               lengthKm: distKm,
-              lengthStr: distKm > 0 ? `${distKm.toFixed(2)} km` : '',
+              lengthStr: distKm > 0 ? `${distKm.toFixed(1)} km` : '',
+              stats: statsObj,
               isImported: true
             }
           });
@@ -3670,6 +3982,7 @@
 
             features.forEach(feat => {
               importedGpxGroup.addData(feat);
+              savePersistedUserTrack(feat);
             });
 
             const bounds = importedGpxGroup.getBounds();
@@ -3678,7 +3991,11 @@
             }
 
             updateTotalStats();
-            document.getElementById('lblDatasetLoading').textContent = `Imported: ${file.name} (${features.length} segment${features.length > 1 ? 's' : ''})`;
+            document.getElementById('lblDatasetLoading').textContent = `Loaded: ${file.name} (${features.length} segment${features.length > 1 ? 's' : ''})`;
+
+            if (features.length === 1) {
+              openTrackElevationProfile(features[0]);
+            }
           } catch (err) {
             console.error('Import file error:', err);
             alert(`Error parsing file "${file.name}": ${err.message}`);
@@ -3689,7 +4006,11 @@
     }
 
     function buildImportedPopup(props, layer) {
-      const typeLabel = props.fileType ? props.fileType : (props.fileName && (props.fileName.endsWith('.geojson') || props.fileName.endsWith('.json')) ? 'GeoJSON' : 'GPX');
+      const typeLabel = props.fileType || 'GPX';
+      const s = props.stats || {};
+      const savedSet = getSavedSet();
+      const isSaved = savedSet.has(props.uid);
+
       return `
         <div class="trail-popup-card">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
@@ -3699,40 +4020,79 @@
           </div>
           <h3>${escapeHTML(props.name || 'Imported Track')}</h3>
           ${props.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(props.lengthStr)}</div>` : ''}
+
+          ${(s.totalAscent !== undefined || s.activeTimeStr || s.avgSpeedKmh) ? `
+            <div class="popup-stats-grid">
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">ASCENT</span>
+                <span class="popup-stat-val" style="color:#10b981;">+${s.totalAscent}m</span>
+              </div>
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">DESCENT</span>
+                <span class="popup-stat-val" style="color:#f59e0b;">-${s.totalDescent}m</span>
+              </div>
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">ELEV RANGE</span>
+                <span class="popup-stat-val" style="color:#9333ea;">${s.minEle}m–${s.maxEle}m</span>
+              </div>
+              ${s.activeTimeStr ? `
+                <div class="popup-stat-tile">
+                  <span class="popup-stat-lbl">ACTIVE TIME</span>
+                  <span class="popup-stat-val" style="color:#0d9488;">${s.activeTimeStr}</span>
+                </div>
+              ` : ''}
+              ${s.totalTimeStr ? `
+                <div class="popup-stat-tile">
+                  <span class="popup-stat-lbl">TOTAL TIME</span>
+                  <span class="popup-stat-val" style="color:#64748b;">${s.totalTimeStr}</span>
+                </div>
+              ` : ''}
+              ${s.avgSpeedKmh ? `
+                <div class="popup-stat-tile">
+                  <span class="popup-stat-lbl">AVG SPEED</span>
+                  <span class="popup-stat-val" style="color:#0284c7;">${s.avgSpeedKmh} km/h</span>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+
           <div class="trail-meta-row">
             <div>📁 <strong>Source:</strong> ${escapeHTML(props.fileName || 'Imported File')}</div>
+            ${props.comment ? `<div class="trail-comment-box">${escapeHTML(props.comment)}</div>` : ''}
           </div>
-          <button class="btn-trail-action btn-elevation" onclick="window.openTrackElevationProfile('${props.uid}');" title="Show Elevation Profile across full width">
-            <span>📈</span> Elevation Profile (Full Width)
-          </button>
-          <button class="btn-trail-action" style="margin-top:6px; color:#e11d48;" onclick="window.removeImportedTrack('${layer._leaflet_id}')">
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+            <button class="btn-trail-action" onclick="window.toggleSaveTrack('${props.uid}', event);">
+              <span>${isSaved ? '❤️ Saved' : '🤍 Save Favorite'}</span>
+            </button>
+            <button class="btn-trail-action btn-elevation" onclick="window.openTrackElevationProfile('${props.uid}');" title="Show Elevation Profile across full width">
+              <span>📈 Elevation</span>
+            </button>
+          </div>
+          <button class="btn-trail-action" style="margin-top:6px; color:#e11d48;" onclick="window.removeImportedTrack('${layer._leaflet_id}', '${props.uid}')">
             <span>🗑️</span> Remove Track
           </button>
         </div>
       `;
     }
 
-    window.removeImportedTrack = function(leafletId) {
+    window.removeImportedTrack = function(leafletId, uid) {
       if (!importedGpxGroup) return;
       const layer = importedGpxGroup.getLayer(leafletId);
       if (layer) {
         map.closePopup();
         importedGpxGroup.removeLayer(layer);
+        if (uid) removePersistedUserTrack(uid);
         updateTotalStats();
       }
     };
 
-    // =========================================================================
-    // INIT & DOM BINDINGS
-    // =========================================================================
-    // =========================================================================
-    // TRAIL POPUP BUILDER & COMPLETE ELEVATION PROFILE ENGINE (AUTO-INJECTED)
-    // =========================================================================
     function buildTrailPopup(p) {
       if (!p) return '';
       const savedSet = getSavedSet();
       const isSaved = savedSet.has(p.uid);
       const gradeClass = p.gradeNum >= 1 && p.gradeNum <= 5 ? `pill-grade-${p.gradeNum}` : 'pill-category';
+      const s = p.stats || {};
 
       let sharedLabel = '';
       if (p.sharedUse) {
@@ -3752,6 +4112,38 @@
           </div>
           <h3>${escapeHTML(p.name || 'MTB Trail')}</h3>
           ${p.lengthStr ? `<div class="trail-distance-sub">📏 <strong>Distance:</strong> ${escapeHTML(p.lengthStr)}</div>` : ''}
+
+          ${(s.totalAscent !== undefined) ? `
+            <div class="popup-stats-grid">
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">ASCENT</span>
+                <span class="popup-stat-val" style="color:#10b981;">+${s.totalAscent}m</span>
+              </div>
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">DESCENT</span>
+                <span class="popup-stat-val" style="color:#f59e0b;">-${s.totalDescent}m</span>
+              </div>
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">ELEV RANGE</span>
+                <span class="popup-stat-val" style="color:#9333ea;">${s.minEle}m–${s.maxEle}m</span>
+              </div>
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">MAX INCLINE</span>
+                <span class="popup-stat-val" style="color:#10b981;">+${s.maxIncline.toFixed(1)}%</span>
+              </div>
+              <div class="popup-stat-tile">
+                <span class="popup-stat-lbl">MAX DECLINE</span>
+                <span class="popup-stat-val" style="color:#ef4444;">${s.maxDecline.toFixed(1)}%</span>
+              </div>
+              ${s.avgSpeedKmh ? `
+                <div class="popup-stat-tile">
+                  <span class="popup-stat-lbl">AVG SPEED</span>
+                  <span class="popup-stat-val" style="color:#0284c7;">${s.avgSpeedKmh} km/h</span>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+
           <div class="trail-meta-row">
             ${p.area ? `<div>📍 <strong>Location / Area:</strong> ${escapeHTML(p.area)}</div>` : ''}
             ${p.network ? `<div>🏢 <strong>Network:</strong> ${escapeHTML(p.network)}</div>` : ''}
@@ -3771,7 +4163,7 @@
             <button class="btn-trail-action btn-download-gpx" onclick="window.downloadTrackGPX('${p.uid}');">
               <span>📥 GPX</span>
             </button>
-            <button class="btn-trail-action" onclick="window.downloadTrackGeoJSON('${p.uid}');">
+            <button class="btn-trail-action btn-download-geoJSON" onclick="window.downloadTrackGeoJSON('${p.uid}');">
               <span>📄 GeoJSON</span>
             </button>
           </div>
@@ -3780,14 +4172,24 @@
       `;
     }
 
+    // =========================================================================
+    // ELEVATION ENGINE WITH HIGH-DENSITY CHUNKING & EQUIDISTANT RESAMPLING
+    // =========================================================================
     function initElevationEvents() {
       document.getElementById('btnElevClose')?.addEventListener('click', closeElevationDrawer);
       document.getElementById('btnElevExpand')?.addEventListener('click', () => {
         const drawer = document.getElementById('elevationDrawer');
         drawer?.classList.toggle('expanded');
+        const isExp = drawer?.classList.contains('expanded');
         const lbl = document.getElementById('lblElevExpand');
-        if (lbl) lbl.textContent = drawer?.classList.contains('expanded') ? '⛶ Collapse' : '⛶ Expand';
-        if (currentElevationData) renderElevationCanvas(currentElevationData);
+        if (lbl) lbl.textContent = isExp ? '⛶ Collapse' : '⛶ Expand';
+
+        if (currentElevationData && currentElevationData.featureRef) {
+          openTrackElevationProfile(currentElevationData.featureRef, isExp);
+        } else if (currentElevationData) {
+          renderElevationCanvas(currentElevationData);
+          renderExpandedDashboard(currentElevationData);
+        }
       });
       document.getElementById('btnElevExportPNG')?.addEventListener('click', downloadElevationProfilePNG);
       document.getElementById('btnElevExportCSV')?.addEventListener('click', exportElevationProfileCSV);
@@ -3808,7 +4210,48 @@
       currentElevationData = null;
     }
 
-    async function openTrackElevationProfile(featOrUid) {
+    function resampleCoordinatesEquidistant(rawLines, targetPointCount) {
+      const continuousCoords = [];
+      rawLines.forEach(line => {
+        line.forEach(pt => continuousCoords.push(pt));
+      });
+      if (continuousCoords.length < 2) return { sampled: [], totalD: 0 };
+
+      const cumDist = [0];
+      let totalD = 0;
+      for (let i = 1; i < continuousCoords.length; i++) {
+        const d = getDistanceKm(continuousCoords[i-1][1], continuousCoords[i-1][0], continuousCoords[i][1], continuousCoords[i][0]);
+        totalD += d;
+        cumDist.push(totalD);
+      }
+      if (totalD === 0) return { sampled: [continuousCoords[0]], totalD: 0 };
+
+      const stepDist = totalD / (targetPointCount - 1);
+      const sampled = [];
+      let curIdx = 0;
+
+      for (let i = 0; i < targetPointCount; i++) {
+        const targetD = Math.min(totalD, i * stepDist);
+        while (curIdx < cumDist.length - 1 && cumDist[curIdx + 1] < targetD) {
+          curIdx++;
+        }
+        if (curIdx >= cumDist.length - 1) {
+          sampled.push(continuousCoords[continuousCoords.length - 1]);
+        } else {
+          const segLen = cumDist[curIdx + 1] - cumDist[curIdx];
+          const t = segLen > 0 ? (targetD - cumDist[curIdx]) / segLen : 0;
+          const p1 = continuousCoords[curIdx];
+          const p2 = continuousCoords[curIdx + 1];
+          const lon = p1[0] + t * (p2[0] - p1[0]);
+          const lat = p1[1] + t * (p2[1] - p1[1]);
+          const ele = (p1[2] !== undefined && p2[2] !== undefined) ? (p1[2] + t * (p2[2] - p1[2])) : undefined;
+          sampled.push(ele !== undefined ? [lon, lat, ele] : [lon, lat]);
+        }
+      }
+      return { sampled, totalD };
+    }
+
+    async function openTrackElevationProfile(featOrUid, isHighDensity = null) {
       let feat = typeof featOrUid === 'string' ? findFeatureByUid(featOrUid) : (Array.isArray(featOrUid) ? featOrUid[0] : featOrUid);
       if (!feat && selectedFeatures.length > 0) feat = selectedFeatures[0];
       if (!feat || !feat.geometry) {
@@ -3821,57 +4264,58 @@
       drawer.style.display = 'flex';
 
       const titleEl = document.getElementById('elevTrackTitle');
-      const statsEl = document.getElementById('elevTrackStats');
       const trackName = (feat.properties && feat.properties.name) ? feat.properties.name : 'Trail Elevation';
-      if (titleEl) titleEl.textContent = `📈 ${trackName}`;
-      if (statsEl) statsEl.textContent = 'Sampling topography...';
+      if (titleEl) titleEl.textContent = `🚵 ${trackName}`;
+
+      document.getElementById('elevStatDistance').textContent = '...';
+      document.getElementById('elevStatRange').textContent = '...';
+      document.getElementById('elevStatAscent').textContent = '...';
+      document.getElementById('elevStatDescent').textContent = '...';
+      document.getElementById('elevStatIncline').textContent = '...';
+      document.getElementById('elevStatDecline').textContent = '...';
 
       const geom = feat.geometry;
-      let rawCoords = [];
-      if (geom.type === 'LineString') rawCoords = geom.coordinates;
-      else if (geom.type === 'MultiLineString') rawCoords = geom.coordinates.flat();
+      let rawLines = [];
+      if (geom.type === 'LineString') rawLines = [geom.coordinates];
+      else if (geom.type === 'MultiLineString') rawLines = geom.coordinates;
 
-      if (!rawCoords || rawCoords.length < 2) {
-        if (statsEl) statsEl.textContent = 'Track too short for elevation profile.';
-        return;
-      }
+      if (!rawLines.length || !rawLines[0].length) return;
 
-      // Check if coordinates already contain altitude / Z values
-      let has3d = rawCoords.some(c => c.length >= 3 && !isNaN(c[2]) && c[2] > 0);
-      let sampled = [];
+      const expanded = isHighDensity !== null ? isHighDensity : drawer.classList.contains('expanded');
+      const targetCount = expanded ? 180 : 90;
 
-      // Sample to max 120 points for fast rendering and API friendliness
-      const step = Math.max(1, Math.floor(rawCoords.length / 120));
-      for (let i = 0; i < rawCoords.length; i += step) {
-        sampled.push(rawCoords[i]);
-      }
-      if (sampled[sampled.length - 1] !== rawCoords[rawCoords.length - 1]) {
-        sampled.push(rawCoords[rawCoords.length - 1]);
-      }
+      const { sampled, totalD } = resampleCoordinatesEquidistant(rawLines, targetCount);
+      if (!sampled || sampled.length < 2) return;
 
+      const has3d = sampled.some(c => c.length >= 3 && !isNaN(c[2]) && c[2] > 0);
       let elevations = [];
+
       if (has3d) {
         elevations = sampled.map(c => Math.round(c[2] || 0));
       } else {
-        // Query Open-Meteo high-resolution topographic DEM elevation API
+        const chunkSize = 90;
+        const chunks = [];
+        for (let i = 0; i < sampled.length; i += chunkSize) {
+          chunks.push(sampled.slice(i, i + chunkSize));
+        }
+
         try {
-          const lats = sampled.map(c => c[1].toFixed(5)).join(',');
-          const lons = sampled.map(c => c[0].toFixed(5)).join(',');
-          const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lons}`;
-          const res = await fetch(url);
-          if (res.ok) {
+          const chunkResults = await Promise.all(chunks.map(async (chunk) => {
+            const lats = chunk.map(c => c[1].toFixed(5)).join(',');
+            const lons = chunk.map(c => c[0].toFixed(5)).join(',');
+            const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lons}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
-            if (data && data.elevation && data.elevation.length === sampled.length) {
-              elevations = data.elevation.map(e => Math.round(e));
-            }
-          }
+            return data.elevation || [];
+          }));
+          elevations = chunkResults.flat().map(e => Math.round(e));
         } catch (err) {
-          console.warn('Open-Meteo elevation query failed, using synthetic slope fallback:', err);
+          console.warn('Open-Meteo elevation chunk query failed, using DEM fallback:', err);
         }
       }
 
-      // Fallback synthetic slope if offline and no 3D coords
-      if (!elevations || elevations.length === 0) {
+      if (!elevations || elevations.length !== sampled.length) {
         elevations = sampled.map((c, idx) => Math.round(50 + 40 * Math.sin((idx / sampled.length) * Math.PI)));
       }
 
@@ -3881,6 +4325,8 @@
       let maxEle = -Infinity;
       let totalClimb = 0;
       let totalDescent = 0;
+      let minPt = null;
+      let maxPt = null;
 
       for (let i = 0; i < sampled.length; i++) {
         if (i > 0) {
@@ -3890,31 +4336,127 @@
           else totalDescent += Math.abs(dEle);
         }
         const ele = elevations[i];
-        if (ele < minEle) minEle = ele;
-        if (ele > maxEle) maxEle = ele;
-        points.push({
+        const ptObj = {
           distKm: totalDist,
           ele: ele,
           lat: sampled[i][1],
           lon: sampled[i][0]
-        });
+        };
+        if (ele < minEle) { minEle = ele; minPt = ptObj; }
+        if (ele > maxEle) { maxEle = ele; maxPt = ptObj; }
+        points.push(ptObj);
       }
 
+      const { maxIncline, maxDecline } = calculateMaxGrades(points);
+
+      let maxPitchPt = points[0];
+      let highestGrade = -Infinity;
+      for (let i = 0; i < points.length - 1; i++) {
+        const dM = (points[i+1].distKm - points[i].distKm) * 1000;
+        if (dM > 10) {
+          const g = ((points[i+1].ele - points[i].ele) / dM) * 100;
+          if (g > highestGrade) {
+            highestGrade = g;
+            maxPitchPt = points[i];
+          }
+        }
+      }
+
+      const existingStats = feat.properties.stats || {};
       currentElevationData = {
         name: trackName,
+        featureRef: feat,
         points: points,
         totalDist: totalDist,
         minEle: minEle,
         maxEle: maxEle,
         climb: totalClimb,
-        descent: totalDescent
+        descent: totalDescent,
+        maxIncline: maxIncline,
+        maxDecline: maxDecline,
+        timeStr: existingStats.totalTimeStr || null,
+        activeTimeStr: existingStats.activeTimeStr || null,
+        avgSpeedKmh: existingStats.avgSpeedKmh || null,
+        milestones: {
+          summit: maxPt,
+          valley: minPt,
+          pitch: maxPitchPt
+        }
       };
 
-      if (statsEl) {
-        statsEl.textContent = `Distance: ${totalDist.toFixed(1)} km • Climb: +${Math.round(totalClimb)}m • Min: ${minEle}m • Max: ${maxEle}m`;
+      feat.properties.stats = {
+        distKm: totalDist,
+        minEle: minEle,
+        maxEle: maxEle,
+        totalAscent: Math.round(totalClimb),
+        totalDescent: Math.round(totalDescent),
+        maxIncline: maxIncline,
+        maxDecline: maxDecline,
+        totalTimeStr: existingStats.totalTimeStr || null,
+        activeTimeStr: existingStats.activeTimeStr || null,
+        avgSpeedKmh: existingStats.avgSpeedKmh || null
+      };
+
+      // Populate The 6 Stats Banners
+      document.getElementById('elevStatDistance').textContent = `${totalDist.toFixed(1)} km`;
+      document.getElementById('elevStatRange').textContent = `${minEle}m – ${maxEle}m`;
+      document.getElementById('elevStatAscent').textContent = `+${Math.round(totalClimb)} m`;
+      document.getElementById('elevStatDescent').textContent = `-${Math.round(totalDescent)} m`;
+      document.getElementById('elevStatIncline').textContent = `+${maxIncline.toFixed(1)}%`;
+      document.getElementById('elevStatDecline').textContent = `${maxDecline.toFixed(1)}%`;
+
+      const extraTimeCol = document.getElementById('elevExtraTimeCol');
+      const extraSpeedCol = document.getElementById('elevExtraSpeedCol');
+
+      if (currentElevationData.activeTimeStr || currentElevationData.timeStr) {
+        if (extraTimeCol) extraTimeCol.style.display = 'flex';
+        document.getElementById('elevStatTime').textContent = currentElevationData.activeTimeStr
+          ? `${currentElevationData.activeTimeStr} (Act)`
+          : currentElevationData.timeStr;
+      } else {
+        if (extraTimeCol) extraTimeCol.style.display = 'none';
+      }
+
+      if (currentElevationData.avgSpeedKmh) {
+        if (extraSpeedCol) extraSpeedCol.style.display = 'flex';
+        document.getElementById('elevStatSpeed').textContent = `${currentElevationData.avgSpeedKmh} km/h`;
+      } else {
+        if (extraSpeedCol) extraSpeedCol.style.display = 'none';
       }
 
       renderElevationCanvas(currentElevationData);
+      renderExpandedDashboard(currentElevationData);
+    }
+
+    function getSlopeColor(gradePct) {
+      if (gradePct <= -8) return '#8b5cf6';
+      if (gradePct <= 4) return '#10b981';
+      if (gradePct <= 8) return '#eab308';
+      if (gradePct <= 14) return '#f97316';
+      return '#ef4444';
+    }
+
+    // Polyfill CanvasRenderingContext2D.prototype.roundRect for cross-browser compatibility
+    if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+        if (!radii) radii = 0;
+        let r = Array.isArray(radii) ? radii : [radii, radii, radii, radii];
+        if (typeof radii === 'number') r = [radii, radii, radii, radii];
+        const tl = r[0] || 0;
+        const tr = r[1] !== undefined ? r[1] : tl;
+        const br = r[2] !== undefined ? r[2] : tl;
+        const bl = r[3] !== undefined ? r[3] : tr;
+        this.moveTo(x + tl, y);
+        this.lineTo(x + w - tr, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + tr);
+        this.lineTo(x + w, y + h - br);
+        this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+        this.lineTo(x + bl, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - bl);
+        this.lineTo(x, y + tl);
+        this.quadraticCurveTo(x, y, x + tl, y);
+        this.closePath();
+      };
     }
 
     function renderElevationCanvas(data) {
@@ -3933,39 +4475,58 @@
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
 
-      const padL = 36, padR = 14, padT = 18, padB = 22;
+      const padL = 48, padR = 24, padT = 32, padB = 40;
       const graphW = width - padL - padR;
       const graphH = height - padT - padB;
       if (graphW <= 0 || graphH <= 0) return;
 
-      const minEle = data.minEle - 10;
-      const maxEle = data.maxEle + 15;
-      const eleRange = Math.max(1, maxEle - minEle);
+      const rawMax = Math.max(50, data.maxEle);
+      const step = Math.ceil(rawMax / 5 / 10) * 10 || 10;
+      const yMax = step * 5;
+      const yMin = 0;
+      const eleRange = yMax - yMin;
       const distRange = Math.max(0.1, data.totalDist);
 
+      const maxCurveHeight = Math.min(graphH - 12, 180);
       const getX = (dist) => padL + (dist / distRange) * graphW;
-      const getY = (ele) => padT + graphH - ((ele - minEle) / eleRange) * graphH;
+      const getY = (ele) => padT + graphH - ((ele - yMin) / eleRange) * maxCurveHeight;
 
-      // Draw Grid Lines
-      ctx.strokeStyle = document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.85)';
+      const textColor = isDark ? '#94a3b8' : '#64748b';
+
       ctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const y = padT + (graphH / 4) * i;
+      ctx.setLineDash([3, 4]);
+      ctx.strokeStyle = gridColor;
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'right';
+
+      for (let i = 0; i <= 5; i++) {
+        const val = Math.round(step * i);
+        const y = getY(val);
         ctx.beginPath();
         ctx.moveTo(padL, y);
         ctx.lineTo(padL + graphW, y);
         ctx.stroke();
-
-        const eleLabel = Math.round(maxEle - (eleRange / 4) * i);
-        ctx.fillStyle = '#64748b';
-        ctx.font = '10px monospace';
-        ctx.textAlign = 'right';
-        ctx.fillText(`${eleLabel}m`, padL - 4, y + 3);
+        ctx.fillText(`${val} m`, padL - 8, y + 3.5);
       }
 
-      // Draw Filled Gradient
+      ctx.textAlign = 'center';
+      const xSteps = width < 600 ? 5 : 10;
+      for (let i = 0; i <= xSteps; i++) {
+        const dist = (distRange / xSteps) * i;
+        const x = getX(dist);
+        ctx.beginPath();
+        ctx.moveTo(x, padT);
+        ctx.lineTo(x, padT + graphH);
+        ctx.stroke();
+        ctx.fillText(`${dist.toFixed(1)} km`, x, padT + graphH + 16);
+      }
+      ctx.setLineDash([]);
+
       const grad = ctx.createLinearGradient(0, padT, 0, padT + graphH);
-      grad.addColorStop(0, 'rgba(16, 185, 129, 0.45)');
+      grad.addColorStop(0, 'rgba(16, 185, 129, 0.38)');
       grad.addColorStop(1, 'rgba(16, 185, 129, 0.03)');
 
       ctx.beginPath();
@@ -3976,7 +4537,6 @@
       ctx.fillStyle = grad;
       ctx.fill();
 
-      // Draw Profile Stroke
       ctx.beginPath();
       data.points.forEach((pt, idx) => {
         const x = getX(pt.distKm);
@@ -3985,11 +4545,77 @@
         else ctx.lineTo(x, y);
       });
       ctx.strokeStyle = '#059669';
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.8;
       ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Interactive Scrubbing Event
+      const ribbonY = padT + graphH + 20;
+      const ribbonHeight = 6;
+      for (let i = 0; i < data.points.length - 1; i++) {
+        const p1 = data.points[i];
+        const p2 = data.points[i+1];
+        const dM = (p2.distKm - p1.distKm) * 1000;
+        const slope = dM > 0 ? ((p2.ele - p1.ele) / dM) * 100 : 0;
+        const x1 = getX(p1.distKm);
+        const x2 = getX(p2.distKm);
+
+        ctx.fillStyle = getSlopeColor(slope);
+        ctx.fillRect(x1, ribbonY, Math.max(1.5, x2 - x1), ribbonHeight);
+      }
+
+      function drawCalloutBadge(pt, text, badgeColor) {
+        if (!pt) return;
+        const x = getX(pt.distKm);
+        const y = getY(pt.ele);
+
+        ctx.setLineDash([2, 3]);
+        ctx.strokeStyle = badgeColor;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 18);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = badgeColor;
+        ctx.beginPath();
+        ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = 'bold 9.5px system-ui, sans-serif';
+        const txtWidth = ctx.measureText(text).width;
+        const bW = txtWidth + 12;
+        const bH = 16;
+        let bX = x - bW / 2;
+        bX = Math.max(padL, Math.min(padL + graphW - bW, bX));
+        const bY = y - 34;
+
+        ctx.fillStyle = isDark ? '#0f172a' : '#ffffff';
+        ctx.strokeStyle = badgeColor;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.roundRect(bX, bY, bW, bH, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = badgeColor;
+        ctx.textAlign = 'center';
+        ctx.fillText(text, bX + bW / 2, bY + 11.5);
+      }
+
+      if (data.milestones) {
+        if (data.milestones.summit) {
+          drawCalloutBadge(data.milestones.summit, `▲ Summit: ${data.milestones.summit.ele}m`, '#9333ea');
+        }
+        if (data.milestones.pitch) {
+          drawCalloutBadge(data.milestones.pitch, `⚡ Pitch: +${data.maxIncline.toFixed(1)}%`, '#ef4444');
+        }
+        if (data.milestones.valley && data.milestones.valley.ele !== data.milestones.summit.ele) {
+          drawCalloutBadge(data.milestones.valley, `▼ Low: ${data.milestones.valley.ele}m`, '#0284c7');
+        }
+      }
+
       canvas.onmousemove = (e) => {
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -4006,7 +4632,6 @@
           if (diff < minDiff) { minDiff = diff; closest = pt; }
         });
 
-        // Update scrub marker on Leaflet map
         if (!elevScrubMarker) {
           elevScrubMarker = L.circleMarker([closest.lat, closest.lon], {
             radius: 7,
@@ -4019,7 +4644,6 @@
           elevScrubMarker.setLatLng([closest.lat, closest.lon]);
         }
 
-        // Tooltip
         if (tooltip) {
           tooltip.style.display = 'block';
           tooltip.style.left = `${mouseX}px`;
@@ -4037,16 +4661,296 @@
       };
     }
 
+    function renderExpandedDashboard(data) {
+      if (!data || !data.points.length) return;
+
+      let flatKm = 0;
+      let climbKm = 0;
+      let descKm = 0;
+
+      for (let i = 0; i < data.points.length - 1; i++) {
+        const p1 = data.points[i];
+        const p2 = data.points[i+1];
+        const segD = p2.distKm - p1.distKm;
+        const dM = segD * 1000;
+        const slope = dM > 0 ? ((p2.ele - p1.ele) / dM) * 100 : 0;
+
+        if (slope >= 5) climbKm += segD;
+        else if (slope <= -5) descKm += segD;
+        else flatKm += segD;
+      }
+
+      const totalD = Math.max(0.01, data.totalDist);
+      document.getElementById('valFlatDist').textContent = `${flatKm.toFixed(1)} km (${Math.round((flatKm/totalD)*100)}%)`;
+      document.getElementById('valClimbDist').textContent = `${climbKm.toFixed(1)} km (${Math.round((climbKm/totalD)*100)}%)`;
+      document.getElementById('valDescDist').textContent = `${descKm.toFixed(1)} km (${Math.round((descKm/totalD)*100)}%)`;
+
+      const splitInterval = data.totalDist <= 45 ? 5 : 10;
+      const tbody = document.getElementById('splitsTableBody');
+      if (!tbody) return;
+
+      let html = '';
+      let curSplitStart = 0;
+      let splitIdx = 1;
+
+      while (curSplitStart < data.totalDist) {
+        const curSplitEnd = Math.min(data.totalDist, curSplitStart + splitInterval);
+        const splitPts = data.points.filter(p => p.distKm >= curSplitStart && p.distKm <= curSplitEnd);
+
+        let splitAsc = 0;
+        let splitDesc = 0;
+        let splitMaxSlope = 0;
+
+        for (let j = 0; j < splitPts.length - 1; j++) {
+          const dE = splitPts[j+1].ele - splitPts[j].ele;
+          if (dE > 0) splitAsc += dE;
+          else splitDesc += Math.abs(dE);
+
+          const dM = (splitPts[j+1].distKm - splitPts[j].distKm) * 1000;
+          if (dM > 10) {
+            const gr = (dE / dM) * 100;
+            if (Math.abs(gr) > Math.abs(splitMaxSlope)) splitMaxSlope = gr;
+          }
+        }
+
+        const splitDist = curSplitEnd - curSplitStart;
+        const estSpeed = Math.max(8, 20 - (splitAsc / Math.max(1, splitDist * 10)));
+        const estTimeMin = Math.round((splitDist / estSpeed) * 60);
+
+        html += `
+          <tr onclick="window.zoomToSplitSegment(${curSplitStart}, ${curSplitEnd});">
+            <td><strong>Split ${splitIdx}</strong> (${curSplitStart.toFixed(0)}–${curSplitEnd.toFixed(0)} km)</td>
+            <td>${splitDist.toFixed(1)} km</td>
+            <td style="color:#10b981;">+${Math.round(splitAsc)} m</td>
+            <td style="color:#f59e0b;">-${Math.round(splitDesc)} m</td>
+            <td>${splitMaxSlope >= 0 ? `+${splitMaxSlope.toFixed(1)}%` : `${splitMaxSlope.toFixed(1)}%`}</td>
+            <td>~${estTimeMin} min</td>
+          </tr>
+        `;
+
+        curSplitStart = curSplitEnd;
+        splitIdx++;
+      }
+
+      tbody.innerHTML = html;
+    }
+
+    window.zoomToSplitSegment = function(startKm, endKm) {
+      if (!currentElevationData) return;
+      const pts = currentElevationData.points.filter(p => p.distKm >= startKm && p.distKm <= endKm);
+      if (pts.length >= 2) {
+        const latlngs = pts.map(p => [p.lat, p.lon]);
+        map.fitBounds(L.latLngBounds(latlngs), { padding: [50, 50], maxZoom: 16 });
+      }
+    };
+
     function downloadElevationProfilePNG() {
-      const canvas = document.getElementById('elevationCanvas');
-      if (!canvas || !currentElevationData) {
+      if (!currentElevationData || !currentElevationData.points.length) {
         alert('Please open an elevation profile first.');
         return;
       }
+      const data = currentElevationData;
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = 1920;
+      exportCanvas.height = 1080;
+      const ctx = exportCanvas.getContext('2d');
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(40, 40, 1840, 1000, 20);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(65, 60, 1790, 140, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 32px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`🚵  ${data.name}`, 95, 108);
+
+      const cols = [
+        { label: 'DISTANCE', val: `${data.totalDist.toFixed(1)} km`, color: '#0284c7' },
+        { label: 'ELEVATION RANGE', val: `${data.minEle}m – ${data.maxEle}m`, color: '#9333ea' },
+        { label: 'TOTAL ASCENT', val: `+${Math.round(data.climb)} m`, color: '#10b981' },
+        { label: 'TOTAL DESCENT', val: `-${Math.round(data.descent)} m`, color: '#f59e0b' },
+        { label: 'MAX INCLINE GRADE', val: `+${data.maxIncline.toFixed(1)}%`, color: '#10b981' },
+        { label: 'MAX DECLINE GRADE', val: `${data.maxDecline.toFixed(1)}%`, color: '#ef4444' }
+      ];
+
+      const colStartX = 95;
+      const colSpacing = 280;
+      cols.forEach((c, idx) => {
+        const x = colStartX + idx * colSpacing;
+        ctx.fillStyle = '#64748b';
+        ctx.font = '800 13px system-ui, sans-serif';
+        ctx.fillText(c.label, x, 146);
+
+        ctx.fillStyle = c.color;
+        ctx.font = '900 24px system-ui, sans-serif';
+        ctx.fillText(c.val, x, 178);
+      });
+
+      const padL = 140, padR = 80, padT = 250, padB = 100;
+      const graphW = 1920 - padL - padR;
+      const graphH = 1080 - padT - padB;
+
+      const rawMax = Math.max(50, data.maxEle);
+      const step = Math.ceil(rawMax / 5 / 10) * 10 || 10;
+      const yMax = step * 5;
+      const distRange = Math.max(0.1, data.totalDist);
+
+      const getX = (dist) => padL + (dist / distRange) * graphW;
+      const getY = (ele) => padT + graphH - (ele / yMax) * graphH;
+
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 6]);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.font = '500 16px system-ui, sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.textAlign = 'right';
+
+      for (let i = 0; i <= 5; i++) {
+        const val = step * i;
+        const y = getY(val);
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(padL + graphW, y);
+        ctx.stroke();
+        ctx.fillText(`${val} m`, padL - 16, y + 6);
+      }
+
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= 10; i++) {
+        const dist = (distRange / 10) * i;
+        const x = getX(dist);
+        ctx.beginPath();
+        ctx.moveTo(x, padT);
+        ctx.lineTo(x, padT + graphH);
+        ctx.stroke();
+        ctx.fillText(`${dist.toFixed(1)} km`, x, padT + graphH + 30);
+      }
+      ctx.setLineDash([]);
+
+      const grad = ctx.createLinearGradient(0, padT, 0, padT + graphH);
+      grad.addColorStop(0, 'rgba(16, 185, 129, 0.40)');
+      grad.addColorStop(1, 'rgba(16, 185, 129, 0.04)');
+
+      ctx.beginPath();
+      ctx.moveTo(getX(data.points[0].distKm), padT + graphH);
+      data.points.forEach(pt => ctx.lineTo(getX(pt.distKm), getY(pt.ele)));
+      ctx.lineTo(getX(data.points[data.points.length - 1].distKm), padT + graphH);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.beginPath();
+      data.points.forEach((pt, idx) => {
+        const x = getX(pt.distKm);
+        const y = getY(pt.ele);
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = '#059669';
+      ctx.lineWidth = 4.5;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Continuous Gradient Slope Ribbon
+      const ribbonY = padT + graphH + 42;
+      const ribbonHeight = 8;
+      for (let i = 0; i < data.points.length - 1; i++) {
+        const p1 = data.points[i];
+        const p2 = data.points[i+1];
+        const dM = (p2.distKm - p1.distKm) * 1000;
+        const slope = dM > 0 ? ((p2.ele - p1.ele) / dM) * 100 : 0;
+        const x1 = getX(p1.distKm);
+        const x2 = getX(p2.distKm);
+
+        ctx.fillStyle = getSlopeColor(slope);
+        ctx.fillRect(x1, ribbonY, Math.max(1.5, x2 - x1), ribbonHeight);
+      }
+
+      // Milestone Callout Badges
+      function drawExportBadge(pt, text, badgeColor) {
+        if (!pt) return;
+        const x = getX(pt.distKm);
+        const y = getY(pt.ele);
+
+        ctx.setLineDash([3, 4]);
+        ctx.strokeStyle = badgeColor;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 28);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = badgeColor;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = 'bold 14px system-ui, sans-serif';
+        const txtWidth = ctx.measureText(text).width;
+        const bW = txtWidth + 20;
+        const bH = 26;
+        let bX = x - bW / 2;
+        bX = Math.max(padL, Math.min(padL + graphW - bW, bX));
+        const bY = y - 56;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = badgeColor;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(bX, bY, bW, bH, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = badgeColor;
+        ctx.textAlign = 'center';
+        ctx.fillText(text, bX + bW / 2, bY + 18);
+      }
+
+      if (data.milestones) {
+        if (data.milestones.summit) {
+          drawExportBadge(data.milestones.summit, `▲ Summit: ${data.milestones.summit.ele}m`, '#9333ea');
+        }
+        if (data.milestones.pitch) {
+          drawExportBadge(data.milestones.pitch, `⚡ Pitch: +${data.maxIncline.toFixed(1)}%`, '#ef4444');
+        }
+        if (data.milestones.valley && data.milestones.valley.ele !== data.milestones.summit.ele) {
+          drawExportBadge(data.milestones.valley, `▼ Low: ${data.milestones.valley.ele}m`, '#0284c7');
+        }
+      }
+
+      ctx.font = '600 14px system-ui, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.textAlign = 'left';
+      ctx.fillText('Aotearoa NZ Mountain Bike & Cycle Trails — BMMC • Topography: Copernicus DEM 30m', padL, 1025);
+
+      ctx.textAlign = 'right';
+      ctx.fillText(new Date().toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' }), padL + graphW, 1025);
+
       const link = document.createElement('a');
-      link.download = `${(currentElevationData.name || 'trail').replace(/[^a-zA-Z0-9]/g, '_')}_elevation.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.download = `${(data.name || 'trail').replace(/[^a-zA-Z0-9]/g, '_')}_elevation.png`;
+      link.href = exportCanvas.toDataURL('image/png');
+      document.body.appendChild(link);
       link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 150);
     }
 
     function exportElevationProfileCSV() {
@@ -4076,6 +4980,9 @@
       downloadFile(gpx, `${(currentElevationData.name || 'trail').replace(/[^a-zA-Z0-9]/g, '_')}_3D.gpx`, 'application/gpx+xml');
     }
 
+    // =========================================================================
+    // START APPLICATION
+    // =========================================================================
     let _leafletWaitAttempts = 0;
     function startApp() {
       if (!window.L) {
@@ -4107,12 +5014,10 @@
       window.clearAllHighlights = clearAllHighlights;
       window.handleTrackSelection = handleTrackSelection;
 
-      // Basemap Buttons
       document.getElementById('btnLayerNatGeo')?.addEventListener('click', () => setBasemap('natgeo'));
       document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
       document.getElementById('btnLayerSat')?.addEventListener('click', () => setBasemap('sat'));
 
-      // Layers Dropdown
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
       const btnToggleSaved = document.getElementById('btnToggleSaved');
@@ -4140,7 +5045,6 @@
         }
       });
 
-      // Filter Map Toggle inside Saved Dropdown
       const btnSavedFilterToggle = document.getElementById('btnSavedFilterToggle');
       const lblSavedFilterState = document.getElementById('lblSavedFilterState');
       btnSavedFilterToggle?.addEventListener('click', () => {
@@ -4153,7 +5057,6 @@
         reapplyFilters();
       });
 
-      // Track Import Input
       const btnImportGPX = document.getElementById('btnImportGPX');
       const gpxFileInput = document.getElementById('gpxFileInput');
       btnImportGPX?.addEventListener('click', () => gpxFileInput?.click());
@@ -4162,7 +5065,6 @@
         gpxFileInput.value = '';
       });
 
-      // Legend Toggle Button with HUD Repositioning
       const trailLegendCard = document.getElementById('trailLegendCard');
       const btnCloseLegend = document.getElementById('btnCloseLegend');
       const btnOpenLegend = document.getElementById('btnOpenLegend');
@@ -4179,7 +5081,6 @@
         positionRecordingHudAboveLegend();
       });
 
-      // Interactive Legend Items
       document.querySelectorAll('#trailLegendCard .legend-item[data-layer-key]').forEach(item => {
         item.addEventListener('click', () => {
           const key = item.getAttribute('data-layer-key');
@@ -4187,7 +5088,6 @@
         });
       });
 
-      // Dataset Overlay Toggles
       document.getElementById('btnToggleGreatRides')?.addEventListener('click', () => toggleDatasetById('great_rides'));
       document.getElementById('btnToggleChchCycle')?.addEventListener('click', () => toggleDatasetById('chch_cycle'));
       document.getElementById('btnToggleHeartland')?.addEventListener('click', () => toggleDatasetById('heartland'));
@@ -4196,14 +5096,12 @@
       document.getElementById('btnToggleCapPlus')?.addEventListener('click', () => toggleDatasetById('cap_plus'));
       document.getElementById('btnToggleDocTracks')?.addEventListener('click', () => toggleDatasetById('doc_tracks'));
 
-      // Grade Selection inside Layers Tab
       const gradeSelect = document.getElementById('gradeSelect');
       gradeSelect?.addEventListener('change', (e) => {
         activeGradeFilter = e.target.value;
         reapplyFilters();
       });
 
-      // Advisory Modal
       const advisoryModal = document.getElementById('advisoryModal');
       const btnOpenAdvisory = document.getElementById('btnOpenAdvisory');
       const btnCloseAdvisory = document.getElementById('btnCloseAdvisory');
@@ -4219,7 +5117,6 @@
         if (e.target === advisoryModal) closeAdvisoryModal();
       });
 
-      // Search Box
       const searchInput = document.getElementById('mapSearchInput');
       const clearSearchBtn = document.getElementById('clearMapSearch');
       searchInput?.addEventListener('input', (e) => {
@@ -4234,8 +5131,6 @@
       });
 
       updateLegendActiveStates();
-
-      // Load remote & local datasets in order
       loadAllDatasetsPipeline();
     }
 
