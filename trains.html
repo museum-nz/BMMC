@@ -1044,6 +1044,165 @@
         margin-left: 0 !important;
       }
     }
+  
+    /* Interactive Rail Key / Legend (like mtb.html) */
+    .legend-wrapper {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      z-index: 1000;
+      pointer-events: auto;
+      transition: bottom 0.22s ease;
+    }
+    .legend-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      min-width: 230px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .dark .legend-card {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+    .legend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-bottom: 2px;
+    }
+    .dark .legend-header {
+      border-bottom-color: #334155;
+    }
+    .legend-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+    }
+    .dark .legend-title { color: #94a3b8; }
+    .legend-hint {
+      font-size: 9.5px;
+      font-weight: 600;
+      text-transform: none;
+      opacity: 0.8;
+      color: #64748b;
+    }
+    .dark .legend-hint { color: #94a3b8; }
+    .legend-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: bold;
+      color: #64748b;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      border-radius: 4px;
+      transition: color 0.15s ease;
+    }
+    .legend-close-btn:hover { color: #0284c7; }
+    .dark .legend-close-btn { color: #94a3b8; }
+    .dark .legend-close-btn:hover { color: #38bdf8; }
+    .legend-open-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      color: #0f172a;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .legend-open-pill:hover {
+      background: #ffffff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+    .dark .legend-open-pill {
+      background: rgba(15, 23, 42, 0.94);
+      border-color: rgba(51, 65, 85, 0.9);
+      color: #f8fafc;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    }
+    .dark .legend-open-pill:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .legend-items {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .legend-item:hover {
+      background: rgba(2, 132, 199, 0.08);
+    }
+    .dark .legend-item { color: #e2e8f0; }
+    .dark .legend-item:hover {
+      background: rgba(56, 189, 248, 0.12);
+    }
+    .legend-item.layer-muted {
+      opacity: 0.38;
+      text-decoration: line-through;
+    }
+    .legend-line {
+      display: inline-block;
+      width: 22px;
+      height: 4px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .legend-pin-symbol {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 10px;
+      border: 1.5px solid;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    @media (max-width: 768px) {
+      .legend-wrapper {
+        bottom: 84px !important;
+        right: 10px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1151,6 +1310,46 @@
   </div>
 
   <div id="map"></div>
+
+  
+  <!-- Interactive Rail Key / Legend -->
+  <div class="legend-wrapper" id="legendWrapper">
+    <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Rail Key">
+      <span>🗺️</span> <span>Rail Key</span>
+    </button>
+    <div id="railLegendCard" class="legend-card">
+      <div class="legend-header">
+        <span class="legend-title">🗺️ Rail Key <span class="legend-hint">(Click to Toggle)</span></span>
+        <button id="btnCloseLegend" class="legend-close-btn" title="Close Key">✕</button>
+      </div>
+      <div class="legend-items">
+        <div class="legend-item" data-layer-key="historic_net" title="Toggle Historic &amp; Branch Lines">
+          <span class="legend-line" style="background:#dc2626; height:4px;"></span>
+          <span>Historic Networks</span>
+        </div>
+        <div class="legend-item" data-layer-key="active_rails" title="Toggle Active Rails (OpenRailwayMap)">
+          <span class="legend-line" style="background:#334155; border-top:2px dashed #38bdf8; height:4px;"></span>
+          <span>Active Rails (ORM)</span>
+        </div>
+        <div class="legend-item" data-layer-key="stn_regional" title="Toggle Regional Hubs &amp; Junctions">
+          <span class="legend-pin-symbol" style="background:rgba(255,251,235,0.95); border-color:#d97706; color:#92400e;">🏛️</span>
+          <span>Regional Junctions</span>
+        </div>
+        <div class="legend-item" data-layer-key="stn_active" title="Toggle Active Passenger Stations">
+          <span class="legend-pin-symbol" style="background:rgba(236,253,245,0.95); border-color:#059669; color:#065f46;">🟢</span>
+          <span>Active Passenger</span>
+        </div>
+        <div class="legend-item" data-layer-key="stn_heritage" title="Toggle Preserved &amp; Disused Halts">
+          <span class="legend-pin-symbol" style="background:rgba(241,245,249,0.95); border-color:#64748b; color:#334155;">📜</span>
+          <span>Heritage &amp; Disused</span>
+        </div>
+        <div class="legend-item" data-layer-key="milestones" title="Toggle Milestone History Markers">
+          <span class="legend-pin-symbol" style="background:rgba(224,242,254,0.95); border-color:#0284c7; color:#0369a1;">📍</span>
+          <span>Milestone Markers</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bottom Timeline & Dual Slider (Bottom Left) -->
   <div class="year-slider-container">
@@ -1339,6 +1538,139 @@
         if (historicNetLayer && map.hasLayer(historicNetLayer)) map.removeLayer(historicNetLayer);
         btn?.classList.remove('active');
       }
+      updateLegendActiveStates();
+    }
+
+        // =========================================================================
+    // AUTHORITATIVE GEOJSON DATA SOURCES
+    // Priority: 1) Local files -> 2) Dropbox raw links -> 3) Current backups
+    // =========================================================================
+    const HISTORIC_NETWORKS_URLS = [
+      'data/trains/nz_historic_rail_networks.geojson',
+      './data/trains/nz_historic_rail_networks.geojson',
+      '../data/trains/nz_historic_rail_networks.geojson',
+      '/data/trains/nz_historic_rail_networks.geojson',
+      'https://www.dropbox.com/scl/fi/2f3eghqez2t1eadp1tj4q/nz_historic_rail_networks.geojson?rlkey=ulxx1h81zq53g6brnuxjhnc47&st=rr2a97ub&raw=1'
+    ];
+
+    const MAIN_TRUNK_STATIONS_URLS = [
+      'data/trains/nz_main_trunk_and_stations.geojson',
+      './data/trains/nz_main_trunk_and_stations.geojson',
+      '../data/trains/nz_main_trunk_and_stations.geojson',
+      '/data/trains/nz_main_trunk_and_stations.geojson',
+      'https://www.dropbox.com/scl/fi/7ufiijyhu1uhwi9hlz90v/nz_main_trunk_and_stations.geojson?rlkey=p4sbwn5pok0ho3rwb1e03p90u&st=yui46q80&raw=1'
+    ];
+
+    async function fetchFirstValidJson(candidates) {
+      for (const url of candidates) {
+        if (!url) continue;
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const text = await res.text();
+            if (text && text.trim().length > 20 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+              return JSON.parse(text);
+            }
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    function normalizeStationSubType(raw) {
+      if (!raw) return 'regional';
+      const s = String(raw).toLowerCase();
+      if (s.includes('active') || s.includes('commuter') || s.includes('metro') || s.includes('passenger')) {
+        return 'active';
+      }
+      if (s.includes('herit') || s.includes('disuse') || s.includes('close') || s.includes('preserv') || s.includes('museum') || s.includes('halt')) {
+        return 'heritage';
+      }
+      return 'regional';
+    }
+
+    async function loadHistoricRailNetworks() {
+      // 1. Try local files first, then Dropbox direct raw link
+      const geojson = await fetchFirstValidJson(HISTORIC_NETWORKS_URLS);
+      if (geojson && historicNetLayer) {
+        historicNetLayer.addData(geojson);
+        return;
+      }
+      // 3. Fallback: current backup Overpass API interpreter
+      fetchLiveOverpassLines();
+    }
+
+    async function loadMainTrunkAndStations() {
+      // 1. Try local files first, then Dropbox direct raw link
+      const geojson = await fetchFirstValidJson(MAIN_TRUNK_STATIONS_URLS);
+      if (!geojson) return; // Keep existing GUARANTEED_STATIONS backup intact
+
+      const lineFeatures = [];
+      const pointFeatures = [];
+
+      const features = geojson.type === 'FeatureCollection' ? (geojson.features || []) : (geojson.type === 'Feature' ? [geojson] : []);
+      features.forEach(f => {
+        if (!f || !f.geometry) return;
+        const gType = f.geometry.type;
+        if (gType === 'LineString' || gType === 'MultiLineString') {
+          lineFeatures.push(f);
+        } else if (gType === 'Point') {
+          pointFeatures.push(f);
+        }
+      });
+
+      // Overlay Main Trunk and connecting tracks
+      if (lineFeatures.length > 0 && historicNetLayer) {
+        historicNetLayer.addData({ type: 'FeatureCollection', features: lineFeatures });
+      }
+
+      // Merge and render stations
+      if (pointFeatures.length > 0) {
+        let addedCount = 0;
+        pointFeatures.forEach(f => {
+          const coords = f.geometry.coordinates || [];
+          const lon = coords[0];
+          const lat = coords[1];
+          if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return;
+
+          const p = f.properties || {};
+          const name = p.name || p.title || p.station || 'Railway Station';
+
+          // Prevent duplication with guaranteed stations
+          const exists = allStationRecords.some(s =>
+            (s.name && s.name.toLowerCase() === name.toLowerCase()) ||
+            (Math.abs(s.lat - lat) < 0.008 && Math.abs(s.lon - lon) < 0.008)
+          );
+          if (exists) return;
+
+          const rawSub = p.sub || p.subType || p.category || p.type || '';
+          const subType = normalizeStationSubType(rawSub);
+          const hub = p.hub || p.desc || p.description || p.notes || 'Main Trunk & Regional Station';
+          const rawYear = p.opened || p.year || p.date || '';
+          const parsedYear = parseYearNum(rawYear);
+          const hasYear = !isNaN(parsedYear) && parsedYear > 0;
+          const id = 'stn_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + lat.toFixed(3) + '_' + lon.toFixed(3);
+
+          const record = {
+            id: id,
+            name: name,
+            lat: lat,
+            lon: lon,
+            subType: subType,
+            hub: hub,
+            year: hasYear ? parsedYear : null,
+            statusText: rawYear ? `Opened ${rawYear}` : (p.status || p.statusText || (hasYear ? `Opened ${parsedYear}` : ''))
+          };
+          record.marker = createStationMarker(record);
+          allStationRecords.push(record);
+          addedCount++;
+        });
+
+        if (addedCount > 0) {
+          refreshStationsOnMap();
+          updateLegendActiveStates();
+        }
+      }
     }
 
     function initNativeHistoricNetworks() {
@@ -1371,7 +1703,7 @@
         historicNetLayer.addTo(map);
       }
 
-      fetchLiveOverpassLines();
+      loadHistoricRailNetworks();
     }
 
     async function fetchLiveOverpassLines() {
@@ -1435,6 +1767,7 @@
         if (map.hasLayer(railwayOverlayLayer)) map.removeLayer(railwayOverlayLayer);
         btn?.classList.remove('active');
       }
+      updateLegendActiveStates();
     }
 
     function updatePillZoomScale() {
@@ -1600,7 +1933,9 @@
       });
 
       refreshStationsOnMap();
+      updateLegendActiveStates();
     }
+      loadMainTrunkAndStations();
 
     function refreshStationsOnMap() {
       const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
@@ -2324,6 +2659,57 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
       }
     }
 
+    
+    let isMilestonesVisible = true;
+
+    function toggleMilestones() {
+      if (!map || !markers) return;
+      isMilestonesVisible = !isMilestonesVisible;
+      if (isMilestonesVisible) {
+        if (!map.hasLayer(markers)) map.addLayer(markers);
+      } else {
+        if (map.hasLayer(markers)) map.removeLayer(markers);
+      }
+      updateLegendActiveStates();
+    }
+
+    function toggleRailLayerByKey(key) {
+      if (key === 'historic_net') {
+        toggleHistoricNetOverlay();
+      } else if (key === 'active_rails') {
+        toggleRailwayOverlay();
+      } else if (key === 'stn_regional') {
+        toggleStationSubGroup('regional');
+      } else if (key === 'stn_active') {
+        toggleStationSubGroup('active');
+      } else if (key === 'stn_heritage') {
+        toggleStationSubGroup('heritage');
+      } else if (key === 'milestones') {
+        toggleMilestones();
+      }
+    }
+
+    function updateLegendActiveStates() {
+      document.querySelectorAll('#railLegendCard .legend-item[data-layer-key]').forEach(item => {
+        const key = item.getAttribute('data-layer-key');
+        let active = true;
+        if (key === 'historic_net') {
+          active = isHistoricNetVisible;
+        } else if (key === 'active_rails') {
+          active = isRailwaysVisible;
+        } else if (key === 'stn_regional') {
+          active = stnVisibility.regional;
+        } else if (key === 'stn_active') {
+          active = stnVisibility.active;
+        } else if (key === 'stn_heritage') {
+          active = stnVisibility.heritage;
+        } else if (key === 'milestones') {
+          active = isMilestonesVisible;
+        }
+        item.classList.toggle('layer-muted', !active);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
 
@@ -2400,6 +2786,31 @@ NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Enginee
           window.stepHistory(1);
         }
       });
+
+      
+      // Interactive Legend Events
+      const railLegendCard = document.getElementById('railLegendCard');
+      const btnCloseLegend = document.getElementById('btnCloseLegend');
+      const btnOpenLegend = document.getElementById('btnOpenLegend');
+
+      btnCloseLegend?.addEventListener('click', () => {
+        railLegendCard.style.display = 'none';
+        btnOpenLegend.style.display = 'inline-flex';
+      });
+
+      btnOpenLegend?.addEventListener('click', () => {
+        btnOpenLegend.style.display = 'none';
+        railLegendCard.style.display = 'flex';
+      });
+
+      document.querySelectorAll('#railLegendCard .legend-item[data-layer-key]').forEach(item => {
+        item.addEventListener('click', () => {
+          const key = item.getAttribute('data-layer-key');
+          if (key) toggleRailLayerByKey(key);
+        });
+      });
+
+      updateLegendActiveStates();
 
       loadDataset();
     });
