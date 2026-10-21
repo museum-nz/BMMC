@@ -1185,6 +1185,92 @@
       gap: 8px;
     }
     .dark .advisory-modal-body { color: #cbd5e1; }
+  
+    /* OLED Dim / Pocket Mode Button & Overlay */
+    .btn-dim-screen {
+      position: absolute;
+      bottom: 64px;
+      left: 20px;
+      z-index: 1000;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn-dim-screen:hover {
+      background: #1e293b;
+      color: #38bdf8;
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+    @media (max-width: 768px) {
+      .btn-dim-screen {
+        bottom: 52px !important;
+        left: 12px !important;
+        height: 28px !important;
+        padding: 0 8px !important;
+        font-size: 10.5px !important;
+      }
+    }
+    .oled-dim-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000 !important;
+      z-index: 999999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      user-select: none;
+      cursor: pointer;
+    }
+    .oled-dim-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      /* Ultra-low 1-2% perceptual contrast for OLED battery saving */
+      opacity: 0.12;
+      transition: opacity 0.2s ease;
+    }
+    .oled-dim-overlay:active .oled-dim-content {
+      opacity: 0.5;
+    }
+    .oled-dim-blip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f43f5e;
+      animation: rec-pulse 1.2s infinite;
+    }
+    .oled-dim-stats {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+    .oled-dim-hint {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #64748b;
+    }
+
   </style>
 </head>
 <body>
@@ -1409,6 +1495,21 @@
         <div class="legend-item" data-layer-key="doc_tracks"><span class="legend-line line-dashed" style="border-top: 3.5px dashed #15803d;"></span><span>DOC MTB Permitted</span></div>
         <div class="legend-item" data-layer-key="imported"><span class="legend-line" style="background:#ff2d87;"></span><span>Recorded / Imported GPS</span></div>
       </div>
+    </div>
+  </div>
+
+  
+  <!-- Dim / Low-Power Screen Button (Bottom-Left) -->
+  <button id="btnDimScreen" class="btn-dim-screen" title="Dim screen to pitch black while keeping GPS recording active">
+    <span>🌙</span> <span id="lblDimText">Dim (1%)</span>
+  </button>
+
+  <!-- OLED Blackout / Pocket Mode Overlay (Tap anywhere to wake) -->
+  <div id="oledDimOverlay" class="oled-dim-overlay" role="dialog" aria-label="Screen Dimmed (Recording Active)">
+    <div class="oled-dim-content">
+      <div class="oled-dim-blip"></div>
+      <div id="oledDimStats" class="oled-dim-stats">0.00 km • 00:00:00</div>
+      <div class="oled-dim-hint">Tap anywhere to restore full brightness</div>
     </div>
   </div>
 
@@ -3145,6 +3246,7 @@
       const activeHours = recActiveTimeMs / 3600000;
       const avgKmh = activeHours > 0 ? (totalKm / activeHours).toFixed(1) : '0.0';
       document.getElementById('recAvgSpeed').textContent = avgKmh;
+      updateDimOverlayStats();
 
       if (recordedPoints.length > 0) {
         const latest = recordedPoints[recordedPoints.length - 1];
@@ -5327,6 +5429,54 @@
     // START APPLICATION
     // =========================================================================
     let _leafletWaitAttempts = 0;
+    
+    // =========================================================================
+    // OLED POCKET / DIM MODE ENGINE (KEEPS WAKE LOCK & GPS RUNNING)
+    // =========================================================================
+    function initDimScreenMode() {
+      const btnDim = document.getElementById('btnDimScreen');
+      const overlay = document.getElementById('oledDimOverlay');
+      const statsEl = document.getElementById('oledDimStats');
+
+      if (!btnDim || !overlay) return;
+
+      const enterDimMode = () => {
+        overlay.style.display = 'flex';
+        // Ensure wake lock is secured before entering dim mode
+        requestScreenWakeLock();
+        updateDimOverlayStats();
+      };
+
+      const exitDimMode = () => {
+        overlay.style.display = 'none';
+        // Re-affirm wake lock when returning to full brightness
+        if (isRecording) {
+          requestScreenWakeLock();
+        }
+      };
+
+      btnDim.addEventListener('click', (e) => {
+        e.stopPropagation();
+        enterDimMode();
+      });
+
+      // Tap or touch anywhere to wake up immediately
+      overlay.addEventListener('click', exitDimMode);
+      overlay.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        exitDimMode();
+      });
+    }
+
+    function updateDimOverlayStats() {
+      const statsEl = document.getElementById('oledDimStats');
+      if (!statsEl) return;
+      const dist = document.getElementById('recDistKm')?.textContent || '0.00';
+      const time = document.getElementById('recActiveTime')?.textContent || '00:00:00';
+      const speed = document.getElementById('recCurSpeed')?.textContent || '0.0';
+      statsEl.textContent = `${dist} km • ${speed} km/h • ${time}`;
+    }
+
     function startApp() {
       if (!window.L) {
         _leafletWaitAttempts++;
@@ -5342,6 +5492,7 @@
       initMap();
       initElevationEvents();
       initGpsAndRecorder();
+      initDimScreenMode();
 
       window.toggleSaveTrack = toggleSaveTrack;
       window.downloadTrackGPX = downloadTrackGPX;
