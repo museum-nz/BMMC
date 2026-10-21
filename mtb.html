@@ -888,7 +888,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 325px;
+      height: 365px;
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(16px);
       border-top: 1px solid rgba(203, 213, 225, 0.95);
@@ -961,6 +961,7 @@
     .elev-stat-val.val-purple { color: #9333ea; }
     .elev-stat-val.val-green { color: #10b981; }
     .elev-stat-val.val-amber { color: #f59e0b; }
+    .elev-stat-val.val-orange { color: #f97316; }
     .elev-stat-val.val-red { color: #ef4444; }
     .elev-stat-val.val-teal { color: #0d9488; }
 
@@ -1030,6 +1031,12 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+      padding: 4px 18px 8px 18px;
+      flex-shrink: 0;
+      border-top: 1px solid rgba(226, 232, 240, 0.7);
+    }
+    .dark .terrain-summary-row {
+      border-top-color: rgba(51, 65, 85, 0.7);
     }
     .terrain-pill {
       display: inline-flex;
@@ -1121,7 +1128,7 @@
       .map-search-box { height: 28px !important; min-width: 110px !important; max-width: 155px !important; }
       .status-summary-bar { bottom: 12px !important; left: 12px !important; padding: 5px 10px !important; }
       .legend-wrapper { bottom: 12px !important; right: 12px !important; }
-      .elevation-drawer { height: 320px; }
+      .elevation-drawer { height: 375px; }
       .elevation-drawer.expanded { height: 86vh; }
       .elevation-stats-banner { gap: 14px; padding: 4px 12px 8px 12px; }
       .elev-stat-val { font-size: 13.5px; }
@@ -1416,6 +1423,7 @@
     <div class="elevation-drawer-header">
       <div class="elevation-title-group">
         <span class="elevation-title" id="elevTrackTitle">🚵 West Coast Wilderness Trail</span>
+        <span class="elevation-subtitle" id="elevTrackSubtitle" style="font-size:12px; font-weight:800; color:#0d9488; margin-left:8px;"></span>
       </div>
       <div class="elevation-controls">
         <button id="btnElevExportPNG" class="top-action-btn" style="height:26px; padding:0 8px; font-size:10.5px; background:#f0fdf4; border-color:#86efac; color:#15803d;" title="Download High-Resolution PNG with Full Stats">
@@ -1434,7 +1442,7 @@
       </div>
     </div>
 
-    <!-- 6 Primary Metric Cards Matching Screenshot -->
+    <!-- Primary Metric Cards with Swapped Ascent/Descent and Red/Purple Slopes -->
     <div class="elevation-stats-banner" id="elevStatsBanner">
       <div class="elev-stat-col">
         <span class="elev-stat-label">DISTANCE</span>
@@ -1446,22 +1454,26 @@
       </div>
       <div class="elev-stat-col">
         <span class="elev-stat-label">TOTAL ASCENT</span>
-        <span class="elev-stat-val val-green" id="elevStatAscent">--</span>
+        <span class="elev-stat-val val-orange" id="elevStatAscent">--</span>
       </div>
       <div class="elev-stat-col">
         <span class="elev-stat-label">TOTAL DESCENT</span>
-        <span class="elev-stat-val val-amber" id="elevStatDescent">--</span>
+        <span class="elev-stat-val val-green" id="elevStatDescent">--</span>
       </div>
       <div class="elev-stat-col">
         <span class="elev-stat-label">MAX INCLINE GRADE</span>
-        <span class="elev-stat-val val-green" id="elevStatIncline">--</span>
+        <span class="elev-stat-val val-red" id="elevStatIncline">--</span>
       </div>
       <div class="elev-stat-col">
         <span class="elev-stat-label">MAX DECLINE GRADE</span>
-        <span class="elev-stat-val val-red" id="elevStatDecline">--</span>
+        <span class="elev-stat-val val-purple" id="elevStatDecline">--</span>
+      </div>
+      <div class="elev-stat-col" id="elevEstTimeCol">
+        <span class="elev-stat-label">EST. MOVING TIME</span>
+        <span class="elev-stat-val val-teal" id="elevStatEstTime">--</span>
       </div>
       <div class="elev-stat-col" id="elevExtraTimeCol" style="display:none;">
-        <span class="elev-stat-label">TIME / ACTIVE TIME</span>
+        <span class="elev-stat-label">RECORDED TIME</span>
         <span class="elev-stat-val val-teal" id="elevStatTime">--</span>
       </div>
       <div class="elev-stat-col" id="elevExtraSpeedCol" style="display:none;">
@@ -1486,20 +1498,21 @@
       <span class="slope-tag"><span class="slope-dot" style="background:#8b5cf6;"></span> Steep Descent</span>
     </div>
 
-    <!-- Expanded View Analysis Dashboard (Terrain Classification & Interval Splits) -->
-    <div class="expanded-analysis-dashboard" id="expandedDashboard">
-      <div class="terrain-summary-row" id="terrainSummaryRow">
-        <div class="terrain-pill pill-terrain-flat">
-          <span>🟢 Rolling / Flat (0–4%):</span> <strong id="valFlatDist">0.0 km (0%)</strong>
-        </div>
-        <div class="terrain-pill pill-terrain-climb">
-          <span>🟠 Climbing (5%+):</span> <strong id="valClimbDist">0.0 km (0%)</strong>
-        </div>
-        <div class="terrain-pill pill-terrain-desc">
-          <span>🟣 Technical Descent:</span> <strong id="valDescDist">0.0 km (0%)</strong>
-        </div>
+    <!-- Terrain Classification Pills (Visible in Collapsed & Expanded Mode) -->
+    <div class="terrain-summary-row" id="terrainSummaryRow">
+      <div class="terrain-pill pill-terrain-flat">
+        <span>🟢 Rolling / Flat (0–4%):</span> <strong id="valFlatDist">0.0 km (0%)</strong>
       </div>
+      <div class="terrain-pill pill-terrain-climb">
+        <span>🟠 Climbing (5%+):</span> <strong id="valClimbDist">0.0 km (0%)</strong>
+      </div>
+      <div class="terrain-pill pill-terrain-desc">
+        <span>🟣 Technical Descent:</span> <strong id="valDescDist">0.0 km (0%)</strong>
+      </div>
+    </div>
 
+    <!-- Expanded View Analysis Dashboard (Interval Splits) -->
+    <div class="expanded-analysis-dashboard" id="expandedDashboard">
       <div class="splits-table-card">
         <table class="splits-table">
           <thead>
@@ -2164,19 +2177,19 @@
               </div>
               <div class="saved-stat-box">
                 <span class="saved-stat-lbl">TOTAL ASC</span>
-                <span class="saved-stat-val" style="color:#10b981;">${ascStr}</span>
+                <span class="saved-stat-val" style="color:#f97316;">${ascStr}</span>
               </div>
               <div class="saved-stat-box">
                 <span class="saved-stat-lbl">TOTAL DESC</span>
-                <span class="saved-stat-val" style="color:#f59e0b;">${descStr}</span>
+                <span class="saved-stat-val" style="color:#10b981;">${descStr}</span>
               </div>
               <div class="saved-stat-box">
                 <span class="saved-stat-lbl">MAX INCLINE</span>
-                <span class="saved-stat-val" style="color:#10b981;">${incStr}</span>
+                <span class="saved-stat-val" style="color:#ef4444;">${incStr}</span>
               </div>
               <div class="saved-stat-box">
                 <span class="saved-stat-lbl">MAX DECLINE</span>
-                <span class="saved-stat-val" style="color:#ef4444;">${decStr}</span>
+                <span class="saved-stat-val" style="color:#9333ea;">${decStr}</span>
               </div>
               ${s.activeTimeStr || s.totalTimeStr ? `
                 <div class="saved-stat-box">
@@ -4025,11 +4038,11 @@
             <div class="popup-stats-grid">
               <div class="popup-stat-tile">
                 <span class="popup-stat-lbl">ASCENT</span>
-                <span class="popup-stat-val" style="color:#10b981;">+${s.totalAscent}m</span>
+                <span class="popup-stat-val" style="color:#f97316;">+${s.totalAscent}m</span>
               </div>
               <div class="popup-stat-tile">
                 <span class="popup-stat-lbl">DESCENT</span>
-                <span class="popup-stat-val" style="color:#f59e0b;">-${s.totalDescent}m</span>
+                <span class="popup-stat-val" style="color:#10b981;">-${s.totalDescent}m</span>
               </div>
               <div class="popup-stat-tile">
                 <span class="popup-stat-lbl">ELEV RANGE</span>
@@ -4117,11 +4130,11 @@
             <div class="popup-stats-grid">
               <div class="popup-stat-tile">
                 <span class="popup-stat-lbl">ASCENT</span>
-                <span class="popup-stat-val" style="color:#10b981;">+${s.totalAscent}m</span>
+                <span class="popup-stat-val" style="color:#f97316;">+${s.totalAscent}m</span>
               </div>
               <div class="popup-stat-tile">
                 <span class="popup-stat-lbl">DESCENT</span>
-                <span class="popup-stat-val" style="color:#f59e0b;">-${s.totalDescent}m</span>
+                <span class="popup-stat-val" style="color:#10b981;">-${s.totalDescent}m</span>
               </div>
               <div class="popup-stat-tile">
                 <span class="popup-stat-lbl">ELEV RANGE</span>
@@ -4362,6 +4375,32 @@
         }
       }
 
+      // Calculate Total Estimated Moving Time
+      let estMovingMinutes = 0;
+      for (let i = 0; i < points.length - 1; i++) {
+        const dDist = points[i+1].distKm - points[i].distKm;
+        if (dDist <= 0) continue;
+        const dEle = points[i+1].ele - points[i].ele;
+        const dM = dDist * 1000;
+        const slope = dM > 0 ? (dEle / dM) * 100 : 0;
+
+        let speedKmh = 18;
+        if (slope > 15) speedKmh = 6;
+        else if (slope > 10) speedKmh = 8.5;
+        else if (slope > 6) speedKmh = 12;
+        else if (slope > 2) speedKmh = 15;
+        else if (slope >= -4) speedKmh = 19;
+        else if (slope >= -10) speedKmh = 23;
+        else speedKmh = 15;
+
+        estMovingMinutes += (dDist / speedKmh) * 60;
+      }
+      const totalEstMins = Math.max(1, Math.round(estMovingMinutes));
+      const estH = Math.floor(totalEstMins / 60);
+      const estM = totalEstMins % 60;
+      const estTimeStr = estH > 0 ? (estM > 0 ? `${estH}h ${estM}m` : `${estH}h`) : `${estM} min`;
+      const estTimeBadgeText = `~${estTimeStr}`;
+
       const existingStats = feat.properties.stats || {};
       currentElevationData = {
         name: trackName,
@@ -4374,6 +4413,7 @@
         descent: totalDescent,
         maxIncline: maxIncline,
         maxDecline: maxDecline,
+        estTimeText: estTimeBadgeText,
         timeStr: existingStats.totalTimeStr || null,
         activeTimeStr: existingStats.activeTimeStr || null,
         avgSpeedKmh: existingStats.avgSpeedKmh || null,
@@ -4397,13 +4437,18 @@
         avgSpeedKmh: existingStats.avgSpeedKmh || null
       };
 
-      // Populate The 6 Stats Banners
+      // Populate Top Track Summary Information Banner
       document.getElementById('elevStatDistance').textContent = `${totalDist.toFixed(1)} km`;
       document.getElementById('elevStatRange').textContent = `${minEle}m – ${maxEle}m`;
       document.getElementById('elevStatAscent').textContent = `+${Math.round(totalClimb)} m`;
       document.getElementById('elevStatDescent').textContent = `-${Math.round(totalDescent)} m`;
       document.getElementById('elevStatIncline').textContent = `+${maxIncline.toFixed(1)}%`;
       document.getElementById('elevStatDecline').textContent = `${maxDecline.toFixed(1)}%`;
+      
+      const elEstTime = document.getElementById('elevStatEstTime');
+      if (elEstTime) elEstTime.textContent = estTimeBadgeText;
+      const elTitleSub = document.getElementById('elevTrackSubtitle');
+      if (elTitleSub) elTitleSub.textContent = `⏱️ Est. Moving Time: ${estTimeBadgeText}`;
 
       const extraTimeCol = document.getElementById('elevExtraTimeCol');
       const extraSpeedCol = document.getElementById('elevExtraSpeedCol');
@@ -4721,9 +4766,9 @@
           <tr onclick="window.zoomToSplitSegment(${curSplitStart}, ${curSplitEnd});">
             <td><strong>Split ${splitIdx}</strong> (${curSplitStart.toFixed(0)}–${curSplitEnd.toFixed(0)} km)</td>
             <td>${splitDist.toFixed(1)} km</td>
-            <td style="color:#10b981;">+${Math.round(splitAsc)} m</td>
-            <td style="color:#f59e0b;">-${Math.round(splitDesc)} m</td>
-            <td>${splitMaxSlope >= 0 ? `+${splitMaxSlope.toFixed(1)}%` : `${splitMaxSlope.toFixed(1)}%`}</td>
+            <td style="color:#f97316;">+${Math.round(splitAsc)} m</td>
+            <td style="color:#10b981;">-${Math.round(splitDesc)} m</td>
+            <td style="color:${splitMaxSlope >= 0 ? '#ef4444' : '#9333ea'};">${splitMaxSlope >= 0 ? `+${splitMaxSlope.toFixed(1)}%` : `${splitMaxSlope.toFixed(1)}%`}</td>
             <td>~${estTimeMin} min</td>
           </tr>
         `;
@@ -4745,65 +4790,185 @@
     };
 
     function downloadElevationProfilePNG() {
-      if (!currentElevationData || !currentElevationData.points.length) {
+      if (!currentElevationData || !currentElevationData.points || !currentElevationData.points.length) {
         alert('Please open an elevation profile first.');
         return;
       }
       const data = currentElevationData;
+      const drawer = document.getElementById('elevationDrawer');
+      const isExpanded = drawer ? drawer.classList.contains('expanded') : false;
+
+      // 1. Calculate Terrain Breakdown (as in Expanded mode)
+      let flatKm = 0;
+      let climbKm = 0;
+      let descKm = 0;
+
+      for (let i = 0; i < data.points.length - 1; i++) {
+        const p1 = data.points[i];
+        const p2 = data.points[i + 1];
+        const segD = p2.distKm - p1.distKm;
+        const dM = segD * 1000;
+        const slope = dM > 0 ? ((p2.ele - p1.ele) / dM) * 100 : 0;
+
+        if (slope >= 5) climbKm += segD;
+        else if (slope <= -5) descKm += segD;
+        else flatKm += segD;
+      }
+
+      const totalD = Math.max(0.01, data.totalDist);
+      const flatPct = Math.round((flatKm / totalD) * 100);
+      const climbPct = Math.round((climbKm / totalD) * 100);
+      const descPct = Math.round((descKm / totalD) * 100);
+
+      // 2. Calculate Interval Splits (as in Expanded mode)
+      const splitInterval = data.totalDist <= 45 ? 5 : 10;
+      let curSplitStart = 0;
+      let splitIdx = 1;
+      const splits = [];
+
+      while (curSplitStart < data.totalDist) {
+        const curSplitEnd = Math.min(data.totalDist, curSplitStart + splitInterval);
+        const splitPts = data.points.filter(p => p.distKm >= curSplitStart && p.distKm <= curSplitEnd);
+
+        let splitAsc = 0;
+        let splitDesc = 0;
+        let splitMaxSlope = 0;
+
+        for (let j = 0; j < splitPts.length - 1; j++) {
+          const dE = splitPts[j + 1].ele - splitPts[j].ele;
+          if (dE > 0) splitAsc += dE;
+          else splitDesc += Math.abs(dE);
+
+          const dM = (splitPts[j + 1].distKm - splitPts[j].distKm) * 1000;
+          if (dM > 10) {
+            const gr = (dE / dM) * 100;
+            if (Math.abs(gr) > Math.abs(splitMaxSlope)) splitMaxSlope = gr;
+          }
+        }
+
+        const splitDist = curSplitEnd - curSplitStart;
+        const estSpeed = Math.max(8, 20 - (splitAsc / Math.max(1, splitDist * 10)));
+        const estTimeMin = Math.round((splitDist / estSpeed) * 60);
+
+        splits.push({
+          label: `Split ${splitIdx} (${curSplitStart.toFixed(0)}–${curSplitEnd.toFixed(0)} km)`,
+          dist: `${splitDist.toFixed(1)} km`,
+          asc: `+${Math.round(splitAsc)} m`,
+          desc: `-${Math.round(splitDesc)} m`,
+          slope: splitMaxSlope >= 0 ? `+${splitMaxSlope.toFixed(1)}%` : `${splitMaxSlope.toFixed(1)}%`,
+          time: `~${estTimeMin} min`
+        });
+
+        curSplitStart = curSplitEnd;
+        splitIdx++;
+      }
+
+      // 3. Dynamic Canvas Dimensioning
       const exportCanvas = document.createElement('canvas');
       exportCanvas.width = 1920;
-      exportCanvas.height = 1080;
+
+      const splitsRowHeight = 36;
+      const splitsHeaderHeight = 40;
+      const splitsTotalHeight = splitsHeaderHeight + (splits.length * splitsRowHeight);
+      
+      // Dynamic canvas height supporting terrain pills in collapsed view and splits in expanded view
+      const exportCanvasHeight = isExpanded ? Math.max(1180, 780 + splitsTotalHeight + 90) : 960;
+      exportCanvas.height = exportCanvasHeight;
+
       const ctx = exportCanvas.getContext('2d');
 
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillRect(0, 0, 1920, 1080);
+      // Helper: Cross-browser rounded rectangle
+      function drawRoundRect(x, y, w, h, r) {
+        if (typeof ctx.roundRect === 'function') {
+          ctx.beginPath();
+          ctx.roundRect(x, y, w, h, r);
+          return;
+        }
+        if (!r) r = 0;
+        let radii = Array.isArray(r) ? r : [r, r, r, r];
+        const [tl, tr, br, bl] = radii;
+        ctx.beginPath();
+        ctx.moveTo(x + tl, y);
+        ctx.lineTo(x + w - tr, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + tr);
+        ctx.lineTo(x + w, y + h - br);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+        ctx.lineTo(x + bl, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - bl);
+        ctx.lineTo(x, y + tl);
+        ctx.quadraticCurveTo(x, y, x + tl, y);
+        ctx.closePath();
+      }
 
+      // Canvas Base Background
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 1920, exportCanvasHeight);
+
+      // Outer Main Container Card
+      drawRoundRect(40, 40, 1840, exportCanvasHeight - 80, 20);
       ctx.fillStyle = '#ffffff';
+      ctx.fill();
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(40, 40, 1840, 1000, 20);
-      ctx.fill();
       ctx.stroke();
 
+      // Top Title & Metric Card Header
+      drawRoundRect(65, 60, 1790, 140, 12);
       ctx.fillStyle = '#ffffff';
+      ctx.fill();
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.roundRect(65, 60, 1790, 140, 12);
-      ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = '#0f172a';
-      ctx.font = '900 32px system-ui, sans-serif';
+      ctx.font = '900 30px system-ui, sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`🚵  ${data.name}`, 95, 108);
+      ctx.fillText(`🚵  ${data.name}`, 95, 106);
 
+      if (isExpanded) {
+        drawRoundRect(1500, 78, 325, 30, 8);
+        ctx.fillStyle = '#ecfdf5';
+        ctx.fill();
+        ctx.strokeStyle = '#86efac';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#059669';
+        ctx.font = '800 12.5px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⛶ EXPANDED ANALYSIS & SPLITS', 1662, 98);
+        ctx.textAlign = 'left';
+      }
+
+      // 7 Top Metric Columns (including Est. Moving Time, Swapped Ascent/Descent, Red/Purple Slopes)
       const cols = [
         { label: 'DISTANCE', val: `${data.totalDist.toFixed(1)} km`, color: '#0284c7' },
         { label: 'ELEVATION RANGE', val: `${data.minEle}m – ${data.maxEle}m`, color: '#9333ea' },
-        { label: 'TOTAL ASCENT', val: `+${Math.round(data.climb)} m`, color: '#10b981' },
-        { label: 'TOTAL DESCENT', val: `-${Math.round(data.descent)} m`, color: '#f59e0b' },
-        { label: 'MAX INCLINE GRADE', val: `+${data.maxIncline.toFixed(1)}%`, color: '#10b981' },
-        { label: 'MAX DECLINE GRADE', val: `${data.maxDecline.toFixed(1)}%`, color: '#ef4444' }
+        { label: 'TOTAL ASCENT', val: `+${Math.round(data.climb)} m`, color: '#f97316' },
+        { label: 'TOTAL DESCENT', val: `-${Math.round(data.descent)} m`, color: '#10b981' },
+        { label: 'MAX INCLINE GRADE', val: `+${data.maxIncline.toFixed(1)}%`, color: '#ef4444' },
+        { label: 'MAX DECLINE GRADE', val: `${data.maxDecline.toFixed(1)}%`, color: '#9333ea' },
+        { label: 'EST. MOVING TIME', val: data.estTimeText || '--', color: '#0d9488' }
       ];
 
-      const colStartX = 95;
-      const colSpacing = 280;
+      const colStartX = 85;
+      const colSpacing = 250;
       cols.forEach((c, idx) => {
         const x = colStartX + idx * colSpacing;
         ctx.fillStyle = '#64748b';
-        ctx.font = '800 13px system-ui, sans-serif';
+        ctx.font = '800 12.5px system-ui, sans-serif';
         ctx.fillText(c.label, x, 146);
 
         ctx.fillStyle = c.color;
-        ctx.font = '900 24px system-ui, sans-serif';
+        ctx.font = '900 22px system-ui, sans-serif';
         ctx.fillText(c.val, x, 178);
       });
 
-      const padL = 140, padR = 80, padT = 250, padB = 100;
+      // 4. Elevation Profile Chart
+      const padL = 140, padR = 80;
+      const padT = 235;
+      const graphH = isExpanded ? 320 : 430;
       const graphW = 1920 - padL - padR;
-      const graphH = 1080 - padT - padB;
 
       const rawMax = Math.max(50, data.maxEle);
       const step = Math.ceil(rawMax / 5 / 10) * 10 || 10;
@@ -4816,7 +4981,7 @@
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 6]);
       ctx.strokeStyle = '#e2e8f0';
-      ctx.font = '500 16px system-ui, sans-serif';
+      ctx.font = '500 15px system-ui, sans-serif';
       ctx.fillStyle = '#64748b';
       ctx.textAlign = 'right';
 
@@ -4827,7 +4992,7 @@
         ctx.moveTo(padL, y);
         ctx.lineTo(padL + graphW, y);
         ctx.stroke();
-        ctx.fillText(`${val} m`, padL - 16, y + 6);
+        ctx.fillText(`${val} m`, padL - 16, y + 5);
       }
 
       ctx.textAlign = 'center';
@@ -4838,7 +5003,7 @@
         ctx.moveTo(x, padT);
         ctx.lineTo(x, padT + graphH);
         ctx.stroke();
-        ctx.fillText(`${dist.toFixed(1)} km`, x, padT + graphH + 30);
+        ctx.fillText(`${dist.toFixed(1)} km`, x, padT + graphH + 26);
       }
       ctx.setLineDash([]);
 
@@ -4862,17 +5027,17 @@
         else ctx.lineTo(x, y);
       });
       ctx.strokeStyle = '#059669';
-      ctx.lineWidth = 4.5;
+      ctx.lineWidth = 4;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
       ctx.stroke();
 
       // Continuous Gradient Slope Ribbon
-      const ribbonY = padT + graphH + 42;
+      const ribbonY = padT + graphH + 34;
       const ribbonHeight = 8;
       for (let i = 0; i < data.points.length - 1; i++) {
         const p1 = data.points[i];
-        const p2 = data.points[i+1];
+        const p2 = data.points[i + 1];
         const dM = (p2.distKm - p1.distKm) * 1000;
         const slope = dM > 0 ? ((p2.ele - p1.ele) / dM) * 100 : 0;
         const x1 = getX(p1.distKm);
@@ -4881,6 +5046,32 @@
         ctx.fillStyle = getSlopeColor(slope);
         ctx.fillRect(x1, ribbonY, Math.max(1.5, x2 - x1), ribbonHeight);
       }
+
+      // Slope Ribbon Legend Bar
+      const sLegY = ribbonY + 23;
+      ctx.font = '800 12px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('Gradient Ribbon:', padL, sLegY);
+
+      const slopeLegends = [
+        { label: '0–4% Flat', color: '#10b981' },
+        { label: '5–8% Moderate', color: '#eab308' },
+        { label: '9–14% Steep', color: '#f97316' },
+        { label: '15%+ Severe', color: '#ef4444' },
+        { label: 'Steep Descent', color: '#8b5cf6' }
+      ];
+
+      let legX = padL + 120;
+      slopeLegends.forEach(leg => {
+        ctx.fillStyle = leg.color;
+        drawRoundRect(legX, sLegY - 9, 12, 10, 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#475569';
+        ctx.fillText(leg.label, legX + 18, sLegY);
+        legX += ctx.measureText(leg.label).width + 34;
+      });
 
       // Milestone Callout Badges
       function drawExportBadge(pt, text, badgeColor) {
@@ -4893,34 +5084,33 @@
         ctx.lineWidth = 1.8;
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x, y - 28);
+        ctx.lineTo(x, y - 26);
         ctx.stroke();
         ctx.setLineDash([]);
 
         ctx.fillStyle = badgeColor;
         ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.arc(x, y, 4.5, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.font = 'bold 14px system-ui, sans-serif';
+        ctx.font = 'bold 13px system-ui, sans-serif';
         const txtWidth = ctx.measureText(text).width;
-        const bW = txtWidth + 20;
-        const bH = 26;
+        const bW = txtWidth + 18;
+        const bH = 24;
         let bX = x - bW / 2;
         bX = Math.max(padL, Math.min(padL + graphW - bW, bX));
-        const bY = y - 56;
+        const bY = y - 52;
 
+        drawRoundRect(bX, bY, bW, bH, 6);
         ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = badgeColor;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(bX, bY, bW, bH, 6);
         ctx.fill();
+        ctx.strokeStyle = badgeColor;
+        ctx.lineWidth = 1.8;
         ctx.stroke();
 
         ctx.fillStyle = badgeColor;
         ctx.textAlign = 'center';
-        ctx.fillText(text, bX + bW / 2, bY + 18);
+        ctx.fillText(text, bX + bW / 2, bY + 16.5);
       }
 
       if (data.milestones) {
@@ -4935,16 +5125,169 @@
         }
       }
 
-      ctx.font = '600 14px system-ui, sans-serif';
+      // 5. Terrain Breakdown Pills (Included in Both Collapsed & Expanded Exports)
+      const terrainY = sLegY + 26;
+      const pillW = 575;
+      const pillH = 44;
+      const pillGap = 32;
+      const pillStartX = 65;
+
+      // Pill 1: Rolling / Flat
+      const p1X = pillStartX;
+      drawRoundRect(p1X, terrainY, pillW, pillH, 9);
+      ctx.fillStyle = '#dcfce7';
+      ctx.fill();
+      ctx.strokeStyle = '#86efac';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(p1X + 22, terrainY + 22, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#166534';
+      ctx.font = '800 13.5px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Rolling / Flat (0–4%):', p1X + 38, terrainY + 27);
+      ctx.font = '900 14.5px monospace';
+      ctx.fillText(`${flatKm.toFixed(1)} km (${flatPct}%)`, p1X + 215, terrainY + 27);
+
+      // Pill 2: Climbing
+      const p2X = p1X + pillW + pillGap;
+      drawRoundRect(p2X, terrainY, pillW, pillH, 9);
+      ctx.fillStyle = '#ffedd5';
+      ctx.fill();
+      ctx.strokeStyle = '#fed7aa';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.arc(p2X + 22, terrainY + 22, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#9a3412';
+      ctx.font = '800 13.5px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Climbing (5%+):', p2X + 38, terrainY + 27);
+      ctx.font = '900 14.5px monospace';
+      ctx.fillText(`${climbKm.toFixed(1)} km (${climbPct}%)`, p2X + 180, terrainY + 27);
+
+      // Pill 3: Technical Descent
+      const p3X = p2X + pillW + pillGap;
+      drawRoundRect(p3X, terrainY, pillW, pillH, 9);
+      ctx.fillStyle = '#ede9fe';
+      ctx.fill();
+      ctx.strokeStyle = '#ddd6fe';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#8b5cf6';
+      ctx.beginPath();
+      ctx.arc(p3X + 22, terrainY + 22, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#5b21b6';
+      ctx.font = '800 13.5px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Technical Descent:', p3X + 38, terrainY + 27);
+      ctx.font = '900 14.5px monospace';
+      ctx.fillText(`${descKm.toFixed(1)} km (${descPct}%)`, p3X + 195, terrainY + 27);
+
+      // 6. Expanded Mode Additions: Interval Splits Table
+      if (isExpanded) {
+        const tableY = terrainY + pillH + 22;
+        const tableW = 1790;
+
+        drawRoundRect(65, tableY, tableW, splitsTotalHeight, 10);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Table Header
+        drawRoundRect(65, tableY, tableW, splitsHeaderHeight, [10, 10, 0, 0]);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fill();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#475569';
+        ctx.font = '800 11.5px system-ui, sans-serif';
+        ctx.textAlign = 'left';
+
+        const colX = {
+          split: 95,
+          dist: 450,
+          asc: 730,
+          desc: 1010,
+          slope: 1280,
+          time: 1540
+        };
+
+        ctx.fillText('INTERVAL SPLIT', colX.split, tableY + 25);
+        ctx.fillText('DISTANCE', colX.dist, tableY + 25);
+        ctx.fillText('ASCENT', colX.asc, tableY + 25);
+        ctx.fillText('DESCENT', colX.desc, tableY + 25);
+        ctx.fillText('MAX SLOPE', colX.slope, tableY + 25);
+        ctx.fillText('EST. MOVING TIME', colX.time, tableY + 25);
+
+        // Table Rows
+        splits.forEach((sp, idx) => {
+          const rowY = tableY + splitsHeaderHeight + idx * splitsRowHeight;
+
+          if (idx % 2 === 1) {
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(66, rowY, tableW - 2, splitsRowHeight);
+          }
+
+          ctx.strokeStyle = '#f1f5f9';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(66, rowY + splitsRowHeight);
+          ctx.lineTo(65 + tableW - 1, rowY + splitsRowHeight);
+          ctx.stroke();
+
+          ctx.font = '700 13px system-ui, sans-serif';
+          ctx.fillStyle = '#0f172a';
+          ctx.fillText(sp.label, colX.split, rowY + 23);
+
+          ctx.font = '700 13.5px monospace';
+          ctx.fillStyle = '#0284c7';
+          ctx.fillText(sp.dist, colX.dist, rowY + 23);
+
+          ctx.font = '800 13.5px monospace';
+          ctx.fillStyle = '#f97316';
+          ctx.fillText(sp.asc, colX.asc, rowY + 23);
+
+          ctx.fillStyle = '#10b981';
+          ctx.fillText(sp.desc, colX.desc, rowY + 23);
+
+          ctx.fillStyle = parseFloat(sp.slope) >= 0 ? '#ef4444' : '#9333ea';
+          ctx.fillText(sp.slope, colX.slope, rowY + 23);
+
+          ctx.fillStyle = '#0d9488';
+          ctx.fillText(sp.time, colX.time, rowY + 23);
+        });
+      }
+
+      // 6. Footer
+      const footerY = exportCanvasHeight - 48;
+      ctx.font = '600 13px system-ui, sans-serif';
       ctx.fillStyle = '#94a3b8';
       ctx.textAlign = 'left';
-      ctx.fillText('Aotearoa NZ Mountain Bike & Cycle Trails — BMMC • Topography: Copernicus DEM 30m', padL, 1025);
+      ctx.fillText('Aotearoa NZ Mountain Bike & Cycle Trails — BMMC • Topography: Copernicus DEM 30m', padL, footerY);
 
       ctx.textAlign = 'right';
-      ctx.fillText(new Date().toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' }), padL + graphW, 1025);
+      ctx.fillText(new Date().toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' }), padL + graphW, footerY);
 
+      // 7. File Download Trigger
       const link = document.createElement('a');
-      link.download = `${(data.name || 'trail').replace(/[^a-zA-Z0-9]/g, '_')}_elevation.png`;
+      const suffix = isExpanded ? '_expanded_elevation.png' : '_elevation.png';
+      link.download = `${(data.name || 'trail').replace(/[^a-zA-Z0-9]/g, '_')}${suffix}`;
       link.href = exportCanvas.toDataURL('image/png');
       document.body.appendChild(link);
       link.click();
