@@ -1541,40 +1541,143 @@
       updateLegendActiveStates();
     }
 
-        // =========================================================================
-    // AUTHORITATIVE GEOJSON DATA SOURCES
-    // Priority: 1) Local files -> 2) Dropbox raw links -> 3) Current backups
+            // =========================================================================
+    // 7 x 24 HOURS (168 HRS) PERSISTENT CLIENT CACHE (IndexedDB + localStorage)
     // =========================================================================
-    const HISTORIC_NETWORKS_URLS = [
-      'data/trains/nz_historic_rail_networks.geojson',
-      './data/trains/nz_historic_rail_networks.geojson',
-      '../data/trains/nz_historic_rail_networks.geojson',
-      '/data/trains/nz_historic_rail_networks.geojson',
-      'https://www.dropbox.com/scl/fi/2f3eghqez2t1eadp1tj4q/nz_historic_rail_networks.geojson?rlkey=ulxx1h81zq53g6brnuxjhnc47&st=rr2a97ub&raw=1'
-    ];
+    const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (7 x 24 hours)
 
-    const MAIN_TRUNK_STATIONS_URLS = [
-      'data/trains/nz_main_trunk_and_stations.geojson',
-      './data/trains/nz_main_trunk_and_stations.geojson',
-      '../data/trains/nz_main_trunk_and_stations.geojson',
-      '/data/trains/nz_main_trunk_and_stations.geojson',
-      'https://www.dropbox.com/scl/fi/7ufiijyhu1uhwi9hlz90v/nz_main_trunk_and_stations.geojson?rlkey=p4sbwn5pok0ho3rwb1e03p90u&st=yui46q80&raw=1'
-    ];
-
-    async function fetchFirstValidJson(candidates) {
-      for (const url of candidates) {
-        if (!url) continue;
+    const DataCache = {
+      dbPromise: null,
+      getDB() {
+        if (!this.dbPromise) {
+          this.dbPromise = new Promise((resolve) => {
+            if (!window.indexedDB) return resolve(null);
+            try {
+              const req = indexedDB.open('bMMC_TrainsCacheDB', 1);
+              req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('cache')) {
+                  db.createObjectStore('cache', { keyPath: 'key' });
+                }
+              };
+              req.onsuccess = () => resolve(req.result);
+              req.onerror = () => resolve(null);
+            } catch (err) {
+              resolve(null);
+            }
+          });
+        }
+        return this.dbPromise;
+      },
+      async get(key) {
         try {
-          const res = await fetch(url);
-          if (res.ok) {
-            const text = await res.text();
-            if (text && text.trim().length > 20 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
-              return JSON.parse(text);
+          const db = await this.getDB();
+          if (db) {
+            return await new Promise((resolve) => {
+              const tx = db.transaction('cache', 'readonly');
+              const store = tx.objectStore('cache');
+              const req = store.get(key);
+              req.onsuccess = () => {
+                const res = req.result;
+                if (res && res.time && (Date.now() - res.time < CACHE_TTL_MS)) {
+                  resolve(res.data);
+                } else {
+                  resolve(null);
+                }
+              };
+              req.onerror = () => resolve(null);
+            });
+          }
+        } catch (e) {}
+
+        // Fallback to localStorage
+        try {
+          const raw = localStorage.getItem('bMMC_7D_' + key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.time && (Date.now() - parsed.time < CACHE_TTL_MS)) {
+              return parsed.data;
             }
           }
         } catch (e) {}
+        return null;
+      },
+      async set(key, data) {
+        const payload = { key: key, data: data, time: Date.now() };
+        try {
+          const db = await this.getDB();
+          if (db) {
+            const tx = db.transaction('cache', 'readwrite');
+            tx.objectStore('cache').put(payload);
+            return;
+          }
+        } catch (e) {}
+        try {
+          localStorage.setItem('bMMC_7D_' + key, JSON.stringify(payload));
+        } catch (e) {}
       }
-      return null;
+    };
+
+    // =========================================================================
+    // AUTHORITATIVE GEOJSON DATA SOURCES & MULTI-DOWNLOAD RACE
+    // Priority: Dropbox direct CDN -> CORS proxies -> Local mirror fallbacks
+    // =========================================================================
+    const DROPBOX_HISTORIC_NET_RAW = 'https://dl.dropboxusercontent.com/scl/fi/2f3eghqez2t1eadp1tj4q/nz_historic_rail_networks.geojson?rlkey=ulxx1h81zq53g6brnuxjhnc47&st=rr2a97ub&raw=1';
+    const DROPBOX_MAIN_TRUNK_RAW   = 'https://dl.dropboxusercontent.com/scl/fi/7ufiijyhu1uhwi9hlz90v/nz_main_trunk_and_stations.geojson?rlkey=p4sbwn5pok0ho3rwb1e03p90u&st=yui46q80&raw=1';
+
+    const HISTORIC_NETWORKS_URLS = [
+      DROPBOX_HISTORIC_NET_RAW,
+      DROPBOX_HISTORIC_NET_RAW.replace('&raw=1', '&dl=1'),
+      `https://corsproxy.io/?url=${encodeURIComponent(DROPBOX_HISTORIC_NET_RAW)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(DROPBOX_HISTORIC_NET_RAW)}`,
+      'data/trains/nz_historic_rail_networks.geojson',
+      './data/trains/nz_historic_rail_networks.geojson',
+      '../data/trains/nz_historic_rail_networks.geojson',
+      '/data/trains/nz_historic_rail_networks.geojson'
+    ];
+
+    const MAIN_TRUNK_STATIONS_URLS = [
+      DROPBOX_MAIN_TRUNK_RAW,
+      DROPBOX_MAIN_TRUNK_RAW.replace('&raw=1', '&dl=1'),
+      `https://corsproxy.io/?url=${encodeURIComponent(DROPBOX_MAIN_TRUNK_RAW)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(DROPBOX_MAIN_TRUNK_RAW)}`,
+      'data/trains/nz_main_trunk_and_stations.geojson',
+      './data/trains/nz_main_trunk_and_stations.geojson',
+      '../data/trains/nz_main_trunk_and_stations.geojson',
+      '/data/trains/nz_main_trunk_and_stations.geojson'
+    ];
+
+    // Multi-download race: queries candidate sources simultaneously with Promise.any
+    async function fetchFastestValidJson(candidates) {
+      const controllers = candidates.map(() => new AbortController());
+      const promises = candidates.map((url, idx) => {
+        return new Promise(async (resolve, reject) => {
+          if (!url) return reject(new Error('Empty URL'));
+          try {
+            const timeoutId = setTimeout(() => controllers[idx].abort(), 7000);
+            const res = await fetch(url, { signal: controllers[idx].signal });
+            clearTimeout(timeoutId);
+            if (!res.ok) return reject(new Error('HTTP ' + res.status));
+            const text = await res.text();
+            if (text && text.trim().length > 20 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+              const parsed = JSON.parse(text);
+              resolve(parsed);
+            } else {
+              reject(new Error('Invalid JSON payload'));
+            }
+          } catch (err) {
+            reject(err);
+          }
+        });
+      });
+
+      try {
+        const fastest = await Promise.any(promises);
+        controllers.forEach(c => c.abort()); // Cancel remaining slower requests
+        return fastest;
+      } catch (err) {
+        return null;
+      }
     }
 
     function normalizeStationSubType(raw) {
@@ -1590,25 +1693,42 @@
     }
 
     async function loadHistoricRailNetworks() {
-      // 1. Try local files first, then Dropbox direct raw link
-      const geojson = await fetchFirstValidJson(HISTORIC_NETWORKS_URLS);
-      if (geojson && historicNetLayer) {
-        historicNetLayer.addData(geojson);
+      // 1. Instant load from 7-day client cache
+      const cached = await DataCache.get('historic_rail_networks');
+      if (cached && historicNetLayer) {
+        historicNetLayer.addData(cached);
         return;
       }
-      // 3. Fallback: current backup Overpass API interpreter
+
+      // 2. Multi-download race across Dropbox CDN, CORS proxies, and local mirrors
+      const geojson = await fetchFastestValidJson(HISTORIC_NETWORKS_URLS);
+      if (geojson && historicNetLayer) {
+        historicNetLayer.addData(geojson);
+        DataCache.set('historic_rail_networks', geojson);
+        return;
+      }
+
+      // 3. Fallback to Overpass API ONLY if all CDN and local mirrors are unreachable
       fetchLiveOverpassLines();
     }
 
     async function loadMainTrunkAndStations() {
-      // 1. Try local files first, then Dropbox direct raw link
-      const geojson = await fetchFirstValidJson(MAIN_TRUNK_STATIONS_URLS);
-      if (!geojson) return; // Keep existing GUARANTEED_STATIONS backup intact
+      // 1. Check 7-day client cache
+      let geojson = await DataCache.get('main_trunk_stations');
+      if (!geojson) {
+        // Multi-download race
+        geojson = await fetchFastestValidJson(MAIN_TRUNK_STATIONS_URLS);
+        if (geojson) {
+          DataCache.set('main_trunk_stations', geojson);
+        }
+      }
+
+      if (!geojson) return; // Keep GUARANTEED_STATIONS intact
 
       const lineFeatures = [];
       const pointFeatures = [];
-
       const features = geojson.type === 'FeatureCollection' ? (geojson.features || []) : (geojson.type === 'Feature' ? [geojson] : []);
+
       features.forEach(f => {
         if (!f || !f.geometry) return;
         const gType = f.geometry.type;
@@ -1619,12 +1739,10 @@
         }
       });
 
-      // Overlay Main Trunk and connecting tracks
       if (lineFeatures.length > 0 && historicNetLayer) {
         historicNetLayer.addData({ type: 'FeatureCollection', features: lineFeatures });
       }
 
-      // Merge and render stations
       if (pointFeatures.length > 0) {
         let addedCount = 0;
         pointFeatures.forEach(f => {
@@ -1636,7 +1754,6 @@
           const p = f.properties || {};
           const name = p.name || p.title || p.station || 'Railway Station';
 
-          // Prevent duplication with guaranteed stations
           const exists = allStationRecords.some(s =>
             (s.name && s.name.toLowerCase() === name.toLowerCase()) ||
             (Math.abs(s.lat - lat) < 0.008 && Math.abs(s.lon - lon) < 0.008)
@@ -1934,8 +2051,9 @@
 
       refreshStationsOnMap();
       updateLegendActiveStates();
-    }
+      // Asynchronously stream Main Trunk & additional stations from Dropbox CDN
       loadMainTrunkAndStations();
+    }
 
     function refreshStationsOnMap() {
       const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
@@ -2587,73 +2705,64 @@
       return false;
     }
 
-    async function fetchFirstValidCsv(candidates) {
-      for (const url of candidates) {
-        if (!url) continue;
-        try {
-          const res = await fetch(url);
-          if (res.ok) {
+        // Multi-download race for CSV datasets with 7-day TTL caching
+    async function fetchFastestValidCsv(candidates) {
+      const controllers = candidates.map(() => new AbortController());
+      const promises = candidates.map((url, idx) => {
+        return new Promise(async (resolve, reject) => {
+          if (!url) return reject(new Error('Empty URL'));
+          try {
+            const timeoutId = setTimeout(() => controllers[idx].abort(), 7000);
+            const res = await fetch(url, { signal: controllers[idx].signal });
+            clearTimeout(timeoutId);
+            if (!res.ok) return reject(new Error('HTTP ' + res.status));
             const text = await res.text();
             if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
-              return text;
+              resolve(text);
+            } else {
+              reject(new Error('Invalid CSV payload'));
             }
+          } catch (err) {
+            reject(err);
           }
-        } catch (e) {}
+        });
+      });
+
+      try {
+        const fastest = await Promise.any(promises);
+        controllers.forEach(c => c.abort());
+        return fastest;
+      } catch (err) {
+        return null;
       }
-      return null;
     }
 
-    // Built-in offline emergency fallback milestones
-    const FALLBACK_TRAINS_CSV = `id,year,date,headline,category,location,latitude,longitude,details,image_url,source_url
-NZR001,1862,7 May 1862,Dun Mountain Railway Opens (NZ's First Railway),Railway Firsts,Nelson,-41.2711,173.2842,New Zealand's first operational railway opened in Nelson to haul chromite and copper from Dun Mountain to Nelson Port.,https://lh3.googleusercontent.com/d/1XilUceRtJ56Z-VyeY4QXklv6ISsWOjkf,https://teara.govt.nz/en/railways/page-1
-NZR002,1863,1 Dec 1863,First Public Steam Railway Opens,Railway Firsts,Ferrymead (Christchurch),-43.5558,172.7051,Canterbury Provincial Railways opened NZ's first steam-powered public railway line between Christchurch and Ferrymead wharf.,,https://nzhistory.govt.nz/first-public-railway-opens
-NZR004,1867,9 Dec 1867,Lyttelton Rail Tunnel Pierces Crater Rim,Engineering Feats,Lyttelton,-43.5997,172.7197,The 2.6 km Lyttelton Rail Tunnel pierced the volcanic crater wall of the Port Hills to link Christchurch directly to Lyttelton Harbour.,,https://nzhistory.govt.nz/culture/tunnel-through-the-port-hills
-NZR005,1867,18 Jun 1867,Bluff to Invercargill Railway Opens,Lines & Corridors,Bluff Harbour,-46.6000,168.3333,Southland opened its first permanent iron-rail line connecting Invercargill to the deep-water ocean port at Bluff.,https://lh3.googleusercontent.com/d/1s-5BXtF21CZOMLSM5UUVr-40yklME6T-,https://teara.govt.nz/en/southland-places/page-14
-NZR008,1873,20 Dec 1873,Auckland to Onehunga Railway Opens,Lines & Corridors,Onehunga (Auckland),-36.9247,174.7865,The first railway line in Auckland Province opened between Point Britomart and Manukau Harbour port at Onehunga.,https://lh3.googleusercontent.com/d/1qgIWoTt02nxubDAU1_V8qUAe65HgsmIP,https://kura.aucklandlibraries.govt.nz
-NZR013,1878,12 Oct 1878,Rimutaka Incline Opens with Fell Mountain Engines,Engineering Feats,Cross Creek (Wairarapa),-41.1783,175.2017,To breach the Rimutaka Range into Wairarapa, engineers built a 1-in-15 gradient using the Swedish Fell center-rail system.,https://lh3.googleusercontent.com/d/1CeT-zMSy_K_Xn9HITcCC0afX0ejXWyzM,https://nzhistory.govt.nz/media/photo/fell-locomotive
-NZR016,1879,1 Nov 1879,Denniston Incline Opens ('Eighth Wonder of the World'),Engineering Feats,Denniston (West Coast),-41.7333,171.7967,A gravity coal railway dropped 518 vertical meters down Mount Rochfort at grades up to 1-in-1.25.,https://lh3.googleusercontent.com/d/1Ee_8AFNsaob_5q9mkVic6taGQcFf9q3x,https://teara.govt.nz/en/west-coast-places/page-5
-NZR027,1898,1 Jun 1898,Raurimu Spiral Surveyed by Peter Ellis,Engineering Feats,Raurimu,-39.1167,175.4000,Confronted with a 132m bluff, surveyor Peter Ellis designed an ingenious spiral incorporating a horseshoe curve and two tunnels.,,https://nzhistory.govt.nz/culture/raurimu-spiral
-NZR032,1906,22 Oct 1906,Dunedin Railway Station Opens,Architecture,Dunedin,-45.8753,170.5078,Designed by George Troup, this Flemish Renaissance palace of rail featured dark basalt stone and 750,000 Royal Doulton tiles.,https://lh3.googleusercontent.com/d/1ljlVfFMhXvkOqf7oOskDLEKcbKjJ14au,https://nzhistory.govt.nz/media/photo/dunedin-railway-station
-NZR034,1908,6 Nov 1908,Driving of the Last Spike on the NIMT,Lines & Corridors,Manganui-o-te-Ao (Pokaka),-39.3500,175.4167,Prime Minister Sir Joseph Ward drove the final silver spike, connecting Wellington and Auckland by rail after 38 years of work.,,https://nzhistory.govt.nz/driving-the-last-spike
-NZR041,1923,4 Aug 1923,Otira Tunnel Opens (NZ's First Electric Mainline),Engineering Feats,Otira (Southern Alps),-42.8300,171.5600,At 8.5 km, the Otira Tunnel through the Southern Alps connected the West Coast to Christchurch under 1500V DC electric power.,https://lh3.googleusercontent.com/d/1T-VuGZq3aZzwggQ2I-HLJ79oXWZg8iXx,https://nzhistory.govt.nz/otira-tunnel-opened
-NZR057,1953,24 Dec 1953,Tangiwai Railway Disaster,Disasters & Accidents,Tangiwai Bridge (Ruapehu),-39.4647,175.5728,A volcanic lahar washed away the bridge pier minutes before the night express arrived, claiming 151 lives on Christmas Eve.,https://lh3.googleusercontent.com/d/19gVYSoWBlvJUGYKCtZpJR64MvlcOujR1,https://nzhistory.govt.nz/culture/tangiwai-railway-disaster
-NZR063,1962,11 Aug 1962,Interisland Rail Ferry GMV Aramoana Arrives,Lines & Corridors,Cook Strait,-41.2780,174.7850,The GMV Aramoana turned Cook Strait into an extension of the railway, rolling wagons directly between Wellington and Picton.,https://lh3.googleusercontent.com/d/1DmUZ8fFVr0qI3tsRLWJxR8gO8KQUG7j5,https://nzhistory.govt.nz/cook-strait-rail-ferry-service-begins
-NZR074,1978,12 Sep 1978,Kaimai Rail Tunnel Opens (NZ's Longest Tunnel),Engineering Feats,Kaimai Range,-37.7200,175.8900,The 8.85 km Kaimai Rail Tunnel opened, bypassing Paeroa gorge to link Waikato freight directly to the Port of Tauranga.,https://lh3.googleusercontent.com/d/1_BEDRvgDCPMlM7PK02tTovYQvZW8nkSK,https://nzhistory.govt.nz/kaimai-tunnel-opened
-NZR080,1987,22 Nov 1987,The TranzAlpine Express Launched,Scenic & Tourism,Arthur's Pass,-42.9400,171.5600,NZR rebranded the Christchurch-Greymouth run into The TranzAlpine, globally recognized as one of the great rail journeys of the world.,,https://www.journeys.kiwirail.co.nz/tranzalpine
-NZR094,2008,1 Jul 2008,Full Renationalization: KiwiRail is Born,Renationalization,Wellington Railway Station,-41.2789,174.7803,The government bought back all trains, tracks, and Cook Strait ferries, reuniting operations under state-owned KiwiRail.,,https://nzhistory.govt.nz/renationalisation-of-rail-network
-NZR099,2014,28 Apr 2014,Auckland Suburban Rail Electrification Opens,Suburban & Commuter,Auckland CBD,-36.8442,174.7681,Auckland transformed passenger transport with 25kV AC overhead electrification and modern three-car electric AM trains.,https://lh3.googleusercontent.com/d/1ShsjLZuzUQ1v_jnemNobe9ZIeZiQHbo8,https://teara.govt.nz/en/auckland-places/page-3
-NZR105,2025,1 Nov 2025,City Rail Link (CRL) Completes Auckland Rail Loop,Engineering Feats,Auckland CBD,-36.8530,174.7610,New Zealand's largest transport infrastructure project completed twin 3.45 km underground tunnels through Auckland's CBD.,https://lh3.googleusercontent.com/d/1_Ek5JuENq8iOiGs8YMr5wqaeke4z--WP,https://www.cityraillink.co.nz`;
-
     async function loadDataset() {
-      // 1. Check local storage cache for instant rendering
-      try {
-        const cached = localStorage.getItem(CACHE_STORAGE_KEY);
-        if (cached && parseCSVData(cached)) {
-          // Cached version mounted
-        }
-      } catch (e) {}
+      // 1. Check 7-day client cache
+      const cached = await DataCache.get('trains_milestones_csv');
+      if (cached && parseCSVData(cached)) {
+        return;
+      }
 
-      // 2. Candidate fetch URLs in prioritized order:
-      // Online Google Drive / Sheets first -> Proxies -> Offline backup files
+      // 2. Multi-download race across live feed, proxies, and local mirrors
       const candidateUrls = [
         LIVE_CSV_URL,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
         `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`,
-        '/data/trains.csv',
-        '../data/trains.csv',
-        './data/trains.csv',
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
         'data/trains.csv',
+        './data/trains.csv',
+        '../data/trains.csv',
         './trains.csv',
         'trains.csv'
       ];
 
-      const csvText = await fetchFirstValidCsv(candidateUrls);
-
+      const csvText = await fetchFastestValidCsv(candidateUrls);
       if (csvText && parseCSVData(csvText)) {
-        try { localStorage.setItem(CACHE_STORAGE_KEY, csvText); } catch (e) {}
+        DataCache.set('trains_milestones_csv', csvText);
         return;
       }
 
+      // 3. Built-in emergency offline fallback
       if (allEvents.length === 0) {
         parseCSVData(FALLBACK_TRAINS_CSV);
       }
