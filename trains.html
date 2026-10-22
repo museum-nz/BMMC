@@ -1167,7 +1167,12 @@
     }
   </script>
 
+  <script src="shared-map.js"></script>
+
   <script>
+    const { escapeHTML, parseYearNum, parseCoord, getCol } = BMMCMap;
+    const savedStore = BMMCMap.createSavedStore('bMMC_nz_trains_saved_ids');
+
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1351464718&single=true&output=csv';
 
     const NZ_CENTER = [-41.2865, 174.2];
@@ -1307,87 +1312,20 @@
       }
     }
 
+    let basemapSwitcher;
+
     const basemaps = {
-      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; National Geographic Society',
-        maxNativeZoom: 12,
-        maxZoom: 19
-      }),
-      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Topographic Survey',
-        maxNativeZoom: 18,
-        maxZoom: 19
-      }),
-      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Earthstar Geographics',
-        maxNativeZoom: 18,
-        maxZoom: 19
-      }),
-      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxNativeZoom: 19,
-        maxZoom: 19
-      })
+      natgeo: BMMCMap.tileLayer('natgeo', { maxNativeZoom: 12, maxZoom: 19 }),
+      topo: BMMCMap.tileLayer('topo', { maxNativeZoom: 18, maxZoom: 19 }),
+      sat: BMMCMap.tileLayer('imagery', { maxNativeZoom: 18, maxZoom: 19 }),
+      street: BMMCMap.tileLayer('street')
     };
 
-    let userSelectedBasemap = 'natgeo';
-    let isAutoSwitchedToTopo = false;
-    const AUTO_SWITCH_ZOOM_THRESHOLD = 12;
-
-    function applyLayer(type) {
-      Object.values(basemaps).forEach(l => {
-        if (map && map.hasLayer(l)) map.removeLayer(l);
-      });
-      if (map) basemaps[type].addTo(map);
-
-      if (historicNetLayer && isHistoricNetVisible && map && !map.hasLayer(historicNetLayer)) {
-        historicNetLayer.addTo(map);
-      }
-      if (bushTramLayer && isBushTramsVisible && map && !map.hasLayer(bushTramLayer)) {
-        bushTramLayer.addTo(map);
-      }
-      if (railInfraSpansLayer && isRailInfraVisible && map && !map.hasLayer(railInfraSpansLayer)) {
-        railInfraSpansLayer.addTo(map);
-      }
-      if (railInfraLayer && isRailInfraVisible && map && !map.hasLayer(railInfraLayer)) {
-        railInfraLayer.addTo(map);
-      }
-      if (railwayOverlayLayer && isRailwaysVisible && map && !map.hasLayer(railwayOverlayLayer)) {
-        railwayOverlayLayer.addTo(map);
-      }
-    }
-
-    function checkBasemapAutoSwitch() {
-      if (!map || userSelectedBasemap !== 'natgeo') return;
-      const currentZoom = map.getZoom();
-      if (currentZoom > AUTO_SWITCH_ZOOM_THRESHOLD) {
-        if (!isAutoSwitchedToTopo) {
-          isAutoSwitchedToTopo = true;
-          applyLayer('topo');
-        }
-      } else {
-        if (isAutoSwitchedToTopo) {
-          isAutoSwitchedToTopo = false;
-          applyLayer('natgeo');
-        }
-      }
-    }
-
     function setBasemap(type) {
-      userSelectedBasemap = type;
-      isAutoSwitchedToTopo = false;
-      if (type === 'natgeo') {
-        if (map && map.getZoom() > AUTO_SWITCH_ZOOM_THRESHOLD) {
-          isAutoSwitchedToTopo = true;
-          applyLayer('topo');
-        } else {
-          applyLayer('natgeo');
-        }
-      } else {
-        applyLayer(type);
-      }
-      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`)?.classList.add('active');
+      if (basemapSwitcher) basemapSwitcher.set(type);
+      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
+      });
     }
 
     function getHistoricNetWeight(zoom) {
@@ -1845,7 +1783,7 @@
 
     function createStationMarker(record) {
       const { id, name, lat, lon, subType, hub, statusText } = record;
-      const isSaved = getSavedSet().has(id);
+      const isSaved = savedStore.get().has(id);
       const marker = L.marker([lat, lon], {
         icon: buildStationMarkerIcon(id, name, subType, statusText, isSaved)
       });
@@ -1856,7 +1794,7 @@
                      : (subType === 'active' ? 'Active Passenger Station' : 'Heritage &amp; Disused Station');
 
       marker.bindPopup(() => {
-        const currentlySaved = getSavedSet().has(id);
+        const currentlySaved = savedStore.get().has(id);
         return `
           <div class="history-card" style="width:270px; padding:12px 14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1915,7 +1853,7 @@
 
     function refreshStationsOnMap() {
       const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
-      const savedSet = getSavedSet();
+      const savedSet = savedStore.get();
       const minVal = parseInt(document.getElementById('minYearSlider')?.value || globalMinYear, 10);
       const maxVal = parseInt(document.getElementById('maxYearSlider')?.value || globalMaxYear, 10);
 
@@ -1979,7 +1917,10 @@
       });
 
       L.control.zoom({ position: 'topright' }).addTo(map);
-      basemaps.natgeo.addTo(map);
+      basemapSwitcher = BMMCMap.createBasemapSwitcher(map, basemaps, {
+        initial: 'natgeo',
+        autoSwitch: { from: 'natgeo', to: 'topo', aboveZoom: 12 }
+      });
 
       map.createPane('activeRailwaysPane');
       const activeRailPane = map.getPane('activeRailwaysPane');
@@ -1995,11 +1936,8 @@
       railwayOverlayLayer.addTo(map);
 
       map.on('click', () => { map.closePopup(); });
-      map.on('zoom', updatePillZoomScale);
-      map.on('zoomend', updatePillZoomScale);
-      map.on('zoomend', checkBasemapAutoSwitch);
       map.on('zoomend', updateHistoricNetStyles);
-      updatePillZoomScale();
+      BMMCMap.bindPillZoomScale(map, NZ_ZOOM);
 
       markers = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
@@ -2017,34 +1955,16 @@
       initStationRecords();
     }
 
-    const SAVED_STORAGE_KEY = 'bMMC_nz_trains_saved_ids';
     let isSavedFilterActive = false;
-
-    function getSavedSet() {
-      try {
-        const raw = localStorage.getItem(SAVED_STORAGE_KEY);
-        if (raw) return new Set(JSON.parse(raw));
-      } catch (e) {}
-      return new Set();
-    }
-
-    function saveSavedSet(set) {
-      try {
-        localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(Array.from(set)));
-      } catch (e) {}
-    }
 
     function updateSavedCountHeader() {
       const badge = document.getElementById('savedCountBadge');
-      if (badge) badge.textContent = getSavedSet().size;
+      if (badge) badge.textContent = savedStore.get().size;
     }
 
     window.toggleSaveItem = function(id, evt) {
       if (evt) { evt.stopPropagation(); evt.preventDefault(); }
-      const savedSet = getSavedSet();
-      const isNowSaved = !savedSet.has(id);
-      if (isNowSaved) savedSet.add(id); else savedSet.delete(id);
-      saveSavedSet(savedSet);
+      const isNowSaved = savedStore.toggle(id);
       updateSavedCountHeader();
 
       document.querySelectorAll(`.btn-card-heart[data-id="${id}"]`).forEach(btn => {
@@ -2076,13 +1996,6 @@
     let globalMinYear = 1862;
     let globalMaxYear = 2026;
     let timelineTimer = null;
-
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str).replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-      }[m]));
-    }
 
     // =========================================================================
     // RAIL POPUP HELPERS
@@ -2422,26 +2335,6 @@
       `;
     }
 
-    function parseYearNum(val) {
-      if (!val) return NaN;
-      const m = String(val).match(/-?\d{3,4}/);
-      return m ? parseInt(m[0], 10) : NaN;
-    }
-
-    function parseCoord(val) {
-      if (val === null || val === undefined || val === '') return NaN;
-      const m = String(val).trim().replace(',', '.').match(/-?\d+(?:\.\d+)?/);
-      if (!m) return NaN;
-      const num = parseFloat(m[0]);
-      return (isNaN(num) || num === 0) ? NaN : num;
-    }
-
-    function updatePillZoomScale() {
-      if (!map) return;
-      const factor = Math.pow(1.05, Math.max(-2, Math.min(10, map.getZoom() - NZ_ZOOM)));
-      document.documentElement.style.setProperty('--pill-zoom-factor', factor.toFixed(3));
-    }
-
     function filterEvents() {
       const minSlider = document.getElementById('minYearSlider');
       const maxSlider = document.getElementById('maxYearSlider');
@@ -2459,7 +2352,7 @@
       if (fill) { fill.style.left = left + '%'; fill.style.width = (right - left) + '%'; }
       document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
 
-      const savedSet = getSavedSet();
+      const savedSet = savedStore.get();
       const filtered = allEvents.filter(ev => {
         if (isSavedFilterActive && !savedSet.has(ev._uid)) return false;
         if (ev.year < minVal || ev.year > maxVal) return false;
@@ -2552,30 +2445,23 @@
       if (!csvString || csvString.trim().length === 0) return false;
       const parsed = Papa.parse(csvString, { header: true, skipEmptyLines: true });
       allEvents = (parsed.data || []).map(row => {
-        const getCol = (aliases) => {
-          for (let k of Object.keys(row)) {
-            const clean = k.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-            for (let a of aliases) { if (clean === a) return String(row[k] || '').trim(); }
-          }
-          return '';
-        };
-
-        const lat = parseCoord(getCol(['latitude', 'lat']));
-        const lng = parseCoord(getCol(['longitude', 'lng', 'lon']));
-        const yr = parseYearNum(getCol(['year', 'yr', 'date']));
-        const hl = getCol(['headline', 'title', 'event', 'name']);
+        const lat = parseCoord(getCol(row, ['latitude', 'lat']));
+        const lng = parseCoord(getCol(row, ['longitude', 'lng', 'lon']));
+        const yr = parseYearNum(getCol(row, ['year', 'yr', 'date']));
+        const hl = getCol(row, ['headline', 'title', 'event', 'name']);
+        const uid = getCol(row, ['id']) || `${yr}_${lat}_${lng}`;
 
         return {
-          id: getCol(['id']) || `${yr}_${lat}_${lng}`,
-          _uid: getCol(['id']) || `${yr}_${lat}_${lng}`,
+          id: uid,
+          _uid: uid,
           year: isNaN(yr) ? 0 : yr,
-          date: getCol(['date']) || String(yr || ''),
+          date: getCol(row, ['date']) || String(yr || ''),
           headline: hl || 'Rail Milestone',
-          category: getCol(['category', 'type']) || 'Railways',
-          location: getCol(['location', 'place']),
+          category: getCol(row, ['category', 'type']) || 'Railways',
+          location: getCol(row, ['location', 'place']),
           latitude: lat,
           longitude: lng,
-          details: getCol(['details', 'description', 'notes'])
+          details: getCol(row, ['details', 'description', 'notes'])
         };
       }).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude) && e.latitude !== 0 && e.longitude !== 0);
 
@@ -2604,18 +2490,8 @@
         './data/trains.csv'
       ];
 
-      for (let url of candidates) {
-        try {
-          const res = await fetch(url);
-          if (res.ok) {
-            const text = await res.text();
-            if (text && text.length > 50 && parseCSVData(text)) {
-              DataCache.set('trains_milestones_csv', text);
-              return;
-            }
-          }
-        } catch (e) {}
-      }
+      const text = await BMMCMap.fetchFirstText(candidates, { accept: parseCSVData });
+      if (text) DataCache.set('trains_milestones_csv', text);
     }
 
     function toggleRailLayerByKey(key) {

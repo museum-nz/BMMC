@@ -622,6 +622,7 @@
   <!-- Leaflet & MarkerCluster JS from CDN -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="shared-map.js"></script>
 
   <!-- Maritime Engine -->
   <script>
@@ -639,29 +640,14 @@
     let currentCategoryFilter = 'all';
 
     // Basemaps & Nautical Overlays
-    let baseLayers = {};
+    let basemapSwitcher;
     let openSeaMapLayer;
     let pioneerRoutesLayer;
 
-    // Saved Items LocalStorage Logic
-    const SAVED_MARITIME_KEY = 'bMMC_maritime_saved_ids';
-
-    function getSavedMaritimeSet() {
-      try {
-        const raw = localStorage.getItem(SAVED_MARITIME_KEY);
-        if (raw) return new Set(JSON.parse(raw));
-      } catch (e) {}
-      return new Set();
-    }
-
-    function saveMaritimeSavedSet(set) {
-      try {
-        localStorage.setItem(SAVED_MARITIME_KEY, JSON.stringify(Array.from(set)));
-      } catch (e) {}
-    }
+    const savedStore = BMMCMap.createSavedStore('bMMC_maritime_saved_ids');
 
     function updateMaritimeSavedCount() {
-      const count = getSavedMaritimeSet().size;
+      const count = savedStore.get().size;
       const countEl = document.getElementById('countSaved');
       if (countEl) countEl.textContent = count;
     }
@@ -671,14 +657,7 @@
         event.stopPropagation();
         event.preventDefault();
       }
-      const savedSet = getSavedMaritimeSet();
-      const isNowSaved = !savedSet.has(siteId);
-      if (isNowSaved) {
-        savedSet.add(siteId);
-      } else {
-        savedSet.delete(siteId);
-      }
-      saveMaritimeSavedSet(savedSet);
+      const isNowSaved = savedStore.toggle(siteId);
       updateMaritimeSavedCount();
 
       document.querySelectorAll(`.btn-save-maritime[data-site-id="${siteId}"]`).forEach(btn => {
@@ -787,22 +766,11 @@
         });
       }
 
-      baseLayers.topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Topographic Survey',
-        maxZoom: 18
-      });
-
-      baseLayers.satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri, Maxar, Earthstar Geographics',
-        maxZoom: 18
-      });
-
-      baseLayers.ocean = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri, Garmin, GEBCO, NOAA',
-        maxZoom: 13
-      });
-
-      baseLayers.topo.addTo(map);
+      basemapSwitcher = BMMCMap.createBasemapSwitcher(map, {
+        topo: BMMCMap.tileLayer('topo', { maxZoom: 18 }),
+        satellite: BMMCMap.tileLayer('imagery'),
+        ocean: BMMCMap.tileLayer('ocean')
+      }, { initial: 'topo' });
 
       const transparentTile = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
       openSeaMapLayer = L.tileLayer('https://t1.openseamap.org/seamark/{z}/{x}/{y}.png', {
@@ -846,15 +814,8 @@
     }
 
     function setBaseMap(type) {
-      [baseLayers.topo, baseLayers.satellite, baseLayers.ocean].forEach(layer => {
-        if (map.hasLayer(layer)) map.removeLayer(layer);
-      });
-
-      if (type === 'satellite') map.addLayer(baseLayers.satellite);
-      else if (type === 'ocean') map.addLayer(baseLayers.ocean);
-      else map.addLayer(baseLayers.topo);
-
-      updateBaseMapButtonsUI(type);
+      if (!basemapSwitcher.set(type)) basemapSwitcher.set('topo');
+      updateBaseMapButtonsUI(basemapSwitcher.selected);
     }
 
     function updateBaseMapButtonsUI(selectedType) {
@@ -908,19 +869,7 @@
     }
 
     function normalizeSiteRow(row, idx) {
-      function getVal(aliases) {
-        for (const a of aliases) {
-          const cleanA = a.toLowerCase().replace(/[\s_-]+/g, '');
-          for (const k of Object.keys(row)) {
-            const cleanK = k.trim().toLowerCase().replace(/[\s_-]+/g, '');
-            if (cleanK === cleanA) {
-              const val = row[k] ? String(row[k]).trim() : '';
-              if (val) return val;
-            }
-          }
-        }
-        return '';
-      }
+      const getVal = aliases => BMMCMap.getCol(row, aliases);
 
       const id = getVal(['id', 'site_id', 'code', 'slug', 'no', 'number', 'vessel', 'ship', 'headline', 'name']) || `maritime_site_${idx !== undefined ? idx : Math.random().toString(36).substr(2, 9)}`;
       const fatalities = parseInt(getVal(['fatalities', 'fatal', 'deaths', 'lost']) || 0, 10) || 0;
@@ -1024,22 +973,6 @@
       return [...new Set(candidates)];
     }
 
-    async function fetchWithTimeout(url, timeoutMs = 2500) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { signal: controller.signal, cache: 'no-cache' });
-        clearTimeout(id);
-        if (res.ok) {
-          const txt = await res.text();
-          if (txt && txt.trim().length > 20) return txt;
-        }
-      } catch (e) {
-        clearTimeout(id);
-      }
-      return null;
-    }
-
     async function loadMaritimeData() {
       const overlay = document.getElementById('mapLoadingOverlay');
       const dismissOverlay = () => {
@@ -1054,14 +987,11 @@
       const safetyTimeout = setTimeout(dismissOverlay, 4000);
 
       try {
-        let rawData = null;
-        const candidates = getCandidateDataUrls();
-        for (const url of candidates) {
-          const isRemote = url.startsWith('http://') || url.startsWith('https://');
-          const timeout = isRemote ? 2500 : 1200;
-          rawData = await fetchWithTimeout(url, timeout);
-          if (rawData) break;
-        }
+        const rawData = await BMMCMap.fetchFirstText(getCandidateDataUrls(), {
+          minLength: 21,
+          timeoutMs: url => /^https?:\/\//.test(url) ? 2500 : 1200,
+          fetchOptions: { cache: 'no-cache' }
+        });
 
         if (!rawData) {
           dismissOverlay();
@@ -1088,7 +1018,7 @@
       markersLayer.clearLayers();
       markerInstances.clear();
 
-      const savedSet = getSavedMaritimeSet();
+      const savedSet = savedStore.get();
       const filtered = MARITIME_SITES.filter(site => {
         if (currentCategoryFilter === 'saved') return savedSet.has(site.id);
         if (currentCategoryFilter === 'all') return true;
@@ -1295,7 +1225,7 @@
       if (iconEl) iconEl.textContent = icon;
       if (titleEl) titleEl.textContent = `${site.title} (${site.year})`;
 
-      const isSaved = getSavedMaritimeSet().has(site.id);
+      const isSaved = savedStore.get().has(site.id);
       const searchUrl = site.sourceUrl || `https://www.google.com/search?q=${encodeURIComponent(site.title + ' New Zealand maritime history')}`;
 
       if (bodyEl) {

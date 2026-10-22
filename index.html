@@ -627,45 +627,6 @@
     (function() {
       'use strict';
 
-      // ==========================================
-      // Built-in Failsafe Directory Data
-      // Ensures the wings ALWAYS render even if shared-nav.js is missing/cached
-      // ==========================================
-      const DEFAULT_BRANCHES = [
-        {
-          group: "Primary Museum Wings",
-          items: [
-            { href: 'museum.html', icon: '🏛️', label: 'Museum Showcase & Catalog', desc: 'Main artifact exhibition, 3D models & gramophones' },
-            { href: 'museum.html#stats', icon: '📊', label: 'Museum Insights & Analytics', desc: 'Chronological charts & artifact distribution' },
-            { href: '2Dmap.html', icon: '🌍', label: 'Museum Artifact Origin Map', desc: 'Global manufacturing locations & timeline' },
-            { href: 'restoration-guide.html', icon: '🛠️', label: 'Artifact Care & Restoration', desc: 'Workshop guide for metals, timber, leather & finishes' }
-          ]
-        },
-        {
-          group: "Specialist Databases & Archives",
-          items: [
-            { href: 'gallery.html', icon: '📷', label: 'Historical Photo Archives', desc: 'Historic photography & Alan Starling WWII oral history' },
-            { href: 'currency.html', icon: '🪙', label: 'NZ Currency & Minting', desc: '1933–2026 coins, banknotes & RBNZ Table F3 metrics' },
-            { 
-              href: 'stamps.html', 
-              icon: '📮', 
-              label: 'NZ Stamp Archive (StampsNZ)', 
-              desc: 'Comprehensive philatelic catalog & valuations',
-              children: [
-                { href: '2Dmap_stamps.html', icon: '🗺️', label: 'Philatelic Photo Map', desc: 'Geographic 2D map of NZ stamps by issue location' }
-              ]
-            }
-          ]
-        },
-        {
-          group: "NZ Historical Info Maps",
-          items: [
-            { href: 'nz_history.html', icon: '📜', label: 'Aotearoa NZ History Map', desc: 'Interactive colonial timeline, ships & battles' },
-            { href: 'trains.html', icon: '🚂', label: 'Aotearoa NZ Railway Map', desc: 'Interactive rail history, steam pioneers, historic railways, disasters & KiwiRail' },
-            { href: 'maritime.html', icon: '⚓', label: 'Aotearoa NZ Maritime & Coastal Map', desc: 'Mosquito Fleet, early arrivals, shipwrecks, whaling & lighthouses' }
-          ]
-        }
-      ];
       // Image Lookup Map for Exhibit Items & Wings
       const IMAGE_LOOKUP = {
         'museum.html': 'https://lh3.googleusercontent.com/d/1MPsC_RvHj1FoYs9qY1uszeKAD8nJjnCl=s200',
@@ -682,10 +643,7 @@
       const WING_IMAGE_LOOKUP = {
       };
 
-      // Resilient source detection
-      const rawBranches = (window.BMMC_BRANCHES && Array.isArray(window.BMMC_BRANCHES) && window.BMMC_BRANCHES.length > 0)
-        ? window.BMMC_BRANCHES
-        : DEFAULT_BRANCHES;
+      const rawBranches = Array.isArray(window.BMMC_BRANCHES) ? window.BMMC_BRANCHES : [];
 
       // ==========================================
       // Ambient Floating Motes Canvas

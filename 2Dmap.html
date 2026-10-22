@@ -600,19 +600,12 @@
 
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <script src="shared-map.js"></script>
 
   <script>
-    const CARTO_API_KEY = 'cb1_28sh_1_689e4b671faa6f5947798385';
+    const { escapeHTML, parseYearNum, parseCoord } = BMMCMap;
 
-    function escapeHTML(str) {
-      if (str === null || str === undefined) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+    const CARTO_API_KEY = 'cb1_28sh_1_689e4b671faa6f5947798385';
 
     function sanitizeUrl(url) {
       if (!url) return '';
@@ -622,21 +615,6 @@
       if (/^https?:\/\//i.test(clean)) return clean;
       if (!clean.includes(':')) return clean.startsWith('./') ? clean : `https://${clean}`;
       return '';
-    }
-
-    function parseYearNum(val) {
-      if (!val) return NaN;
-      const m = String(val).match(/-?\d{3,4}/);
-      return m ? parseInt(m[0], 10) : NaN;
-    }
-
-    function parseCoord(val) {
-      if (val === null || val === undefined || val === '') return NaN;
-      const clean = String(val).trim().replace(',', '.');
-      const m = clean.match(/-?\d+(?:\.\d+)?/);
-      if (!m) return NaN;
-      const num = parseFloat(m[0]);
-      return (isNaN(num) || num === 0) ? NaN : num;
     }
 
     let savedState = null;
@@ -653,7 +631,7 @@
           lat: center.lat,
           lng: center.lng,
           zoom: map.getZoom(),
-          basemap: currentBasemapKey,
+          basemap: basemapSwitcher.selected,
           minYear: document.getElementById('minYearSlider')?.value,
           maxYear: document.getElementById('maxYearSlider')?.value,
           search: document.getElementById('mapSearchInput')?.value || ''
@@ -716,47 +694,37 @@
     L.control.zoom({ position: 'topright' }).addTo(map);
 
     // Basemaps
-    const layerGoogle = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'], noWrap: true });
-    const layerHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'], noWrap: true });
-    const layerEsriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri &mdash; Maxar', maxZoom: 18, noWrap: true });
-    const layerEsriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri &mdash; Topo', maxZoom: 19, noWrap: true });
-    const layerNatGeoHistory = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri &mdash; NatGeo', maxZoom: 16, noWrap: true });
     const cartoUrl = CARTO_API_KEY 
-      ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-    const layerVoyager = L.tileLayer(cartoUrl, { attribution: '&copy; CARTO', maxZoom: 19, subdomains: 'abcd', noWrap: true });
+      ? `${BMMCMap.TILE_SOURCES.voyager.url}?key=${CARTO_API_KEY}`
+      : BMMCMap.TILE_SOURCES.voyager.url;
 
     const baseLayers = {
-      google: layerGoogle,
-      hybrid: layerHybrid,
-      satellite: layerEsriSatellite,
-      topo: layerEsriTopo,
-      natgeo: layerNatGeoHistory,
-      voyager: layerVoyager
+      google: BMMCMap.tileLayer('google', { noWrap: true }),
+      hybrid: BMMCMap.tileLayer('hybrid', { noWrap: true }),
+      satellite: BMMCMap.tileLayer('imagery', { noWrap: true }),
+      topo: BMMCMap.tileLayer('topo', { noWrap: true }),
+      natgeo: BMMCMap.tileLayer('natgeo', { noWrap: true }),
+      voyager: BMMCMap.tileLayer('voyager', { url: cartoUrl, noWrap: true })
     };
 
-    let currentBasemapKey = (savedState && savedState.basemap && baseLayers[savedState.basemap]) ? savedState.basemap : 'google';
-    baseLayers[currentBasemapKey].addTo(map);
+    const basemapSwitcher = BMMCMap.createBasemapSwitcher(map, baseLayers, {
+      initial: savedState && savedState.basemap ? savedState.basemap : 'google'
+    });
 
-    function setBasemap(type) {
-      if (!baseLayers[type]) return;
-
-      Object.values(baseLayers).forEach(layer => {
-        if (map.hasLayer(layer)) map.removeLayer(layer);
-      });
-      baseLayers[type].addTo(map);
-      currentBasemapKey = type;
-
+    function highlightBasemapButton(type) {
       document.querySelectorAll('.layer-option-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
       });
+    }
+
+    function setBasemap(type) {
+      if (!basemapSwitcher.set(type)) return;
+      highlightBasemapButton(type);
       document.getElementById('layerDropdownCard')?.classList.remove('show');
       saveMapViewState();
     }
 
-    document.querySelectorAll('.layer-option-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${currentBasemapKey.toLowerCase()}`);
-    });
+    highlightBasemapButton(basemapSwitcher.selected);
 
     map.on('moveend', saveMapViewState);
     map.on('zoomend', saveMapViewState);

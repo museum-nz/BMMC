@@ -642,8 +642,11 @@
   </script>
 
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <script src="shared-map.js"></script>
 
   <script>
+    const { escapeHTML, parseYearNum } = BMMCMap;
+
     const REMOTE_STAMPS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1362859267&single=true&output=csv';
     const LOCAL_CSV_CANDIDATES = [
       'stamps-data.csv',
@@ -737,30 +740,19 @@
     L.control.zoom({ position: 'topright' }).addTo(map);
 
     // Basemaps
-    const layerGoogle = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'] });
-    const layerHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20, subdomains: ['0', '1', '2', '3'] });
-    const layerEsriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy;', maxZoom: 18 });
-    const layerEsriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri &copy;', maxZoom: 19 });
-    const layerNatGeo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'NatGeo &copy;', maxZoom: 16 });
-    const layerVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19, subdomains: 'abcd' });
-
     const baseLayers = {
-      google: layerGoogle,
-      hybrid: layerHybrid,
-      satellite: layerEsriSatellite,
-      topo: layerEsriTopo,
-      natgeo: layerNatGeo,
-      voyager: layerVoyager
+      google: BMMCMap.tileLayer('google'),
+      hybrid: BMMCMap.tileLayer('hybrid'),
+      satellite: BMMCMap.tileLayer('imagery'),
+      topo: BMMCMap.tileLayer('topo'),
+      natgeo: BMMCMap.tileLayer('natgeo'),
+      voyager: BMMCMap.tileLayer('voyager')
     };
 
-    let currentBasemapKey = 'google';
-    baseLayers[currentBasemapKey].addTo(map);
+    const basemapSwitcher = BMMCMap.createBasemapSwitcher(map, baseLayers, { initial: 'google' });
 
     function setBasemap(type) {
-      if (!baseLayers[type]) return;
-      Object.values(baseLayers).forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
-      baseLayers[type].addTo(map);
-      currentBasemapKey = type;
+      if (!basemapSwitcher.set(type)) return;
       document.querySelectorAll('.layer-option-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
       });
@@ -787,17 +779,6 @@
     let globalMinYear = 1855;
     let globalMaxYear = 2026;
     let timelinePlayTimer = null;
-
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    }
-
-    function parseYearNum(val) {
-      if (!val) return NaN;
-      const m = String(val).match(/-?\d{3,4}/);
-      return m ? parseInt(m[0], 10) : NaN;
-    }
 
     function formatMediaUrl(url) {
       if (!url) return SVG_NO_IMG;
@@ -1100,22 +1081,6 @@
       }
     }
 
-    async function fetchFirstValidCsv(candidates) {
-      for (const url of candidates) {
-        if (!url) continue;
-        try {
-          const res = await fetch(url);
-          if (res.ok) {
-            const text = await res.text();
-            if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
-              return text;
-            }
-          }
-        } catch (e) {}
-      }
-      return null;
-    }
-
     async function loadData() {
       try {
         const cachedRaw = localStorage.getItem('bMMC_cached_stamps');
@@ -1141,7 +1106,7 @@
         `https://corsproxy.io/?url=${encodeURIComponent(REMOTE_STAMPS_CSV_URL)}`
       ];
 
-      const csvText = await fetchFirstValidCsv(candidateUrls);
+      const csvText = await BMMCMap.fetchFirstText(candidateUrls);
 
       if (csvText) {
         const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
