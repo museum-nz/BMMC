@@ -964,6 +964,12 @@
       .year-slider-container { left: 10px; bottom: 12px; width: calc(100vw - 20px); max-width: calc(100vw - 20px); }
       .legend-wrapper { bottom: 84px !important; right: 10px !important; }
     }
+
+    /* Wings Button */
+    .top-controls-bar .btn-bmmc-menu-trigger {
+      order: 999 !important;
+      margin-left: auto !important;
+    }
   </style>
 </head>
 <body>
@@ -1059,10 +1065,6 @@
         <span class="heart-icon">❤️</span>
         <span>Saved</span>
         <span id="savedCountBadge" class="saved-pill-count">0</span>
-      </button>
-
-      <button id="btnFitNZ" class="top-action-btn" title="Zoom to fit New Zealand">
-        <span>🇳🇿</span> <span>Fit NZ</span>
       </button>
     </div>
 
@@ -1916,7 +1918,9 @@
         zoomControl: false
       });
 
-      L.control.zoom({ position: 'topright' }).addTo(map);
+      const zoomControl = L.control.zoom({ position: 'topright' }).addTo(map);
+      BMMCMap.addResetViewButton(zoomControl, () => map.setView(NZ_CENTER, NZ_ZOOM));
+      BMMCMap.fitPopupsToScreen(map);
       basemapSwitcher = BMMCMap.createBasemapSwitcher(map, basemaps, {
         initial: 'natgeo',
         autoSwitch: { from: 'natgeo', to: 'topo', aboveZoom: 12 }
@@ -2543,10 +2547,6 @@
 
       document.getElementById('btnToggleSaved')?.addEventListener('click', toggleSavedFilter);
       updateSavedCountHeader();
-
-      document.getElementById('btnFitNZ')?.addEventListener('click', () => {
-        map.setView(NZ_CENTER, NZ_ZOOM);
-      });
 
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');

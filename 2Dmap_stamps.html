@@ -527,19 +527,10 @@
       }
     }
   
-    /* Responsive Wings Position: Hard Right on Desktop, Hard Left on Mobile */
-    @media (min-width: 769px) {
-      .top-controls-bar .btn-bmmc-menu-trigger {
-        order: 999 !important;
-        margin-left: auto !important;
-      }
-    }
-    @media (max-width: 768px) {
-      .top-controls-bar .btn-bmmc-menu-trigger {
-        order: -1 !important;
-        margin-left: 0 !important;
-        margin-right: auto !important;
-      }
+    /* Wings Button */
+    .top-controls-bar .btn-bmmc-menu-trigger {
+      order: 999 !important;
+      margin-left: auto !important;
     }
   </style>
 </head>
@@ -585,11 +576,6 @@
         </button>
       </div>
     </div>
-
-    <button id="btnFitBounds" class="top-action-btn" title="Fit all visible items in view">
-      <span>🧭</span> <span>Fit All</span>
-    </button>
-
 
     <a href="stamps.html" class="top-action-btn" title="Return to Stamp Catalog">
       <span>📮</span> <span>Catalog</span>
@@ -737,7 +723,11 @@
     }).setView(defaultCenter, defaultZoom);
 
     // Add Zoom Control explicitly to Top-Right
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    const zoomControl = L.control.zoom({ position: 'topright' }).addTo(map);
+    BMMCMap.addResetViewButton(zoomControl, () => {
+      if (markers.getLayers().length > 0) map.fitBounds(markers.getBounds(), { padding: [50, 50] });
+    }, 'Fit all visible items in view');
+    BMMCMap.fitPopupsToScreen(map);
 
     // Basemaps
     const baseLayers = {
@@ -1130,9 +1120,6 @@
         updateYearFilter();
       });
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
-      document.getElementById('btnFitBounds')?.addEventListener('click', () => {
-        if (markers.getLayers().length > 0) map.fitBounds(markers.getBounds(), { padding: [50, 50] });
-      });
 const btnLayers = document.getElementById('btnLayersToggle');
       const layerCard = document.getElementById('layerDropdownCard');
       btnLayers?.addEventListener('click', (e) => {

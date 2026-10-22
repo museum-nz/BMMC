@@ -315,11 +315,6 @@
               <input type="checkbox" id="togglePioneerRoutes" onchange="toggleOverlayLayer('routes', this.checked)" class="rounded text-teal-600 focus:ring-teal-500 w-3 h-3 cursor-pointer">
               <span>⛵ Paths</span>
             </label>
-
-            <!-- Reset Extent Button -->
-            <button onclick="resetMapExtent()" title="Reset to NZ view" class="p-1 px-2 rounded-xl text-[11px] font-black bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition">
-              ⤢ NZ
-            </button>
           </div>
         </div>
 
@@ -747,24 +742,8 @@
         scrollWheelZoom: true
       });
 
-      if (map.zoomControl) {
-        const zoomContainer = map.zoomControl.getContainer();
-        const extentBtn = L.DomUtil.create('a', 'leaflet-control-zoom-in font-bold', zoomContainer);
-        extentBtn.href = '#';
-        extentBtn.title = 'Zoom to New Zealand Extents';
-        extentBtn.setAttribute('role', 'button');
-        extentBtn.innerHTML = '<span style="font-size: 15px; font-weight: bold; line-height: 1;">⤢</span>';
-        extentBtn.style.display = 'flex';
-        extentBtn.style.alignItems = 'center';
-        extentBtn.style.justifyContent = 'center';
-        extentBtn.style.cursor = 'pointer';
-
-        L.DomEvent.disableClickPropagation(extentBtn);
-        L.DomEvent.on(extentBtn, 'click', function(e) {
-          L.DomEvent.stop(e);
-          resetMapExtent();
-        });
-      }
+      BMMCMap.addResetViewButton(map.zoomControl, resetMapExtent);
+      BMMCMap.fitPopupsToScreen(map);
 
       basemapSwitcher = BMMCMap.createBasemapSwitcher(map, {
         topo: BMMCMap.tileLayer('topo', { maxZoom: 18 }),

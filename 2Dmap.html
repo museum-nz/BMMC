@@ -488,19 +488,10 @@
       }
     }
   
-    /* Responsive Wings Position: Hard Right on Desktop, Hard Left on Mobile */
-    @media (min-width: 769px) {
-      .top-controls-bar .btn-bmmc-menu-trigger {
-        order: 999 !important;
-        margin-left: auto !important;
-      }
-    }
-    @media (max-width: 768px) {
-      .top-controls-bar .btn-bmmc-menu-trigger {
-        order: -1 !important;
-        margin-left: 0 !important;
-        margin-right: auto !important;
-      }
+    /* Wings Button */
+    .top-controls-bar .btn-bmmc-menu-trigger {
+      order: 999 !important;
+      margin-left: auto !important;
     }
   </style>
 </head>
@@ -546,11 +537,6 @@
         </button>
       </div>
     </div>
-
-    <button id="btnFitBounds" class="top-action-btn" title="Fit all visible items in view">
-      <span>🧭</span> <span>Fit All</span>
-    </button>
-
   </div>
 
   <div id="map"></div>
@@ -691,7 +677,9 @@
     }).setView(initialCenter, initialZoom);
 
     // Place Zoom Control explicitly in Top-Right
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    const zoomControl = L.control.zoom({ position: 'topright' }).addTo(map);
+    BMMCMap.addResetViewButton(zoomControl, () => fitAllMarkers(), 'Fit all visible items in view');
+    BMMCMap.fitPopupsToScreen(map);
 
     // Basemaps
     const cartoUrl = CARTO_API_KEY 
@@ -1272,7 +1260,6 @@
       document.getElementById('minYearSlider')?.addEventListener('input', updateYearFilter);
       document.getElementById('maxYearSlider')?.addEventListener('input', updateYearFilter);
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
-      document.getElementById('btnFitBounds')?.addEventListener('click', fitAllMarkers);
 const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');
 

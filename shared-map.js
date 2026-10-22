@@ -1,5 +1,5 @@
 // shared-map.js — BMMC shared helpers for the Leaflet map pages
-// (2Dmap, 2Dmap_stamps, nz_history, trains, maritime). Load after Leaflet.
+// (2Dmap, 2Dmap_stamps, nz_history, trains, maritime, mtb). Load after Leaflet.
 (function() {
   'use strict';
 
@@ -208,6 +208,127 @@
     update();
   }
 
+  // 7. Fit All / Reset View Button (appended under the +/- zoom buttons)
+  const RESET_VIEW_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+
+  function addResetViewButton(zoomControl, onReset, title) {
+    const container = zoomControl && zoomControl.getContainer();
+    if (!container) return null;
+    const btn = L.DomUtil.create('a', 'leaflet-control-zoom-all', container);
+    btn.href = '#';
+    btn.title = title || 'Fit All / Reset View (New Zealand)';
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('aria-label', btn.title);
+    btn.innerHTML = RESET_VIEW_ICON;
+    // Tailwind's preflight makes SVGs display:block, which defeats Leaflet's text centring.
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    L.DomEvent.disableClickPropagation(btn);
+    L.DomEvent.on(btn, 'click', (e) => {
+      L.DomEvent.preventDefault(e);
+      onReset();
+    });
+    return btn;
+  }
+
+  // 8. Fit Popups to Small Screens
+  // On maps no wider than options.breakpoint (default 640px), each popup is shrunk to fit the
+  // screen and auto-panned clear of any floating controls matched by options.obstacles.
+  // Tall popups scroll inside instead of running off screen.
+  const POPUP_TIP_ALLOWANCE = 30;
+
+  function boxSize(el, sides) {
+    if (!el) return 0;
+    const cs = getComputedStyle(el);
+    return sides.reduce((sum, s) => sum + (parseFloat(cs['margin' + s]) || 0) + (parseFloat(cs['padding' + s]) || 0) + (parseFloat(cs['border' + s + 'Width']) || 0), 0);
+  }
+
+  function topObstacleBottom(map, selector) {
+    const mapRect = map.getContainer().getBoundingClientRect();
+    let bottom = 0;
+    document.querySelectorAll(selector).forEach(el => {
+      if (!el.offsetParent) return;
+      const r = el.getBoundingClientRect();
+      if (r.height === 0 || r.bottom <= mapRect.top || r.top - mapRect.top > mapRect.height / 2) return;
+      bottom = Math.max(bottom, r.bottom - mapRect.top);
+    });
+    return Math.round(bottom);
+  }
+
+  function fitPopupToScreen(popup) {
+    const map = popup._map;
+    const cfg = map && map._bmmcPopupFit;
+    if (!cfg) return;
+    const o = popup.options;
+    if (!popup._bmmcOriginal) {
+      popup._bmmcOriginal = {
+        maxWidth: o.maxWidth, minWidth: o.minWidth, maxHeight: o.maxHeight,
+        autoPanPaddingTopLeft: o.autoPanPaddingTopLeft, autoPanPaddingBottomRight: o.autoPanPaddingBottomRight
+      };
+    }
+    const orig = popup._bmmcOriginal;
+    Object.assign(o, orig);
+
+    const size = map.getSize();
+    if (size.x > cfg.breakpoint) return;
+
+    const m = cfg.margin;
+    const top = Math.max(m, topObstacleBottom(map, cfg.obstacles) + m);
+    const content = popup._contentNode;
+    const wrapper = content && content.parentNode;
+    const chromeX = boxSize(content, ['Left', 'Right']) + boxSize(wrapper, ['Left', 'Right']);
+    const chromeY = boxSize(content, ['Top', 'Bottom']) + boxSize(wrapper, ['Top', 'Bottom']);
+
+    o.maxWidth = Math.max(120, Math.min(orig.maxWidth, size.x - 2 * m - chromeX));
+    o.minWidth = Math.min(orig.minWidth, o.maxWidth);
+    const fitHeight = Math.max(120, size.y - top - m - chromeY - POPUP_TIP_ALLOWANCE);
+    o.maxHeight = orig.maxHeight ? Math.min(orig.maxHeight, fitHeight) : fitHeight;
+    o.autoPanPaddingTopLeft = L.point(m, top);
+    o.autoPanPaddingBottomRight = L.point(m, m);
+  }
+
+  // Styles applied after opening (e.g. Tailwind's CDN generating classes) can resize a popup
+  // after Leaflet has already laid it out and panned, so lay out and pan again when that happens.
+  function watchPopupResize(popup) {
+    if (typeof ResizeObserver === 'undefined' || !popup._map || !popup._map._bmmcPopupFit || !popup._contentNode) return;
+    let lastHeight = popup._container.offsetHeight;
+    let frame = 0;
+    popup._bmmcResizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (!popup._map || !popup._container) return;
+        const height = popup._container.offsetHeight;
+        if (Math.abs(height - lastHeight) < 2) return;
+        lastHeight = height;
+        fitPopupToScreen(popup);
+        popup._updateLayout();
+        popup._updatePosition();
+        popup._adjustPan();
+        lastHeight = popup._container.offsetHeight;
+      });
+    });
+    popup._bmmcResizeObserver.observe(popup._contentNode);
+  }
+
+  L.Popup.addInitHook(function() {
+    this.on('contentupdate', () => fitPopupToScreen(this));
+    this.on('add', () => watchPopupResize(this));
+    this.on('remove', () => {
+      if (this._bmmcResizeObserver) this._bmmcResizeObserver.disconnect();
+      this._bmmcResizeObserver = null;
+    });
+  });
+
+  function fitPopupsToScreen(map, options) {
+    const opts = options || {};
+    map._bmmcPopupFit = {
+      breakpoint: opts.breakpoint || 640,
+      margin: opts.margin === undefined ? 10 : opts.margin,
+      obstacles: opts.obstacles || '.top-controls-wrapper, .leaflet-top .leaflet-control'
+    };
+  }
+
   window.BMMCMap = {
     escapeHTML,
     parseYearNum,
@@ -218,6 +339,8 @@
     TILE_SOURCES,
     tileLayer,
     createBasemapSwitcher,
-    bindPillZoomScale
+    bindPillZoomScale,
+    addResetViewButton,
+    fitPopupsToScreen
   };
 })();

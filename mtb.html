@@ -447,32 +447,65 @@
       color: #f8fafc;
     }
 
-    /* Floating Status Bar */
-    .status-summary-bar {
+    /* Floating Status Bar & Thin Bottom Pills */
+    .bottom-left-pills {
       position: absolute;
       bottom: 20px;
       left: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: calc(100vw - 40px);
+      pointer-events: auto;
+      transition: bottom 0.22s ease;
+    }
+    .status-summary-bar,
+    .thin-pill-btn {
+      box-sizing: border-box;
+      height: 31px;
       background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(203, 213, 225, 0.9);
       border-radius: 14px;
-      padding: 8px 14px;
+      padding: 0 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      z-index: 1000;
       display: flex;
       align-items: center;
       gap: 10px;
+      font-family: inherit;
       font-size: 11.5px;
       font-weight: 800;
       color: #0f172a;
-      pointer-events: auto;
-      transition: bottom 0.22s ease;
+      white-space: nowrap;
     }
-    .dark .status-summary-bar {
+    .status-summary-bar {
+      min-width: 0;
+    }
+    #lblDatasetLoading {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .thin-pill-btn {
+      flex-shrink: 0;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .thin-pill-btn:hover {
+      border-color: #10b981;
+      color: #10b981;
+    }
+    .dark .status-summary-bar,
+    .dark .thin-pill-btn {
       background: rgba(15, 23, 42, 0.94);
       border-color: rgba(51, 65, 85, 0.9);
       color: #f8fafc;
       box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+    }
+    .dark .thin-pill-btn:hover {
+      border-color: #10b981;
+      color: #34d399;
     }
     .status-dot {
       width: 9px;
@@ -828,23 +861,6 @@
       line-height: 1;
       border-radius: 4px;
     }
-    .legend-open-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(203, 213, 225, 0.9);
-      color: #0f172a;
-      font-size: 11.5px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      transition: all 0.15s ease;
-    }
     .legend-items {
       display: flex;
       flex-direction: column;
@@ -1126,8 +1142,11 @@
       .top-controls-bar { gap: 4px; }
       .top-action-btn { height: 28px !important; padding: 0 8px !important; font-size: 11px !important; }
       .map-search-box { height: 28px !important; min-width: 110px !important; max-width: 155px !important; }
-      .status-summary-bar { bottom: 12px !important; left: 12px !important; padding: 5px 10px !important; }
+      .bottom-left-pills { bottom: 12px !important; left: 12px !important; gap: 5px; max-width: calc(100vw - 24px); }
+      .status-summary-bar, .thin-pill-btn { height: 26px; padding: 0 9px; font-size: 10.5px; gap: 6px; }
+      .thin-pill-btn { gap: 4px; }
       .legend-wrapper { bottom: 12px !important; right: 12px !important; }
+      .legend-card { margin-bottom: 32px; }
       .elevation-drawer { height: 375px; }
       .elevation-drawer.expanded { height: 86vh; }
       .elevation-stats-banner { gap: 14px; padding: 4px 12px 8px 12px; }
@@ -1393,11 +1412,6 @@
         <span id="iconRecord">⏺️</span> <span id="lblRecord">Record</span>
       </button>
 
-      <!-- Advisory Modal Trigger -->
-      <button id="btnOpenAdvisory" class="top-action-btn" title="Official Trail Data Advisory &amp; Disclaimer">
-        <span>⚠️</span> <span>Advisory</span>
-      </button>
-
       <!-- Wings Button -->
       <button class="btn-bmmc-menu-trigger top-action-btn" title="Open Museum Wings Menu">
         <span style="font-size: 14px;">☰</span>
@@ -1475,7 +1489,7 @@
 
   <!-- Interactive Legend -->
   <div class="legend-wrapper" id="legendWrapper">
-    <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Trail Legend">
+    <button id="btnOpenLegend" class="legend-open-pill thin-pill-btn" style="display:none;" title="Show Trail Legend">
       <span>🗺️</span> <span>Trail Key</span>
     </button>
     <div id="trailLegendCard" class="legend-card">
@@ -1513,10 +1527,15 @@
     </div>
   </div>
 
-  <!-- Bottom Status Bar -->
-  <div class="status-summary-bar" id="statusBar">
-    <span class="status-dot"></span>
-    <span id="lblDatasetLoading">Initialising MTB network...</span>
+  <!-- Bottom Status Bar & Advisory Pill -->
+  <div class="bottom-left-pills">
+    <div class="status-summary-bar" id="statusBar">
+      <span class="status-dot"></span>
+      <span id="lblDatasetLoading">Initialising MTB network...</span>
+    </div>
+    <button id="btnOpenAdvisory" class="thin-pill-btn" title="Official Trail Data Advisory &amp; Disclaimer">
+      <span>⚠️</span> <span>Advisory</span>
+    </button>
   </div>
 
   <!-- Elevation Profile Bottom Drawer & Complete Expanded Dashboard -->
@@ -1649,6 +1668,7 @@
       document.write('<script src="../vendor/leaflet/leaflet.js"><\/script>');
     }
   </script>
+  <script src="shared-map.js"></script>
 
   <script>
     // =========================================================================
@@ -3460,6 +3480,7 @@
         closePopupOnClick: true,
         zoomControl: false
       });
+      BMMCMap.fitPopupsToScreen(map);
 
       Object.entries(PANE_CONFIG).forEach(([key, cfg]) => {
         map.createPane(cfg.pane);
@@ -3757,7 +3778,7 @@
         count += importedGpxGroup.getLayers().length;
       }
       totalTrackCount = count;
-      document.getElementById('lblDatasetLoading').textContent = `${count.toLocaleString()} trail segments displayed`;
+      document.getElementById('lblDatasetLoading').textContent = `${count.toLocaleString()} trail segments`;
     }
 
     // =========================================================================
