@@ -248,6 +248,185 @@
       color: #38bdf8;
     }
 
+    /* OSM Heritage Layer Panel */
+    .heritage-switcher-container { position: relative; display: inline-block; }
+    .heritage-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 900;
+      background: rgba(124, 58, 237, 0.12);
+      color: #7c3aed;
+      border: 1px solid rgba(124, 58, 237, 0.25);
+    }
+    .dark .heritage-count { background: rgba(167, 139, 250, 0.18); color: #c4b5fd; border-color: rgba(167, 139, 250, 0.35); }
+    .heritage-card {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 300px;
+      max-width: calc(100vw - 24px);
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(12px);
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+      padding: 10px;
+      z-index: 2000;
+      color: #0f172a;
+      font-size: 12px;
+    }
+    .heritage-card.show { display: block; }
+    .dark .heritage-card { background: rgba(15, 23, 42, 0.97); border-color: #334155; color: #f8fafc; box-shadow: 0 12px 32px rgba(0,0,0,0.6); }
+    .heritage-card label { display: flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; }
+    .heritage-card input[type="checkbox"] { accent-color: #7c3aed; margin: 0; flex-shrink: 0; }
+    .heritage-master { font-weight: 900; font-size: 13px; padding: 2px 2px 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px; }
+    .dark .heritage-master { border-color: #334155; }
+    .heritage-options { display: flex; flex-direction: column; gap: 6px; font-weight: 700; color: #334155; margin-bottom: 8px; }
+    .dark .heritage-options { color: #cbd5e1; }
+    .heritage-cat-head { display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; margin: 4px 2px 6px; }
+    .heritage-cat-head button {
+      background: none; border: 1px solid #cbd5e1; border-radius: 6px; padding: 1px 7px; margin-left: 4px;
+      font-size: 10px; font-weight: 800; color: #475569; cursor: pointer;
+    }
+    .dark .heritage-cat-head button { border-color: #475569; color: #cbd5e1; }
+    .heritage-cat-list { display: flex; flex-direction: column; gap: 2px; }
+    .heritage-cat-row { padding: 4px 6px; border-radius: 8px; font-weight: 700; }
+    .heritage-cat-row:hover { background: #f1f5f9; }
+    .dark .heritage-cat-row:hover { background: #1e293b; }
+    .heritage-swatch { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #ffffff; box-shadow: 0 0 0 1px rgba(15,23,42,0.25); flex-shrink: 0; }
+    .heritage-cat-label { flex: 1; min-width: 0; }
+    .heritage-cat-count { font-size: 10px; font-weight: 800; color: #64748b; font-family: monospace; }
+    .heritage-card-foot { margin-top: 8px; padding-top: 7px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #64748b; line-height: 1.4; }
+    .dark .heritage-card-foot { border-color: #334155; color: #94a3b8; }
+    .osm-heritage-cluster { background-color: rgba(167, 139, 250, 0.55) !important; }
+    .osm-heritage-cluster div { background-color: rgba(124, 58, 237, 0.9) !important; color: #ffffff !important; }
+    .heritage-popup-row { font-size: 11px; color: #475569; margin: 0 0 6px 0; line-height: 1.4; }
+    .heritage-popup-row strong { color: #0f172a; }
+    .heritage-inscription { font-style: italic; border-left: 3px solid #a78bfa; padding-left: 8px; }
+
+    /* Interactive History Key / Legend */
+    .legend-wrapper {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      z-index: 1000;
+      pointer-events: auto;
+    }
+    .legend-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      min-width: 235px;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .dark .legend-card {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+    .legend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-bottom: 2px;
+    }
+    .dark .legend-header { border-bottom-color: #334155; }
+    .legend-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+    }
+    .dark .legend-title { color: #94a3b8; }
+    .legend-section-title {
+      font-size: 9.5px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      margin: 4px 6px 0;
+    }
+    .legend-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: bold;
+      color: #64748b;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    .legend-open-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      color: #0f172a;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    }
+    .dark .legend-open-pill { background: rgba(15, 23, 42, 0.94); border-color: rgba(51, 65, 85, 0.9); color: #f8fafc; }
+    .legend-items { display: flex; flex-direction: column; gap: 3px; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .legend-item:hover { background: rgba(2, 132, 199, 0.08); }
+    .dark .legend-item { color: #e2e8f0; }
+    .dark .legend-item:hover { background: rgba(56, 189, 248, 0.12); }
+    .legend-item.layer-muted { opacity: 0.38; text-decoration: line-through; }
+    .legend-item.legend-sub { padding-left: 16px; }
+    .legend-item-label { flex: 1; }
+    .legend-item-count { font-size: 10px; font-weight: 800; color: #64748b; font-family: monospace; }
+    .legend-pin-symbol {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 10px;
+      border: 1.5px solid;
+      flex-shrink: 0;
+    }
+    .legend-dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #ffffff; box-shadow: 0 0 0 1px rgba(15,23,42,0.25); flex-shrink: 0; margin: 0 4.5px; }
+
     /* Era Bar */
     .era-bar {
       pointer-events: auto;
@@ -806,6 +985,8 @@
       .leaflet-top.leaflet-right .leaflet-control-zoom { margin-top: 66px; margin-right: 10px; }
       .map-search-box { min-width: 130px; }
       .year-slider-container { left: 12px; bottom: 15px; width: calc(100vw - 24px); max-width: calc(100vw - 24px); }
+      .legend-wrapper { bottom: 96px !important; right: 10px !important; }
+      .legend-card { max-height: calc(100vh - 260px); }
     }
   
     .cat-vessel .marker-stem { background: #0284c7 !important; }
@@ -864,6 +1045,26 @@
         </div>
       </div>
 
+      <!-- OpenStreetMap Heritage Layer -->
+      <div class="heritage-switcher-container">
+        <button id="btnHeritageToggle" class="top-action-btn" title="OpenStreetMap heritage sites">
+          <span>🏛️</span> <span>Heritage</span> <span id="heritageCountBadge" class="heritage-count">0</span>
+        </button>
+        <div id="heritageCard" class="heritage-card">
+          <label class="heritage-master"><input type="checkbox" id="chkHeritageEnabled"> Show OSM heritage sites</label>
+          <div class="heritage-options">
+            <label title="Sites with a start_date are shown only when their year is inside the timeline range"><input type="checkbox" id="chkHeritageTimeline"> Filter dated sites by timeline</label>
+            <label title="Most OSM sites have no start_date tagged"><input type="checkbox" id="chkHeritageHideUndated"> Hide undated sites</label>
+          </div>
+          <div class="heritage-cat-head">
+            <span>Categories</span>
+            <span><button type="button" id="btnHeritageAll">All</button><button type="button" id="btnHeritageNone">None</button></span>
+          </div>
+          <div id="heritageCatList" class="heritage-cat-list"></div>
+          <div id="heritageFoot" class="heritage-card-foot">Heritage data &copy; OpenStreetMap contributors (ODbL).</div>
+        </div>
+      </div>
+
       <button id="btnToggleSaved" class="top-action-btn btn-saved-toggle" title="Filter by Saved Items">
         <span class="heart-icon">❤️</span>
         <span>Saved</span>
@@ -887,6 +1088,23 @@
   </div>
 
   <div id="map"></div>
+
+  <!-- Interactive History Key / Legend -->
+  <div class="legend-wrapper" id="legendWrapper">
+    <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show History Key">
+      <span>🗺️</span> <span>History Key</span>
+    </button>
+    <div id="historyLegendCard" class="legend-card">
+      <div class="legend-header">
+        <span class="legend-title">🗺️ History Key <span style="font-size:9.5px; opacity:0.8;">(Click to Toggle)</span></span>
+        <button id="btnCloseLegend" class="legend-close-btn" title="Close Key">✕</button>
+      </div>
+      <div class="legend-section-title">Timeline Events</div>
+      <div class="legend-items" id="legendEventItems"></div>
+      <div class="legend-section-title" id="legendHeritageTitle">OSM Heritage Sites</div>
+      <div class="legend-items" id="legendHeritageItems"></div>
+    </div>
+  </div>
 
   <!-- Bottom Timeline & Dual Slider (Bottom Left) -->
   <div class="year-slider-container">
@@ -930,6 +1148,9 @@
       document.write('<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"><\/script>');
     }
   </script>
+
+  <!-- OpenStreetMap heritage sites (generated by 2_extract_osm_heritage.py) -->
+  <script src="../data/osm_heritage.js" onerror="this.onerror=null;"></script>
 
   <script>
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1659493611&single=true&output=csv';
@@ -1055,6 +1276,407 @@
         disableClusteringAtZoom: CONSISTENT_EVENT_ZOOM
       });
       map.addLayer(markers);
+    }
+
+    // OpenStreetMap Heritage Layer
+    const HERITAGE_STATE_KEY = 'bMMC_nz_history_osm_heritage';
+    const HERITAGE_COLORS = {
+      memorial: '#e11d48', military: '#dc2626', maori: '#a16207', maritime: '#0284c7',
+      mining: '#57534e', transport: '#ea580c', religious: '#9333ea', cemetery: '#475569',
+      building: '#16a34a', ruins: '#b45309', marker: '#0d9488', other: '#64748b'
+    };
+    const OSM_TYPE_PATH = { n: 'node', w: 'way', r: 'relation' };
+
+    let heritageLayer = null;
+    let heritageItems = [];
+    let heritageCategories = [];
+    let heritageRefreshTimer = null;
+    let heritageState = { enabled: true, useTimeline: true, hideUndated: false, hiddenCats: [] };
+
+    function loadHeritageState() {
+      try {
+        const raw = localStorage.getItem(HERITAGE_STATE_KEY);
+        if (raw) heritageState = Object.assign(heritageState, JSON.parse(raw));
+      } catch (e) {}
+    }
+
+    function saveHeritageState() {
+      try { localStorage.setItem(HERITAGE_STATE_KEY, JSON.stringify(heritageState)); } catch (e) {}
+    }
+
+    function prettyOsmValue(val) {
+      if (!val) return '';
+      const s = String(val).replace(/_/g, ' ');
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function buildHeritagePopup(it) {
+      const cat = heritageCategories[it.c] || { label: 'Heritage', key: 'other' };
+      const typeLabel = prettyOsmValue(it.t === 'yes' ? 'Historic site' : it.t);
+      const name = it.n || typeLabel || 'Heritage site';
+      const yearLabel = it.y ? `${it.ya ? 'c. ' : ''}${it.y}` : 'Undated';
+      const subtype = it.mem || it.st || it.arch;
+
+      const links = [];
+      const osmPath = OSM_TYPE_PATH[it.id.charAt(0)];
+      if (osmPath) links.push([`https://www.openstreetmap.org/${osmPath}/${it.id.slice(1)}`, '🗺️ View on OpenStreetMap']);
+      if (it.wp) {
+        const m = String(it.wp).match(/^([a-z-]{2,12}):(.+)$/i);
+        const lang = m ? m[1] : 'en';
+        const title = m ? m[2] : it.wp;
+        links.push([`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`, '📖 Wikipedia']);
+      }
+      if (it.wd && /^Q\d+$/.test(it.wd)) links.push([`https://www.wikidata.org/wiki/${it.wd}`, '🔗 Wikidata']);
+      if (it.hnz && /^\d+$/.test(it.hnz)) links.push([`https://www.heritage.org.nz/list-details/${it.hnz}/`, '🏛️ Heritage NZ List #' + it.hnz]);
+      if (it.web && /^https?:\/\//i.test(it.web)) links.push([it.web, '🌐 Website']);
+
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(name + ' New Zealand history')}`;
+
+      return `
+        <div class="history-card">
+          <div style="padding: 10px 12px 0; display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="category-pill" style="color:${HERITAGE_COLORS[cat.key] || '#38bdf8'}; background:#f8fafc; border:1px solid currentColor;">${escapeHTML(cat.label)}</span>
+            <span class="date-pill" style="background:${it.y ? '#7c3aed' : '#94a3b8'};">${escapeHTML(yearLabel)}</span>
+          </div>
+          <div class="history-card-body">
+            <h3>${escapeHTML(name)}</h3>
+            ${it.nmi && it.nmi !== it.n ? `<div class="history-card-meta"><span>🌿</span><span>${escapeHTML(it.nmi)}</span></div>` : ''}
+            <p class="heritage-popup-row"><strong>Type:</strong> ${escapeHTML(typeLabel)}${subtype ? ' · ' + escapeHTML(prettyOsmValue(subtype)) : ''}</p>
+            ${it.sd ? `<p class="heritage-popup-row"><strong>start_date:</strong> ${escapeHTML(it.sd)}</p>` : ''}
+            ${!it.sd && it.yk ? `<p class="heritage-popup-row"><strong>${escapeHTML(it.yk)}:</strong> ${escapeHTML(it.y)}</p>` : ''}
+            ${it.desc ? `<p class="history-card-desc">${escapeHTML(it.desc)}</p>` : ''}
+            ${it.ins ? `<p class="history-card-desc heritage-inscription">“${escapeHTML(it.ins)}”</p>` : ''}
+            <div class="history-card-footer">
+              <a href="${googleUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai"><span>✨</span> Ask Google AI Overview ↗</a>
+              ${links.map(([href, label]) => `<a href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" class="btn-source-archive">${escapeHTML(label)} ↗</a>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHeritageCategoryList() {
+      const list = document.getElementById('heritageCatList');
+      if (!list) return;
+      const hidden = new Set(heritageState.hiddenCats);
+      list.innerHTML = heritageCategories.filter(c => c.count > 0).map(c => `
+        <label class="heritage-cat-row">
+          <input type="checkbox" data-cat="${escapeHTML(c.key)}" ${hidden.has(c.key) ? '' : 'checked'}>
+          <span class="heritage-swatch" style="background:${HERITAGE_COLORS[c.key] || '#64748b'}"></span>
+          <span class="heritage-cat-label">${escapeHTML(c.label)}</span>
+          <span class="heritage-cat-count">${c.count}</span>
+        </label>
+      `).join('');
+      list.querySelectorAll('input[data-cat]').forEach(input => {
+        input.addEventListener('change', () => {
+          const set = new Set(heritageState.hiddenCats);
+          if (input.checked) set.delete(input.dataset.cat); else set.add(input.dataset.cat);
+          heritageState.hiddenCats = Array.from(set);
+          saveHeritageState();
+          refreshHeritageLayer();
+        });
+      });
+    }
+
+    function syncHeritageControls() {
+      document.getElementById('chkHeritageEnabled').checked = heritageState.enabled;
+      document.getElementById('chkHeritageTimeline').checked = heritageState.useTimeline;
+      document.getElementById('chkHeritageHideUndated').checked = heritageState.hideUndated;
+    }
+
+    const HERITAGE_GEOJSON_URL = 'https://dl.dropboxusercontent.com/scl/fi/j2l8jmov3wjhx5a5kmkmr/osm_heritage.geojson?rlkey=fan00dpy9vc9gl0p5b2vheirg&st=ked3wx2v&raw=1';
+    // Must match the CATEGORIES order in 2_extract_osm_heritage.py
+    const HERITAGE_CATEGORY_KEYS = ['memorial', 'military', 'maori', 'maritime', 'mining', 'transport',
+      'religious', 'cemetery', 'building', 'ruins', 'marker', 'other'];
+
+    function heritageFromGeoJSON(gj, sourceLabel) {
+      if (!gj || !Array.isArray(gj.features) || gj.features.length === 0) return null;
+      const labels = {};
+      const counts = {};
+      const items = [];
+      gj.features.forEach(f => {
+        const p = f.properties || {};
+        const coords = f.geometry && f.geometry.coordinates;
+        if (!coords || typeof p.c !== 'number') return;
+        if (p.category) labels[p.c] = p.category;
+        const it = Object.assign({}, p, { la: coords[1], lo: coords[0] });
+        delete it.category;
+        counts[it.c] = (counts[it.c] || 0) + 1;
+        items.push(it);
+      });
+      const categories = (Array.isArray(gj.categories) ? gj.categories : HERITAGE_CATEGORY_KEYS.map((key, i) => ({ key, label: labels[i] || prettyOsmValue(key) })))
+        .map((c, i) => Object.assign({}, c, { count: counts[i] || 0 }));
+      return { generated: gj.generated, source: gj.source || sourceLabel, categories, items };
+    }
+
+    async function fetchHeritageGeoJSON(url, sourceLabel) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) return null;
+        return heritageFromGeoJSON(JSON.parse(await res.text()), sourceLabel);
+      } catch (e) {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function loadHeritageData() {
+      const local = window.OSM_HERITAGE && Array.isArray(window.OSM_HERITAGE.items) && window.OSM_HERITAGE.items.length ? window.OSM_HERITAGE : null;
+      if (local && location.protocol === 'file:') return local;
+      return (await fetchHeritageGeoJSON(HERITAGE_GEOJSON_URL, 'Dropbox osm_heritage.geojson'))
+        || local
+        || (await fetchHeritageGeoJSON('../data/osm_heritage.geojson', 'osm_heritage.geojson'));
+    }
+
+    async function initHeritageLayer() {
+      const btn = document.getElementById('btnHeritageToggle');
+      const card = document.getElementById('heritageCard');
+
+      btn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        card?.classList.toggle('show');
+      });
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.heritage-switcher-container')) card?.classList.remove('show');
+      });
+
+      document.getElementById('heritageCountBadge').textContent = '…';
+      const data = await loadHeritageData();
+
+      if (!data || !Array.isArray(data.items) || data.items.length === 0) {
+        document.getElementById('heritageCountBadge').textContent = '–';
+        document.getElementById('heritageFoot').textContent = 'Heritage data could not be loaded (Dropbox or data/osm_heritage.js). Run 2_extract_osm_heritage.py to create it.';
+        document.getElementById('chkHeritageEnabled').disabled = true;
+        return;
+      }
+
+      loadHeritageState();
+      heritageCategories = data.categories || [];
+      heritageItems = data.items;
+
+      const renderer = L.canvas({ padding: 0.5 });
+      heritageLayer = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 50,
+        showCoverageOnHover: false,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 15,
+        iconCreateFunction: cluster => L.divIcon({
+          html: `<div><span>${cluster.getChildCount()}</span></div>`,
+          className: 'marker-cluster osm-heritage-cluster',
+          iconSize: L.point(40, 40)
+        })
+      });
+
+      heritageItems.forEach(it => {
+        const cat = heritageCategories[it.c] || {};
+        it._catKey = cat.key || 'other';
+        it._hay = `${it.n || ''} ${it.nmi || ''} ${it.t || ''} ${it.mem || ''} ${it.ins || ''} ${it.desc || ''} ${cat.label || ''} ${it.y || ''}`.toLowerCase();
+        const marker = L.circleMarker([it.la, it.lo], {
+          renderer,
+          radius: 6,
+          color: '#ffffff',
+          weight: 1.5,
+          fillColor: HERITAGE_COLORS[it._catKey] || '#64748b',
+          fillOpacity: 0.9,
+          bubblingMouseEvents: false
+        });
+        marker.bindTooltip(escapeHTML(it.n || prettyOsmValue(it.t)), { direction: 'top', offset: [0, -6] });
+        marker.bindPopup(() => buildHeritagePopup(it), { maxWidth: 320, autoPan: true });
+        it._marker = marker;
+      });
+
+      const generated = data.generated ? String(data.generated).slice(0, 10) : '';
+      document.getElementById('heritageFoot').innerHTML =
+        `${heritageItems.length.toLocaleString()} sites from <strong>${escapeHTML(data.source || 'OpenStreetMap')}</strong>${generated ? ' (extracted ' + escapeHTML(generated) + ')' : ''}. ` +
+        `Only ${heritageItems.filter(i => i.y).length.toLocaleString()} have a start_date. Data &copy; OpenStreetMap contributors (ODbL).`;
+      map.attributionControl.addAttribution('Heritage sites &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors');
+
+      syncHeritageControls();
+      renderHeritageCategoryList();
+
+      document.getElementById('chkHeritageEnabled').addEventListener('change', (e) => {
+        heritageState.enabled = e.target.checked; saveHeritageState(); refreshHeritageLayer();
+      });
+      document.getElementById('chkHeritageTimeline').addEventListener('change', (e) => {
+        heritageState.useTimeline = e.target.checked; saveHeritageState(); refreshHeritageLayer();
+      });
+      document.getElementById('chkHeritageHideUndated').addEventListener('change', (e) => {
+        heritageState.hideUndated = e.target.checked; saveHeritageState(); refreshHeritageLayer();
+      });
+      document.getElementById('btnHeritageAll').addEventListener('click', () => {
+        heritageState.hiddenCats = []; saveHeritageState(); renderHeritageCategoryList(); refreshHeritageLayer();
+      });
+      document.getElementById('btnHeritageNone').addEventListener('click', () => {
+        heritageState.hiddenCats = heritageCategories.map(c => c.key); saveHeritageState(); renderHeritageCategoryList(); refreshHeritageLayer();
+      });
+
+      renderHistoryLegend();
+      refreshHeritageLayer();
+    }
+
+    function refreshHeritageLayer() {
+      if (!heritageLayer) return;
+      updateLegendActiveStates();
+      const badge = document.getElementById('heritageCountBadge');
+
+      if (!heritageState.enabled || isSavedFilterActive) {
+        if (map.hasLayer(heritageLayer)) map.removeLayer(heritageLayer);
+        if (badge) badge.textContent = heritageState.enabled ? '0' : 'off';
+        return;
+      }
+
+      const minVal = parseInt(document.getElementById('minYearSlider').value, 10);
+      const maxVal = parseInt(document.getElementById('maxYearSlider').value, 10);
+      const lo = Math.min(minVal, maxVal);
+      const hi = Math.max(minVal, maxVal);
+      const openLow = lo <= globalMinYear;
+      const openHigh = hi >= globalMaxYear;
+      const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
+      const hidden = new Set(heritageState.hiddenCats);
+
+      const visible = [];
+      for (const it of heritageItems) {
+        if (hidden.has(it._catKey)) continue;
+        if (it.y) {
+          if (heritageState.useTimeline && ((!openLow && it.y < lo) || (!openHigh && it.y > hi))) continue;
+        } else if (heritageState.hideUndated) {
+          continue;
+        }
+        if (search && !it._hay.includes(search)) continue;
+        visible.push(it._marker);
+      }
+
+      heritageLayer.clearLayers();
+      heritageLayer.addLayers(visible);
+      if (!map.hasLayer(heritageLayer)) map.addLayer(heritageLayer);
+      if (badge) badge.textContent = visible.length.toLocaleString();
+    }
+
+    function scheduleHeritageRefresh() {
+      clearTimeout(heritageRefreshTimer);
+      heritageRefreshTimer = setTimeout(refreshHeritageLayer, 120);
+    }
+
+    // Interactive History Key
+    const EVENT_GROUPS = [
+      { key: 'cat-vessel',   label: 'Ships & Vessels',          icon: '🚢', color: '#0284c7', bg: 'rgba(224,242,254,0.95)' },
+      { key: 'cat-war',      label: 'Wars & Battles',           icon: '⚔️', color: '#dc2626', bg: 'rgba(254,226,226,0.95)' },
+      { key: 'cat-disaster', label: 'Disasters',                icon: '🌋', color: '#ea580c', bg: 'rgba(255,237,213,0.95)' },
+      { key: 'cat-rights',   label: 'Rights, Treaties & Protest', icon: '✊', color: '#9333ea', bg: 'rgba(243,232,255,0.95)' },
+      { key: 'cat-general',  label: 'General History',          icon: '📍', color: '#16a34a', bg: 'rgba(220,252,231,0.95)' }
+    ];
+    const HIDDEN_EVENT_GROUPS_KEY = 'bMMC_nz_history_hidden_event_groups';
+    let hiddenEventGroups = new Set();
+
+    try {
+      const raw = localStorage.getItem(HIDDEN_EVENT_GROUPS_KEY);
+      if (raw) hiddenEventGroups = new Set(JSON.parse(raw));
+    } catch (e) {}
+
+    function renderHistoryLegend() {
+      const eventBox = document.getElementById('legendEventItems');
+      const counts = {};
+      allEvents.forEach(ev => {
+        const k = getCategoryClass(ev.category);
+        counts[k] = (counts[k] || 0) + 1;
+      });
+      if (eventBox) {
+        eventBox.innerHTML = EVENT_GROUPS.map(g => `
+          <div class="legend-item" data-event-group="${g.key}" title="Toggle ${escapeHTML(g.label)}">
+            <span class="legend-pin-symbol" style="background:${g.bg}; border-color:${g.color};">${g.icon}</span>
+            <span class="legend-item-label">${escapeHTML(g.label)}</span>
+            <span class="legend-item-count">${counts[g.key] || 0}</span>
+          </div>
+        `).join('');
+      }
+
+      const heritageBox = document.getElementById('legendHeritageItems');
+      const hasHeritage = heritageItems.length > 0;
+      document.getElementById('legendHeritageTitle').style.display = hasHeritage ? '' : 'none';
+      if (heritageBox) {
+        heritageBox.innerHTML = !hasHeritage ? '' : `
+          <div class="legend-item" data-heritage-master="1" title="Toggle all OSM heritage sites">
+            <span class="legend-pin-symbol" style="background:rgba(237,233,254,0.95); border-color:#7c3aed;">🏛️</span>
+            <span class="legend-item-label">All Heritage Sites</span>
+            <span class="legend-item-count">${heritageItems.length.toLocaleString()}</span>
+          </div>
+          ${heritageCategories.filter(c => c.count > 0).map(c => `
+            <div class="legend-item legend-sub" data-heritage-cat="${escapeHTML(c.key)}" title="Toggle ${escapeHTML(c.label)}">
+              <span class="legend-dot" style="background:${HERITAGE_COLORS[c.key] || '#64748b'}"></span>
+              <span class="legend-item-label">${escapeHTML(c.label)}</span>
+              <span class="legend-item-count">${c.count.toLocaleString()}</span>
+            </div>
+          `).join('')}
+        `;
+      }
+      updateLegendActiveStates();
+    }
+
+    function updateLegendActiveStates() {
+      document.querySelectorAll('#historyLegendCard [data-event-group]').forEach(item => {
+        item.classList.toggle('layer-muted', hiddenEventGroups.has(item.dataset.eventGroup));
+      });
+      const hiddenCats = new Set(heritageState.hiddenCats);
+      document.querySelectorAll('#historyLegendCard [data-heritage-master]').forEach(item => {
+        item.classList.toggle('layer-muted', !heritageState.enabled);
+      });
+      document.querySelectorAll('#historyLegendCard [data-heritage-cat]').forEach(item => {
+        item.classList.toggle('layer-muted', !heritageState.enabled || hiddenCats.has(item.dataset.heritageCat));
+      });
+    }
+
+    function initHistoryLegend() {
+      const card = document.getElementById('historyLegendCard');
+      const btnOpen = document.getElementById('btnOpenLegend');
+
+      document.getElementById('btnCloseLegend')?.addEventListener('click', () => {
+        card.style.display = 'none';
+        btnOpen.style.display = 'inline-flex';
+      });
+      btnOpen?.addEventListener('click', () => {
+        btnOpen.style.display = 'none';
+        card.style.display = 'flex';
+      });
+
+      card?.addEventListener('click', (e) => {
+        const item = e.target.closest('.legend-item');
+        if (!item) return;
+
+        if (item.dataset.eventGroup) {
+          const key = item.dataset.eventGroup;
+          if (hiddenEventGroups.has(key)) hiddenEventGroups.delete(key); else hiddenEventGroups.add(key);
+          try { localStorage.setItem(HIDDEN_EVENT_GROUPS_KEY, JSON.stringify(Array.from(hiddenEventGroups))); } catch (err) {}
+          updateLegendActiveStates();
+          filterEvents();
+        } else if (item.dataset.heritageMaster) {
+          heritageState.enabled = !heritageState.enabled;
+          saveHeritageState();
+          syncHeritageControls();
+          refreshHeritageLayer();
+        } else if (item.dataset.heritageCat) {
+          const key = item.dataset.heritageCat;
+          const set = new Set(heritageState.hiddenCats);
+          if (!heritageState.enabled) {
+            heritageState.enabled = true;
+            set.delete(key);
+            syncHeritageControls();
+          } else if (set.has(key)) {
+            set.delete(key);
+          } else {
+            set.add(key);
+          }
+          heritageState.hiddenCats = Array.from(set);
+          saveHeritageState();
+          renderHeritageCategoryList();
+          refreshHeritageLayer();
+        }
+      });
+
+      renderHistoryLegend();
     }
 
     
@@ -1449,6 +2071,7 @@
       const filtered = allEvents.filter(ev => {
         const savedSet = getSavedSet();
         if (isSavedFilterActive && !savedSet.has(ev._uid)) return false;
+        if (hiddenEventGroups.has(getCategoryClass(ev.category))) return false;
 
         const inYear = ev.year >= minVal && ev.year <= maxVal;
         if (!inYear) return false;
@@ -1461,6 +2084,7 @@
       });
 
       renderDataset(filtered);
+      scheduleHeritageRefresh();
     }
 
     function toggleTimelinePlayback() {
@@ -1515,6 +2139,7 @@
       minSlider.value = globalMinYear;
       maxSlider.value = globalMaxYear;
 
+      renderHistoryLegend();
       filterEvents();
     }
 
@@ -1625,6 +2250,8 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
+      initHeritageLayer();
+      initHistoryLegend();
 
       document.getElementById('minYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('maxYearSlider')?.addEventListener('input', filterEvents);
