@@ -1,8 +1,7 @@
 /* ==========================================================================
    BMMC Showcase — Unified Stylesheet (styles.css)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
+/* Local fonts loaded via vendor/fonts/fonts.css from each page */
 :root {
   --bg-page-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
   --text-main: #0f172a;

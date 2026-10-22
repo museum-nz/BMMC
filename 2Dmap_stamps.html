@@ -571,6 +571,9 @@
         <button id="btnLayerNatGeo" class="layer-option-btn" title="National Geographic Cartography">
           <span>📜</span> <span>NatGeo</span>
         </button>
+        <button id="btnLayerOffline" class="layer-option-btn" title="Offline NZ vector map (used automatically when online tiles fail)">
+          <span>💾</span><span>Offline</span>
+        </button>
         <button id="btnLayerVoyager" class="layer-option-btn" title="CARTO Voyager Basemap">
           <span>🗺️</span> <span>Voyager</span>
         </button>
@@ -628,6 +631,8 @@
   </script>
 
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <script src="../vendor/leaflet/protomaps-leaflet.js" onerror="this.onerror=null;"></script>
+  <script src="../data/nz_places.js" onerror="this.onerror=null;this.src='data/nz_places.js'"></script>
   <script src="shared-map.js"></script>
 
   <script>
@@ -644,57 +649,7 @@
     ];
     const SVG_NO_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2275%22%20height%3D%2275%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%2275%22%20height%3D%2275%22%2F%3E%3Ctext%20fill%3D%22%23059669%22%20font-size%3D%2210%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENZ%20Stamp%3C%2Ftext%3E%3C%2Fsvg%3E';
 
-    const NZ_GEO_LOOKUP = {
-      'auckland': { lat: -36.8485, lng: 174.7633, label: 'Auckland' },
-      'wellington': { lat: -41.2865, lng: 174.7762, label: 'Wellington' },
-      'christchurch': { lat: -43.5321, lng: 172.6362, label: 'Christchurch' },
-      'dunedin': { lat: -45.8788, lng: 170.5028, label: 'Dunedin' },
-      'otago': { lat: -45.4000, lng: 170.0000, label: 'Otago' },
-      'canterbury': { lat: -43.5000, lng: 171.5000, label: 'Canterbury' },
-      'waikato': { lat: -37.7870, lng: 175.2793, label: 'Waikato (Hamilton)' },
-      'hamilton': { lat: -37.7870, lng: 175.2793, label: 'Hamilton' },
-      'rotorua': { lat: -38.1368, lng: 176.2497, label: 'Rotorua' },
-      'taupo': { lat: -38.6857, lng: 176.0702, label: 'Lake Taupō' },
-      'napier': { lat: -39.4928, lng: 176.9120, label: 'Napier' },
-      'hastings': { lat: -39.6394, lng: 176.8441, label: 'Hastings' },
-      'hawke\'s bay': { lat: -39.5000, lng: 176.8000, label: 'Hawke\'s Bay' },
-      'gisborne': { lat: -38.6623, lng: 178.0176, label: 'Gisborne / East Coast' },
-      'taranaki': { lat: -39.2974, lng: 174.0639, label: 'Taranaki / Mt Egmont' },
-      'egmont': { lat: -39.2974, lng: 174.0639, label: 'Mount Taranaki / Egmont' },
-      'new plymouth': { lat: -39.0556, lng: 174.0752, label: 'New Plymouth' },
-      'mt cook': { lat: -43.5950, lng: 170.1418, label: 'Aoraki / Mount Cook' },
-      'aoraki': { lat: -43.5950, lng: 170.1418, label: 'Aoraki / Mount Cook' },
-      'bay of islands': { lat: -35.2500, lng: 174.1500, label: 'Bay of Islands (Waitangi)' },
-      'waitangi': { lat: -35.2650, lng: 174.0850, label: 'Waitangi' },
-      'northland': { lat: -35.5000, lng: 173.9000, label: 'Northland' },
-      'whangarei': { lat: -35.7251, lng: 174.3237, label: 'Whangārei' },
-      'nelson': { lat: -41.2706, lng: 173.2840, label: 'Nelson' },
-      'marlborough': { lat: -41.5000, lng: 173.8000, label: 'Marlborough' },
-      'blenheim': { lat: -41.5134, lng: 173.9528, label: 'Blenheim' },
-      'southland': { lat: -46.0000, lng: 168.0000, label: 'Southland' },
-      'invercargill': { lat: -46.4132, lng: 168.3538, label: 'Invercargill' },
-      'fiordland': { lat: -45.4167, lng: 167.7167, label: 'Fiordland / Milford Sound' },
-      'milford': { lat: -44.6715, lng: 167.9256, label: 'Milford Sound / Mitre Peak' },
-      'mitre peak': { lat: -44.6715, lng: 167.9256, label: 'Mitre Peak' },
-      'queenstown': { lat: -45.0312, lng: 168.6626, label: 'Queenstown / Wakatipu' },
-      'wanaka': { lat: -44.7000, lng: 169.1500, label: 'Lake Wānaka' },
-      'tongariro': { lat: -39.1300, lng: 175.6400, label: 'Tongariro / Ruapehu' },
-      'ruapehu': { lat: -39.2800, lng: 175.5600, label: 'Mount Ruapehu' },
-      'ross dependency': { lat: -77.8500, lng: 166.6667, label: 'Ross Dependency (Antarctica)' },
-      'antarctica': { lat: -77.8500, lng: 166.6667, label: 'Ross Dependency (Antarctica)' },
-      'chatham islands': { lat: -43.9537, lng: -176.5401, label: 'Chatham Islands' },
-      'stewart island': { lat: -46.9000, lng: 167.8500, label: 'Stewart Island / Rakiura' },
-      'rakiura': { lat: -46.9000, lng: 167.8500, label: 'Rakiura' },
-      'palmerston north': { lat: -40.3523, lng: 175.6082, label: 'Palmerston North / Manawatū' },
-      'manawatu': { lat: -40.3523, lng: 175.6082, label: 'Manawatū' },
-      'whanganui': { lat: -39.9301, lng: 175.0489, label: 'Whanganui' },
-      'tauranga': { lat: -37.6878, lng: 176.1651, label: 'Bay of Plenty (Tauranga)' },
-      'bay of plenty': { lat: -37.6878, lng: 176.1651, label: 'Bay of Plenty' },
-      'coromandel': { lat: -36.7500, lng: 175.5000, label: 'Coromandel Peninsula' },
-      'west coast': { lat: -42.4500, lng: 171.2100, label: 'West Coast' },
-      'greymouth': { lat: -42.4500, lng: 171.2100, label: 'Greymouth' },
-      'hokitika': { lat: -42.7167, lng: 170.9667, label: 'Hokitika' }
-    };
+    const NZ_GEO_LOOKUP = window.NZ_PLACES || {};
 
     const NZ_REGIONAL_NODES = [
       { lat: -36.8485, lng: 174.7633, label: 'Auckland Region' },
@@ -738,14 +693,24 @@
       natgeo: BMMCMap.tileLayer('natgeo'),
       voyager: BMMCMap.tileLayer('voyager')
     };
+    const offlineBasemap = BMMCMap.offlineLayer();
+    if (offlineBasemap) baseLayers.offline = offlineBasemap;
+    else document.getElementById('btnLayerOffline')?.remove();
 
-    const basemapSwitcher = BMMCMap.createBasemapSwitcher(map, baseLayers, { initial: 'google' });
-
-    function setBasemap(type) {
-      if (!basemapSwitcher.set(type)) return;
+    function highlightBasemapButton(type) {
       document.querySelectorAll('.layer-option-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
       });
+    }
+
+    const basemapSwitcher = BMMCMap.createBasemapSwitcher(map, baseLayers, {
+      initial: 'google',
+      onChange: (key) => highlightBasemapButton(key)
+    });
+
+    function setBasemap(type) {
+      if (!basemapSwitcher.set(type)) return;
+      highlightBasemapButton(basemapSwitcher.shown);
       document.getElementById('layerDropdownCard')?.classList.remove('show');
     }
 
@@ -1133,6 +1098,7 @@ const btnLayers = document.getElementById('btnLayersToggle');
       document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
       document.getElementById('btnLayerNatGeo')?.addEventListener('click', () => setBasemap('natgeo'));
       document.getElementById('btnLayerVoyager')?.addEventListener('click', () => setBasemap('voyager'));
+      document.getElementById('btnLayerOffline')?.addEventListener('click', () => setBasemap('offline'));
 
       document.addEventListener('click', (e) => {
         if (!e.target.closest('.layer-switcher-container')) layerCard?.classList.remove('show');

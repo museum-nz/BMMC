@@ -1000,6 +1000,7 @@
             <button id="btnLayerTopo" class="layer-option-btn"><span>⛰️</span><span>Topo</span></button>
             <button id="btnLayerSat" class="layer-option-btn"><span>🛰️</span><span>Satellite</span></button>
             <button id="btnLayerStreet" class="layer-option-btn"><span>📍</span><span>Street</span></button>
+            <button id="btnLayerOffline" class="layer-option-btn" title="Offline NZ vector map (used automatically when online tiles fail)"><span>💾</span><span>Offline</span></button>
           </div>
 
           <div class="layer-section-divider"></div>
@@ -1169,6 +1170,7 @@
     }
   </script>
 
+  <script src="../vendor/leaflet/protomaps-leaflet.js" onerror="this.onerror=null;"></script>
   <script src="shared-map.js"></script>
 
   <script>
@@ -1322,12 +1324,20 @@
       sat: BMMCMap.tileLayer('imagery', { maxNativeZoom: 18, maxZoom: 19 }),
       street: BMMCMap.tileLayer('street')
     };
+    const offlineBasemap = BMMCMap.offlineLayer();
+    if (offlineBasemap) basemaps.offline = offlineBasemap;
+    else document.getElementById('btnLayerOffline')?.remove();
+
+    function highlightBasemapButton(type) {
+      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => {
+        if (!btn.id.startsWith('btnLayer')) return;
+        btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
+      });
+    }
 
     function setBasemap(type) {
       if (basemapSwitcher) basemapSwitcher.set(type);
-      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
-      });
+      highlightBasemapButton(basemapSwitcher ? basemapSwitcher.shown : type);
     }
 
     function getHistoricNetWeight(zoom) {
@@ -1923,7 +1933,8 @@
       BMMCMap.fitPopupsToScreen(map);
       basemapSwitcher = BMMCMap.createBasemapSwitcher(map, basemaps, {
         initial: 'natgeo',
-        autoSwitch: { from: 'natgeo', to: 'topo', aboveZoom: 12 }
+        autoSwitch: { from: 'natgeo', to: 'topo', aboveZoom: 12 },
+        onChange: (key) => highlightBasemapButton(key)
       });
 
       map.createPane('activeRailwaysPane');
@@ -2399,6 +2410,7 @@
         });
 
         const m = L.marker([ev.latitude, ev.longitude], { icon: icon });
+        ev._marker = m;
         m.bindPopup(`
           <div class="history-card" style="padding:12px;">
             <h3 style="margin:0 0 4px 0;">${escapeHTML(ev.headline)}</h3>
@@ -2406,11 +2418,48 @@
             <p class="history-card-desc">${escapeHTML(ev.details)}</p>
           </div>
         `, { maxWidth: 320 });
+        if (window.BMMCMap && BMMCMap.mountRelatedOnPopup) {
+          BMMCMap.mountRelatedOnPopup(m, {
+            lat: ev.latitude, lng: ev.longitude, year: ev.year, id: ev.id || ev._uid
+          });
+        }
         return m;
       });
 
       markers.addLayers(markerList);
       document.getElementById('itemCountBadge').textContent = `${sorted.length} milestones`;
+    }
+
+    function focusFromUrl() {
+      const focusId = new URLSearchParams(window.location.search).get('focus');
+      if (!focusId || !allEvents.length) return;
+      const ev = allEvents.find(e => String(e.id) === focusId || String(e._uid) === focusId);
+      if (!ev) return;
+
+      const minSlider = document.getElementById('minYearSlider');
+      const maxSlider = document.getElementById('maxYearSlider');
+      if (minSlider && maxSlider && ev.year) {
+        minSlider.value = Math.min(parseInt(minSlider.value, 10) || ev.year, ev.year);
+        maxSlider.value = Math.max(parseInt(maxSlider.value, 10) || ev.year, ev.year);
+        filterEvents();
+      }
+
+      const openFocused = () => {
+        if (!ev._marker) return false;
+        if (window.BMMCMap && BMMCMap.focusMarkerInCluster) {
+          BMMCMap.focusMarkerInCluster(map, markers, ev._marker, 12);
+        } else if (markers && markers.zoomToShowLayer) {
+          markers.zoomToShowLayer(ev._marker, () => {
+            map.setView([ev.latitude, ev.longitude], 12, { animate: true });
+            ev._marker.openPopup();
+          });
+        } else {
+          map.setView([ev.latitude, ev.longitude], 12, { animate: true });
+          ev._marker.openPopup();
+        }
+        return true;
+      };
+      setTimeout(() => { if (!openFocused()) setTimeout(openFocused, 400); }, 250);
     }
 
     function toggleTimelinePlayback() {
@@ -2484,18 +2533,23 @@
 
     async function loadDataset() {
       const cached = await DataCache.get('trains_milestones_csv');
-      if (cached && parseCSVData(cached)) return;
+      if (cached && parseCSVData(cached)) {
+        focusFromUrl();
+        return;
+      }
 
       const candidates = [
+        '../data/trains.csv',
+        './data/trains.csv',
+        'data/trains.csv',
         LIVE_CSV_URL,
         `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
-        'data/trains.csv',
-        './data/trains.csv'
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`
       ];
 
       const text = await BMMCMap.fetchFirstText(candidates, { accept: parseCSVData });
       if (text) DataCache.set('trains_milestones_csv', text);
+      focusFromUrl();
     }
 
     function toggleRailLayerByKey(key) {
@@ -2564,6 +2618,7 @@
       document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
       document.getElementById('btnLayerSat')?.addEventListener('click', () => setBasemap('sat'));
       document.getElementById('btnLayerStreet')?.addEventListener('click', () => setBasemap('street'));
+      document.getElementById('btnLayerOffline')?.addEventListener('click', () => setBasemap('offline'));
 
       const searchInput = document.getElementById('mapSearchInput');
       const clearSearchBtn = document.getElementById('clearMapSearch');

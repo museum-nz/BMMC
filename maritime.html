@@ -20,49 +20,23 @@
     })();
   </script>
 
-  <!-- Preconnect for Performance -->
+  <!-- Preconnect for Tile Performance -->
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin="">
   <link rel="preconnect" href="https://t1.openseamap.org" crossorigin="">
   <link rel="preconnect" href="https://tiles.openseamap.org" crossorigin="">
   <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin="">
-  <link rel="preconnect" href="https://unpkg.com" crossorigin="">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 
   <!-- Inline Ship Favicon -->
   <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;⚓&lt;/text&gt;&lt;/svg&gt;">
 
-  <!-- Tailwind CSS Engine -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) {
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f0f9ff',
-                100: '#e0f2fe',
-                500: '#0284c7',
-                600: '#0369a1',
-                700: '#075985',
-              }
-            }
-          }
-        }
-      };
-    }
-  </script>
+  <!-- Tailwind & Local Fonts -->
+  <link rel="stylesheet" href="../vendor/tailwind.css" onerror="this.onerror=null;this.href='vendor/tailwind.css'">
+  <link rel="stylesheet" href="../vendor/fonts/fonts.css" onerror="this.onerror=null;this.href='vendor/fonts/fonts.css'">
 
-  <!-- Leaflet CSS & MarkerCluster -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
-
-  <!-- PapaParse for CSV Data Ingestion -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Leaflet CSS & MarkerCluster (CDN with vendor fallback) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='../vendor/leaflet/leaflet.css';">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" onerror="this.onerror=null;this.href='../vendor/leaflet/MarkerCluster.css';">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" onerror="this.onerror=null;this.href='../vendor/leaflet/MarkerCluster.Default.css';">
 
   <!-- Master Unified Stylesheet & Offline Media Adapter -->
   <link rel="stylesheet" href="styles.css" onerror="this.onerror=null;">
@@ -302,6 +276,9 @@
               </button>
               <button onclick="setBaseMap('ocean')" id="btnBaseOcean" class="px-2 py-0.5 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-sky-600 transition cursor-pointer whitespace-nowrap">
                 Ocean
+              </button>
+              <button onclick="setBaseMap('offline')" id="btnBaseOffline" title="Offline NZ vector map (used automatically when online tiles fail)" class="px-2 py-0.5 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-sky-600 transition cursor-pointer whitespace-nowrap">
+                Offline
               </button>
             </div>
 
@@ -614,9 +591,29 @@
   <!-- Universal BMMC Navigation Drawer Script -->
   <script src="shared-nav.js"></script>
 
-  <!-- Leaflet & MarkerCluster JS from CDN -->
+  <!-- Leaflet, MarkerCluster & PapaParse (CDN with vendor fallback) -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    if (!window.L) {
+      document.write('<script src="../vendor/leaflet/leaflet.js"><\/script>');
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script>
+    if (!window.Papa) {
+      document.write('<script src="../vendor/papaparse.min.js"><\/script>');
+    }
+  </script>
+
   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script>
+    if (!window.L || !window.L.markerClusterGroup) {
+      document.write('<script src="../vendor/leaflet/markercluster.js"><\/script>');
+    }
+  </script>
+
+  <script src="../vendor/leaflet/protomaps-leaflet.js" onerror="this.onerror=null;"></script>
   <script src="shared-map.js"></script>
 
   <!-- Maritime Engine -->
@@ -745,11 +742,19 @@
       BMMCMap.addResetViewButton(map.zoomControl, resetMapExtent);
       BMMCMap.fitPopupsToScreen(map);
 
-      basemapSwitcher = BMMCMap.createBasemapSwitcher(map, {
+      const basemaps = {
         topo: BMMCMap.tileLayer('topo', { maxZoom: 18 }),
         satellite: BMMCMap.tileLayer('imagery'),
         ocean: BMMCMap.tileLayer('ocean')
-      }, { initial: 'topo' });
+      };
+      const offlineBasemap = BMMCMap.offlineLayer();
+      if (offlineBasemap) basemaps.offline = offlineBasemap;
+      else document.getElementById('btnBaseOffline')?.remove();
+
+      basemapSwitcher = BMMCMap.createBasemapSwitcher(map, basemaps, {
+        initial: 'topo',
+        onChange: (key) => updateBaseMapButtonsUI(key)
+      });
 
       const transparentTile = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
       openSeaMapLayer = L.tileLayer('https://t1.openseamap.org/seamark/{z}/{x}/{y}.png', {
@@ -793,15 +798,18 @@
     }
 
     function setBaseMap(type) {
-      if (!basemapSwitcher.set(type)) basemapSwitcher.set('topo');
-      updateBaseMapButtonsUI(basemapSwitcher.selected);
+      if (!basemapSwitcher || !basemapSwitcher.set(type)) {
+        if (basemapSwitcher) basemapSwitcher.set('topo');
+      }
+      updateBaseMapButtonsUI(basemapSwitcher ? basemapSwitcher.shown : type);
     }
 
     function updateBaseMapButtonsUI(selectedType) {
       const btns = {
         topo: document.getElementById('btnBaseTopo'),
         satellite: document.getElementById('btnBaseSatellite'),
-        ocean: document.getElementById('btnBaseOcean')
+        ocean: document.getElementById('btnBaseOcean'),
+        offline: document.getElementById('btnBaseOffline')
       };
 
       Object.entries(btns).forEach(([type, el]) => {
@@ -985,6 +993,12 @@
         renderMapMarkers();
         updateFilterCounts();
         resetMapExtent();
+
+        const focusId = new URLSearchParams(window.location.search).get('focus');
+        if (focusId) {
+          setTimeout(() => focusMapItem(focusId), 500);
+          setTimeout(() => focusMapItem(focusId), 1200);
+        }
       } catch (err) {
         console.error("Error loading maritime data:", err);
       } finally {
@@ -1112,6 +1126,12 @@
 
         const marker = L.marker([site.lat, site.lng], { icon: icon });
         marker.bindPopup(popupContent, { className: 'maritime-popup', maxWidth: 380 });
+        if (window.BMMCMap && BMMCMap.mountRelatedOnPopup) {
+          const yrNum = BMMCMap.parseYearNum(site.year || site.date);
+          BMMCMap.mountRelatedOnPopup(marker, {
+            lat: site.lat, lng: site.lng, year: isNaN(yrNum) ? null : yrNum, id: site.id
+          });
+        }
         markersLayer.addLayer(marker);
         markerInstances.set(site.id, marker);
       });

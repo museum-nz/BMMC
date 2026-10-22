@@ -1314,6 +1314,7 @@
             <button id="btnLayerNatGeo" class="layer-option-btn" title="National Geographic Topo"><span>📜</span><span>Hist</span></button>
             <button id="btnLayerTopo" class="layer-option-btn active" title="World Topographic Map"><span>⛰️</span><span>Topo</span></button>
             <button id="btnLayerSat" class="layer-option-btn" title="Satellite Imagery"><span>🛰️</span><span>Sat</span></button>
+            <button id="btnLayerOffline" class="layer-option-btn" title="Offline NZ vector map (used automatically when online tiles fail)"><span>💾</span><span>Offline</span></button>
           </div>
 
           <div class="layer-section-divider"></div>
@@ -1668,6 +1669,7 @@
       document.write('<script src="../vendor/leaflet/leaflet.js"><\/script>');
     }
   </script>
+  <script src="../vendor/leaflet/protomaps-leaflet.js" onerror="this.onerror=null;"></script>
   <script src="shared-map.js"></script>
 
   <script>
@@ -3438,33 +3440,31 @@
     // =========================================================================
     // BASEMAP MANAGEMENT
     // =========================================================================
+    let basemapSwitcher = null;
     const basemaps = {
-      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; National Geographic Society',
-        maxNativeZoom: 12,
-        maxZoom: 19
-      }),
-      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Topographic Survey',
-        maxNativeZoom: 18,
-        maxZoom: 19
-      }),
-      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Earthstar Geographics',
-        maxNativeZoom: 18,
-        maxZoom: 19
-      })
+      natgeo: BMMCMap.tileLayer('natgeo', { maxNativeZoom: 12, maxZoom: 19 }),
+      topo: BMMCMap.tileLayer('topo', { maxNativeZoom: 18, maxZoom: 19 }),
+      sat: BMMCMap.tileLayer('imagery', { maxNativeZoom: 18, maxZoom: 19 })
     };
+    const offlineBasemap = BMMCMap.offlineLayer();
+    if (offlineBasemap) basemaps.offline = offlineBasemap;
+    else document.getElementById('btnLayerOffline')?.remove();
+
+    function highlightBasemapButton(type) {
+      const key = type === 'natgeo' ? 'NatGeo' : type.charAt(0).toUpperCase() + type.slice(1);
+      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => {
+        if (!btn.id.startsWith('btnLayer')) return;
+        btn.classList.toggle('active', btn.id === `btnLayer${key}` || btn.id.toLowerCase() === `btnlayer${type.toLowerCase()}`);
+      });
+    }
 
     function setBasemap(type) {
-      Object.values(basemaps).forEach(l => {
-        if (map && map.hasLayer(l)) map.removeLayer(l);
-      });
-      if (map && basemaps[type]) basemaps[type].addTo(map);
-
-      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => btn.classList.remove('active'));
-      const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
-      if (activeBtn) activeBtn.classList.add('active');
+      if (basemapSwitcher) basemapSwitcher.set(type);
+      else if (map && basemaps[type]) {
+        Object.values(basemaps).forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+        basemaps[type].addTo(map);
+      }
+      highlightBasemapButton(basemapSwitcher ? basemapSwitcher.shown : type);
     }
 
     // =========================================================================
@@ -3507,7 +3507,10 @@
         });
       }
 
-      basemaps.topo.addTo(map);
+      basemapSwitcher = BMMCMap.createBasemapSwitcher(map, basemaps, {
+        initial: 'topo',
+        onChange: (key) => highlightBasemapButton(key)
+      });
 
       importedGpxGroup = L.geoJSON(null, {
         pane: 'pane_imported',
@@ -5532,6 +5535,7 @@
       document.getElementById('btnLayerNatGeo')?.addEventListener('click', () => setBasemap('natgeo'));
       document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
       document.getElementById('btnLayerSat')?.addEventListener('click', () => setBasemap('sat'));
+      document.getElementById('btnLayerOffline')?.addEventListener('click', () => setBasemap('offline'));
 
       const btnLayersToggle = document.getElementById('btnLayersToggle');
       const layerDropdownCard = document.getElementById('layerDropdownCard');

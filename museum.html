@@ -23,40 +23,13 @@
   <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://docs.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="../vendor/fonts/fonts.css" onerror="this.onerror=null;this.href='vendor/fonts/fonts.css'">
 
   <!-- Inline Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 
   <!-- Tailwind CSS Engine with Local & CDN Fallbacks -->
-  <script src="../vendor/tailwind.js" onerror="this.onerror=null;"></script>
-  <script src="vendor/tailwind.js" onerror="this.onerror=null;"></script>
-  <script>
-    if (!window.tailwind) {
-      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
-    }
-  </script>
-  <script>
-    if (window.tailwind) {
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f0f7ff',
-                100: '#e0effe',
-                500: '#2563eb',
-                600: '#1d4ed8',
-                700: '#1e40af',
-              }
-            }
-          }
-        }
-      };
-    }
-  </script>
+  <link rel="stylesheet" href="../vendor/tailwind.css" onerror="this.onerror=null;this.href='vendor/tailwind.css'">
 
   <!-- Master Unified Stylesheet -->
   <link rel="stylesheet" href="styles.css">

@@ -6,10 +6,7 @@
   
   <!-- Museum Tab Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../vendor/fonts/fonts.css" onerror="this.onerror=null;this.href='vendor/fonts/fonts.css'">
 
           <!-- Instant Theme Initializer (Defaults to Light Mode on First Start) -->
   <script>
@@ -281,6 +278,53 @@
     }
     .search-box input:focus { outline: none; width: 230px; border-color: var(--cyan); box-shadow: 0 0 16px var(--pulse-glow); }
     .search-icon { position: absolute; left: 10px; font-size: 12px; color: var(--muted); pointer-events: none; }
+    .search-results {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      width: min(420px, 92vw); max-height: min(62vh, 420px); overflow-y: auto;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(16px); z-index: 120; padding: 8px;
+    }
+    .search-results.show { display: block; }
+    .search-wing { margin-bottom: 8px; }
+    .search-wing-label {
+      font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--muted); padding: 4px 8px 2px;
+    }
+    .search-hit {
+      display: block; text-decoration: none; color: var(--text);
+      padding: 8px 10px; border-radius: 10px; transition: background 0.15s;
+    }
+    .search-hit:hover { background: var(--filter-active); }
+    .search-hit-title { font-size: 0.82rem; font-weight: 700; line-height: 1.3; }
+    .search-hit-meta { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .search-empty { padding: 14px 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
+
+    .on-this-day {
+      position: absolute; left: 16px; bottom: 18px; z-index: 20;
+      width: min(340px, calc(100vw - 32px));
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; box-shadow: var(--card-shadow);
+      backdrop-filter: blur(14px); padding: 12px 14px;
+    }
+    .on-this-day h2 {
+      margin: 0 0 8px; font-size: 0.78rem; font-weight: 800;
+      letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+    }
+    .on-this-day-list { display: grid; gap: 6px; max-height: 180px; overflow-y: auto; }
+    .on-this-day a {
+      display: block; text-decoration: none; color: var(--text);
+      font-size: 0.8rem; font-weight: 650; line-height: 1.35;
+      padding: 6px 8px; border-radius: 10px; background: var(--filter-bg);
+    }
+    .on-this-day a:hover { background: var(--filter-active); }
+    .on-this-day .otd-meta { display: block; font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 2px; }
+    .on-this-day .otd-note { font-size: 0.72rem; color: var(--muted); margin: 0 0 6px; }
+    @media (max-width: 720px) {
+      .on-this-day { left: 10px; right: 10px; width: auto; bottom: 10px; }
+      .search-box input { width: 140px; }
+      .search-box input:focus { width: 170px; }
+    }
 
     /* Interactive Stage */
     .stage-container {
@@ -588,13 +632,15 @@
 
     <!-- Right-aligned Actions -->
     <div class="hud-actions">
-      <!-- Surprise Roulette Button -->
+      <div class="search-box" id="hubSearchBox">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="search" id="hubSearchInput" placeholder="Search all wings…" autocomplete="off" aria-label="Search museum wings" />
+        <div class="search-results" id="hubSearchResults" role="listbox" aria-label="Search results"></div>
+      </div>
+
       <button class="surprise-btn" id="btnSurprise" title="Surprise Me (Artifact Roulette)">
         <span>🎲</span> <span>Surprise</span>
       </button>
-
-      <!-- Menu Button (Hard Right) -->
-      
     </div>
   </header>
 
@@ -618,9 +664,17 @@
 
       <div class="network-flank" id="rightFlank"></div>
     </div>
+
+    <aside class="on-this-day" id="onThisDayPanel" aria-label="On this day in New Zealand history">
+      <h2>On this day</h2>
+      <p class="otd-note" id="onThisDayNote">Loading…</p>
+      <div class="on-this-day-list" id="onThisDayList"></div>
+    </aside>
   </main>
 
   <!-- Load Navigation Script (Dynamic Source of Truth) -->
+  <script src="../vendor/fuse.min.js" onerror="this.onerror=null;this.src='vendor/fuse.min.js'"></script>
+  <script>if (typeof Fuse === 'undefined') { document.write('<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"><\/script>'); }</script>
   <script src="shared-nav.js"></script>
 
   <script>
@@ -893,7 +947,7 @@
 
       // Hotkeys
       window.addEventListener('keydown', (e) => {
-        if (e.key === ' ') {
+        if (e.key === ' ' && document.activeElement?.tagName !== 'INPUT') {
           e.preventDefault();
           triggerRoulette();
         }
@@ -903,6 +957,228 @@
       window.addEventListener('load', drawConduits);
       setTimeout(drawConduits, 100);
       setTimeout(drawConduits, 500);
+
+      // ==========================================
+      // Hub cross-wing search + On this day
+      // ==========================================
+      const WING_META = {
+        exhibit: { label: 'Museum', icon: '🏛️' },
+        stamp: { label: 'Stamps', icon: '📮' },
+        gallery: { label: 'Gallery', icon: '📷' },
+        transcript: { label: 'Oral history', icon: '🎙️' },
+        history: { label: 'NZ History', icon: '📜' },
+        trains: { label: 'Railways', icon: '🚂' },
+        maritime: { label: 'Maritime', icon: '⚓' },
+        heritage: { label: 'Heritage', icon: '🗿' }
+      };
+
+      function stripAccents(str) {
+        return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
+      function esc(str) {
+        return String(str || '').replace(/[&<>"']/g, m => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        }[m]));
+      }
+
+      function iconForWing(wing) {
+        if (WING_META[wing]) return WING_META[wing].icon;
+        try {
+          const branches = window.BMMC_BRANCHES || [];
+          for (const g of branches) {
+            for (const item of (g.items || [])) {
+              if ((item.href || '').includes(wing)) return item.icon || '📍';
+              for (const child of (item.children || [])) {
+                if ((child.href || '').includes(wing)) return child.icon || '📍';
+              }
+            }
+          }
+        } catch (e) {}
+        return '📍';
+      }
+
+      let searchIndex = null;
+      let fuse = null;
+
+      async function ensureSearchIndex() {
+        if (searchIndex && fuse) return searchIndex;
+        const jsonUrls = ['../data/search_index.json', 'data/search_index.json', './data/search_index.json'];
+        for (const url of jsonUrls) {
+          try {
+            const res = await fetch(url);
+            if (res.ok) {
+              const data = await res.json();
+              if (data && Array.isArray(data.entries)) { searchIndex = data; break; }
+            }
+          } catch (e) {}
+        }
+        if (!searchIndex || !Array.isArray(searchIndex.entries)) {
+          await new Promise((resolve) => {
+            const jsUrls = ['../data/search_index.js', 'data/search_index.js', './data/search_index.js'];
+            let i = 0;
+            const tryNext = () => {
+              if (i >= jsUrls.length) { searchIndex = { entries: [] }; resolve(); return; }
+              const s = document.createElement('script');
+              s.src = jsUrls[i++];
+              s.onload = () => { searchIndex = window.SEARCH_INDEX || { entries: [] }; resolve(); };
+              s.onerror = tryNext;
+              document.head.appendChild(s);
+            };
+            tryNext();
+          });
+        }
+        const entries = (searchIndex.entries || []).map(e => Object.assign({}, e, {
+          _t: stripAccents(e.t),
+          _s: stripAccents(e.s)
+        }));
+        if (window.Fuse) {
+          fuse = new Fuse(entries, {
+            keys: [
+              { name: '_t', weight: 0.55 },
+              { name: '_s', weight: 0.25 },
+              { name: 'id', weight: 0.1 },
+              { name: 'w', weight: 0.1 }
+            ],
+            threshold: 0.38,
+            ignoreLocation: true,
+            minMatchCharLength: 2
+          });
+        }
+        return searchIndex;
+      }
+
+      function renderSearchResults(query) {
+        const box = document.getElementById('hubSearchResults');
+        if (!box) return;
+        const q = stripAccents(query).trim();
+        if (q.length < 2) {
+          box.classList.remove('show');
+          box.innerHTML = '';
+          return;
+        }
+        let hits = [];
+        if (fuse) {
+          hits = fuse.search(q, { limit: 40 }).map(r => r.item);
+        } else {
+          const ql = q.toLowerCase();
+          hits = (searchIndex.entries || []).filter(e =>
+            stripAccents(e.t).toLowerCase().includes(ql) ||
+            stripAccents(e.s).toLowerCase().includes(ql)
+          ).slice(0, 40);
+        }
+        if (!hits.length) {
+          box.innerHTML = '<div class="search-empty">No matches across the archive.</div>';
+          box.classList.add('show');
+          return;
+        }
+        const order = ['exhibit', 'stamp', 'gallery', 'transcript', 'history', 'trains', 'maritime', 'heritage'];
+        const grouped = {};
+        hits.forEach(e => {
+          (grouped[e.w] = grouped[e.w] || []).push(e);
+        });
+        let html = '';
+        order.forEach(w => {
+          const list = grouped[w];
+          if (!list || !list.length) return;
+          const meta = WING_META[w] || { label: w, icon: iconForWing(w) };
+          html += `<div class="search-wing"><div class="search-wing-label">${meta.icon} ${meta.label}</div>`;
+          list.slice(0, 8).forEach(e => {
+            const yr = e.y != null ? ` · ${e.y}` : '';
+            const snip = e.s ? e.s.slice(0, 90) : '';
+            html += `<a class="search-hit" href="${esc(e.u)}" role="option">` +
+              `<div class="search-hit-title">${esc(e.t || e.id)}</div>` +
+              `<div class="search-hit-meta">${esc(snip)}${esc(yr)}</div></a>`;
+          });
+          html += '</div>';
+        });
+        box.innerHTML = html;
+        box.classList.add('show');
+      }
+
+      const searchInput = document.getElementById('hubSearchInput');
+      const searchResults = document.getElementById('hubSearchResults');
+      let searchTimer = null;
+      searchInput?.addEventListener('focus', () => { ensureSearchIndex(); });
+      searchInput?.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(async () => {
+          await ensureSearchIndex();
+          renderSearchResults(searchInput.value);
+        }, 120);
+      });
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#hubSearchBox')) {
+          searchResults?.classList.remove('show');
+        }
+      });
+
+      function mmddFromDate(d) {
+        return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+
+      function parseMmDd(str) {
+        const m = String(str || '').match(/^(\d{2})-(\d{2})$/);
+        if (!m) return null;
+        return { mm: parseInt(m[1], 10), dd: parseInt(m[2], 10) };
+      }
+
+      async function renderOnThisDay() {
+        const noteEl = document.getElementById('onThisDayNote');
+        const listEl = document.getElementById('onThisDayList');
+        if (!noteEl || !listEl) return;
+        await ensureSearchIndex();
+        const entries = (searchIndex && searchIndex.entries) || [];
+        const params = new URLSearchParams(window.location.search);
+        const override = params.get('date');
+        const today = new Date();
+        let target = override && parseMmDd(override)
+          ? override
+          : mmddFromDate(today);
+        if (override && !parseMmDd(override)) target = mmddFromDate(today);
+
+        let matches = entries.filter(e => e.d === target && (e.w === 'history' || e.w === 'trains' || e.w === 'maritime' || e.w === 'exhibit'));
+        // Fall back to any wing if timeline wings empty
+        if (!matches.length) matches = entries.filter(e => e.d === target);
+
+        let heading = `On this day · ${target}`;
+        if (!matches.length) {
+          const t = parseMmDd(target);
+          const upcoming = [];
+          for (let offset = 1; offset <= 7; offset++) {
+            const d = new Date(today.getFullYear(), (t.mm - 1), t.dd + offset);
+            const key = mmddFromDate(d);
+            const dayHits = entries.filter(e => e.d === key && (e.w === 'history' || e.w === 'maritime' || e.w === 'trains'));
+            dayHits.forEach(e => upcoming.push({ e, key, offset }));
+            if (upcoming.length >= 6) break;
+          }
+          if (!upcoming.length) {
+            noteEl.textContent = `No dated events for ${target} (or next 7 days).`;
+            listEl.innerHTML = '';
+            return;
+          }
+          noteEl.textContent = `Nothing on ${target} — nearest in the next week:`;
+          listEl.innerHTML = upcoming.slice(0, 6).map(({ e, key, offset }) => {
+            const icon = iconForWing(e.w);
+            const ago = e.y != null ? `${today.getFullYear() - e.y} years ago` : '';
+            return `<a href="${e.u}">${icon} ${e.t}` +
+              `<span class="otd-meta">${key} · in ${offset} day${offset === 1 ? '' : 's'}${ago ? ' · ' + ago : ''}</span></a>`;
+          }).join('');
+          return;
+        }
+
+        noteEl.textContent = heading;
+        const yearNow = today.getFullYear();
+        matches.sort((a, b) => (b.y || 0) - (a.y || 0));
+        listEl.innerHTML = matches.slice(0, 8).map(e => {
+          const icon = iconForWing(e.w);
+          const ago = e.y != null ? `${yearNow - e.y} years ago` : '';
+          return `<a href="${e.u}">${icon} ${e.t}` +
+            `<span class="otd-meta">${ago}${e.w ? ' · ' + (WING_META[e.w]?.label || e.w) : ''}</span></a>`;
+        }).join('');
+      }
+
+      renderOnThisDay();
     })();
   </script>
 </body>

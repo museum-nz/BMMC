@@ -532,6 +532,9 @@
         <button id="btnLayerNatGeo" class="layer-option-btn" title="National Geographic Archive">
           <span>📜</span> <span>NatGeo</span>
         </button>
+        <button id="btnLayerOffline" class="layer-option-btn" title="Offline NZ vector map (used automatically when online tiles fail)">
+          <span>💾</span><span>Offline</span>
+        </button>
         <button id="btnLayerVoyager" class="layer-option-btn" title="CARTO Voyager Basemap">
           <span>🗺️</span> <span>Voyager</span>
         </button>
@@ -586,6 +589,7 @@
 
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="offline-adapter.js" onerror="this.onerror=null;"></script>
+  <script src="../vendor/leaflet/protomaps-leaflet.js" onerror="this.onerror=null;"></script>
   <script src="shared-map.js"></script>
 
   <script>
@@ -694,10 +698,9 @@
       natgeo: BMMCMap.tileLayer('natgeo', { noWrap: true }),
       voyager: BMMCMap.tileLayer('voyager', { url: cartoUrl, noWrap: true })
     };
-
-    const basemapSwitcher = BMMCMap.createBasemapSwitcher(map, baseLayers, {
-      initial: savedState && savedState.basemap ? savedState.basemap : 'google'
-    });
+    const offlineBasemap = BMMCMap.offlineLayer();
+    if (offlineBasemap) baseLayers.offline = offlineBasemap;
+    else document.getElementById('btnLayerOffline')?.remove();
 
     function highlightBasemapButton(type) {
       document.querySelectorAll('.layer-option-btn').forEach(btn => {
@@ -705,14 +708,19 @@
       });
     }
 
+    const basemapSwitcher = BMMCMap.createBasemapSwitcher(map, baseLayers, {
+      initial: savedState && savedState.basemap && baseLayers[savedState.basemap] ? savedState.basemap : 'google',
+      onChange: (key) => highlightBasemapButton(key)
+    });
+
     function setBasemap(type) {
       if (!basemapSwitcher.set(type)) return;
-      highlightBasemapButton(type);
+      highlightBasemapButton(basemapSwitcher.shown);
       document.getElementById('layerDropdownCard')?.classList.remove('show');
       saveMapViewState();
     }
 
-    highlightBasemapButton(basemapSwitcher.selected);
+    highlightBasemapButton(basemapSwitcher.shown);
 
     map.on('moveend', saveMapViewState);
     map.on('zoomend', saveMapViewState);
@@ -1274,6 +1282,7 @@ const btnLayersToggle = document.getElementById('btnLayersToggle');
       document.getElementById('btnLayerTopo')?.addEventListener('click', () => setBasemap('topo'));
       document.getElementById('btnLayerNatGeo')?.addEventListener('click', () => setBasemap('natgeo'));
       document.getElementById('btnLayerVoyager')?.addEventListener('click', () => setBasemap('voyager'));
+      document.getElementById('btnLayerOffline')?.addEventListener('click', () => setBasemap('offline'));
 
       document.addEventListener('click', (e) => {
         if (!e.target.closest('.layer-switcher-container')) {

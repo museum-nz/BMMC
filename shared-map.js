@@ -155,43 +155,138 @@
     return L.tileLayer(url, options);
   }
 
+  // Offline NZ vector basemap (PMTiles via protomaps-leaflet). Returns null if unavailable.
+  // options.url — path to nz.pmtiles (default '../data/tiles/nz.pmtiles')
+  // options.theme — 'light' | 'dark' | 'white' | 'grayscale' | 'black' (default 'light')
+  function offlineLayer(overrides) {
+    const opts = overrides || {};
+    if (typeof protomapsL === 'undefined' || typeof protomapsL.leafletLayer !== 'function') return null;
+    const url = opts.url || '../data/tiles/nz.pmtiles';
+    try {
+      return protomapsL.leafletLayer({
+        url: url,
+        theme: opts.theme || 'light',
+        attribution: opts.attribution || '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://protomaps.com">Protomaps</a>',
+        maxZoom: opts.maxZoom || 19
+      });
+    } catch (e) {
+      return null;
+    }
+  }
+
   // 5. Basemap Switcher
   // layers — { key: L.TileLayer }; only these layers are removed when switching.
   // options.initial — key shown first (default: first key)
   // options.autoSwitch — { from, to, aboveZoom }: while `from` is selected, show `to` above that zoom
+  // options.offlineKey — key of the offline layer in `layers` (default 'offline' if present)
+  // options.onChange — function(key) called after a visible basemap change (including auto-fallback)
+  // When online tiles fail (3+ tileerror with no tileload in ~4s) or navigator.onLine is false,
+  // the switcher falls back to the offline layer. Picking an online layer clears the fallback.
   function createBasemapSwitcher(map, layers, options) {
     const opts = options || {};
     const auto = opts.autoSwitch || null;
+    const offlineKey = opts.offlineKey || (layers.offline ? 'offline' : null);
     let selected = layers[opts.initial] ? opts.initial : Object.keys(layers)[0];
     let shown = null;
+    let fallbackActive = false;
+    let watchTimer = null;
+    let errorCount = 0;
+    let loadCount = 0;
+    let watchedLayer = null;
 
     function resolve() {
+      if (fallbackActive && offlineKey && layers[offlineKey]) return offlineKey;
       if (auto && selected === auto.from && map.getZoom() > auto.aboveZoom) return auto.to;
       return selected;
     }
 
+    function clearWatch() {
+      if (watchTimer) { clearTimeout(watchTimer); watchTimer = null; }
+      if (watchedLayer) {
+        watchedLayer.off('tileerror', onTileError);
+        watchedLayer.off('tileload', onTileLoad);
+        watchedLayer = null;
+      }
+      errorCount = 0;
+      loadCount = 0;
+    }
+
+    function onTileError() {
+      errorCount += 1;
+      maybeFallback();
+    }
+
+    function onTileLoad() {
+      loadCount += 1;
+    }
+
+    function maybeFallback() {
+      if (!offlineKey || !layers[offlineKey] || fallbackActive) return;
+      if (selected === offlineKey) return;
+      if (errorCount >= 3 && loadCount === 0) {
+        fallbackActive = true;
+        show(resolve());
+      }
+    }
+
+    function watchLayer(layer) {
+      clearWatch();
+      if (!layer || !offlineKey || selected === offlineKey) return;
+      // Only raster TileLayers emit tileerror/tileload; skip PMTiles GridLayers.
+      if (!(layer instanceof L.TileLayer)) return;
+      watchedLayer = layer;
+      errorCount = 0;
+      loadCount = 0;
+      layer.on('tileerror', onTileError);
+      layer.on('tileload', onTileLoad);
+      watchTimer = setTimeout(() => {
+        if (errorCount >= 3 && loadCount === 0) maybeFallback();
+      }, 4000);
+    }
+
     function show(key) {
+      if (!layers[key]) return;
       if (shown === key) return;
       Object.values(layers).forEach(layer => {
-        if (map.hasLayer(layer)) map.removeLayer(layer);
+        if (layer && map.hasLayer(layer)) map.removeLayer(layer);
       });
       layers[key].addTo(map);
       shown = key;
+      if (typeof opts.onChange === 'function') opts.onChange(key);
+      if (key !== offlineKey) watchLayer(layers[key]);
+      else clearWatch();
     }
 
     function set(key) {
       if (!layers[key]) return false;
       selected = key;
+      if (key !== offlineKey) fallbackActive = false;
       show(resolve());
       return true;
     }
 
+    function checkOnline() {
+      if (typeof navigator !== 'undefined' && navigator.onLine === false && offlineKey && layers[offlineKey]) {
+        fallbackActive = true;
+        show(resolve());
+      }
+    }
+
     if (auto) map.on('zoomend', () => show(resolve()));
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offline', checkOnline);
+      window.addEventListener('online', () => {
+        // Stay on offline until the user picks an online basemap.
+      });
+    }
+    checkOnline();
     show(resolve());
 
     return {
       set,
-      get selected() { return selected; }
+      get selected() { return selected; },
+      get shown() { return shown; },
+      get fallbackActive() { return fallbackActive; }
     };
   }
 
@@ -329,6 +424,202 @@
     };
   }
 
+  // ---- Cross-wing search index (nearby / same era) ----
+  let _searchIndexPromise = null;
+
+  function haversineKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function loadSearchIndex() {
+    if (window.SEARCH_INDEX && Array.isArray(window.SEARCH_INDEX.entries)) {
+      return Promise.resolve(window.SEARCH_INDEX);
+    }
+    if (_searchIndexPromise) return _searchIndexPromise;
+
+    const jsonCandidates = ['../data/search_index.json', 'data/search_index.json', './data/search_index.json'];
+    const jsCandidates = ['../data/search_index.js', 'data/search_index.js', './data/search_index.js'];
+
+    async function fetchJsonFirst(urls) {
+      for (const url of urls) {
+        try {
+          const r = await fetch(url);
+          if (r.ok) {
+            const data = await r.json();
+            if (data && Array.isArray(data.entries)) return data;
+          }
+        } catch (e) { /* try next */ }
+      }
+      return null;
+    }
+
+    function loadScriptFirst(urls) {
+      return new Promise((resolve) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= urls.length) {
+            resolve(window.SEARCH_INDEX || { entries: [] });
+            return;
+          }
+          const s = document.createElement('script');
+          s.src = urls[i++];
+          s.onload = () => resolve(window.SEARCH_INDEX || { entries: [] });
+          s.onerror = tryNext;
+          document.head.appendChild(s);
+        };
+        tryNext();
+      });
+    }
+
+    _searchIndexPromise = fetchJsonFirst(jsonCandidates).then(data => {
+      if (data) {
+        window.SEARCH_INDEX = data;
+        return data;
+      }
+      return loadScriptFirst(jsCandidates);
+    });
+    return _searchIndexPromise;
+  }
+
+  async function findRelated(point, options) {
+    const opts = Object.assign({ km: 5, years: 10, limit: 6 }, options || {});
+    const lat = point && point.lat;
+    const lng = point && (point.lng !== undefined ? point.lng : point.lon);
+    const year = point && point.year;
+    const excludeId = opts.excludeId || (point && point.id) || null;
+    const index = await loadSearchIndex();
+    const entries = (index && index.entries) || [];
+
+    const nearby = [];
+    const sameEra = [];
+
+    for (const e of entries) {
+      if (excludeId && e.id === excludeId) continue;
+      if (lat != null && lng != null && e.la != null && e.lo != null) {
+        const dist = haversineKm(lat, lng, e.la, e.lo);
+        if (dist <= opts.km) nearby.push(Object.assign({ _dist: dist }, e));
+      }
+      if (year != null && e.y != null && Math.abs(e.y - year) <= opts.years) {
+        sameEra.push(Object.assign({ _yearDelta: Math.abs(e.y - year) }, e));
+      }
+    }
+
+    nearby.sort((a, b) => a._dist - b._dist);
+    sameEra.sort((a, b) => a._yearDelta - b._yearDelta || String(a.t).localeCompare(String(b.t)));
+
+    // Prefer variety: drop duplicate titles, keep first N
+    const pick = (arr, n) => {
+      const out = [];
+      const seen = new Set();
+      for (const e of arr) {
+        const key = (e.w || '') + '|' + (e.t || '');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(e);
+        if (out.length >= n) break;
+      }
+      return out;
+    };
+
+    return {
+      nearby: pick(nearby, opts.limit),
+      sameEra: pick(sameEra, opts.limit)
+    };
+  }
+
+  const WING_ICONS = {
+    exhibit: '🏛️', stamp: '📮', gallery: '📷', transcript: '🎙️',
+    history: '📜', trains: '🚂', maritime: '⚓', heritage: '🗿'
+  };
+
+  function relatedLinksHTML(related) {
+    const blocks = [];
+    const renderList = (label, items) => {
+      if (!items || !items.length) return '';
+      const lis = items.map(e => {
+        const icon = WING_ICONS[e.w] || '📍';
+        const yr = e.y != null ? ` (${e.y})` : '';
+        const href = e.u || '#';
+        return `<li><a href="${escapeHTML(href)}" class="bmmc-related-link">${icon} ${escapeHTML(e.t || e.id)}${escapeHTML(yr)}</a></li>`;
+      }).join('');
+      return `<div class="bmmc-related-group"><div class="bmmc-related-label">${label}</div><ul>${lis}</ul></div>`;
+    };
+    const near = renderList('Nearby', related.nearby);
+    const era = renderList('Same era', related.sameEra);
+    if (!near && !era) return '';
+    return (
+      `<details class="bmmc-related">` +
+      `<summary>Nearby &amp; same era</summary>` +
+      `<div class="bmmc-related-body">${near}${era}</div>` +
+      `</details>`
+    );
+  }
+
+  function ensureRelatedStyles() {
+    if (document.getElementById('bmmc-related-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'bmmc-related-styles';
+    style.textContent = `
+      .bmmc-related { margin-top: 10px; border-top: 1px solid rgba(148,163,184,0.35); padding-top: 8px; font-size: 11px; }
+      .bmmc-related > summary { cursor: pointer; font-weight: 800; color: #0369a1; list-style: none; }
+      .dark .bmmc-related > summary { color: #38bdf8; }
+      .bmmc-related > summary::-webkit-details-marker { display: none; }
+      .bmmc-related-body { margin-top: 6px; display: grid; gap: 8px; }
+      .bmmc-related-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; margin-bottom: 2px; }
+      .bmmc-related ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+      .bmmc-related-link { color: inherit; text-decoration: none; font-weight: 600; display: block; line-height: 1.35; }
+      .bmmc-related-link:hover { text-decoration: underline; color: #0284c7; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function mountRelatedOnPopup(marker, point) {
+    if (!marker || !marker.on) return;
+    ensureRelatedStyles();
+    marker.on('popupopen', async () => {
+      try {
+        const popup = marker.getPopup && marker.getPopup();
+        const root = popup && (popup.getElement ? popup.getElement() : null);
+        const content = root && (root.querySelector('.leaflet-popup-content') || root);
+        if (!content || content.querySelector('.bmmc-related')) return;
+        const related = await findRelated(point, { km: 5, years: 10, limit: 6, excludeId: point && point.id });
+        const html = relatedLinksHTML(related);
+        if (!html) return;
+        const wrap = document.createElement('div');
+        wrap.innerHTML = html;
+        content.appendChild(wrap.firstChild);
+        if (popup && popup._updateLayout) {
+          popup._updateLayout();
+          popup._updatePosition();
+        }
+      } catch (err) {
+        console.warn('BMMCMap related panel:', err);
+      }
+    });
+  }
+
+  function focusMarkerInCluster(map, clusterGroup, marker, zoom) {
+    if (!map || !marker) return;
+    const z = zoom || 12;
+    const open = () => {
+      try {
+        map.setView(marker.getLatLng(), Math.max(map.getZoom(), z), { animate: true });
+      } catch (e) {}
+      marker.openPopup();
+    };
+    if (clusterGroup && typeof clusterGroup.zoomToShowLayer === 'function') {
+      clusterGroup.zoomToShowLayer(marker, open);
+    } else {
+      open();
+    }
+  }
+
   window.BMMCMap = {
     escapeHTML,
     parseYearNum,
@@ -338,9 +629,15 @@
     createSavedStore,
     TILE_SOURCES,
     tileLayer,
+    offlineLayer,
     createBasemapSwitcher,
     bindPillZoomScale,
     addResetViewButton,
-    fitPopupsToScreen
+    fitPopupsToScreen,
+    loadSearchIndex,
+    findRelated,
+    mountRelatedOnPopup,
+    focusMarkerInCluster,
+    WING_ICONS
   };
 })();
