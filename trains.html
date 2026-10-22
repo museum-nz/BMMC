@@ -216,7 +216,7 @@
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      width: 300px;
+      width: 310px;
       max-height: calc(100vh - 120px);
       overflow-y: auto;
       background: rgba(255, 255, 255, 0.97);
@@ -258,7 +258,7 @@
     .layer-overlay-col {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
     .layer-option-btn {
       display: flex;
@@ -299,6 +299,18 @@
       color: #fca5a5 !important;
     }
 
+    /* Amber Bush Tramways Active Style */
+    .layer-option-btn.btn-bush-tram.active {
+      background: #fffbeb !important;
+      border-color: #f59e0b !important;
+      color: #b45309 !important;
+    }
+    .dark .layer-option-btn.btn-bush-tram.active {
+      background: #451a03 !important;
+      border-color: #fbbf24 !important;
+      color: #fde68a !important;
+    }
+
     .layer-opt-left {
       display: inline-flex;
       align-items: center;
@@ -314,7 +326,7 @@
       opacity: 1;
     }
 
-    /* Numeric Badge Pills on Station Buttons */
+    /* Numeric Badge Pills */
     .stn-count-pill {
       display: inline-flex;
       align-items: center;
@@ -723,9 +735,6 @@
       border-color: #0f172a !important;
       box-shadow: 0 0 0 1.5px rgba(56, 189, 248, 0.75), 0 2px 6px rgba(0, 0, 0, 0.6) !important;
     }
-    .nz-train-marker:hover .marker-point-dot {
-      transform: scale(1.4) !important;
-    }
 
     /* Saved Hearts Button & Badge */
     .btn-saved-toggle {
@@ -758,157 +767,107 @@
       color: #be123c !important;
       box-shadow: 0 0 10px rgba(244, 63, 94, 0.3) !important;
     }
-    .btn-saved-toggle.active .saved-pill-count {
-      background: #e11d48 !important;
-      color: #ffffff !important;
-      border-color: #be123c !important;
-    }
-    .dark .btn-saved-toggle.active {
-      background: #4c0519 !important;
-      border-color: #fb7185 !important;
-      color: #fda4af !important;
-    }
-    .dark .btn-saved-toggle.active .saved-pill-count {
-      background: #f43f5e !important;
-      color: #ffffff !important;
-    }
 
-    /* Pop-up Card Styling */
-    .btn-card-heart {
+    /* Interactive Rail Key / Legend */
+    .legend-wrapper {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      z-index: 1000;
+      pointer-events: auto;
+      transition: bottom 0.22s ease;
+    }
+    .legend-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      min-width: 235px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+    .dark .legend-card {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+    .legend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-bottom: 2px;
+    }
+    .dark .legend-header { border-bottom-color: #334155; }
+    .legend-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+    }
+    .dark .legend-title { color: #94a3b8; }
+    .legend-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: bold;
+      color: #64748b;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    .legend-open-pill {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      height: 24px;
-      padding: 0 8px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: #475569;
-      font-size: 11px;
+      gap: 6px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      color: #0f172a;
+      font-size: 11.5px;
       font-weight: 800;
       cursor: pointer;
-      transition: all 0.15s ease;
-      line-height: 1;
-      user-select: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
     }
-    .btn-card-heart:hover {
-      background: #ffe4e6;
-      border-color: #fda4af;
-      color: #e11d48;
-      transform: scale(1.05);
-    }
-    .btn-card-heart.saved {
-      background: #ffe4e6;
-      border-color: #f43f5e;
-      color: #e11d48;
-    }
-    .dark .btn-card-heart {
-      background: #1e293b;
-      border-color: #475569;
-      color: #cbd5e1;
-    }
-    .dark .btn-card-heart:hover {
-      background: #4c0519;
-      border-color: #fb7185;
-      color: #fda4af;
-      transform: scale(1.05);
-    }
-    .dark .btn-card-heart.saved {
-      background: #4c0519;
-      border-color: #fb7185;
-      color: #fda4af;
-    }
-    .marker-saved-heart {
-      font-size: 10px;
-      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-    }
-
-    /* Category Distinct Border Colors */
-    .cat-firsts .marker-pill { border-color: rgba(217, 119, 6, 0.85) !important; }
-    .cat-firsts .marker-stem { background: #d97706 !important; }
-    .cat-firsts .marker-point-dot { background: #d97706 !important; box-shadow: 0 0 0 1.5px rgba(217, 119, 6, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-feats .marker-pill { border-color: rgba(2, 132, 199, 0.85) !important; }
-    .cat-feats .marker-stem { background: #0284c7 !important; }
-    .cat-feats .marker-point-dot { background: #0284c7 !important; box-shadow: 0 0 0 1.5px rgba(2, 132, 199, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-loco .marker-pill { border-color: rgba(79, 70, 229, 0.85) !important; }
-    .cat-loco .marker-stem { background: #4f46e5 !important; }
-    .cat-loco .marker-point-dot { background: #4f46e5 !important; box-shadow: 0 0 0 1.5px rgba(79, 70, 229, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-towns .marker-pill { border-color: rgba(124, 58, 237, 0.85) !important; }
-    .cat-towns .marker-stem { background: #7c3aed !important; }
-    .cat-towns .marker-point-dot { background: #7c3aed !important; box-shadow: 0 0 0 1.5px rgba(124, 58, 237, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-disasters .marker-pill { border-color: rgba(234, 88, 12, 0.85) !important; }
-    .cat-disasters .marker-stem { background: #ea580c !important; }
-    .cat-disasters .marker-point-dot { background: #ea580c !important; box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-decline .marker-pill { border-color: rgba(234, 88, 12, 0.85) !important; }
-    .cat-decline .marker-stem { background: #ea580c !important; }
-    .cat-decline .marker-point-dot { background: #ea580c !important; box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-scenic .marker-pill { border-color: rgba(219, 39, 119, 0.85) !important; }
-    .cat-scenic .marker-stem { background: #db2777 !important; }
-    .cat-scenic .marker-point-dot { background: #db2777 !important; box-shadow: 0 0 0 1.5px rgba(219, 39, 119, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-commuter .marker-pill { border-color: rgba(8, 145, 178, 0.85) !important; }
-    .cat-commuter .marker-stem { background: #0891b2 !important; }
-    .cat-commuter .marker-point-dot { background: #0891b2 !important; box-shadow: 0 0 0 1.5px rgba(8, 145, 178, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    .cat-lines .marker-pill { border-color: rgba(5, 150, 105, 0.85) !important; }
-    .cat-lines .marker-stem { background: #059669 !important; }
-    .cat-lines .marker-point-dot { background: #059669 !important; box-shadow: 0 0 0 1.5px rgba(5, 150, 105, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45) !important; }
-
-    /* Cluster Halos */
-    .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6) !important; }
-    .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.9) !important; }
-    .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6) !important; }
-    .marker-cluster-medium div { background-color: rgba(240, 194, 12, 0.9) !important; }
-    .marker-cluster-large { background-color: rgba(253, 156, 115, 0.6) !important; }
-    .marker-cluster-large div { background-color: rgba(241, 128, 23, 0.9) !important; }
-    .marker-cluster {
-      background-clip: padding-box;
-      border-radius: 50% !important;
-      transition: transform 0.15s ease;
-    }
-    .marker-cluster:hover { transform: scale(1.1); }
-    .marker-cluster div {
-      width: 30px !important;
-      height: 30px !important;
-      margin-left: 5px !important;
-      margin-top: 5px !important;
-      text-align: center !important;
-      border-radius: 50% !important;
-      font: 12px/30px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-      font-weight: 900 !important;
-      color: #0f172a !important;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
-    }
-    .dark .marker-cluster div { color: #ffffff !important; }
-    .marker-cluster span { line-height: 30px !important; display: inline-block !important; }
-
-    /* Polyline Popup */
-    .historic-rail-popup {
-      font-family: system-ui, sans-serif;
+    .legend-items { display: flex; flex-direction: column; gap: 3px; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
       font-size: 11px;
-      line-height: 1.4;
-      color: #0f172a;
+      font-weight: 700;
+      color: #1e293b;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
     }
-    .historic-rail-popup h4 {
-      margin: 0 0 2px 0;
-      font-size: 12px;
-      font-weight: 900;
-    }
-    .historic-rail-badge {
-      display: inline-block;
-      background: #fee2e2;
-      color: #991b1b;
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 4px;
-      margin-bottom: 4px;
+    .legend-item:hover { background: rgba(2, 132, 199, 0.08); }
+    .dark .legend-item { color: #e2e8f0; }
+    .dark .legend-item:hover { background: rgba(56, 189, 248, 0.12); }
+    .legend-item.layer-muted { opacity: 0.38; text-decoration: line-through; }
+    .legend-line { display: inline-block; width: 22px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+    .legend-pin-symbol {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 10px;
+      border: 1.5px solid;
+      flex-shrink: 0;
     }
 
     /* Pop-up Card Styling */
@@ -945,47 +904,6 @@
       padding: 3px 8px;
       border-radius: 6px;
     }
-    .history-card-stepper {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f1f5f9;
-      border-radius: 8px;
-      padding: 3px 6px;
-      margin-bottom: 8px;
-      border: 1px solid #e2e8f0;
-    }
-    .dark .history-card-stepper { background: #0f172a; border-color: #334155; }
-    .btn-step-nav {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: #0f172a;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      line-height: 1;
-      user-select: none;
-    }
-    .btn-step-nav:hover:not(:disabled) {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      transform: scale(1.08);
-    }
-    .btn-step-nav:disabled { opacity: 0.35; cursor: not-allowed; border-color: transparent; }
-    .dark .btn-step-nav { background: #1e293b; color: #f8fafc; border-color: #475569; }
-    .dark .btn-step-nav:hover:not(:disabled) { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
-    .step-index-label { font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.2px; }
-    .dark .step-index-label { color: #94a3b8; }
-    .step-index-label strong { color: #0284c7; font-weight: 900; }
-    .dark .step-index-label strong { color: #38bdf8; }
     .history-card-body { padding: 10px 12px 12px; }
     .history-card-body h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: 900; color: #0f172a; line-height: 1.3; }
     .history-card-meta { display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
@@ -1004,9 +922,7 @@
       font-size: 11px;
       font-weight: 800;
       text-decoration: none;
-      transition: all 0.15s ease;
     }
-    .btn-google-ai:hover { background: #0284c7; color: #ffffff; }
     .btn-source-archive {
       display: flex;
       align-items: center;
@@ -1020,189 +936,34 @@
       font-size: 10px;
       font-weight: 700;
       text-decoration: none;
-      transition: all 0.15s ease;
     }
-    .btn-source-archive:hover { background: #e2e8f0; color: #0f172a; }
+
+    /* Polyline Popup */
+    .historic-rail-popup {
+      font-family: system-ui, sans-serif;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #0f172a;
+    }
+    .historic-rail-popup h4 { margin: 0 0 2px 0; font-size: 12px; font-weight: 900; }
+    .historic-rail-badge {
+      display: inline-block;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
 
     @media (max-width: 768px) {
       .top-controls-wrapper { top: 10px; left: 10px; right: 10px; }
       .leaflet-top.leaflet-right .leaflet-control-zoom { margin-top: 66px; margin-right: 10px; }
       .map-search-box { min-width: 140px; }
       .year-slider-container { left: 10px; bottom: 12px; width: calc(100vw - 20px); max-width: calc(100vw - 20px); }
+      .legend-wrapper { bottom: 84px !important; right: 10px !important; }
     }
-  
-    /* Responsive Wings Position: Hard Right on Desktop, Hard Left on Mobile */
-    @media (min-width: 769px) {
-      .top-controls-bar .btn-bmmc-menu-trigger {
-        order: 999 !important;
-        margin-left: auto !important;
-      }
-    }
-    @media (max-width: 768px) {
-      .top-controls-bar .btn-bmmc-menu-trigger {
-        order: -1 !important;
-        margin-left: 0 !important;
-      }
-    }
-  
-    /* Interactive Rail Key / Legend (like mtb.html) */
-    .legend-wrapper {
-      position: absolute;
-      bottom: 24px;
-      right: 20px;
-      z-index: 1000;
-      pointer-events: auto;
-      transition: bottom 0.22s ease;
-    }
-    .legend-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(203, 213, 225, 0.9);
-      border-radius: 14px;
-      padding: 10px 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-      min-width: 230px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-    .dark .legend-card {
-      background: rgba(15, 23, 42, 0.95);
-      border-color: rgba(51, 65, 85, 0.9);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-    }
-    .legend-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 5px;
-      margin-bottom: 2px;
-    }
-    .dark .legend-header {
-      border-bottom-color: #334155;
-    }
-    .legend-title {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #475569;
-    }
-    .dark .legend-title { color: #94a3b8; }
-    .legend-hint {
-      font-size: 9.5px;
-      font-weight: 600;
-      text-transform: none;
-      opacity: 0.8;
-      color: #64748b;
-    }
-    .dark .legend-hint { color: #94a3b8; }
-    .legend-close-btn {
-      background: transparent;
-      border: none;
-      font-size: 13px;
-      font-weight: bold;
-      color: #64748b;
-      cursor: pointer;
-      padding: 0 4px;
-      line-height: 1;
-      border-radius: 4px;
-      transition: color 0.15s ease;
-    }
-    .legend-close-btn:hover { color: #0284c7; }
-    .dark .legend-close-btn { color: #94a3b8; }
-    .dark .legend-close-btn:hover { color: #38bdf8; }
-    .legend-open-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(203, 213, 225, 0.9);
-      color: #0f172a;
-      font-size: 11.5px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-      transition: all 0.15s ease;
-      user-select: none;
-    }
-    .legend-open-pill:hover {
-      background: #ffffff;
-      border-color: #0284c7;
-      color: #0284c7;
-    }
-    .dark .legend-open-pill {
-      background: rgba(15, 23, 42, 0.94);
-      border-color: rgba(51, 65, 85, 0.9);
-      color: #f8fafc;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-    }
-    .dark .legend-open-pill:hover {
-      background: #1e293b;
-      border-color: #38bdf8;
-      color: #38bdf8;
-    }
-    .legend-items {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #1e293b;
-      padding: 4px 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-    }
-    .legend-item:hover {
-      background: rgba(2, 132, 199, 0.08);
-    }
-    .dark .legend-item { color: #e2e8f0; }
-    .dark .legend-item:hover {
-      background: rgba(56, 189, 248, 0.12);
-    }
-    .legend-item.layer-muted {
-      opacity: 0.38;
-      text-decoration: line-through;
-    }
-    .legend-line {
-      display: inline-block;
-      width: 22px;
-      height: 4px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    .legend-pin-symbol {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      font-size: 10px;
-      border: 1.5px solid;
-      flex-shrink: 0;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-    }
-    @media (max-width: 768px) {
-      .legend-wrapper {
-        bottom: 84px !important;
-        right: 10px !important;
-      }
-    }
-
   </style>
 </head>
 <body>
@@ -1221,7 +982,7 @@
         <button id="clearMapSearch" class="clear-search-btn" title="Clear Search">✕</button>
       </div>
 
-      <!-- Unified Layers Switcher (Basemaps, Track Overlays & Stations in One Dropdown) -->
+      <!-- Unified Layers Switcher -->
       <div class="layer-switcher-container">
         <button id="btnLayersToggle" class="top-action-btn" title="Toggle Basemaps, Overlays &amp; Stations">
           <span>🗺️</span> <span>Layers ▾</span>
@@ -1229,7 +990,7 @@
         <div id="layerDropdownCard" class="layer-dropdown-card">
           <div class="layer-section-title">Basemaps</div>
           <div class="layer-grid">
-            <button id="btnLayerNatGeo" class="layer-option-btn active" title="Auto-switches to detailed topo when zoomed in"><span>📜</span><span>Historical</span></button>
+            <button id="btnLayerNatGeo" class="layer-option-btn active"><span>📜</span><span>Historical</span></button>
             <button id="btnLayerTopo" class="layer-option-btn"><span>⛰️</span><span>Topo</span></button>
             <button id="btnLayerSat" class="layer-option-btn"><span>🛰️</span><span>Satellite</span></button>
             <button id="btnLayerStreet" class="layer-option-btn"><span>📍</span><span>Street</span></button>
@@ -1237,11 +998,23 @@
 
           <div class="layer-section-divider"></div>
 
-          <div class="layer-section-title">Railway Overlays</div>
+          <div class="layer-section-title">Railway Networks &amp; Corridors</div>
           <div class="layer-overlay-col">
-            <!-- Historic Networks (Native Red Lines: Branches, Industrial, Sidings, Preserved, Disused) -->
+            <!-- Historic Main & Branch Networks -->
             <button id="btnToggleHistoricNet" class="layer-option-btn active btn-historic-net" title="Toggle Historic Networks in Red">
               <span class="layer-opt-left"><span>🔴</span><span>Historic Networks</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+
+            <!-- Historic Bush & Mining Tramways -->
+            <button id="btnToggleBushTrams" class="layer-option-btn active btn-bush-tram" title="Toggle Timber, Logging &amp; Mining Bush Tramways">
+              <span class="layer-opt-left"><span>🌲</span><span>Bush &amp; Mining Tramways</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+
+            <!-- Rail Viaducts & Tunnels -->
+            <button id="btnToggleRailInfra" class="layer-option-btn" title="Toggle Historic Rail Viaducts, Bridges &amp; Tunnels">
+              <span class="layer-opt-left"><span>🌉</span><span>Viaducts &amp; Tunnels</span></span>
               <span class="layer-status-indicator">✓</span>
             </button>
 
@@ -1254,36 +1027,31 @@
 
           <div class="layer-section-divider"></div>
 
-          <!-- Railway Station Sub-selection Suite with Live Counter Badges -->
+          <!-- Stations & Hubs -->
           <div class="layer-section-title">Stations &amp; Hubs</div>
           <div class="station-sub-toggle-group">
-            <button id="btnToggleStnRegional" class="layer-option-btn active" title="Regional Hubs &amp; Junctions (Gore, Frankton, Taumarunui, Oamaru...)">
+            <button id="btnToggleStnRegional" class="layer-option-btn active">
               <span class="layer-opt-left">
-                <span>🏛️</span>
-                <span>Regional Junctions</span>
+                <span>🏛️</span><span>Regional Junctions</span>
                 <span id="badgeStnRegional" class="stn-count-pill">0</span>
               </span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <button id="btnToggleStnActive" class="layer-option-btn active" title="Active Commuter &amp; Scenic Passenger Stations">
+            <button id="btnToggleStnActive" class="layer-option-btn active">
               <span class="layer-opt-left">
-                <span>🟢</span>
-                <span>Active Passenger</span>
+                <span>🟢</span><span>Active Passenger</span>
                 <span id="badgeStnActive" class="stn-count-pill">0</span>
               </span>
               <span class="layer-status-indicator">✓</span>
             </button>
-            <!-- Heritage & Disused defaults to ON -->
-            <button id="btnToggleStnHeritage" class="layer-option-btn active" title="Disused, Preserved &amp; Heritage Line Halts">
+            <button id="btnToggleStnHeritage" class="layer-option-btn active">
               <span class="layer-opt-left">
-                <span>📜</span>
-                <span>Heritage &amp; Disused</span>
+                <span>📜</span><span>Heritage &amp; Disused</span>
                 <span id="badgeStnHeritage" class="stn-count-pill">0</span>
               </span>
               <span class="layer-status-indicator">✓</span>
             </button>
           </div>
-
         </div>
       </div>
 
@@ -1311,7 +1079,6 @@
 
   <div id="map"></div>
 
-  
   <!-- Interactive Rail Key / Legend -->
   <div class="legend-wrapper" id="legendWrapper">
     <button id="btnOpenLegend" class="legend-open-pill" style="display:none;" title="Show Rail Key">
@@ -1319,13 +1086,21 @@
     </button>
     <div id="railLegendCard" class="legend-card">
       <div class="legend-header">
-        <span class="legend-title">🗺️ Rail Key <span class="legend-hint">(Click to Toggle)</span></span>
+        <span class="legend-title">🗺️ Rail Key <span class="legend-hint" style="font-size:9.5px; opacity:0.8;">(Click to Toggle)</span></span>
         <button id="btnCloseLegend" class="legend-close-btn" title="Close Key">✕</button>
       </div>
       <div class="legend-items">
         <div class="legend-item" data-layer-key="historic_net" title="Toggle Historic &amp; Branch Lines">
           <span class="legend-line" style="background:#dc2626; height:4px;"></span>
           <span>Historic Networks</span>
+        </div>
+        <div class="legend-item" data-layer-key="bush_trams" title="Toggle Bush &amp; Mining Tramways">
+          <span class="legend-line" style="background:#d97706; height:6px; border-top:2px dashed #f59e0b;"></span>
+          <span>Bush &amp; Mining Tramways</span>
+        </div>
+        <div class="legend-item" data-layer-key="rail_infra" title="Toggle Rail Viaducts &amp; Tunnels">
+          <span class="legend-pin-symbol" style="background:rgba(238,242,255,0.95); border-color:#6366f1; color:#4338ca;">🌉</span>
+          <span>Viaducts &amp; Tunnels</span>
         </div>
         <div class="legend-item" data-layer-key="active_rails" title="Toggle Active Rails (OpenRailwayMap)">
           <span class="legend-line" style="background:#334155; border-top:2px dashed #38bdf8; height:4px;"></span>
@@ -1351,7 +1126,7 @@
     </div>
   </div>
 
-  <!-- Bottom Timeline & Dual Slider (Bottom Left) -->
+  <!-- Bottom Timeline & Dual Slider -->
   <div class="year-slider-container">
     <div class="year-slider-header">
       <div class="timeline-title-group">
@@ -1379,14 +1154,12 @@
       document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
     }
   </script>
-
   <script src="../vendor/papaparse.min.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.Papa) {
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
     }
   </script>
-
   <script src="../vendor/leaflet/markercluster.js" onerror="this.onerror=null;"></script>
   <script>
     if (!window.L || !window.L.markerClusterGroup) {
@@ -1396,7 +1169,6 @@
 
   <script>
     const LIVE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRa2_IODuuz5_h6b15Vc-8zHDbAR-pIBO08bE-c3SZliZhm6h_CSU9LLuStjjlfN6CYm3qksR4klwgy/pub?gid=1351464718&single=true&output=csv';
-    const CACHE_STORAGE_KEY = 'bMMC_nz_trains_csv_cache';
 
     const NZ_CENTER = [-41.2865, 174.2];
     const NZ_ZOOM = window.innerWidth < 768 ? 5 : 6;
@@ -1406,145 +1178,31 @@
     let markers;
     let railwayOverlayLayer = null;
     let historicNetLayer = null;
+    let bushTramLayer = null;
+    let railInfraLayer = null;
+    let railInfraSpansLayer = null;
+
     let isRailwaysVisible = true;
     let isHistoricNetVisible = true;
+    let isBushTramsVisible = true;
+    let isRailInfraVisible = false;
+    let isMilestonesVisible = true;
 
-    // Station Layers & Visibility State (Heritage defaults to ON)
+    // Station Layers & Visibility
     const stnLayers = {
       regional: L.layerGroup(),
       active: L.layerGroup(),
       heritage: L.layerGroup()
     };
-
-    const stnVisibility = {
-      regional: true,  // Regional Junctions ON by default
-      active: true,    // Active passenger stations ON by default
-      heritage: true   // Heritage & Disused halts ON by default
-    };
+    const stnVisibility = { regional: true, active: true, heritage: true };
 
     let allStationRecords = [];
     let isTimelinePlaying = false;
 
-    const basemaps = {
-      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; National Geographic Society',
-        maxNativeZoom: 12,
-        maxZoom: 19
-      }),
-      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Topographic Survey',
-        maxNativeZoom: 18,
-        maxZoom: 19
-      }),
-      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri &copy; Earthstar Geographics',
-        maxNativeZoom: 18,
-        maxZoom: 19
-      }),
-      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxNativeZoom: 19,
-        maxZoom: 19
-      })
-    };
-
-    let userSelectedBasemap = 'natgeo';
-    let isAutoSwitchedToTopo = false;
-    const AUTO_SWITCH_ZOOM_THRESHOLD = 12;
-
-    function applyLayer(type) {
-      Object.values(basemaps).forEach(l => {
-        if (map && map.hasLayer(l)) map.removeLayer(l);
-      });
-      if (map) basemaps[type].addTo(map);
-
-      if (historicNetLayer && isHistoricNetVisible && map && !map.hasLayer(historicNetLayer)) {
-        historicNetLayer.addTo(map);
-      }
-      if (railwayOverlayLayer && isRailwaysVisible && map && !map.hasLayer(railwayOverlayLayer)) {
-        railwayOverlayLayer.addTo(map);
-      }
-    }
-
-    function checkBasemapAutoSwitch() {
-      if (!map || userSelectedBasemap !== 'natgeo') return;
-
-      const currentZoom = map.getZoom();
-      if (currentZoom > AUTO_SWITCH_ZOOM_THRESHOLD) {
-        if (!isAutoSwitchedToTopo) {
-          isAutoSwitchedToTopo = true;
-          applyLayer('topo');
-        }
-      } else {
-        if (isAutoSwitchedToTopo) {
-          isAutoSwitchedToTopo = false;
-          applyLayer('natgeo');
-        }
-      }
-    }
-
-    function setBasemap(type) {
-      userSelectedBasemap = type;
-      isAutoSwitchedToTopo = false;
-
-      if (type === 'natgeo') {
-        if (map && map.getZoom() > AUTO_SWITCH_ZOOM_THRESHOLD) {
-          isAutoSwitchedToTopo = true;
-          applyLayer('topo');
-        } else {
-          applyLayer('natgeo');
-        }
-      } else {
-        applyLayer(type);
-      }
-
-      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => btn.classList.remove('active'));
-      const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
-      if (activeBtn) activeBtn.classList.add('active');
-    }
-
-    // Dynamic line weight scaling for Historic Networks
-    function getHistoricNetWeight(zoom) {
-      if (zoom <= 5) return 2.8;
-      if (zoom <= 7) return 3.6;
-      if (zoom <= 9) return 4.8;
-      if (zoom <= 11) return 6.4;
-      if (zoom <= 13) return 8.0;
-      if (zoom <= 15) return 9.6;
-      return 11.2;
-    }
-
-    function updateHistoricNetStyles() {
-      if (!historicNetLayer || !map) return;
-      const curZoom = map.getZoom();
-      const currentWeight = getHistoricNetWeight(curZoom);
-      historicNetLayer.setStyle({
-        color: '#dc2626',
-        weight: currentWeight,
-        opacity: 0.90,
-        lineCap: 'round',
-        lineJoin: 'round'
-      });
-    }
-
-    function toggleHistoricNetOverlay() {
-      if (!map) return;
-      isHistoricNetVisible = !isHistoricNetVisible;
-      const btn = document.getElementById('btnToggleHistoricNet');
-      if (isHistoricNetVisible) {
-        if (historicNetLayer && !map.hasLayer(historicNetLayer)) historicNetLayer.addTo(map);
-        btn?.classList.add('active');
-      } else {
-        if (historicNetLayer && map.hasLayer(historicNetLayer)) map.removeLayer(historicNetLayer);
-        btn?.classList.remove('active');
-      }
-      updateLegendActiveStates();
-    }
-
-            // =========================================================================
-    // 7 x 24 HOURS (168 HRS) PERSISTENT CLIENT CACHE (IndexedDB + localStorage)
     // =========================================================================
-    const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (7 x 24 hours)
+    // 7 x 24 HOURS (168-HR) CLIENT PERSISTENT CACHE (IndexedDB + localStorage)
+    // =========================================================================
+    const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
     const DataCache = {
       dbPromise: null,
@@ -1590,7 +1248,6 @@
           }
         } catch (e) {}
 
-        // Fallback to localStorage
         try {
           const raw = localStorage.getItem('bMMC_7D_' + key);
           if (raw) {
@@ -1618,35 +1275,6 @@
       }
     };
 
-    // =========================================================================
-    // AUTHORITATIVE GEOJSON DATA SOURCES & MULTI-DOWNLOAD RACE
-    // Priority: Dropbox direct CDN -> CORS proxies -> Local mirror fallbacks
-    // =========================================================================
-    const DROPBOX_HISTORIC_NET_RAW = 'https://dl.dropboxusercontent.com/scl/fi/2f3eghqez2t1eadp1tj4q/nz_historic_rail_networks.geojson?rlkey=ulxx1h81zq53g6brnuxjhnc47&st=rr2a97ub&raw=1';
-    const DROPBOX_MAIN_TRUNK_RAW   = 'https://dl.dropboxusercontent.com/scl/fi/7ufiijyhu1uhwi9hlz90v/nz_main_trunk_and_stations.geojson?rlkey=p4sbwn5pok0ho3rwb1e03p90u&st=yui46q80&raw=1';
-
-    const HISTORIC_NETWORKS_URLS = [
-      DROPBOX_HISTORIC_NET_RAW,
-      DROPBOX_HISTORIC_NET_RAW.replace('&raw=1', '&dl=1'),
-      `https://corsproxy.io/?url=${encodeURIComponent(DROPBOX_HISTORIC_NET_RAW)}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(DROPBOX_HISTORIC_NET_RAW)}`,
-      'data/trains/nz_historic_rail_networks.geojson',
-      './data/trains/nz_historic_rail_networks.geojson',
-      '../data/trains/nz_historic_rail_networks.geojson',
-      '/data/trains/nz_historic_rail_networks.geojson'
-    ];
-
-    const MAIN_TRUNK_STATIONS_URLS = [
-      DROPBOX_MAIN_TRUNK_RAW,
-      DROPBOX_MAIN_TRUNK_RAW.replace('&raw=1', '&dl=1'),
-      `https://corsproxy.io/?url=${encodeURIComponent(DROPBOX_MAIN_TRUNK_RAW)}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(DROPBOX_MAIN_TRUNK_RAW)}`,
-      'data/trains/nz_main_trunk_and_stations.geojson',
-      './data/trains/nz_main_trunk_and_stations.geojson',
-      '../data/trains/nz_main_trunk_and_stations.geojson',
-      '/data/trains/nz_main_trunk_and_stations.geojson'
-    ];
-
     // Multi-download race: queries candidate sources simultaneously with Promise.any
     async function fetchFastestValidJson(candidates) {
       const controllers = candidates.map(() => new AbortController());
@@ -1660,8 +1288,7 @@
             if (!res.ok) return reject(new Error('HTTP ' + res.status));
             const text = await res.text();
             if (text && text.trim().length > 20 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
-              const parsed = JSON.parse(text);
-              resolve(parsed);
+              resolve(JSON.parse(text));
             } else {
               reject(new Error('Invalid JSON payload'));
             }
@@ -1673,57 +1300,399 @@
 
       try {
         const fastest = await Promise.any(promises);
-        controllers.forEach(c => c.abort()); // Cancel remaining slower requests
+        controllers.forEach(c => c.abort());
         return fastest;
       } catch (err) {
         return null;
       }
     }
 
-    function normalizeStationSubType(raw) {
-      if (!raw) return 'regional';
-      const s = String(raw).toLowerCase();
-      if (s.includes('active') || s.includes('commuter') || s.includes('metro') || s.includes('passenger')) {
-        return 'active';
+    const basemaps = {
+      natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; National Geographic Society',
+        maxNativeZoom: 12,
+        maxZoom: 19
+      }),
+      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; Topographic Survey',
+        maxNativeZoom: 18,
+        maxZoom: 19
+      }),
+      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri &copy; Earthstar Geographics',
+        maxNativeZoom: 18,
+        maxZoom: 19
+      }),
+      street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxNativeZoom: 19,
+        maxZoom: 19
+      })
+    };
+
+    let userSelectedBasemap = 'natgeo';
+    let isAutoSwitchedToTopo = false;
+    const AUTO_SWITCH_ZOOM_THRESHOLD = 12;
+
+    function applyLayer(type) {
+      Object.values(basemaps).forEach(l => {
+        if (map && map.hasLayer(l)) map.removeLayer(l);
+      });
+      if (map) basemaps[type].addTo(map);
+
+      if (historicNetLayer && isHistoricNetVisible && map && !map.hasLayer(historicNetLayer)) {
+        historicNetLayer.addTo(map);
       }
-      if (s.includes('herit') || s.includes('disuse') || s.includes('close') || s.includes('preserv') || s.includes('museum') || s.includes('halt')) {
-        return 'heritage';
+      if (bushTramLayer && isBushTramsVisible && map && !map.hasLayer(bushTramLayer)) {
+        bushTramLayer.addTo(map);
       }
-      return 'regional';
+      if (railInfraSpansLayer && isRailInfraVisible && map && !map.hasLayer(railInfraSpansLayer)) {
+        railInfraSpansLayer.addTo(map);
+      }
+      if (railInfraLayer && isRailInfraVisible && map && !map.hasLayer(railInfraLayer)) {
+        railInfraLayer.addTo(map);
+      }
+      if (railwayOverlayLayer && isRailwaysVisible && map && !map.hasLayer(railwayOverlayLayer)) {
+        railwayOverlayLayer.addTo(map);
+      }
+    }
+
+    function checkBasemapAutoSwitch() {
+      if (!map || userSelectedBasemap !== 'natgeo') return;
+      const currentZoom = map.getZoom();
+      if (currentZoom > AUTO_SWITCH_ZOOM_THRESHOLD) {
+        if (!isAutoSwitchedToTopo) {
+          isAutoSwitchedToTopo = true;
+          applyLayer('topo');
+        }
+      } else {
+        if (isAutoSwitchedToTopo) {
+          isAutoSwitchedToTopo = false;
+          applyLayer('natgeo');
+        }
+      }
+    }
+
+    function setBasemap(type) {
+      userSelectedBasemap = type;
+      isAutoSwitchedToTopo = false;
+      if (type === 'natgeo') {
+        if (map && map.getZoom() > AUTO_SWITCH_ZOOM_THRESHOLD) {
+          isAutoSwitchedToTopo = true;
+          applyLayer('topo');
+        } else {
+          applyLayer('natgeo');
+        }
+      } else {
+        applyLayer(type);
+      }
+      document.querySelectorAll('.layer-grid .layer-option-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`)?.classList.add('active');
+    }
+
+    function getHistoricNetWeight(zoom) {
+      if (zoom <= 5) return 2.8;
+      if (zoom <= 7) return 3.6;
+      if (zoom <= 9) return 4.8;
+      if (zoom <= 11) return 6.4;
+      if (zoom <= 13) return 8.0;
+      if (zoom <= 15) return 9.6;
+      return 11.2;
+    }
+
+    function updateHistoricNetStyles() {
+      if (!historicNetLayer || !map) return;
+      const curZoom = map.getZoom();
+      const currentWeight = getHistoricNetWeight(curZoom);
+      historicNetLayer.options.style = {
+        color: '#dc2626',
+        weight: currentWeight,
+        opacity: 0.90,
+        lineCap: 'round',
+        lineJoin: 'round'
+      };
+      historicNetLayer.setStyle(historicNetLayer.options.style);
+      if (activeLineGroup && activeLineGroup.geoLayer === historicNetLayer) {
+        highlightLineGroup(activeLineGroup, null, { weight: currentWeight + 2.5, color: '#991b1b', opacity: 1 });
+      }
+    }
+
+    // =========================================================================
+    // LAYER TOGGLE HANDLERS
+    // =========================================================================
+    function toggleHistoricNetOverlay() {
+      if (!map || !historicNetLayer) return;
+      isHistoricNetVisible = !isHistoricNetVisible;
+      const btn = document.getElementById('btnToggleHistoricNet');
+      if (isHistoricNetVisible) {
+        if (!map.hasLayer(historicNetLayer)) historicNetLayer.addTo(map);
+        btn?.classList.add('active');
+      } else {
+        if (map.hasLayer(historicNetLayer)) map.removeLayer(historicNetLayer);
+        btn?.classList.remove('active');
+      }
+      updateLegendActiveStates();
+    }
+
+    function toggleBushTramsOverlay() {
+      if (!map || !bushTramLayer) return;
+      isBushTramsVisible = !isBushTramsVisible;
+      const btn = document.getElementById('btnToggleBushTrams');
+      if (isBushTramsVisible) {
+        if (!map.hasLayer(bushTramLayer)) bushTramLayer.addTo(map);
+        btn?.classList.add('active');
+      } else {
+        if (map.hasLayer(bushTramLayer)) map.removeLayer(bushTramLayer);
+        btn?.classList.remove('active');
+      }
+      updateLegendActiveStates();
+    }
+
+    function toggleRailInfraOverlay() {
+      if (!map || !railInfraLayer) return;
+      isRailInfraVisible = !isRailInfraVisible;
+      const btn = document.getElementById('btnToggleRailInfra');
+      if (isRailInfraVisible) {
+        if (railInfraSpansLayer && !map.hasLayer(railInfraSpansLayer)) railInfraSpansLayer.addTo(map);
+        if (!map.hasLayer(railInfraLayer)) railInfraLayer.addTo(map);
+        btn?.classList.add('active');
+      } else {
+        if (railInfraSpansLayer && map.hasLayer(railInfraSpansLayer)) map.removeLayer(railInfraSpansLayer);
+        if (map.hasLayer(railInfraLayer)) map.removeLayer(railInfraLayer);
+        btn?.classList.remove('active');
+      }
+      updateLegendActiveStates();
+    }
+
+    function toggleRailwayOverlay() {
+      if (!map || !railwayOverlayLayer) return;
+      isRailwaysVisible = !isRailwaysVisible;
+      const btn = document.getElementById('btnToggleRailways');
+      if (isRailwaysVisible) {
+        if (!map.hasLayer(railwayOverlayLayer)) railwayOverlayLayer.addTo(map);
+        btn?.classList.add('active');
+      } else {
+        if (map.hasLayer(railwayOverlayLayer)) map.removeLayer(railwayOverlayLayer);
+        btn?.classList.remove('active');
+      }
+      updateLegendActiveStates();
+    }
+
+    // =========================================================================
+    // REMOTE & LOCAL DATA SOURCES
+    // =========================================================================
+    const DROPBOX_HISTORIC_NET = 'https://dl.dropboxusercontent.com/scl/fi/2f3eghqez2t1eadp1tj4q/nz_historic_rail_networks.geojson?rlkey=ulxx1h81zq53g6brnuxjhnc47&st=rr2a97ub&raw=1';
+    const DROPBOX_MAIN_TRUNK   = 'https://dl.dropboxusercontent.com/scl/fi/7ufiijyhu1uhwi9hlz90v/nz_main_trunk_and_stations.geojson?rlkey=p4sbwn5pok0ho3rwb1e03p90u&st=yui46q80&raw=1';
+
+    const HISTORIC_NETWORKS_URLS = [
+      DROPBOX_HISTORIC_NET,
+      DROPBOX_HISTORIC_NET.replace('&raw=1', '&dl=1'),
+      `https://corsproxy.io/?url=${encodeURIComponent(DROPBOX_HISTORIC_NET)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(DROPBOX_HISTORIC_NET)}`,
+      'data/trains/nz_historic_rail_networks.geojson',
+      './data/trains/nz_historic_rail_networks.geojson'
+    ];
+
+    const MAIN_TRUNK_STATIONS_URLS = [
+      DROPBOX_MAIN_TRUNK,
+      DROPBOX_MAIN_TRUNK.replace('&raw=1', '&dl=1'),
+      `https://corsproxy.io/?url=${encodeURIComponent(DROPBOX_MAIN_TRUNK)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(DROPBOX_MAIN_TRUNK)}`,
+      'data/trains/nz_main_trunk_and_stations.geojson',
+      './data/trains/nz_main_trunk_and_stations.geojson'
+    ];
+
+    const BUSH_TRAMWAYS_URLS = [
+      'data/trains/nz_bush_and_mining_tramways.geojson',
+      './data/trains/nz_bush_and_mining_tramways.geojson',
+      '../data/trains/nz_bush_and_mining_tramways.geojson',
+      '/data/trains/nz_bush_and_mining_tramways.geojson'
+    ];
+
+    const RAIL_INFRA_URLS = [
+      'data/trains/nz_rail_infrastructure_points.geojson',
+      './data/trains/nz_rail_infrastructure_points.geojson',
+      '../data/trains/nz_rail_infrastructure_points.geojson',
+      '/data/trains/nz_rail_infrastructure_points.geojson'
+    ];
+
+    const RAIL_INFRA_SPANS_URLS = [
+      'data/trains/nz_rail_infrastructure_spans.geojson',
+      './data/trains/nz_rail_infrastructure_spans.geojson',
+      '../data/trains/nz_rail_infrastructure_spans.geojson',
+      '/data/trains/nz_rail_infrastructure_spans.geojson'
+    ];
+
+    // =========================================================================
+    // LAYER INITIALIZATION & LOADING
+    // =========================================================================
+    function initNativeHistoricNetworks() {
+      const curZoom = map.getZoom();
+      const weight = getHistoricNetWeight(curZoom);
+
+      historicNetLayer = L.geoJSON(null, {
+        style: {
+          color: '#dc2626',
+          weight: weight,
+          opacity: 0.90,
+          lineCap: 'round',
+          lineJoin: 'round'
+        },
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties || {};
+          layer.bindPopup(l => p.layer_type === 'track' ? buildMainTrunkPopup(p, l) : buildHistoricLinePopup(p, l), { maxWidth: 280 });
+          bindLineGroupInteractions(historicNetLayer, layer, () => ({
+            weight: getHistoricNetWeight(map.getZoom()) + 2.5, color: '#991b1b', opacity: 1
+          }));
+        }
+      });
+      historicNetLayer.on('layeradd', () => lineGroupCache.clear());
+
+      if (isHistoricNetVisible) historicNetLayer.addTo(map);
+      loadHistoricRailNetworks();
     }
 
     async function loadHistoricRailNetworks() {
-      // 1. Instant load from 7-day client cache
       const cached = await DataCache.get('historic_rail_networks');
       if (cached && historicNetLayer) {
         historicNetLayer.addData(cached);
         return;
       }
-
-      // 2. Multi-download race across Dropbox CDN, CORS proxies, and local mirrors
       const geojson = await fetchFastestValidJson(HISTORIC_NETWORKS_URLS);
       if (geojson && historicNetLayer) {
         historicNetLayer.addData(geojson);
         DataCache.set('historic_rail_networks', geojson);
+      }
+    }
+
+    function initBushTramways() {
+      bushTramLayer = L.geoJSON(null, {
+        style: {
+          color: '#d97706',
+          weight: 6,
+          dashArray: '8, 7',
+          opacity: 0.95,
+          lineCap: 'round',
+          lineJoin: 'round'
+        },
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(l => buildBushTramPopup(feature.properties || {}, l), { maxWidth: 290 });
+          bindLineGroupInteractions(bushTramLayer, layer, () => ({ weight: 8.5, color: '#b45309', opacity: 1 }));
+        }
+      });
+      bushTramLayer.on('layeradd', () => lineGroupCache.clear());
+
+      if (isBushTramsVisible && map) bushTramLayer.addTo(map);
+      loadBushTramways();
+    }
+
+    async function loadBushTramways() {
+      const cached = await DataCache.get('bush_and_mining_tramways');
+      if (cached && bushTramLayer) {
+        bushTramLayer.addData(cached);
         return;
       }
+      const geojson = await fetchFastestValidJson(BUSH_TRAMWAYS_URLS);
+      if (geojson && bushTramLayer) {
+        bushTramLayer.addData(geojson);
+        DataCache.set('bush_and_mining_tramways', geojson);
+      }
+    }
 
-      // 3. Fallback to Overpass API ONLY if all CDN and local mirrors are unreachable
-      fetchLiveOverpassLines();
+    function initRailInfrastructure() {
+      railInfraLayer = L.geoJSON(null, {
+        pointToLayer: (feature, latlng) => {
+          const p = feature.properties || {};
+          const style = INFRA_TYPE_STYLES[p.type] || INFRA_TYPE_STYLES.Viaduct;
+
+          const html = `
+            <div class="station-marker-pin" style="background:${style.bg}; border-color:${style.border}; width:24px; height:24px; font-size:12px;" title="${escapeHTML(cleanRailText(p.name))} (${escapeHTML(p.type || 'Structure')})">
+              <span>${style.emoji}</span>
+            </div>
+          `;
+          return L.marker(latlng, {
+            icon: L.divIcon({
+              className: 'station-div-icon',
+              html: html,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+              popupAnchor: [0, -14]
+            })
+          });
+        },
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(l => buildInfraPopup(feature.properties || {}, l.getLatLng()), { maxWidth: 280 });
+        }
+      });
+
+      map.createPane('railInfraSpansPane');
+      map.getPane('railInfraSpansPane').style.zIndex = 460;
+
+      railInfraSpansLayer = L.geoJSON(null, {
+        interactive: false,
+        pane: 'railInfraSpansPane',
+        style: (feature) => {
+          const type = feature.properties?.type;
+          const style = INFRA_TYPE_STYLES[type] || INFRA_TYPE_STYLES.Viaduct;
+          return {
+            color: style.border,
+            weight: 10,
+            opacity: 0.9,
+            lineCap: type === 'Tunnel' ? 'butt' : 'round',
+            dashArray: type === 'Tunnel' ? '6, 5' : null
+          };
+        }
+      });
+
+      if (isRailInfraVisible && map) {
+        railInfraSpansLayer.addTo(map);
+        railInfraLayer.addTo(map);
+      }
+      loadRailInfrastructure();
+      loadRailInfrastructureSpans();
+    }
+
+    async function loadRailInfrastructureSpans() {
+      const cached = await DataCache.get('rail_infrastructure_spans');
+      if (cached && railInfraSpansLayer) {
+        railInfraSpansLayer.addData(cached);
+        return;
+      }
+      const geojson = await fetchFastestValidJson(RAIL_INFRA_SPANS_URLS);
+      if (geojson && railInfraSpansLayer) {
+        railInfraSpansLayer.addData(geojson);
+        DataCache.set('rail_infrastructure_spans', geojson);
+      }
+    }
+
+    async function loadRailInfrastructure() {
+      const cached = await DataCache.get('rail_infrastructure_points');
+      if (cached && railInfraLayer) {
+        railInfraLayer.addData(cached);
+        return;
+      }
+      const geojson = await fetchFastestValidJson(RAIL_INFRA_URLS);
+      if (geojson && railInfraLayer) {
+        railInfraLayer.addData(geojson);
+        DataCache.set('rail_infrastructure_points', geojson);
+      }
+    }
+
+    function normalizeStationSubType(raw) {
+      if (!raw) return 'regional';
+      const s = String(raw).toLowerCase();
+      if (s.includes('active') || s.includes('commuter') || s.includes('metro') || s.includes('passenger')) return 'active';
+      if (s.includes('herit') || s.includes('disuse') || s.includes('close') || s.includes('preserv') || s.includes('museum') || s.includes('halt')) return 'heritage';
+      return 'regional';
     }
 
     async function loadMainTrunkAndStations() {
-      // 1. Check 7-day client cache
       let geojson = await DataCache.get('main_trunk_stations');
       if (!geojson) {
-        // Multi-download race
         geojson = await fetchFastestValidJson(MAIN_TRUNK_STATIONS_URLS);
-        if (geojson) {
-          DataCache.set('main_trunk_stations', geojson);
-        }
+        if (geojson) DataCache.set('main_trunk_stations', geojson);
       }
-
-      if (!geojson) return; // Keep GUARANTEED_STATIONS intact
+      if (!geojson) return;
 
       const lineFeatures = [];
       const pointFeatures = [];
@@ -1731,10 +1700,9 @@
 
       features.forEach(f => {
         if (!f || !f.geometry) return;
-        const gType = f.geometry.type;
-        if (gType === 'LineString' || gType === 'MultiLineString') {
+        if (f.geometry.type === 'LineString' || f.geometry.type === 'MultiLineString') {
           lineFeatures.push(f);
-        } else if (gType === 'Point') {
+        } else if (f.geometry.type === 'Point') {
           pointFeatures.push(f);
         }
       });
@@ -1760,8 +1728,7 @@
           );
           if (exists) return;
 
-          const rawSub = p.sub || p.subType || p.category || p.type || '';
-          const subType = normalizeStationSubType(rawSub);
+          const subType = normalizeStationSubType(p.sub || p.subType || p.category || p.type || '');
           const hub = p.hub || p.desc || p.description || p.notes || 'Main Trunk & Regional Station';
           const rawYear = p.opened || p.year || p.date || '';
           const parsedYear = parseYearNum(rawYear);
@@ -1788,112 +1755,6 @@
           updateLegendActiveStates();
         }
       }
-    }
-
-    function initNativeHistoricNetworks() {
-      const curZoom = map.getZoom();
-      const weight = getHistoricNetWeight(curZoom);
-
-      historicNetLayer = L.geoJSON(null, {
-        style: {
-          color: '#dc2626',
-          weight: weight,
-          opacity: 0.90,
-          lineCap: 'round',
-          lineJoin: 'round'
-        },
-        onEachFeature: (feature, layer) => {
-          const p = feature.properties || {};
-          layer.bindPopup(`
-            <div class="historic-rail-popup">
-              <h4 style="color:#dc2626;">🔴 ${escapeHTML(p.name || 'Historic Railway Line')}</h4>
-              <span class="historic-rail-badge">📜 ${escapeHTML(p.category || 'Historic Line')}</span>
-              <p style="margin:4px 0 0 0;">${escapeHTML(p.desc || '')}</p>
-            </div>
-          `, { maxWidth: 280 });
-          layer.on('mouseover', function() { this.setStyle({ weight: weight + 2.5, color: '#991b1b', opacity: 1 }); });
-          layer.on('mouseout', function() { if (historicNetLayer) historicNetLayer.resetStyle(this); });
-        }
-      });
-
-      if (isHistoricNetVisible) {
-        historicNetLayer.addTo(map);
-      }
-
-      loadHistoricRailNetworks();
-    }
-
-    async function fetchLiveOverpassLines() {
-      const overpassQuery = `[out:json][timeout:25];(
-        way["railway"~"abandoned|dismantled|disused|preserved"](-47.5,166.0,-34.0,179.0);
-        way["railway"="rail"]["usage"~"branch|industrial"](-47.5,166.0,-34.0,179.0);
-        way["railway"="rail"]["service"~"spur|siding|yard"](-47.5,166.0,-34.0,179.0);
-      );out geom;`;
-
-      const cacheKey = 'bMMC_live_historic_rails_cache';
-      try {
-        let osmData = null;
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          osmData = JSON.parse(cached);
-        } else {
-          const res = await fetch('https://overpass-api.de/api/interpreter', {
-            method: 'POST',
-            body: overpassQuery
-          });
-          if (res.ok) {
-            osmData = await res.json();
-            try { localStorage.setItem(cacheKey, JSON.stringify(osmData)); } catch(e) {}
-          }
-        }
-
-        if (osmData && osmData.elements && osmData.elements.length > 0) {
-          const features = [];
-          osmData.elements.forEach(elem => {
-            if (elem.geometry && elem.geometry.length > 1) {
-              features.push({
-                type: 'Feature',
-                properties: {
-                  name: elem.tags.name || (elem.tags.railway + ' corridor'),
-                  category: elem.tags.usage || elem.tags.service || elem.tags.railway,
-                  desc: elem.tags.description || elem.tags.operator || ''
-                },
-                geometry: {
-                  type: 'LineString',
-                  coordinates: elem.geometry.map(pt => [pt.lon, pt.lat])
-                }
-              });
-            }
-          });
-
-          if (features.length > 0 && historicNetLayer) {
-            historicNetLayer.addData({ type: 'FeatureCollection', features: features });
-          }
-        }
-      } catch (err) {}
-    }
-
-    function toggleRailwayOverlay() {
-      if (!map) return;
-      isRailwaysVisible = !isRailwaysVisible;
-      const btn = document.getElementById('btnToggleRailways');
-      if (isRailwaysVisible) {
-        if (!map.hasLayer(railwayOverlayLayer)) railwayOverlayLayer.addTo(map);
-        btn?.classList.add('active');
-      } else {
-        if (map.hasLayer(railwayOverlayLayer)) map.removeLayer(railwayOverlayLayer);
-        btn?.classList.remove('active');
-      }
-      updateLegendActiveStates();
-    }
-
-    function updatePillZoomScale() {
-      if (!map) return;
-      const currentZoom = map.getZoom();
-      const baseZoom = (typeof NZ_ZOOM !== 'undefined') ? NZ_ZOOM : 6;
-      const delta = currentZoom - baseZoom;
-      const factor = Math.pow(1.05, Math.max(-2, Math.min(10, delta)));
-      document.documentElement.style.setProperty('--pill-zoom-factor', factor.toFixed(3));
     }
 
     // =========================================================================
@@ -1968,15 +1829,14 @@
     function buildStationMarkerIcon(stnId, name, subType, statusText, isSaved) {
       const typeClass = `stn-${subType}`;
       const iconEmoji = subType === 'regional' ? '🏛️' : (subType === 'active' ? '🟢' : '📜');
-      const iconHtml = `
-        <div class="station-marker-pin ${typeClass} ${isSaved ? 'saved-station' : ''}" id="stn_pin_${stnId}" title="${escapeHTML(name)} (${escapeHTML(statusText || subType)})">
-          <span style="font-size:10px;">${iconEmoji}</span>
-          ${isSaved ? '<span class="stn-heart-badge">❤️</span>' : ''}
-        </div>
-      `;
       return L.divIcon({
         className: 'station-div-icon',
-        html: iconHtml,
+        html: `
+          <div class="station-marker-pin ${typeClass} ${isSaved ? 'saved-station' : ''}" id="stn_pin_${stnId}" title="${escapeHTML(name)} (${escapeHTML(statusText || subType)})">
+            <span style="font-size:10px;">${iconEmoji}</span>
+            ${isSaved ? '<span class="stn-heart-badge">❤️</span>' : ''}
+          </div>
+        `,
         iconSize: [22, 22],
         iconAnchor: [11, 11],
         popupAnchor: [0, -14]
@@ -1995,38 +1855,35 @@
       const subLabel = subType === 'regional' ? 'Regional Hub / Junction'
                      : (subType === 'active' ? 'Active Passenger Station' : 'Heritage &amp; Disused Station');
 
-      function buildStationPopup() {
+      marker.bindPopup(() => {
         const currentlySaved = getSavedSet().has(id);
         return `
-          <div class="history-card" style="width:270px;">
-            <div style="padding:12px 14px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span class="category-pill" style="font-size:9px;">${subLabel}</span>
-                <button type="button" class="btn-card-heart ${currentlySaved ? 'saved' : ''}" data-id="${id}" onclick="window.toggleSaveItem('${id}', event);" title="${currentlySaved ? 'Remove from Saved' : 'Save to Favorites'}">
-                  <span class="heart-icon">${currentlySaved ? '❤️' : '🤍'}</span>
-                  <span class="heart-label">${currentlySaved ? 'Saved' : 'Save'}</span>
-                </button>
-              </div>
-              <h3 style="margin:0 0 3px 0; font-size:14px; font-weight:900; color:#0f172a;" class="dark:text-white">🚉 ${escapeHTML(name)}</h3>
-              <div style="font-size:11px; color:#64748b; font-weight:700; margin-bottom:6px;">${escapeHTML(hub || 'New Zealand Railway System')}</div>
-              <div style="font-size:11px; line-height:1.4; color:#334155;" class="dark:text-slate-300">
-                ${statusText ? `<p style="margin:0 0 4px 0;"><strong>Status:</strong> ${escapeHTML(statusText)}</p>` : ''}
-                <p style="margin:0 0 6px 0; font-family:monospace; color:#64748b;">${lat.toFixed(4)}°S, ${lon.toFixed(4)}°E</p>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:5px; border-top:1px solid #f1f5f9; padding-top:8px;" class="dark:border-slate-800">
-                <a href="${papersPastUrl}" target="_blank" rel="noopener noreferrer" class="btn-source-archive" style="justify-content:center;">
-                  <span>🗞️</span> Search Papers Past ↗
-                </a>
-                <a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai" style="justify-content:center;">
-                  <span>✨</span> Historical Research ↗
-                </a>
-              </div>
+          <div class="history-card" style="width:270px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="category-pill" style="font-size:9px;">${subLabel}</span>
+              <button type="button" class="btn-card-heart ${currentlySaved ? 'saved' : ''}" data-id="${id}" onclick="window.toggleSaveItem('${id}', event);" title="${currentlySaved ? 'Remove from Saved' : 'Save to Favorites'}">
+                <span class="heart-icon">${currentlySaved ? '❤️' : '🤍'}</span>
+                <span class="heart-label">${currentlySaved ? 'Saved' : 'Save'}</span>
+              </button>
+            </div>
+            <h3 style="margin:0 0 3px 0; font-size:14px; font-weight:900; color:#0f172a;">🚉 ${escapeHTML(name)}</h3>
+            <div style="font-size:11px; color:#64748b; font-weight:700; margin-bottom:6px;">${escapeHTML(hub || 'New Zealand Railway System')}</div>
+            <div style="font-size:11px; line-height:1.4; color:#334155;">
+              ${statusText ? `<p style="margin:0 0 4px 0;"><strong>Status:</strong> ${escapeHTML(statusText)}</p>` : ''}
+              <p style="margin:0 0 6px 0; font-family:monospace; color:#64748b;">${lat.toFixed(4)}°S, ${lon.toFixed(4)}°E</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:5px; border-top:1px solid #f1f5f9; padding-top:8px;">
+              <a href="${papersPastUrl}" target="_blank" rel="noopener noreferrer" class="btn-source-archive" style="justify-content:center;">
+                <span>🗞️</span> Search Papers Past ↗
+              </a>
+              <a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai" style="justify-content:center;">
+                <span>✨</span> Historical Research ↗
+              </a>
             </div>
           </div>
         `;
-      }
+      }, { maxWidth: 295 });
 
-      marker.bindPopup(buildStationPopup, { maxWidth: 295 });
       return marker;
     }
 
@@ -2051,38 +1908,31 @@
 
       refreshStationsOnMap();
       updateLegendActiveStates();
-      // Asynchronously stream Main Trunk & additional stations from Dropbox CDN
+
+      // Load additional Main Trunk lines & stations from cache/CDN
       loadMainTrunkAndStations();
     }
 
     function refreshStationsOnMap() {
       const search = (document.getElementById('mapSearchInput')?.value || '').trim().toLowerCase();
       const savedSet = getSavedSet();
-      const minSlider = document.getElementById('minYearSlider');
-      const maxSlider = document.getElementById('maxYearSlider');
-      const minVal = minSlider ? parseInt(minSlider.value, 10) : globalMinYear;
-      const maxVal = maxSlider ? parseInt(maxSlider.value, 10) : globalMaxYear;
+      const minVal = parseInt(document.getElementById('minYearSlider')?.value || globalMinYear, 10);
+      const maxVal = parseInt(document.getElementById('maxYearSlider')?.value || globalMaxYear, 10);
 
       Object.values(stnLayers).forEach(lg => lg.clearLayers());
 
       allStationRecords.forEach(rec => {
         if (isSavedFilterActive && !savedSet.has(rec.id)) return;
-
         if (search) {
           const hay = `${rec.name} ${rec.hub} ${rec.subType} ${rec.statusText}`.toLowerCase();
           if (!hay.includes(search)) return;
         }
-
         const hasDate = rec.year !== null && !isNaN(rec.year);
         if (isTimelinePlaying) {
-          // When playing: add stations with a date as their opening year comes up
-          if (!hasDate) return;
-          if (rec.year < minVal || rec.year > maxVal) return;
+          if (!hasDate || rec.year < minVal || rec.year > maxVal) return;
         } else {
-          // When paused, at the end, or stopped: add all stations without a date + dated stations in range
           if (hasDate && (rec.year < minVal || rec.year > maxVal)) return;
         }
-
         stnLayers[rec.subType].addLayer(rec.marker);
       });
 
@@ -2108,14 +1958,13 @@
       const btnId = subType === 'regional' ? 'btnToggleStnRegional'
                   : (subType === 'active' ? 'btnToggleStnActive' : 'btnToggleStnHeritage');
       const btn = document.getElementById(btnId);
-
       if (stnVisibility[subType]) {
         btn?.classList.add('active');
       } else {
         btn?.classList.remove('active');
       }
-
       refreshStationsOnMap();
+      updateLegendActiveStates();
     }
 
     function initMap() {
@@ -2163,6 +2012,8 @@
       map.addLayer(markers);
 
       initNativeHistoricNetworks();
+      initBushTramways();
+      initRailInfrastructure();
       initStationRecords();
     }
 
@@ -2184,78 +2035,39 @@
     }
 
     function updateSavedCountHeader() {
-      const count = getSavedSet().size;
       const badge = document.getElementById('savedCountBadge');
-      if (badge) badge.textContent = count;
+      if (badge) badge.textContent = getSavedSet().size;
     }
 
     window.toggleSaveItem = function(id, evt) {
-      if (evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-      }
+      if (evt) { evt.stopPropagation(); evt.preventDefault(); }
       const savedSet = getSavedSet();
       const isNowSaved = !savedSet.has(id);
-      if (isNowSaved) {
-        savedSet.add(id);
-      } else {
-        savedSet.delete(id);
-      }
+      if (isNowSaved) savedSet.add(id); else savedSet.delete(id);
       saveSavedSet(savedSet);
       updateSavedCountHeader();
 
-      // Update any open popup heart button matching this ID
       document.querySelectorAll(`.btn-card-heart[data-id="${id}"]`).forEach(btn => {
         if (isNowSaved) {
           btn.classList.add('saved');
           btn.innerHTML = '<span class="heart-icon">❤️</span> <span class="heart-label">Saved</span>';
-          btn.title = 'Remove from Saved';
         } else {
           btn.classList.remove('saved');
           btn.innerHTML = '<span class="heart-icon">🤍</span> <span class="heart-label">Save</span>';
-          btn.title = 'Save to Favorites';
         }
       });
 
-      // If it is a station record, re-render its icon immediately
       const stn = allStationRecords.find(s => s.id === id);
       if (stn && stn.marker) {
         stn.marker.setIcon(buildStationMarkerIcon(stn.id, stn.name, stn.subType, stn.statusText, isNowSaved));
       }
-
       filterEvents();
     };
 
     function toggleSavedFilter() {
       isSavedFilterActive = !isSavedFilterActive;
-      const btn = document.getElementById('btnToggleSaved');
-      if (btn) {
-        if (isSavedFilterActive) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      }
+      document.getElementById('btnToggleSaved')?.classList.toggle('active', isSavedFilterActive);
       filterEvents();
-
-      if (isSavedFilterActive) {
-        const boundsList = [];
-        if (markers && markers.getLayers().length > 0) {
-          boundsList.push(markers.getBounds());
-        }
-        allStationRecords.forEach(stn => {
-          if (getSavedSet().has(stn.id) && map.hasLayer(stn.marker)) {
-            boundsList.push(L.latLngBounds([stn.marker.getLatLng(), stn.marker.getLatLng()]));
-          }
-        });
-        if (boundsList.length > 0) {
-          try {
-            let combined = boundsList[0];
-            for (let i = 1; i < boundsList.length; i++) combined.extend(boundsList[i]);
-            map.fitBounds(combined, { padding: [50, 50], maxZoom: 14 });
-          } catch (e) {}
-        }
-      }
     }
 
     let allEvents = [];
@@ -2272,6 +2084,344 @@
       }[m]));
     }
 
+    // =========================================================================
+    // RAIL POPUP HELPERS
+    // =========================================================================
+    const GENERIC_CORRIDOR_NAMES = new Set(['rail corridor', 'disused corridor', 'abandoned corridor']);
+    const GENERIC_INFRA_NAMES = new Set(['nz rail tunnel']);
+
+    const HISTORIC_CATEGORY_LABELS = {
+      yard: 'Rail Yard',
+      siding: 'Siding',
+      branch: 'Branch Line',
+      abandoned: 'Abandoned Line',
+      industrial: 'Industrial Line',
+      spur: 'Spur Line',
+      main: 'Main Line',
+      tourism: 'Heritage / Tourist Line',
+      disused: 'Disused Line',
+      crossover: 'Crossover',
+      freight: 'Freight Line',
+      driveway: 'Service Track',
+      parking_aisle: 'Service Track',
+      military: 'Military Line',
+      derail: 'Derail',
+      dismantled: 'Dismantled Line'
+    };
+
+    const RAIL_STATUS_LABELS = {
+      rail: 'In service',
+      abandoned: 'Abandoned (track lifted)',
+      disused: 'Disused (track in place)',
+      razed: 'Demolished',
+      miniature: 'Miniature railway',
+      funicular: 'Funicular',
+      tram: 'Tramway',
+      narrow_gauge: 'Narrow gauge (in service)',
+      construction: 'Under construction',
+      proposed: 'Proposed',
+      monorail: 'Monorail',
+      unloading_hole: 'Unloading point'
+    };
+
+    const ELECTRIFIED_LABELS = {
+      no: 'Not electrified',
+      contact_line: 'Electrified (overhead wires)',
+      rail: 'Electrified (third rail)',
+      construction: 'Electrification under construction'
+    };
+
+    const INFRA_TYPE_STYLES = {
+      Tunnel:  { emoji: '🚇', border: '#6366f1', bg: 'rgba(238, 242, 255, 0.95)', text: '#4338ca' },
+      Viaduct: { emoji: '🌉', border: '#0284c7', bg: 'rgba(240, 249, 255, 0.95)', text: '#0369a1' },
+      Bridge:  { emoji: '🛤️', border: '#0d9488', bg: 'rgba(240, 253, 250, 0.95)', text: '#0f766e' }
+    };
+
+    function cleanRailText(str) {
+      return String(str || '').replace(/\s*\uFFFD\s*/g, ' – ').trim();
+    }
+
+    function toTitleCase(str) {
+      return String(str || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function labelHistoricCategory(cat) {
+      return HISTORIC_CATEGORY_LABELS[cat] || toTitleCase(cat || 'Historic Line');
+    }
+
+    function labelRailStatus(status) {
+      return RAIL_STATUS_LABELS[status] || toTitleCase(status);
+    }
+
+    function baseLineName(name) {
+      return cleanRailText(name)
+        .split(/\s+–\s+|\//)[0]
+        .replace(/\s+(Up|Down|West|East|Centre|Middle|Third)\s+Main$/i, '')
+        .trim();
+    }
+
+    function formatLengthMetres(lengthM, fallback) {
+      const m = parseFloat(lengthM);
+      if (isNaN(m)) return fallback || 'Unknown';
+      return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
+    }
+
+    function mmToImperial(mm) {
+      const quarters = Math.round((mm / 25.4) * 4);
+      const ft = Math.floor(quarters / 48);
+      const inchQuarters = quarters - ft * 48;
+      const wholeIn = Math.floor(inchQuarters / 4);
+      const frac = ['', '¼', '½', '¾'][inchQuarters % 4];
+      const inPart = (wholeIn || frac) ? `${wholeIn || ''}${frac} in` : '';
+      return [ft ? `${ft} ft` : '', inPart].filter(Boolean).join(' ');
+    }
+
+    function formatGauge(raw) {
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      const parts = s.split(/[;,]/).map(x => x.trim()).filter(Boolean);
+      if (!parts.every(x => /^\d+(\.\d+)?$/.test(x))) return s;
+      const mms = parts.map(Number);
+      return `${mms.join(' / ')} mm (${mms.map(mmToImperial).join(' / ')})`;
+    }
+
+    function formatOsmDate(raw) {
+      const s = String(raw || '').trim();
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return s;
+      const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+      return d.toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    }
+
+    function popupRow(label, value) {
+      return value ? `<p style="margin:2px 0;"><strong>${label}:</strong> ${escapeHTML(value)}</p>` : '';
+    }
+
+    function popupBadge(text, bg, color) {
+      return `<span class="historic-rail-badge" style="background:${bg}; color:${color};">${text}</span>`;
+    }
+
+    function papersPastLink(query) {
+      if (!query) return '';
+      return `<a href="https://paperspast.natlib.govt.nz/newspapers?query=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer" class="btn-source-archive" style="margin-top:8px;"><span>🗞️</span> Search Papers Past ↗</a>`;
+    }
+
+    // Same-name line sections are joined at runtime so popups can report a combined length.
+    const lineGroupCache = new Map();
+    let activeLineGroup = null;
+
+    function lineGroupKind(p) {
+      if (p.layer_type === 'track') return 'main';
+      if (p.subtype) return 'bush';
+      return 'historic';
+    }
+
+    function lineGroupKey(p) {
+      const name = cleanRailText(p.name).toLowerCase();
+      if (!name || GENERIC_CORRIDOR_NAMES.has(name) || name === 'historic bush tramway') return null;
+      return `${lineGroupKind(p)}|${name}`;
+    }
+
+    function featureLengthM(layer) {
+      const p = layer.feature.properties;
+      if (p._lenM !== undefined) return p._lenM;
+      const given = parseFloat(p.length_m);
+      if (!isNaN(given)) return (p._lenM = given);
+      const lls = layer.getLatLngs();
+      const parts = L.LineUtil.isFlat(lls) ? [lls] : lls;
+      let total = 0;
+      parts.forEach(part => {
+        for (let i = 1; i < part.length; i++) total += part[i - 1].distanceTo(part[i]);
+      });
+      return (p._lenM = total);
+    }
+
+    function getLineGroup(geoLayer, layer) {
+      const key = lineGroupKey(layer.feature.properties || {});
+      if (!key) return null;
+      if (lineGroupCache.has(key)) return lineGroupCache.get(key);
+      const members = [];
+      let totalM = 0;
+      geoLayer.eachLayer(l => {
+        if (lineGroupKey(l.feature.properties || {}) === key) {
+          members.push(l);
+          totalM += featureLengthM(l);
+        }
+      });
+      const group = { key, geoLayer, members, totalM };
+      lineGroupCache.set(key, group);
+      return group;
+    }
+
+    function highlightLineGroup(group, layer, style) {
+      (group ? group.members : [layer]).forEach(l => l.setStyle(style));
+    }
+
+    function resetLineGroup(group, layer, geoLayer) {
+      (group ? group.members : [layer]).forEach(l => geoLayer.resetStyle(l));
+    }
+
+    function bindLineGroupInteractions(geoLayer, layer, getHoverStyle) {
+      layer.on('mouseover', () => {
+        highlightLineGroup(getLineGroup(geoLayer, layer), layer, getHoverStyle());
+      });
+      layer.on('mouseout', () => {
+        const group = getLineGroup(geoLayer, layer);
+        if (group && group === activeLineGroup) return;
+        resetLineGroup(group, layer, geoLayer);
+      });
+      layer.on('popupopen', () => {
+        const group = getLineGroup(geoLayer, layer);
+        if (activeLineGroup && activeLineGroup !== group) {
+          resetLineGroup(activeLineGroup, null, activeLineGroup.geoLayer);
+        }
+        activeLineGroup = group;
+        highlightLineGroup(group, layer, getHoverStyle());
+      });
+      layer.on('popupclose', () => {
+        const group = getLineGroup(geoLayer, layer);
+        if (activeLineGroup === group) activeLineGroup = null;
+        resetLineGroup(group, layer, geoLayer);
+      });
+    }
+
+    function lineLengthRows(geoLayer, layer, sectionLabel) {
+      const group = getLineGroup(geoLayer, layer);
+      const sectionM = featureLengthM(layer);
+      if (!group || group.members.length < 2) {
+        return popupRow(sectionLabel, formatLengthMetres(sectionM));
+      }
+      return popupRow('Total Mapped Track', `${formatLengthMetres(group.totalM)} (${group.members.length} sections)`) +
+             popupRow('This Section', formatLengthMetres(sectionM));
+    }
+
+    function findNearestNamedLine(latlng, maxMetres = 400) {
+      if (!historicNetLayer || !latlng) return null;
+      const pad = 0.01;
+      const kx = Math.cos(latlng.lat * Math.PI / 180);
+      const target = L.point(latlng.lng * kx, latlng.lat);
+      let best = null;
+      let bestDist = Infinity;
+      historicNetLayer.eachLayer(layer => {
+        const name = cleanRailText(layer.feature?.properties?.name);
+        if (!name || GENERIC_CORRIDOR_NAMES.has(name.toLowerCase())) return;
+        const b = layer.getBounds();
+        if (latlng.lat < b.getSouth() - pad || latlng.lat > b.getNorth() + pad ||
+            latlng.lng < b.getWest() - pad || latlng.lng > b.getEast() + pad) return;
+        const pts = layer.getLatLngs().flat(Infinity);
+        for (let i = 1; i < pts.length; i++) {
+          const d = L.LineUtil.pointToSegmentDistance(
+            target,
+            L.point(pts[i - 1].lng * kx, pts[i - 1].lat),
+            L.point(pts[i].lng * kx, pts[i].lat)
+          );
+          if (d < bestDist) { bestDist = d; best = name; }
+        }
+      });
+      return bestDist * 111320 <= maxMetres ? baseLineName(best) : null;
+    }
+
+    function buildHistoricLinePopup(p, layer) {
+      const rawName = cleanRailText(p.name);
+      const catLabel = labelHistoricCategory(p.category);
+      const isGeneric = !rawName || GENERIC_CORRIDOR_NAMES.has(rawName.toLowerCase());
+      const title = isGeneric ? catLabel : rawName;
+      const badge = isGeneric ? toTitleCase(rawName || 'Historic Corridor') : catLabel;
+      const desc = cleanRailText(p.desc);
+      const descIsOperator = desc && desc.length <= 40 && /^[A-Z]/.test(desc) && desc !== 'Loop';
+      return `
+        <div class="historic-rail-popup">
+          <h4 style="color:#dc2626;">🔴 ${escapeHTML(title)}</h4>
+          <span class="historic-rail-badge">📜 ${escapeHTML(badge)}</span>
+          ${lineLengthRows(historicNetLayer, layer, 'Length')}
+          ${descIsOperator ? popupRow('Operator / Owner', desc) : (desc ? `<p style="margin:4px 0 0 0;">${escapeHTML(desc)}</p>` : '')}
+          ${isGeneric ? '' : papersPastLink(`"${baseLineName(rawName)}"`)}
+        </div>
+      `;
+    }
+
+    function buildMainTrunkPopup(p, layer) {
+      const name = cleanRailText(p.name) || 'Main Trunk Line';
+      const electrified = ELECTRIFIED_LABELS[p.electrified] || (p.electrified ? toTitleCase(p.electrified) : '');
+      return `
+        <div class="historic-rail-popup">
+          <h4 style="color:#1d4ed8;">🚆 ${escapeHTML(name)}</h4>
+          ${popupBadge('🛤️ Main Trunk Line', '#dbeafe', '#1e40af')}
+          ${lineLengthRows(historicNetLayer, layer, 'Length')}
+          ${popupRow('Track', cleanRailText(p.ref))}
+          ${popupRow('Electrification', electrified)}
+          ${popupRow('Gauge', formatGauge(p.gauge))}
+          ${papersPastLink(`"${baseLineName(name)}"`)}
+        </div>
+      `;
+    }
+
+    function buildBushTramPopup(p, layer) {
+      const name = cleanRailText(p.name) || 'Historic Bush Tramway';
+      const isGeneric = name === 'Historic Bush Tramway';
+      return `
+        <div class="historic-rail-popup">
+          <h4 style="color:#d97706;">🌲 ${escapeHTML(name)}</h4>
+          ${popupBadge(`🏷️ ${escapeHTML(p.subtype || 'Bush Tramway')}`, '#fef3c7', '#92400e')}
+          ${popupRow('Status', p.railway ? labelRailStatus(p.railway) : '')}
+          ${lineLengthRows(bushTramLayer, layer, 'Track Length')}
+          ${popupRow('Gauge', formatGauge(p.gauge))}
+          ${popupRow('Operator', cleanRailText(p.operator))}
+          ${popupRow('Opened', formatOsmDate(p.start_date))}
+          ${p.description ? `<p style="margin:4px 0 0 0; font-size:11px; color:#475569;">${escapeHTML(p.description)}</p>` : ''}
+          ${isGeneric ? '' : papersPastLink(`"${name}"`)}
+        </div>
+      `;
+    }
+
+    function resolveInfraTitle(p, latlng) {
+      const type = p.type || 'Structure';
+      const name = cleanRailText(p.name);
+      const isGenericName = !name || GENERIC_INFRA_NAMES.has(name.toLowerCase());
+      if (!isGenericName && /tunnel|bridge|viaduct/i.test(name)) {
+        return { title: name, query: `"${name}"` };
+      }
+      if (p._nearestLine === undefined) {
+        p._nearestLine = isGenericName ? findNearestNamedLine(latlng) : baseLineName(name);
+      }
+      if (p._nearestLine) {
+        return { title: `${type} on ${p._nearestLine}`, query: `"${p._nearestLine}" ${type.toLowerCase()}` };
+      }
+      return { title: `Unnamed Rail ${type}`, query: null };
+    }
+
+    function buildInfraPopup(p, latlng) {
+      const style = INFRA_TYPE_STYLES[p.type] || INFRA_TYPE_STYLES.Viaduct;
+      const { title, query } = resolveInfraTitle(p, latlng);
+      const isHeritage = p.historic === true || String(p.historic).toLowerCase() === 'true' || p.heritage === 'yes';
+      const wikiTitle = p.wikipedia ? String(p.wikipedia).replace(/^en:/, '') : '';
+      const wikiLink = wikiTitle
+        ? `<a href="https://en.wikipedia.org/wiki/${encodeURIComponent(wikiTitle.replace(/ /g, '_'))}" target="_blank" rel="noopener noreferrer" class="btn-source-archive"><span>📖</span> Wikipedia: ${escapeHTML(wikiTitle)} ↗</a>`
+        : '';
+      const wikidataLink = p.wikidata
+        ? `<a href="https://www.wikidata.org/wiki/${encodeURIComponent(p.wikidata)}" target="_blank" rel="noopener noreferrer" class="btn-source-archive"><span>🗃️</span> Wikidata ${escapeHTML(p.wikidata)} ↗</a>`
+        : '';
+      return `
+        <div class="history-card" style="width:260px; padding:12px;">
+          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">
+            ${popupBadge(`${style.emoji} ${escapeHTML(p.type || 'Structure')}`, style.bg, style.text)}
+            ${isHeritage ? popupBadge('🏛️ Historic Structure', '#fef3c7', '#92400e') : ''}
+          </div>
+          <h3 style="margin:0 0 6px 0; font-size:13px; font-weight:900; color:#0f172a;">${style.emoji} ${escapeHTML(title)}</h3>
+          <div style="font-size:11px; line-height:1.45; color:#334155;">
+            ${popupRow('Length', formatLengthMetres(p.length_m, p.length))}
+            ${popupRow('Opened / Built', formatOsmDate(p.start_date))}
+            ${popupRow('Status', p.railway_status ? labelRailStatus(p.railway_status) : '')}
+          </div>
+          <div style="display:flex; flex-direction:column; gap:5px; margin-top:6px;">
+            ${wikiLink}
+            ${wikidataLink}
+            ${papersPastLink(query)}
+          </div>
+        </div>
+      `;
+    }
+
     function parseYearNum(val) {
       if (!val) return NaN;
       const m = String(val).match(/-?\d{3,4}/);
@@ -2280,269 +2430,16 @@
 
     function parseCoord(val) {
       if (val === null || val === undefined || val === '') return NaN;
-      const clean = String(val).trim().replace(',', '.');
-      const m = clean.match(/-?\d+(?:\.\d+)?/);
+      const m = String(val).trim().replace(',', '.').match(/-?\d+(?:\.\d+)?/);
       if (!m) return NaN;
       const num = parseFloat(m[0]);
       return (isNaN(num) || num === 0) ? NaN : num;
     }
 
-    function getThumbnailUrl(url) {
-      if (!url) return '';
-      url = url.trim();
-      if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
-        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s240');
-        return url.includes('?') ? url + '&sz=s240' : url + '=s240';
-      }
-      if (url.includes('drive.google.com')) {
-        const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=s240`;
-      }
-      return url;
-    }
-
-    function getFullImageUrl(url) {
-      if (!url) return '';
-      url = url.trim();
-      if (url.includes('googleusercontent.com') || url.includes('ggpht.com')) {
-        if (/=[sw]\d+/i.test(url)) return url.replace(/=[sw]\d+[^?]*/i, '=s0');
-        return url;
-      }
-      if (url.includes('drive.google.com')) {
-        const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) return `https://drive.google.com/uc?id=${idMatch[1]}&export=view`;
-      }
-      return url;
-    }
-
-    function getCategoryClass(cat) {
-      const c = (cat || '').toLowerCase();
-      if (c.includes('first')) return 'cat-firsts';
-      if (c.includes('feat') || c.includes('engineer') || c.includes('tunnel') || c.includes('viaduct')) return 'cat-feats';
-      if (c.includes('loco') || c.includes('works') || c.includes('shop') || c.includes('engine')) return 'cat-loco';
-      if (c.includes('town') || c.includes('junction') || c.includes('depot')) return 'cat-towns';
-      if (c.includes('disaster') || c.includes('accident') || c.includes('collision')) return 'cat-disasters';
-      if (c.includes('decline') || c.includes('deregulat') || c.includes('privat')) return 'cat-decline';
-      if (c.includes('scenic') || c.includes('tourism') || c.includes('preserv') || c.includes('heritage')) return 'cat-scenic';
-      if (c.includes('commuter') || c.includes('suburban') || c.includes('electrif')) return 'cat-commuter';
-      if (c.includes('line') || c.includes('corridor')) return 'cat-lines';
-      return 'cat-feats';
-    }
-
-    function getCategoryIcon(cat) {
-      const c = (cat || '').toLowerCase();
-      if (c.includes('first')) return '🥇';
-      if (c.includes('feat') || c.includes('tunnel') || c.includes('viaduct')) return '🌉';
-      if (c.includes('loco') || c.includes('works') || c.includes('engine')) return '🚂';
-      if (c.includes('town') || c.includes('junction')) return '🏘️';
-      if (c.includes('disaster') || c.includes('accident')) return '💥';
-      if (c.includes('decline') || c.includes('deregulat')) return '📉';
-      if (c.includes('scenic') || c.includes('tourism') || c.includes('heritage')) return '🎫';
-      if (c.includes('commuter') || c.includes('suburban')) return '🚆';
-      if (c.includes('line') || c.includes('corridor')) return '🛤️';
-      return '📍';
-    }
-
-    window.stepHistory = function(delta) {
-      if (!currentActiveEvents || currentActiveEvents.length === 0) return;
-      let nextIdx = currentActiveIndex + delta;
-      if (nextIdx < 0) nextIdx = 0;
-      if (nextIdx >= currentActiveEvents.length) nextIdx = currentActiveEvents.length - 1;
-      if (nextIdx === currentActiveIndex) return;
-
-      currentActiveIndex = nextIdx;
-      const targetEv = currentActiveEvents[nextIdx];
-      if (targetEv && targetEv._marker) {
-        markers.zoomToShowLayer(targetEv._marker, () => {
-          const curZoom = map.getZoom();
-          if (curZoom > CONSISTENT_EVENT_ZOOM || curZoom < 12) {
-            map.setView([targetEv.latitude, targetEv.longitude], CONSISTENT_EVENT_ZOOM, { animate: true });
-          } else {
-            map.panTo([targetEv.latitude, targetEv.longitude]);
-          }
-          targetEv._marker.openPopup();
-        });
-      }
-    };
-
-    function renderDataset(items) {
-      if (!markers) return;
-      markers.clearLayers();
-
-      const sortedItems = [...items].sort((a, b) => {
-        if (a.year !== b.year) return (a.year || 0) - (b.year || 0);
-        return String(a.date || '').localeCompare(String(b.date || ''));
-      });
-
-      currentActiveEvents = sortedItems;
-      const totalCount = sortedItems.length;
-
-      sortedItems.forEach((ev, i) => {
-        ev._chronoIndex = i;
-      });
-
-      const markerList = [];
-      const PROXIMITY_DEG = 0.025;
-      const groups = [];
-
-      sortedItems.forEach(ev => {
-        let found = null;
-        for (const grp of groups) {
-          if (Math.abs(grp.lat - ev.latitude) < PROXIMITY_DEG && Math.abs(grp.lng - ev.longitude) < PROXIMITY_DEG) {
-            found = grp;
-            break;
-          }
-        }
-        if (found) found.items.push(ev);
-        else groups.push({ lat: ev.latitude, lng: ev.longitude, items: [ev] });
-      });
-
-      groups.forEach(grp => {
-        grp.items.sort((a, b) => (a.year || 0) - (b.year || 0));
-
-        grp.items.forEach((ev, idx) => {
-          const safeYear = escapeHTML(ev.year || '');
-          const safeDate = escapeHTML(ev.date || ev.year || '');
-          const safeHeadline = escapeHTML(ev.headline || 'Event');
-          const safeLocation = escapeHTML(ev.location || '');
-          const safeCategory = escapeHTML(ev.category || 'History');
-          const safeDetails = escapeHTML(ev.details || '');
-          const safeUid = escapeHTML(ev._uid || ev.id || '');
-
-          const rawImg = (ev.image_url || '').trim();
-          const hasImageLink = rawImg.length > 0 && rawImg !== '#';
-          const safeThumbImg = hasImageLink ? escapeHTML(getThumbnailUrl(rawImg)) : '';
-          const safeFullImg = hasImageLink ? escapeHTML(typeof getFullImageUrl === 'function' ? getFullImageUrl(rawImg) : rawImg) : '';
-
-          const catClass = getCategoryClass(ev.category);
-          const catIcon = getCategoryIcon(ev.category);
-          const isSaved = getSavedSet().has(ev._uid);
-
-          const baseLeaderHeight = 22;
-          const stemHeight = baseLeaderHeight + (idx * 56);
-          const pillHeight = 44;
-          const tailHeight = 7;
-          const dotHeight = 8;
-          const totalIconHeight = pillHeight + tailHeight + stemHeight + dotHeight;
-          const iconWidth = 260;
-          const iconAnchorX = iconWidth / 2;
-          const iconAnchorY = totalIconHeight - (dotHeight / 2);
-
-          const googleAiSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(ev.headline + ' ' + (ev.date || ev.year) + ' New Zealand')}`;
-
-          let markerImgSrc = '';
-          if (hasImageLink) {
-            if (typeof window.resolveOfflineMedia === 'function') {
-              markerImgSrc = window.resolveOfflineMedia(rawImg) || window.resolveOfflineMedia(ev.id) || '';
-            }
-            if (!markerImgSrc) {
-              markerImgSrc = safeThumbImg;
-            }
-          }
-
-          const markerHTML = `
-            <div class="nz-train-marker ${catClass}">
-              <div class="marker-pill">
-                ${markerImgSrc ? `
-                  <div class="marker-thumb-box">
-                    <img class="marker-thumb-img" 
-                         src="${markerImgSrc}" 
-                         alt="" 
-                         loading="lazy" 
-                         onerror="this.parentElement.style.display='none';" />
-                  </div>
-                ` : ''}
-                <div class="marker-text-block">
-                  <div class="marker-header-row">
-                    <span class="marker-date-tag">${catIcon} ${safeYear}</span>
-                    ${isSaved ? '<span class="marker-saved-heart" title="Saved">❤️</span>' : ''}
-                  </div>
-                  <div class="marker-headline-text" title="${safeHeadline}">${safeHeadline}</div>
-                </div>
-              </div>
-              <div class="marker-pin-tail"></div>
-              <div class="marker-stem" style="height: ${stemHeight}px;"></div>
-              <div class="marker-point-dot"></div>
-            </div>
-          `;
-
-          const customIcon = L.divIcon({
-            html: markerHTML,
-            className: 'history-div-icon',
-            iconSize: [iconWidth, totalIconHeight],
-            iconAnchor: [iconAnchorX, iconAnchorY],
-            popupAnchor: [0, -totalIconHeight + 12]
-          });
-
-          const popupImageBlock = hasImageLink ? `
-            <a href="${safeFullImg}" target="_blank" rel="noopener noreferrer" class="history-card-img-wrap" title="Click to view full image">
-              <img src="${safeThumbImg}" alt="${safeHeadline}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';" />
-              <div class="history-card-badge-row">
-                <span class="category-pill">${safeCategory}</span>
-                <span class="date-pill">${safeDate}</span>
-              </div>
-            </a>
-          ` : `
-            <div style="padding: 10px 12px 0; display: flex; gap: 6px;">
-              <span class="category-pill">${safeCategory}</span>
-              <span class="date-pill">${safeDate}</span>
-            </div>
-          `;
-
-          const itemIndex = ev._chronoIndex;
-          const isFirst = itemIndex === 0;
-          const isLast = itemIndex === totalCount - 1;
-
-          const popupHTML = `
-            <div class="history-card">
-              ${popupImageBlock}
-              <div class="history-card-body">
-                <div class="history-card-stepper">
-                  <div style="display:inline-flex; align-items:center; gap:4px;">
-                    <button type="button" class="btn-step-nav" onclick="window.stepHistory(-1); event.stopPropagation();" ${isFirst ? 'disabled' : ''} title="Previous event (earlier)">◀</button>
-                    <span class="step-index-label">Item <strong>#${itemIndex + 1}</strong> of <strong>${totalCount}</strong></span>
-                    <button type="button" class="btn-step-nav" onclick="window.stepHistory(1); event.stopPropagation();" ${isLast ? 'disabled' : ''} title="Next event (later)">▶</button>
-                  </div>
-                  <button type="button" class="btn-card-heart ${isSaved ? 'saved' : ''}" data-id="${safeUid}" onclick="window.toggleSaveItem('${safeUid}', event);" title="${isSaved ? 'Remove from Saved' : 'Save to Favorites'}">
-                    <span class="heart-icon">${isSaved ? '❤️' : '🤍'}</span>
-                    <span class="heart-label">${isSaved ? 'Saved' : 'Save'}</span>
-                  </button>
-                </div>
-
-                <h3>${safeHeadline}</h3>
-                <div class="history-card-meta">
-                  <span>📍</span>
-                  <span>${safeLocation}</span>
-                </div>
-                <p class="history-card-desc">${safeDetails}</p>
-                <div class="history-card-footer">
-                  <a href="${googleAiSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-ai">
-                    <span>✨</span> Ask Google AI Overview ↗
-                  </a>
-                  ${ev.source_url && ev.source_url !== '#' ? `
-                    <a href="${ev.source_url}" target="_blank" rel="noopener noreferrer" class="btn-source-archive">
-                      <span>📖</span> Reference Link ↗
-                    </a>
-                  ` : ''}
-                </div>
-              </div>
-            </div>
-          `;
-
-          const marker = L.marker([ev.latitude, ev.longitude], { icon: customIcon });
-          ev._marker = marker;
-          marker.bindPopup(popupHTML, { maxWidth: 390, autoPan: true, keepInView: true, closeOnClick: true });
-
-          marker.on('popupopen', () => {
-            currentActiveIndex = ev._chronoIndex;
-          });
-
-          markerList.push(marker);
-        });
-      });
-
-      markers.addLayers(markerList);
-      document.getElementById('itemCountBadge').textContent = `${totalCount} milestone${totalCount === 1 ? '' : 's'}`;
+    function updatePillZoomScale() {
+      if (!map) return;
+      const factor = Math.pow(1.05, Math.max(-2, Math.min(10, map.getZoom() - NZ_ZOOM)));
+      document.documentElement.style.setProperty('--pill-zoom-factor', factor.toFixed(3));
     }
 
     function filterEvents() {
@@ -2553,42 +2450,70 @@
 
       let minVal = parseInt(minSlider.value, 10);
       let maxVal = parseInt(maxSlider.value, 10);
-
-      if (minVal > maxVal) {
-        const tmp = minVal;
-        minVal = maxVal;
-        maxVal = tmp;
-        minSlider.value = minVal;
-        maxSlider.value = maxVal;
-      }
+      if (minVal > maxVal) { const tmp = minVal; minVal = maxVal; maxVal = tmp; minSlider.value = minVal; maxSlider.value = maxVal; }
 
       const span = (globalMaxYear - globalMinYear) || 1;
       const left = ((minVal - globalMinYear) / span) * 100;
       const right = ((maxVal - globalMinYear) / span) * 100;
 
-      if (fill) {
-        fill.style.left = left + '%';
-        fill.style.width = (right - left) + '%';
-      }
-
+      if (fill) { fill.style.left = left + '%'; fill.style.width = (right - left) + '%'; }
       document.getElementById('yearRangeText').textContent = `${minVal} – ${maxVal}`;
 
+      const savedSet = getSavedSet();
       const filtered = allEvents.filter(ev => {
-        const savedSet = getSavedSet();
         if (isSavedFilterActive && !savedSet.has(ev._uid)) return false;
-
-        const inYear = ev.year >= minVal && ev.year <= maxVal;
-        if (!inYear) return false;
-
+        if (ev.year < minVal || ev.year > maxVal) return false;
         if (search) {
-          const hay = `${ev.headline} ${ev.location} ${ev.details} ${ev.category} ${ev.date}`.toLowerCase();
-          return hay.includes(search);
+          return `${ev.headline} ${ev.location} ${ev.details} ${ev.category} ${ev.date}`.toLowerCase().includes(search);
         }
         return true;
       });
 
       renderDataset(filtered);
       refreshStationsOnMap();
+    }
+
+    function renderDataset(items) {
+      if (!markers) return;
+      markers.clearLayers();
+      const sorted = [...items].sort((a, b) => (a.year || 0) - (b.year || 0));
+      currentActiveEvents = sorted;
+
+      const markerList = sorted.map((ev, i) => {
+        ev._chronoIndex = i;
+        const icon = L.divIcon({
+          className: 'history-div-icon',
+          html: `
+            <div class="nz-train-marker cat-feats">
+              <div class="marker-pill">
+                <div class="marker-text-block">
+                  <div class="marker-header-row"><span class="marker-date-tag">📍 ${ev.year}</span></div>
+                  <div class="marker-headline-text">${escapeHTML(ev.headline)}</div>
+                </div>
+              </div>
+              <div class="marker-pin-tail"></div>
+              <div class="marker-stem" style="height:22px;"></div>
+              <div class="marker-point-dot"></div>
+            </div>
+          `,
+          iconSize: [260, 65],
+          iconAnchor: [130, 61],
+          popupAnchor: [0, -55]
+        });
+
+        const m = L.marker([ev.latitude, ev.longitude], { icon: icon });
+        m.bindPopup(`
+          <div class="history-card" style="padding:12px;">
+            <h3 style="margin:0 0 4px 0;">${escapeHTML(ev.headline)}</h3>
+            <div class="history-card-meta"><span>📍 ${escapeHTML(ev.location)}</span></div>
+            <p class="history-card-desc">${escapeHTML(ev.details)}</p>
+          </div>
+        `, { maxWidth: 320 });
+        return m;
+      });
+
+      markers.addLayers(markerList);
+      document.getElementById('itemCountBadge').textContent = `${sorted.length} milestones`;
     }
 
     function toggleTimelinePlayback() {
@@ -2602,199 +2527,109 @@
         isTimelinePlaying = false;
         btn.textContent = '▶';
         btn.classList.remove('playing');
-        filterEvents(); // Re-render map immediately on pause to add undated stations
+        filterEvents();
       } else {
         isTimelinePlaying = true;
         btn.textContent = '⏸';
         btn.classList.add('playing');
-
         minSlider.value = globalMinYear;
-
-        let currentMax = parseInt(maxSlider.value, 10);
-        if (currentMax >= globalMaxYear || currentMax < 1880) {
-          maxSlider.value = 1880;
-        }
+        if (parseInt(maxSlider.value, 10) >= globalMaxYear) maxSlider.value = 1880;
 
         timelineTimer = setInterval(() => {
           let curr = parseInt(maxSlider.value, 10);
           if (curr >= globalMaxYear) {
-            toggleTimelinePlayback(); // Automatically pauses at end and displays undated stations
+            toggleTimelinePlayback();
           } else {
             maxSlider.value = Math.min(globalMaxYear, curr + 3);
             filterEvents();
           }
         }, 250);
-
         filterEvents();
       }
-    }
-
-    function initSliders() {
-      const years = allEvents.map(e => e.year).filter(y => !isNaN(y) && y > 0);
-      if (years.length === 0) return;
-
-      globalMinYear = Math.min(...years);
-      globalMaxYear = Math.max(...years);
-
-      const minSlider = document.getElementById('minYearSlider');
-      const maxSlider = document.getElementById('maxYearSlider');
-
-      minSlider.min = globalMinYear;
-      minSlider.max = globalMaxYear;
-      maxSlider.min = globalMinYear;
-      maxSlider.max = globalMaxYear;
-
-      minSlider.value = globalMinYear;
-      maxSlider.value = globalMaxYear;
-
-      filterEvents();
-    }
-
-    function getCol(row, aliases) {
-      for (const key of Object.keys(row)) {
-        const clean = key.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-        for (const alias of aliases) {
-          if (clean === alias) return String(row[key] || '').trim();
-        }
-      }
-      return '';
     }
 
     function parseCSVData(csvString) {
       if (!csvString || csvString.trim().length === 0) return false;
       const parsed = Papa.parse(csvString, { header: true, skipEmptyLines: true });
-
       allEvents = (parsed.data || []).map(row => {
-        let latStr = getCol(row, ['latitude', 'lat', 'latdeg', 'y']);
-        let lngStr = getCol(row, ['longitude', 'lng', 'lon', 'long', 'x']);
-        let yearStr = getCol(row, ['year', 'yr']);
-        let dateStr = getCol(row, ['date', 'when', 'time']);
+        const getCol = (aliases) => {
+          for (let k of Object.keys(row)) {
+            const clean = k.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+            for (let a of aliases) { if (clean === a) return String(row[k] || '').trim(); }
+          }
+          return '';
+        };
 
-        let lat = parseCoord(latStr);
-        let lng = parseCoord(lngStr);
-
-        let parsedYear = parseYearNum(yearStr);
-        if (isNaN(parsedYear) && dateStr) {
-          parsedYear = parseYearNum(dateStr);
-        }
-
-        const rawId = getCol(row, ['id', 'no', 'item']);
-        const headlineStr = getCol(row, ['headline', 'title', 'event', 'name']);
-        const safeUid = rawId || `${parsedYear || 0}_${(headlineStr || '').slice(0, 24).replace(/[^a-zA-Z0-9]/g, '_')}_${lat.toFixed(3)}_${lng.toFixed(3)}`;
+        const lat = parseCoord(getCol(['latitude', 'lat']));
+        const lng = parseCoord(getCol(['longitude', 'lng', 'lon']));
+        const yr = parseYearNum(getCol(['year', 'yr', 'date']));
+        const hl = getCol(['headline', 'title', 'event', 'name']);
 
         return {
-          id: safeUid,
-          _uid: safeUid,
-          year: isNaN(parsedYear) ? 0 : parsedYear,
-          date: dateStr || String(parsedYear || ''),
-          headline: getCol(row, ['headline', 'title', 'event', 'name']),
-          category: getCol(row, ['category', 'type', 'era']) || 'Railways',
-          location: getCol(row, ['location', 'place', 'station']),
+          id: getCol(['id']) || `${yr}_${lat}_${lng}`,
+          _uid: getCol(['id']) || `${yr}_${lat}_${lng}`,
+          year: isNaN(yr) ? 0 : yr,
+          date: getCol(['date']) || String(yr || ''),
+          headline: hl || 'Rail Milestone',
+          category: getCol(['category', 'type']) || 'Railways',
+          location: getCol(['location', 'place']),
           latitude: lat,
           longitude: lng,
-          details: getCol(row, ['details', 'description', 'notes', 'summary']),
-          image_url: getCol(row, ['imageurl', 'image', 'img', 'photo']),
-          source_url: getCol(row, ['sourceurl', 'source', 'url', 'link']) || '#'
+          details: getCol(['details', 'description', 'notes'])
         };
       }).filter(e => !isNaN(e.latitude) && !isNaN(e.longitude) && e.latitude !== 0 && e.longitude !== 0);
 
       if (allEvents.length > 0) {
-        initSliders();
+        globalMinYear = Math.min(...allEvents.map(e => e.year).filter(y => y > 0));
+        globalMaxYear = Math.max(...allEvents.map(e => e.year).filter(y => y > 0));
+        const minS = document.getElementById('minYearSlider');
+        const maxS = document.getElementById('maxYearSlider');
+        minS.min = globalMinYear; minS.max = globalMaxYear; minS.value = globalMinYear;
+        maxS.min = globalMinYear; maxS.max = globalMaxYear; maxS.value = globalMaxYear;
+        filterEvents();
         return true;
       }
       return false;
     }
 
-        // Multi-download race for CSV datasets with 7-day TTL caching
-    async function fetchFastestValidCsv(candidates) {
-      const controllers = candidates.map(() => new AbortController());
-      const promises = candidates.map((url, idx) => {
-        return new Promise(async (resolve, reject) => {
-          if (!url) return reject(new Error('Empty URL'));
-          try {
-            const timeoutId = setTimeout(() => controllers[idx].abort(), 7000);
-            const res = await fetch(url, { signal: controllers[idx].signal });
-            clearTimeout(timeoutId);
-            if (!res.ok) return reject(new Error('HTTP ' + res.status));
-            const text = await res.text();
-            if (text && text.trim().length > 50 && !text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
-              resolve(text);
-            } else {
-              reject(new Error('Invalid CSV payload'));
-            }
-          } catch (err) {
-            reject(err);
-          }
-        });
-      });
-
-      try {
-        const fastest = await Promise.any(promises);
-        controllers.forEach(c => c.abort());
-        return fastest;
-      } catch (err) {
-        return null;
-      }
-    }
-
     async function loadDataset() {
-      // 1. Check 7-day client cache
       const cached = await DataCache.get('trains_milestones_csv');
-      if (cached && parseCSVData(cached)) {
-        return;
-      }
+      if (cached && parseCSVData(cached)) return;
 
-      // 2. Multi-download race across live feed, proxies, and local mirrors
-      const candidateUrls = [
+      const candidates = [
         LIVE_CSV_URL,
         `https://corsproxy.io/?url=${encodeURIComponent(LIVE_CSV_URL)}`,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(LIVE_CSV_URL)}`,
         'data/trains.csv',
-        './data/trains.csv',
-        '../data/trains.csv',
-        './trains.csv',
-        'trains.csv'
+        './data/trains.csv'
       ];
 
-      const csvText = await fetchFastestValidCsv(candidateUrls);
-      if (csvText && parseCSVData(csvText)) {
-        DataCache.set('trains_milestones_csv', csvText);
-        return;
+      for (let url of candidates) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const text = await res.text();
+            if (text && text.length > 50 && parseCSVData(text)) {
+              DataCache.set('trains_milestones_csv', text);
+              return;
+            }
+          }
+        } catch (e) {}
       }
-
-      // 3. Built-in emergency offline fallback
-      if (allEvents.length === 0) {
-        parseCSVData(FALLBACK_TRAINS_CSV);
-      }
-    }
-
-    
-    let isMilestonesVisible = true;
-
-    function toggleMilestones() {
-      if (!map || !markers) return;
-      isMilestonesVisible = !isMilestonesVisible;
-      if (isMilestonesVisible) {
-        if (!map.hasLayer(markers)) map.addLayer(markers);
-      } else {
-        if (map.hasLayer(markers)) map.removeLayer(markers);
-      }
-      updateLegendActiveStates();
     }
 
     function toggleRailLayerByKey(key) {
-      if (key === 'historic_net') {
-        toggleHistoricNetOverlay();
-      } else if (key === 'active_rails') {
-        toggleRailwayOverlay();
-      } else if (key === 'stn_regional') {
-        toggleStationSubGroup('regional');
-      } else if (key === 'stn_active') {
-        toggleStationSubGroup('active');
-      } else if (key === 'stn_heritage') {
-        toggleStationSubGroup('heritage');
-      } else if (key === 'milestones') {
-        toggleMilestones();
+      if (key === 'historic_net') toggleHistoricNetOverlay();
+      else if (key === 'bush_trams') toggleBushTramsOverlay();
+      else if (key === 'rail_infra') toggleRailInfraOverlay();
+      else if (key === 'active_rails') toggleRailwayOverlay();
+      else if (key === 'stn_regional') toggleStationSubGroup('regional');
+      else if (key === 'stn_active') toggleStationSubGroup('active');
+      else if (key === 'stn_heritage') toggleStationSubGroup('heritage');
+      else if (key === 'milestones') {
+        isMilestonesVisible = !isMilestonesVisible;
+        if (isMilestonesVisible) map.addLayer(markers); else map.removeLayer(markers);
+        updateLegendActiveStates();
       }
     }
 
@@ -2802,19 +2637,14 @@
       document.querySelectorAll('#railLegendCard .legend-item[data-layer-key]').forEach(item => {
         const key = item.getAttribute('data-layer-key');
         let active = true;
-        if (key === 'historic_net') {
-          active = isHistoricNetVisible;
-        } else if (key === 'active_rails') {
-          active = isRailwaysVisible;
-        } else if (key === 'stn_regional') {
-          active = stnVisibility.regional;
-        } else if (key === 'stn_active') {
-          active = stnVisibility.active;
-        } else if (key === 'stn_heritage') {
-          active = stnVisibility.heritage;
-        } else if (key === 'milestones') {
-          active = isMilestonesVisible;
-        }
+        if (key === 'historic_net') active = isHistoricNetVisible;
+        else if (key === 'bush_trams') active = isBushTramsVisible;
+        else if (key === 'rail_infra') active = isRailInfraVisible;
+        else if (key === 'active_rails') active = isRailwaysVisible;
+        else if (key === 'stn_regional') active = stnVisibility.regional;
+        else if (key === 'stn_active') active = stnVisibility.active;
+        else if (key === 'stn_heritage') active = stnVisibility.heritage;
+        else if (key === 'milestones') active = isMilestonesVisible;
         item.classList.toggle('layer-muted', !active);
       });
     }
@@ -2825,10 +2655,12 @@
       document.getElementById('minYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('maxYearSlider')?.addEventListener('input', filterEvents);
       document.getElementById('btnPlayTimeline')?.addEventListener('click', toggleTimelinePlayback);
+
       document.getElementById('btnToggleHistoricNet')?.addEventListener('click', toggleHistoricNetOverlay);
+      document.getElementById('btnToggleBushTrams')?.addEventListener('click', toggleBushTramsOverlay);
+      document.getElementById('btnToggleRailInfra')?.addEventListener('click', toggleRailInfraOverlay);
       document.getElementById('btnToggleRailways')?.addEventListener('click', toggleRailwayOverlay);
 
-      // Station Sub-Group Toggles
       document.getElementById('btnToggleStnRegional')?.addEventListener('click', () => toggleStationSubGroup('regional'));
       document.getElementById('btnToggleStnActive')?.addEventListener('click', () => toggleStationSubGroup('active'));
       document.getElementById('btnToggleStnHeritage')?.addEventListener('click', () => toggleStationSubGroup('heritage'));
@@ -2837,11 +2669,7 @@
       updateSavedCountHeader();
 
       document.getElementById('btnFitNZ')?.addEventListener('click', () => {
-        if (markers && markers.getLayers().length > 0) {
-          map.fitBounds(markers.getBounds(), { padding: [50, 50] });
-        } else {
-          map.setView(NZ_CENTER, NZ_ZOOM);
-        }
+        map.setView(NZ_CENTER, NZ_ZOOM);
       });
 
       const btnLayersToggle = document.getElementById('btnLayersToggle');
@@ -2871,14 +2699,11 @@
         searchInput.value = '';
         clearSearchBtn.style.display = 'none';
         filterEvents();
-        searchInput.focus();
       });
 
       document.querySelectorAll('.era-chip').forEach(chip => {
         chip.addEventListener('click', function () {
-          if (timelineTimer) {
-            toggleTimelinePlayback();
-          }
+          if (timelineTimer) toggleTimelinePlayback();
           document.querySelectorAll('.era-chip').forEach(c => c.classList.remove('active'));
           this.classList.add('active');
           document.getElementById('minYearSlider').value = this.dataset.min;
@@ -2887,16 +2712,6 @@
         });
       });
 
-      document.addEventListener('keydown', (e) => {
-        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-        if (e.key === 'ArrowLeft') {
-          window.stepHistory(-1);
-        } else if (e.key === 'ArrowRight') {
-          window.stepHistory(1);
-        }
-      });
-
-      
       // Interactive Legend Events
       const railLegendCard = document.getElementById('railLegendCard');
       const btnCloseLegend = document.getElementById('btnCloseLegend');
@@ -2906,7 +2721,6 @@
         railLegendCard.style.display = 'none';
         btnOpenLegend.style.display = 'inline-flex';
       });
-
       btnOpenLegend?.addEventListener('click', () => {
         btnOpenLegend.style.display = 'none';
         railLegendCard.style.display = 'flex';
@@ -2920,7 +2734,6 @@
       });
 
       updateLegendActiveStates();
-
       loadDataset();
     });
   </script>
