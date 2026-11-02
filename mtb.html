@@ -1495,10 +1495,10 @@
       </div>
 
       <!-- Import Track -->
-      <button id="btnImportGPX" class="top-action-btn" title="Import GPX, KML, or GeoJSON track from your drive">
+      <button id="btnImportGPX" class="top-action-btn" title="Import GPX, KML, KMZ, or GeoJSON track from your drive">
         <span>📥</span> <span>Import Track</span>
       </button>
-      <input type="file" id="gpxFileInput" accept=".gpx,.kml,.geojson,.json,application/vnd.google-earth.kml+xml,application/gpx+xml" multiple style="display:none;">
+      <input type="file" id="gpxFileInput" accept=".gpx,.kml,.kmz,.geojson,.json,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/gpx+xml" multiple style="display:none;">
 
       <!-- GPS Locate / Follow Button -->
       <button id="btnLocateMe" class="top-action-btn" title="Track &amp; Follow My GPS Location">
@@ -1774,6 +1774,7 @@
   <script src="../vendor/leaflet/leaflet-heat.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js'"></script>
   <script src="shared-map.js"></script>
   <script src="mtb-nav.js"></script>
+  <script src="../vendor/fflate/fflate.min.js" onerror="this.onerror=null;this.src='vendor/fflate/fflate.min.js'"></script>
 
   <script>
     // =========================================================================
@@ -4136,6 +4137,34 @@
       return lines;
     }
 
+    function parseKMZToGeoJSON(arrayBuffer, fileName) {
+      if (!window.fflate || typeof fflate.unzipSync !== 'function') {
+        throw new Error('KMZ support requires fflate (zip library not loaded)');
+      }
+      const files = fflate.unzipSync(new Uint8Array(arrayBuffer));
+      const names = Object.keys(files || {});
+      // Prefer doc.kml, else first .kml (root preferred over nested)
+      const kmlNames = names.filter(n => /\.kml$/i.test(n) && !n.endsWith('/'));
+      if (!kmlNames.length) {
+        throw new Error('No .kml file found inside KMZ archive');
+      }
+      kmlNames.sort((a, b) => {
+        const aDoc = /(^|\/)doc\.kml$/i.test(a) ? 0 : 1;
+        const bDoc = /(^|\/)doc\.kml$/i.test(b) ? 0 : 1;
+        if (aDoc !== bDoc) return aDoc - bDoc;
+        const aDepth = (a.match(/\//g) || []).length;
+        const bDepth = (b.match(/\//g) || []).length;
+        return aDepth - bDepth || a.localeCompare(b);
+      });
+      const kmlBytes = files[kmlNames[0]];
+      const kmlText = fflate.strFromU8(kmlBytes);
+      const features = parseKMLToGeoJSON(kmlText, fileName);
+      features.forEach(f => {
+        if (f.properties) f.properties.fileType = 'KMZ';
+      });
+      return features;
+    }
+
     function parseKMLToGeoJSON(kmlText, fileName) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(kmlText, 'text/xml');
@@ -4332,15 +4361,55 @@
       return features;
     }
 
+    function applyImportedFeatures(features, fileName) {
+      if (!features || features.length === 0) {
+        alert(`Could not extract valid track coordinates from "${fileName}".`);
+        return;
+      }
+
+      features.forEach(feat => {
+        importedGpxGroup.addData(feat);
+        savePersistedUserTrack(feat);
+      });
+
+      const bounds = importedGpxGroup.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+      }
+
+      updateTotalStats();
+      if (window.BMMCMtbNav) window.BMMCMtbNav.rebuildHeat();
+      document.getElementById('lblDatasetLoading').textContent = `Loaded: ${fileName} (${features.length} segment${features.length > 1 ? 's' : ''})`;
+
+      if (features.length === 1) {
+        openTrackElevationProfile(features[0]);
+      }
+    }
+
     function handleGPXFiles(files) {
       if (!files || files.length === 0) return;
 
       Array.from(files).forEach(file => {
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
         const reader = new FileReader();
+
+        if (ext === 'kmz') {
+          reader.onload = (e) => {
+            try {
+              const features = parseKMZToGeoJSON(e.target.result, file.name);
+              applyImportedFeatures(features, file.name);
+            } catch (err) {
+              console.error('Import KMZ error:', err);
+              alert(`Error parsing KMZ "${file.name}": ${err.message}`);
+            }
+          };
+          reader.readAsArrayBuffer(file);
+          return;
+        }
+
         reader.onload = (e) => {
           try {
             const text = e.target.result;
-            const ext = (file.name.split('.').pop() || '').toLowerCase();
             let features = [];
 
             if (ext === 'geojson' || ext === 'json') {
@@ -4360,28 +4429,7 @@
               }
             }
 
-            if (!features || features.length === 0) {
-              alert(`Could not extract valid track coordinates from "${file.name}".`);
-              return;
-            }
-
-            features.forEach(feat => {
-              importedGpxGroup.addData(feat);
-              savePersistedUserTrack(feat);
-            });
-
-            const bounds = importedGpxGroup.getBounds();
-            if (bounds.isValid()) {
-              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-            }
-
-            updateTotalStats();
-            if (window.BMMCMtbNav) window.BMMCMtbNav.rebuildHeat();
-            document.getElementById('lblDatasetLoading').textContent = `Loaded: ${file.name} (${features.length} segment${features.length > 1 ? 's' : ''})`;
-
-            if (features.length === 1) {
-              openTrackElevationProfile(features[0]);
-            }
+            applyImportedFeatures(features, file.name);
           } catch (err) {
             console.error('Import file error:', err);
             alert(`Error parsing file "${file.name}": ${err.message}`);
