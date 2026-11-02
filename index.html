@@ -300,20 +300,26 @@
     .search-hit-meta { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
     .search-empty { padding: 14px 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
 
-    .on-this-day {
-      position: absolute; left: 16px; bottom: 18px; z-index: 20;
-      width: min(340px, calc(100vw - 32px));
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 16px; box-shadow: var(--card-shadow);
-      backdrop-filter: blur(14px); padding: 12px 14px;
+    .on-this-day-section {
+      position: relative;
+      z-index: 10;
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(14px);
+      padding: 16px 18px 18px;
     }
     .on-this-day-head {
       display: flex; align-items: center; justify-content: space-between;
       gap: 8px; margin-bottom: 8px;
     }
-    .on-this-day h2 {
+    .on-this-day-section h2 {
       margin: 0; font-size: 0.78rem; font-weight: 800;
       letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+      font-family: 'Space Grotesk', sans-serif;
     }
     .on-this-day-close {
       flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
@@ -322,30 +328,57 @@
       cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
     }
     .on-this-day-close:hover { color: var(--text); background: var(--filter-active); }
-    .on-this-day-list { display: grid; gap: 6px; max-height: 180px; overflow-y: auto; }
-    .on-this-day a {
+    .on-this-day-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    @media (min-width: 769px) {
+      .on-this-day-list { grid-template-columns: 1fr 1fr; }
+    }
+    .on-this-day-list a {
       display: block; text-decoration: none; color: var(--text);
       font-size: 0.8rem; font-weight: 650; line-height: 1.35;
-      padding: 6px 8px; border-radius: 10px; background: var(--filter-bg);
+      padding: 8px 10px; border-radius: 10px; background: var(--filter-bg);
     }
-    .on-this-day a:hover { background: var(--filter-active); }
-    .on-this-day .otd-meta { display: block; font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 2px; }
-    .on-this-day .otd-note { font-size: 0.72rem; color: var(--muted); margin: 0 0 6px; }
+    .on-this-day-list a:hover { background: var(--filter-active); }
+    .on-this-day-list .otd-meta { display: block; font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 2px; }
+    .on-this-day-section .otd-note { font-size: 0.72rem; color: var(--muted); margin: 0 0 10px; }
     @media (max-width: 720px) {
-      .on-this-day { left: 10px; right: 10px; width: auto; bottom: 10px; }
       .search-box input { width: 140px; }
       .search-box input:focus { width: 170px; }
     }
 
-    /* Interactive Stage */
+    .wing-grid-section {
+      position: relative;
+      z-index: 10;
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto 28px;
+    }
+    .wing-grid-section h2 {
+      margin: 0 0 12px;
+      font-size: 0.78rem; font-weight: 800;
+      letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .wing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 769px) {
+      .wing-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Interactive Stage — Primary Museum Wings spider */
     .stage-container {
       position: relative;
       width: 100%;
-      min-height: calc(100vh - 57px);
+      min-height: min(72vh, 720px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px 20px 60px;
+      padding: 16px 20px 28px;
       z-index: 10;
     }
 
@@ -651,8 +684,8 @@
     </div>
   </header>
 
-  <!-- Interactive Constellation Stage -->
-  <main class="stage-container" id="stageContainer">
+  <!-- Interactive Constellation Stage — Primary Museum Wings only -->
+  <main class="stage-container" id="stageContainer" aria-label="Primary Museum Wings">
     <svg id="spokeConduits"></svg>
 
     <div class="spider-network">
@@ -671,16 +704,18 @@
 
       <div class="network-flank" id="rightFlank"></div>
     </div>
-
-    <aside class="on-this-day" id="onThisDayPanel" aria-label="On this day in New Zealand history">
-      <div class="on-this-day-head">
-        <h2>On this day</h2>
-        <button type="button" class="on-this-day-close" id="onThisDayClose" title="Close" aria-label="Close On this day">×</button>
-      </div>
-      <p class="otd-note" id="onThisDayNote">Loading…</p>
-      <div class="on-this-day-list" id="onThisDayList"></div>
-    </aside>
   </main>
+
+  <section class="on-this-day-section" id="on-this-day" aria-label="On this day in New Zealand history">
+    <div class="on-this-day-head">
+      <h2>On this day</h2>
+      <button type="button" class="on-this-day-close" id="onThisDayClose" title="Close" aria-label="Close On this day">×</button>
+    </div>
+    <p class="otd-note" id="onThisDayNote">Loading…</p>
+    <div class="on-this-day-list" id="onThisDayList"></div>
+  </section>
+
+  <div id="wingGridSections"></div>
 
   <!-- Load Navigation Script (Dynamic Source of Truth) -->
   <script src="../vendor/fuse.min.js" onerror="this.onerror=null;this.src='vendor/fuse.min.js'"></script>
@@ -707,7 +742,11 @@
       const WING_IMAGE_LOOKUP = {
       };
 
-      const rawBranches = Array.isArray(window.BMMC_BRANCHES) ? window.BMMC_BRANCHES : [];
+      const rawBranches = Array.isArray(window.BMMC_PAGE_BRANCHES)
+        ? window.BMMC_PAGE_BRANCHES
+        : (Array.isArray(window.BMMC_BRANCHES) ? window.BMMC_BRANCHES.filter(b => !b.menuOnly) : []);
+      const primaryBranch = rawBranches.find(b => (b.group || '') === 'Primary Museum Wings') || rawBranches[0] || null;
+      const gridBranches = rawBranches.filter(b => b !== primaryBranch);
 
       // ==========================================
       // Ambient Floating Motes Canvas
@@ -761,82 +800,95 @@
       // ==========================================
       const leftFlank = document.getElementById('leftFlank');
       const rightFlank = document.getElementById('rightFlank');
-            const svg = document.getElementById('spokeConduits');
+      const svg = document.getElementById('spokeConduits');
       const core = document.getElementById('nexusCore');
       const stage = document.getElementById('stageContainer');
 
-      rawBranches.forEach((branch, index) => {
-        const wingId = `wing-cluster-${index}`;
-        const colorIdx = index % 3;
-        const wingTitle = branch.group || branch.name || branch.title || `Wing ${index + 1}`;
-        const branchItems = branch.items || branch.links || [];
-        const wingImgUrl = branch.image || WING_IMAGE_LOOKUP[wingTitle] || null;
-
-        // Wing Container
-        const cluster = document.createElement('div');
-        cluster.className = 'wing-cluster';
-        cluster.id = wingId;
-        cluster.setAttribute('data-wing-index', index);
-
-        let itemsHTML = '';
-        branchItems.forEach((item, cardIdx) => {
-          const hasChildren = Array.isArray(item.children) && item.children.length > 0;
-          const cleanHref = (item.href || '').replace('./', '');
-          const cardImg = item.image || IMAGE_LOOKUP[item.href] || IMAGE_LOOKUP[cleanHref] || null;
-
-          itemsHTML += `
-            <div class="spoke-card" id="card-${index}-${cardIdx}" data-wing="${index}" data-card="${cardIdx}" data-tags="${(item.label + ' ' + (item.desc || '') + ' ' + item.href).toLowerCase()}">
-              <a href="${item.href}" class="card-layout-link">
-                <div class="card-info-col">
-                  <div class="card-header-row">
-                    <div class="card-meta">
-                      <div class="card-icon">${item.icon || '📁'}</div>
-                      <div class="card-label">${item.label}</div>
-                    </div>
+      function cardHTML(item, wingIndex, cardIdx) {
+        const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+        const cleanHref = (item.href || '').replace('./', '');
+        const cardImg = item.image || IMAGE_LOOKUP[item.href] || IMAGE_LOOKUP[cleanHref] || null;
+        const tags = (item.label + ' ' + (item.desc || '') + ' ' + item.href).toLowerCase();
+        return `
+          <div class="spoke-card" id="card-${wingIndex}-${cardIdx}" data-wing="${wingIndex}" data-card="${cardIdx}" data-tags="${tags}">
+            <a href="${item.href}" class="card-layout-link">
+              <div class="card-info-col">
+                <div class="card-header-row">
+                  <div class="card-meta">
+                    <div class="card-icon">${item.icon || '📁'}</div>
+                    <div class="card-label">${item.label}</div>
                   </div>
-                  ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
                 </div>
-
-                ${cardImg ? `
-                  <div class="card-media-slot" title="${item.label}">
-                    <img src="${cardImg}" alt="${item.label}" class="card-media-img" referrerpolicy="no-referrer" />
-                  </div>
-                ` : ''}
-              </a>
-
-              ${hasChildren ? `
-                <div class="sub-satellite">
-                  ${item.children.map(ch => `
-                    <a href="${ch.href}" class="sub-satellite-link">
-                      <span>${ch.icon || '🗺️'}</span>
-                      <span>${ch.label}</span>
-                      <span style="opacity:0.75; margin-left:3px; font-family:'JetBrains Mono',monospace;">→</span>
-                    </a>
-                  `).join('')}
+                ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+              </div>
+              ${cardImg ? `
+                <div class="card-media-slot" title="${item.label}">
+                  <img src="${cardImg}" alt="${item.label}" class="card-media-img" referrerpolicy="no-referrer" />
                 </div>
               ` : ''}
-            </div>
-          `;
-        });
+            </a>
+            ${hasChildren ? `
+              <div class="sub-satellite">
+                ${item.children.map(ch => `
+                  <a href="${ch.href}" class="sub-satellite-link">
+                    <span>${ch.icon || '🗺️'}</span>
+                    <span>${ch.label}</span>
+                    <span style="opacity:0.75; margin-left:3px; font-family:'JetBrains Mono',monospace;">→</span>
+                  </a>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
 
+      function appendSpiderCluster(flank, index, wingTitle, branchItems, colorIdx, tagLabel) {
+        if (!flank || !branchItems.length) return;
+        const cluster = document.createElement('div');
+        cluster.className = 'wing-cluster';
+        cluster.id = `wing-cluster-${index}`;
+        cluster.setAttribute('data-wing-index', index);
         cluster.innerHTML = `
           <div class="wing-hub" data-color="${colorIdx}" id="hub-node-${index}">
             <div class="wing-info">
               <div class="wing-title">${wingTitle}</div>
-              <span class="wing-tag">${branchItems.length} Exhibits</span>
+              <span class="wing-tag">${tagLabel}</span>
             </div>
-            ${wingImgUrl ? `
-              <div class="wing-media-slot" title="${wingTitle}">
-                <img src="${wingImgUrl}" alt="${wingTitle}" class="wing-media-img" loading="lazy" referrerpolicy="no-referrer" />
-              </div>
-            ` : ''}
           </div>
-          <div class="spoke-cards">${itemsHTML}</div>
+          <div class="spoke-cards">${branchItems.map((item, i) => cardHTML(item, index, i)).join('')}</div>
         `;
+        flank.appendChild(cluster);
+      }
 
-        if (index === 0) leftFlank.appendChild(cluster);
-        else rightFlank.appendChild(cluster);
-      });
+      // Primary Museum Wings → radial spider (split L/R around nexus)
+      if (primaryBranch) {
+        const wingTitle = primaryBranch.group || 'Primary Museum Wings';
+        const items = primaryBranch.items || primaryBranch.links || [];
+        const mid = Math.ceil(items.length / 2);
+        const leftItems = items.slice(0, mid);
+        const rightItems = items.slice(mid);
+        appendSpiderCluster(leftFlank, 0, wingTitle, leftItems, 0, `${items.length} Exhibits`);
+        appendSpiderCluster(rightFlank, 1, wingTitle, rightItems, 0, `${items.length} Exhibits`);
+      }
+
+      // Specialist + NZ Historical → responsive grid sections (2-col desktop / 1-col phone)
+      const gridRoot = document.getElementById('wingGridSections');
+      if (gridRoot) {
+        gridBranches.forEach((branch, gIdx) => {
+          const wingTitle = branch.group || branch.name || branch.title || `Section ${gIdx + 1}`;
+          const branchItems = branch.items || branch.links || [];
+          const section = document.createElement('section');
+          section.className = 'wing-grid-section';
+          section.setAttribute('aria-label', wingTitle);
+          section.innerHTML = `
+            <h2>${wingTitle}</h2>
+            <div class="wing-grid">
+              ${branchItems.map((item, i) => cardHTML(item, 10 + gIdx, i)).join('')}
+            </div>
+          `;
+          gridRoot.appendChild(section);
+        });
+      }
 
       // Conduit Curves Generator
       function createCurve(elemA, elemB, pulseClass, conduitId) {
@@ -1196,11 +1248,18 @@
       }
 
       document.getElementById('onThisDayClose')?.addEventListener('click', () => {
-        const panel = document.getElementById('onThisDayPanel');
+        const panel = document.getElementById('on-this-day');
         if (panel) panel.hidden = true;
       });
 
       renderOnThisDay();
+
+      // Honor deep-link from side menu: index.html#on-this-day
+      if (location.hash === '#on-this-day') {
+        requestAnimationFrame(() => {
+          document.getElementById('on-this-day')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
     })();
 
   </script>

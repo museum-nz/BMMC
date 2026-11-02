@@ -101,7 +101,20 @@
       ]
     },
     {
+      group: "On this day",
+      menuOnly: true,
+      items: [
+        {
+          href: 'index.html#on-this-day',
+          icon: '📅',
+          label: 'Today in the collection',
+          desc: 'Anniversaries & same-date history on the Hub'
+        }
+      ]
+    },
+    {
       group: "Hub tools",
+      menuOnly: true,
       items: [
         {
           href: 'downloads.html',
@@ -128,6 +141,8 @@
 
   // Expose globally so index.html (Spider Hub) can dynamically render from this array
   window.BMMC_BRANCHES = BMMC_BRANCHES;
+  // Hub page sections (excludes menu-only groups like Hub tools / On this day link)
+  window.BMMC_PAGE_BRANCHES = BMMC_BRANCHES.filter(function (b) { return !b.menuOnly; });
 
   // 2. Active Link Matching
   function getCleanCurrentPath() {
