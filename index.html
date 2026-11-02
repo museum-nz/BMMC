@@ -303,14 +303,14 @@
     .on-this-day-section {
       position: relative;
       z-index: 10;
-      width: min(1100px, calc(100% - 32px));
-      margin: 0 auto 28px;
+      width: 100%;
+      margin: 8px 0 0;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       box-shadow: var(--card-shadow);
       backdrop-filter: blur(14px);
-      padding: 16px 18px 18px;
+      padding: 12px 14px 14px;
     }
     .on-this-day-head {
       display: flex; align-items: center; justify-content: space-between;
@@ -331,54 +331,32 @@
     .on-this-day-list {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 8px;
-    }
-    @media (min-width: 769px) {
-      .on-this-day-list { grid-template-columns: 1fr 1fr; }
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
     }
     .on-this-day-list a {
       display: block; text-decoration: none; color: var(--text);
       font-size: 0.8rem; font-weight: 650; line-height: 1.35;
-      padding: 8px 10px; border-radius: 10px; background: var(--filter-bg);
+      padding: 6px 8px; border-radius: 10px; background: var(--filter-bg);
     }
     .on-this-day-list a:hover { background: var(--filter-active); }
     .on-this-day-list .otd-meta { display: block; font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 2px; }
-    .on-this-day-section .otd-note { font-size: 0.72rem; color: var(--muted); margin: 0 0 10px; }
+    .on-this-day-section .otd-note { font-size: 0.72rem; color: var(--muted); margin: 0 0 8px; }
     @media (max-width: 720px) {
       .search-box input { width: 140px; }
       .search-box input:focus { width: 170px; }
     }
 
-    .wing-grid-section {
-      position: relative;
-      z-index: 10;
-      width: min(1100px, calc(100% - 32px));
-      margin: 0 auto 28px;
-    }
-    .wing-grid-section h2 {
-      margin: 0 0 12px;
-      font-size: 0.78rem; font-weight: 800;
-      letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .wing-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    @media (min-width: 769px) {
-      .wing-grid { grid-template-columns: 1fr 1fr; }
-    }
-
-    /* Interactive Stage — Primary Museum Wings spider */
+    /* Interactive Stage — all wings around nexus */
     .stage-container {
       position: relative;
       width: 100%;
-      min-height: min(72vh, 720px);
+      min-height: calc(100vh - 57px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px 20px 28px;
+      padding: 16px 20px 40px;
       z-index: 10;
     }
 
@@ -421,12 +399,25 @@
     }
 
     .spider-network {
-      position: relative; width: 100%; max-width: 1480px;
-      display: grid; grid-template-columns: 1.2fr auto 1.2fr;
-      align-items: center; gap: 36px; z-index: 5;
+      position: relative; width: 100%; max-width: 1600px;
+      display: grid; grid-template-columns: minmax(280px, 1fr) auto minmax(320px, 1.55fr);
+      align-items: center; gap: 28px; z-index: 5;
+      padding-top: 12px;
     }
 
-    .network-flank { display: flex; flex-direction: column; gap: 16px; min-width: 330px; }
+    .network-flank { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    /* Right flank: Specialist + NZ Maps side-by-side on desktop */
+    .network-flank-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-content: start;
+    }
+    @media (min-width: 769px) {
+      .network-flank-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .network-flank-grid .spoke-cards { padding-left: 8px; }
+    .network-flank-grid .card-desc { white-space: normal; }
     
     /* Interactive Spotlight Zoom & Receding Transitions */
     .wing-cluster { 
@@ -625,7 +616,7 @@
     .core-desc { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--cyan); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
 
     @media (max-width: 1100px) {
-      .spider-network { grid-template-columns: 1fr; gap: 32px; }
+      .spider-network { grid-template-columns: 1fr; gap: 28px; }
       .network-center { order: -1; }
       #spokeConduits { display: none; }
       .filter-bar { overflow-x: auto; }
@@ -684,12 +675,22 @@
     </div>
   </header>
 
-  <!-- Interactive Constellation Stage — Primary Museum Wings only -->
-  <main class="stage-container" id="stageContainer" aria-label="Primary Museum Wings">
+  <!-- Interactive Constellation Stage — all wings around nexus -->
+  <main class="stage-container" id="stageContainer" aria-label="BMMC Hub">
     <svg id="spokeConduits"></svg>
 
     <div class="spider-network">
-      <div class="network-flank" id="leftFlank"></div>
+      <!-- Left: Primary (1-col) then On this day -->
+      <div class="network-flank" id="leftFlank">
+        <section class="on-this-day-section" id="on-this-day" aria-label="On this day in New Zealand history">
+          <div class="on-this-day-head">
+            <h2>On this day</h2>
+            <button type="button" class="on-this-day-close" id="onThisDayClose" title="Close" aria-label="Close On this day">×</button>
+          </div>
+          <p class="otd-note" id="onThisDayNote">Loading…</p>
+          <div class="on-this-day-list" id="onThisDayList"></div>
+        </section>
+      </div>
 
       <!-- Center Nexus -->
       <div class="network-center">
@@ -702,20 +703,10 @@
         </div>
       </div>
 
-      <div class="network-flank" id="rightFlank"></div>
+      <!-- Right: Specialist + NZ Maps (2-col desktop / 1-col phone) -->
+      <div class="network-flank network-flank-grid" id="rightFlank"></div>
     </div>
   </main>
-
-  <section class="on-this-day-section" id="on-this-day" aria-label="On this day in New Zealand history">
-    <div class="on-this-day-head">
-      <h2>On this day</h2>
-      <button type="button" class="on-this-day-close" id="onThisDayClose" title="Close" aria-label="Close On this day">×</button>
-    </div>
-    <p class="otd-note" id="onThisDayNote">Loading…</p>
-    <div class="on-this-day-list" id="onThisDayList"></div>
-  </section>
-
-  <div id="wingGridSections"></div>
 
   <!-- Load Navigation Script (Dynamic Source of Truth) -->
   <script src="../vendor/fuse.min.js" onerror="this.onerror=null;this.src='vendor/fuse.min.js'"></script>
@@ -745,8 +736,6 @@
       const rawBranches = Array.isArray(window.BMMC_PAGE_BRANCHES)
         ? window.BMMC_PAGE_BRANCHES
         : (Array.isArray(window.BMMC_BRANCHES) ? window.BMMC_BRANCHES.filter(b => !b.menuOnly) : []);
-      const primaryBranch = rawBranches.find(b => (b.group || '') === 'Primary Museum Wings') || rawBranches[0] || null;
-      const gridBranches = rawBranches.filter(b => b !== primaryBranch);
 
       // ==========================================
       // Ambient Floating Motes Canvas
@@ -842,53 +831,44 @@
         `;
       }
 
-      function appendSpiderCluster(flank, index, wingTitle, branchItems, colorIdx, tagLabel) {
-        if (!flank || !branchItems.length) return;
+      function appendSpiderCluster(flank, index, wingTitle, branchItems, colorIdx, beforeNode) {
+        if (!flank || !branchItems.length) return null;
         const cluster = document.createElement('div');
         cluster.className = 'wing-cluster';
         cluster.id = `wing-cluster-${index}`;
         cluster.setAttribute('data-wing-index', index);
+        const wingImgUrl = WING_IMAGE_LOOKUP[wingTitle] || null;
         cluster.innerHTML = `
           <div class="wing-hub" data-color="${colorIdx}" id="hub-node-${index}">
             <div class="wing-info">
               <div class="wing-title">${wingTitle}</div>
-              <span class="wing-tag">${tagLabel}</span>
+              <span class="wing-tag">${branchItems.length} Exhibits</span>
             </div>
+            ${wingImgUrl ? `
+              <div class="wing-media-slot" title="${wingTitle}">
+                <img src="${wingImgUrl}" alt="${wingTitle}" class="wing-media-img" loading="lazy" referrerpolicy="no-referrer" />
+              </div>
+            ` : ''}
           </div>
           <div class="spoke-cards">${branchItems.map((item, i) => cardHTML(item, index, i)).join('')}</div>
         `;
-        flank.appendChild(cluster);
+        if (beforeNode) flank.insertBefore(cluster, beforeNode);
+        else flank.appendChild(cluster);
+        return cluster;
       }
 
-      // Primary Museum Wings → radial spider (split L/R around nexus)
-      if (primaryBranch) {
-        const wingTitle = primaryBranch.group || 'Primary Museum Wings';
-        const items = primaryBranch.items || primaryBranch.links || [];
-        const mid = Math.ceil(items.length / 2);
-        const leftItems = items.slice(0, mid);
-        const rightItems = items.slice(mid);
-        appendSpiderCluster(leftFlank, 0, wingTitle, leftItems, 0, `${items.length} Exhibits`);
-        appendSpiderCluster(rightFlank, 1, wingTitle, rightItems, 0, `${items.length} Exhibits`);
-      }
-
-      // Specialist + NZ Historical → responsive grid sections (2-col desktop / 1-col phone)
-      const gridRoot = document.getElementById('wingGridSections');
-      if (gridRoot) {
-        gridBranches.forEach((branch, gIdx) => {
-          const wingTitle = branch.group || branch.name || branch.title || `Section ${gIdx + 1}`;
-          const branchItems = branch.items || branch.links || [];
-          const section = document.createElement('section');
-          section.className = 'wing-grid-section';
-          section.setAttribute('aria-label', wingTitle);
-          section.innerHTML = `
-            <h2>${wingTitle}</h2>
-            <div class="wing-grid">
-              ${branchItems.map((item, i) => cardHTML(item, 10 + gIdx, i)).join('')}
-            </div>
-          `;
-          gridRoot.appendChild(section);
-        });
-      }
+      // Spider: all page branches — Primary (+ OTD below) left; Specialist/NZ right (2-col)
+      const otdPanel = document.getElementById('on-this-day');
+      rawBranches.forEach((branch, index) => {
+        const wingTitle = branch.group || branch.name || branch.title || `Wing ${index + 1}`;
+        const branchItems = branch.items || branch.links || [];
+        const colorIdx = index % 3;
+        if (index === 0) {
+          appendSpiderCluster(leftFlank, index, wingTitle, branchItems, colorIdx, otdPanel);
+        } else {
+          appendSpiderCluster(rightFlank, index, wingTitle, branchItems, colorIdx, null);
+        }
+      });
 
       // Conduit Curves Generator
       function createCurve(elemA, elemB, pulseClass, conduitId) {
