@@ -1495,10 +1495,10 @@
       </div>
 
       <!-- Import Track -->
-      <button id="btnImportGPX" class="top-action-btn" title="Import GPX or GeoJSON track from your drive">
+      <button id="btnImportGPX" class="top-action-btn" title="Import GPX, KML, or GeoJSON track from your drive">
         <span>📥</span> <span>Import Track</span>
       </button>
-      <input type="file" id="gpxFileInput" accept=".gpx,.geojson,.json" multiple style="display:none;">
+      <input type="file" id="gpxFileInput" accept=".gpx,.kml,.geojson,.json,application/vnd.google-earth.kml+xml,application/gpx+xml" multiple style="display:none;">
 
       <!-- GPS Locate / Follow Button -->
       <button id="btnLocateMe" class="top-action-btn" title="Track &amp; Follow My GPS Location">
@@ -4070,6 +4070,129 @@
       return validFeatures;
     }
 
+    function parseKmlCoordText(coordText) {
+      if (!coordText) return [];
+      return String(coordText).trim().split(/\s+/).map(pair => {
+        const parts = pair.split(',').map(Number);
+        if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+        if (parts.length >= 3 && !isNaN(parts[2])) return [parts[0], parts[1], parts[2]];
+        return [parts[0], parts[1]];
+      }).filter(Boolean);
+    }
+
+    function localName(el) {
+      return (el.localName || el.nodeName || '').replace(/^.*:/, '').toLowerCase();
+    }
+
+    function findKmlChildren(parent, name) {
+      const want = String(name).toLowerCase();
+      return Array.from(parent.children || []).filter(ch => localName(ch) === want);
+    }
+
+    function findKmlDescendant(parent, name) {
+      const want = String(name).toLowerCase();
+      const all = parent.getElementsByTagName('*');
+      for (let i = 0; i < all.length; i++) {
+        if (localName(all[i]) === want) return all[i];
+      }
+      return null;
+    }
+
+    function extractKmlLineCoords(geomNode) {
+      if (!geomNode) return [];
+      const tag = localName(geomNode);
+      if (tag === 'linestring' || tag === 'linearring') {
+        const coordsNode = findKmlDescendant(geomNode, 'coordinates');
+        const line = parseKmlCoordText(coordsNode && coordsNode.textContent);
+        return line.length ? [line] : [];
+      }
+      if (tag === 'track' || tag === 'gx:track') {
+        const line = [];
+        Array.from(geomNode.getElementsByTagName('*')).forEach(node => {
+          if (localName(node) !== 'coord') return;
+          const parts = String(node.textContent || '').trim().split(/\s+/).map(Number);
+          if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            if (parts.length >= 3 && !isNaN(parts[2])) line.push([parts[0], parts[1], parts[2]]);
+            else line.push([parts[0], parts[1]]);
+          }
+        });
+        return line.length ? [line] : [];
+      }
+      if (tag === 'multigeometry' || tag === 'multitrack') {
+        const lines = [];
+        Array.from(geomNode.children || []).forEach(child => {
+          extractKmlLineCoords(child).forEach(line => lines.push(line));
+        });
+        return lines;
+      }
+      // Unknown geometry wrapper — search nested LineString / Track
+      const lines = [];
+      Array.from(geomNode.getElementsByTagName('*')).forEach(node => {
+        const n = localName(node);
+        if (n === 'linestring' || n === 'linearring' || n === 'track') {
+          extractKmlLineCoords(node).forEach(line => lines.push(line));
+        }
+      });
+      return lines;
+    }
+
+    function parseKMLToGeoJSON(kmlText, fileName) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(kmlText, 'text/xml');
+      const features = [];
+      const placemarks = Array.from(xmlDoc.getElementsByTagName('*')).filter(el => localName(el) === 'placemark');
+
+      placemarks.forEach((pm, pIdx) => {
+        const nameNode = findKmlChildren(pm, 'name')[0] || findKmlDescendant(pm, 'name');
+        const name = (nameNode && nameNode.textContent.trim()) || `${fileName} (Track ${pIdx + 1})`;
+        const multiLine = [];
+
+        Array.from(pm.children || []).forEach(child => {
+          const n = localName(child);
+          if (n === 'name' || n === 'description' || n === 'style' || n === 'styleurl' || n === 'extendeddata') return;
+          extractKmlLineCoords(child).forEach(line => {
+            if (line.length >= 2) multiLine.push(line);
+          });
+        });
+
+        // Fallback: any LineString under placemark
+        if (!multiLine.length) {
+          Array.from(pm.getElementsByTagName('*')).forEach(node => {
+            const n = localName(node);
+            if (n === 'linestring' || n === 'track') {
+              extractKmlLineCoords(node).forEach(line => {
+                if (line.length >= 2) multiLine.push(line);
+              });
+            }
+          });
+        }
+
+        if (!multiLine.length) return;
+
+        const geom = multiLine.length === 1
+          ? { type: 'LineString', coordinates: multiLine[0] }
+          : { type: 'MultiLineString', coordinates: multiLine };
+        const distKm = calculateCoordsLengthKm(geom.coordinates, geom.type);
+        const trackUid = `imported_${Date.now()}_${pIdx}_${name.slice(0, 14).replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+        features.push({
+          type: 'Feature',
+          geometry: geom,
+          properties: {
+            uid: trackUid,
+            name: name,
+            fileName: fileName,
+            fileType: 'KML',
+            lengthKm: distKm,
+            lengthStr: distKm > 0 ? `${distKm.toFixed(1)} km` : '',
+            isImported: true
+          }
+        });
+      });
+
+      return features;
+    }
+
     function parseGPXToGeoJSON(gpxXmlText, fileName) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(gpxXmlText, 'text/xml');
@@ -4224,10 +4347,14 @@
               features = parseGeoJSONText(text, file.name);
             } else if (ext === 'gpx') {
               features = parseGPXToGeoJSON(text, file.name);
+            } else if (ext === 'kml') {
+              features = parseKMLToGeoJSON(text, file.name);
             } else {
               const trimmed = text.trim();
               if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
                 features = parseGeoJSONText(text, file.name);
+              } else if (/<kml[\s>]/i.test(trimmed)) {
+                features = parseKMLToGeoJSON(text, file.name);
               } else if (trimmed.includes('<gpx') || trimmed.startsWith('<?xml')) {
                 features = parseGPXToGeoJSON(text, file.name);
               }

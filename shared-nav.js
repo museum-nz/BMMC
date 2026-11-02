@@ -62,18 +62,28 @@
               desc: 'Geographic 2D map of NZ stamps by issue location' 
             }
           ]
-        },
-        { 
+        }
+      ]
+    },
+    {
+      group: "NZ MTB & Cycle Trails",
+      items: [
+        {
+          href: 'mtb.html',
+          icon: '🚵',
+          label: 'NZ MTB & Cycle Trails',
+          desc: 'Interactive Great Rides, Heartland, CCC & DOC network'
+        }
+      ]
+    },
+    {
+      group: "Trimble NZ History Wall",
+      items: [
+        {
           href: 'trimble.html',
-          icon: '🛰️', 
-          label: 'Trimble NZ History Wall', 
+          icon: '🛰️',
+          label: 'Trimble NZ History Wall',
           desc: 'A bit about Trimble NZ'
-        },
-        { 
-          href: 'mtb.html', 
-          icon: '🚵', 
-          label: 'NZ MTB & Cycle Trails', 
-          desc: 'Interactive Great Rides, Heartland, CCC & DOC network' 
         }
       ]
     },
