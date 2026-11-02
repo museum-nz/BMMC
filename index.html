@@ -594,18 +594,49 @@
       display: block;
     }
 
-    /* Sub-Satellite Link */
+    /* Sub-Satellite Link (nested under parent card — title + description) */
     .sub-satellite {
       margin-top: 6px; padding-top: 6px;
       border-top: 1px dashed var(--card-border);
+      display: flex; flex-direction: column; gap: 4px;
     }
     .sub-satellite-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.7rem; font-weight: 700; color: var(--emerald);
-      text-decoration: none; padding: 3px 8px; border-radius: 5px;
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; padding: 6px 8px; border-radius: 8px;
       background: rgba(16, 185, 129, 0.1); transition: all 0.2s;
+      border-left: 2px solid rgba(16, 185, 129, 0.45);
     }
     .sub-satellite-link:hover { background: rgba(16, 185, 129, 0.22); transform: translateX(3px); }
+    .sub-satellite-icon { font-size: 0.85rem; line-height: 1.2; flex-shrink: 0; }
+    .sub-satellite-text { min-width: 0; flex: 1; }
+    .sub-satellite-label {
+      display: block; font-size: 0.72rem; font-weight: 750; color: var(--emerald);
+      line-height: 1.25;
+    }
+    .sub-satellite-desc {
+      display: block; font-size: 0.65rem; font-weight: 600; color: var(--muted);
+      line-height: 1.3; margin-top: 2px;
+    }
+    .sub-satellite-media {
+      flex-shrink: 0;
+      margin-left: auto;
+      width: 72px;
+      height: 42px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--slot-bg);
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+    .sub-satellite-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
 
     /* Center Nexus Reactor */
     .network-center {
@@ -845,17 +876,34 @@
             </a>
             ${hasChildren ? `
               <div class="sub-satellite">
-                ${item.children.map(ch => `
+                ${item.children.map(ch => {
+                  // Exact href only — avoid museum.html#stats inheriting museum.html image
+                  const chKey = (ch.href || '').replace('./', '');
+                  const chImg = ch.image || IMAGE_LOOKUP[chKey] || IMAGE_LOOKUP[ch.href] || null;
+                  return `
                   <a href="${ch.href}" class="sub-satellite-link">
-                    <span>${ch.icon || '🗺️'}</span>
-                    <span>${ch.label}</span>
-                    <span style="opacity:0.75; margin-left:3px; font-family:'JetBrains Mono',monospace;">→</span>
-                  </a>
-                `).join('')}
+                    <span class="sub-satellite-icon">${ch.icon || '🗺️'}</span>
+                    <span class="sub-satellite-text">
+                      <span class="sub-satellite-label">${ch.label}</span>
+                      ${ch.desc ? `<span class="sub-satellite-desc">${ch.desc}</span>` : ''}
+                    </span>
+                    ${chImg ? `
+                      <span class="sub-satellite-media" title="${ch.label}">
+                        <img src="${chImg}" alt="${ch.label}" class="card-media-img" loading="lazy" referrerpolicy="no-referrer" />
+                      </span>
+                    ` : ''}
+                  </a>`;
+                }).join('')}
               </div>
             ` : ''}
           </div>
         `;
+      }
+
+      function countExhibits(items) {
+        return (items || []).reduce((n, item) => {
+          return n + 1 + (Array.isArray(item.children) ? item.children.length : 0);
+        }, 0);
       }
 
       function appendSpiderCluster(flank, index, wingTitle, branchItems, colorIdx, beforeNode) {
@@ -865,11 +913,12 @@
         cluster.id = `wing-cluster-${index}`;
         cluster.setAttribute('data-wing-index', index);
         const wingImgUrl = WING_IMAGE_LOOKUP[wingTitle] || null;
+        const exhibitCount = countExhibits(branchItems);
         cluster.innerHTML = `
           <div class="wing-hub" data-color="${colorIdx}" id="hub-node-${index}">
             <div class="wing-info">
               <div class="wing-title">${wingTitle}</div>
-              <span class="wing-tag">${branchItems.length} Exhibits</span>
+              <span class="wing-tag">${exhibitCount} Exhibit${exhibitCount === 1 ? '' : 's'}</span>
             </div>
             ${wingImgUrl ? `
               <div class="wing-media-slot" title="${wingTitle}">

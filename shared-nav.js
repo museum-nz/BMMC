@@ -11,25 +11,27 @@
           href: 'museum.html', 
           icon: '🏛️', 
           label: 'Museum Showcase & Catalog', 
-          desc: 'Main artifact exhibition, 3D models & gramophones' 
-        },
-        { 
-          href: 'museum.html#stats', 
-          icon: '📊', 
-          label: 'Museum Insights & Analytics', 
-          desc: 'Chronological charts & artifact distribution' 
-        },
-        { 
-          href: '2Dmap.html', 
-          icon: '🌍', 
-          label: 'Museum Artifact Origin Map', 
-          desc: 'Global manufacturing locations & timeline' 
-        },
-        { 
-          href: 'restoration-guide.html', 
-          icon: '🛠️', 
-          label: 'Artifact Care & Restoration', 
-          desc: 'Workshop guide for metals, timber, leather & finishes' 
+          desc: 'Main artifact exhibition, 3D models & gramophones',
+          children: [
+            { 
+              href: 'museum.html#stats', 
+              icon: '📊', 
+              label: 'Museum Insights & Analytics', 
+              desc: 'Chronological charts & artifact distribution' 
+            },
+            { 
+              href: '2Dmap.html', 
+              icon: '🌍', 
+              label: 'Museum Artifact Origin Map', 
+              desc: 'Global manufacturing locations & timeline' 
+            },
+            { 
+              href: 'restoration-guide.html', 
+              icon: '🛠️', 
+              label: 'Artifact Care & Restoration', 
+              desc: 'Workshop guide for metals, timber, leather & finishes' 
+            }
+          ]
         }
       ]
     },
@@ -53,7 +55,6 @@
           icon: '📮', 
           label: 'NZ Stamp Archive (StampsNZ)', 
           desc: 'Comprehensive philatelic catalog & valuations',
-          // Nested child section (indented under stamps)
           children: [
             { 
               href: '2Dmap_stamps.html', 
@@ -62,6 +63,12 @@
               desc: 'Geographic 2D map of NZ stamps by issue location' 
             }
           ]
+        },
+        {
+          href: 'trimble.html',
+          icon: '🛰️',
+          label: 'Trimble NZ History Wall',
+          desc: 'A bit about Trimble NZ'
         }
       ]
     },
@@ -73,17 +80,6 @@
           icon: '🚵',
           label: 'NZ MTB & Cycle Trails',
           desc: 'Interactive Great Rides, Heartland, CCC & DOC network'
-        }
-      ]
-    },
-    {
-      group: "Trimble NZ History Wall",
-      items: [
-        {
-          href: 'trimble.html',
-          icon: '🛰️',
-          label: 'Trimble NZ History Wall',
-          desc: 'A bit about Trimble NZ'
         }
       ]
     },
