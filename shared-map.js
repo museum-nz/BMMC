@@ -155,20 +155,141 @@
     return L.tileLayer(url, options);
   }
 
-  // Offline NZ vector basemap (PMTiles via protomaps-leaflet). Returns null if unavailable.
+  // Offline NZ vector basemap (PMTiles via protomaps-leaflet v5 + tileset v4).
+  // Requires matching library: older protomaps-leaflet@4 + v4 tiles looks blank/washed-out.
   // options.url — path to nz.pmtiles (default '../data/tiles/nz.pmtiles')
-  // options.theme — 'light' | 'dark' | 'white' | 'grayscale' | 'black' (default 'light')
+  // options.flavor — 'light' | 'dark' | 'white' | 'grayscale' | 'black' | 'atlas' (default 'atlas')
+  //   'atlas' = stronger land/water/road contrast (Carto Voyager–ish) for a readable offline map.
+  // options.lang — label language (default 'en')
+  function offlineAtlasFlavor() {
+    // Based on Protomaps "light", with clearer water, greener parks/woods, warmer earth, yellow highways.
+    return {
+      background: '#c8d7e3',
+      earth: '#f0e9dc',
+      park_a: '#b7d9b0',
+      park_b: '#8fcf8a',
+      hospital: '#f0d9d6',
+      industrial: '#d5dce0',
+      school: '#efe6d4',
+      wood_a: '#b5d4a8',
+      wood_b: '#7fbf72',
+      pedestrian: '#ebe4d4',
+      scrub_a: '#c9d9b8',
+      scrub_b: '#a8c98f',
+      glacier: '#eef4f7',
+      sand: '#efe4c8',
+      beach: '#f2e6b8',
+      aerodrome: '#d8dce2',
+      runway: '#c5cad3',
+      water: '#6eb6e0',
+      zoo: '#b8d4b0',
+      military: '#ddd8d0',
+      tunnel_other_casing: '#d0d0d0',
+      tunnel_minor_casing: '#d0d0d0',
+      tunnel_link_casing: '#d0d0d0',
+      tunnel_major_casing: '#d0d0d0',
+      tunnel_highway_casing: '#d0d0d0',
+      tunnel_other: '#c8c8c8',
+      tunnel_minor: '#c8c8c8',
+      tunnel_link: '#c8c8c8',
+      tunnel_major: '#c8c8c8',
+      tunnel_highway: '#e6c86e',
+      pier: '#e0e0e0',
+      buildings: '#d4cfc6',
+      minor_service_casing: '#d0ccc4',
+      minor_casing: '#d0ccc4',
+      link_casing: '#c9b48a',
+      major_casing_late: '#c9b48a',
+      highway_casing_late: '#c9a24a',
+      other: '#f5f2eb',
+      minor_service: '#f5f2eb',
+      minor_a: '#ffffff',
+      minor_b: '#ffffff',
+      link: '#f7e8b0',
+      major_casing_early: '#c9b48a',
+      major: '#f7e8b0',
+      highway_casing_early: '#c9a24a',
+      highway: '#f0c14a',
+      railway: '#9aa3a8',
+      boundaries: '#8a7a6a',
+      bridges_other_casing: '#d0ccc4',
+      bridges_minor_casing: '#d0ccc4',
+      bridges_link_casing: '#c9b48a',
+      bridges_major_casing: '#c9b48a',
+      bridges_highway_casing: '#c9a24a',
+      bridges_other: '#f5f2eb',
+      bridges_minor: '#ffffff',
+      bridges_link: '#f7e8b0',
+      bridges_major: '#f7e8b0',
+      bridges_highway: '#f0c14a',
+      roads_label_minor: '#6a6560',
+      roads_label_minor_halo: '#ffffff',
+      roads_label_major: '#5a5048',
+      roads_label_major_halo: '#ffffff',
+      ocean_label: '#3d6fa8',
+      subplace_label: '#5a5a5a',
+      subplace_label_halo: '#f0e9dc',
+      city_label: '#2c2c2c',
+      city_label_halo: '#f0e9dc',
+      state_label: '#6a5a4a',
+      state_label_halo: '#f0e9dc',
+      country_label: '#4a3a2a',
+      address_label: '#6a6560',
+      address_label_halo: '#ffffff',
+      pois: {
+        blue: '#1A8CBD', green: '#20834D', lapis: '#315BCF', pink: '#EF56BA',
+        red: '#F2567A', slategray: '#6A5B8F', tangerine: '#CB6704', turquoise: '#00C3D4'
+      },
+      landcover: {
+        grassland: 'rgba(190, 220, 160, 1)',
+        barren: 'rgba(235, 220, 180, 1)',
+        urban_area: 'rgba(220, 215, 205, 1)',
+        farmland: 'rgba(210, 225, 165, 1)',
+        glacier: 'rgba(235, 245, 250, 1)',
+        scrub: 'rgba(210, 215, 165, 1)',
+        forest: 'rgba(140, 185, 130, 1)'
+      }
+    };
+  }
+
+  function defaultOfflinePmtilesUrl() {
+    try {
+      // Phone app LocalServer: prefer the draw-a-box region extract.
+      if (String(location.port) === '18766' ||
+          location.hostname === '127.0.0.1' ||
+          location.hostname === 'localhost') {
+        return 'data/tiles/region.pmtiles';
+      }
+    } catch (_) {}
+    return '../data/tiles/nz.pmtiles';
+  }
+
   function offlineLayer(overrides) {
     const opts = overrides || {};
     if (typeof protomapsL === 'undefined' || typeof protomapsL.leafletLayer !== 'function') return null;
-    const url = opts.url || '../data/tiles/nz.pmtiles';
+    const url = opts.url || defaultOfflinePmtilesUrl();
+    const flavorName = opts.flavor || opts.theme || 'atlas';
+    const lang = opts.lang || 'en';
+    const attribution = opts.attribution ||
+      '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://protomaps.com">Protomaps</a>';
     try {
-      return protomapsL.leafletLayer({
+      const layerOpts = {
         url: url,
-        theme: opts.theme || 'light',
-        attribution: opts.attribution || '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://protomaps.com">Protomaps</a>',
-        maxZoom: opts.maxZoom || 19
-      });
+        attribution: attribution,
+        maxZoom: opts.maxZoom || 19,
+        lang: lang
+      };
+      // Custom atlas palette (v5 paintRules / labelRules). Named flavors use `flavor`.
+      if (flavorName === 'atlas' && typeof protomapsL.paintRules === 'function' && typeof protomapsL.labelRules === 'function') {
+        const atlas = offlineAtlasFlavor();
+        layerOpts.paintRules = protomapsL.paintRules(atlas);
+        layerOpts.labelRules = protomapsL.labelRules(atlas, lang);
+        layerOpts.backgroundColor = atlas.background;
+      } else if (flavorName) {
+        // protomaps-leaflet v5+
+        layerOpts.flavor = flavorName === 'atlas' ? 'light' : flavorName;
+      }
+      return protomapsL.leafletLayer(layerOpts);
     } catch (e) {
       return null;
     }
@@ -327,10 +448,10 @@
     return btn;
   }
 
-  // 8. Fit Popups to Small Screens
-  // On maps no wider than options.breakpoint (default 640px), each popup is shrunk to fit the
-  // screen and auto-panned clear of any floating controls matched by options.obstacles.
-  // Tall popups scroll inside instead of running off screen.
+  // 8. Fit Popups to Screen
+  // Shrinks each popup to the map viewport and auto-pans clear of floating controls matched by
+  // options.obstacles. Tall popups scroll inside instead of running off screen.
+  // options.breakpoint (default Infinity) can limit fitting to narrow widths if needed.
   const POPUP_TIP_ALLOWANCE = 30;
 
   function boxSize(el, sides) {
@@ -375,10 +496,13 @@
     const chromeX = boxSize(content, ['Left', 'Right']) + boxSize(wrapper, ['Left', 'Right']);
     const chromeY = boxSize(content, ['Top', 'Bottom']) + boxSize(wrapper, ['Top', 'Bottom']);
 
-    o.maxWidth = Math.max(120, Math.min(orig.maxWidth, size.x - 2 * m - chromeX));
-    o.minWidth = Math.min(orig.minWidth, o.maxWidth);
-    const fitHeight = Math.max(120, size.y - top - m - chromeY - POPUP_TIP_ALLOWANCE);
+    // Keep room for the tip and map edge; content scrolls when taller than fitHeight.
+    o.maxWidth = Math.max(140, Math.min(orig.maxWidth || 420, size.x - 2 * m - chromeX));
+    o.minWidth = Math.min(orig.minWidth || 0, o.maxWidth);
+    const fitHeight = Math.max(100, size.y - top - m - chromeY - POPUP_TIP_ALLOWANCE);
     o.maxHeight = orig.maxHeight ? Math.min(orig.maxHeight, fitHeight) : fitHeight;
+    o.autoPan = true;
+    o.keepInView = true;
     o.autoPanPaddingTopLeft = L.point(m, top);
     o.autoPanPaddingBottomRight = L.point(m, m);
   }
@@ -418,9 +542,10 @@
   function fitPopupsToScreen(map, options) {
     const opts = options || {};
     map._bmmcPopupFit = {
-      breakpoint: opts.breakpoint || 640,
+      // Fit on all widths by default (was 640 — wide phones / landscape still overflowed).
+      breakpoint: opts.breakpoint === undefined ? Infinity : opts.breakpoint,
       margin: opts.margin === undefined ? 10 : opts.margin,
-      obstacles: opts.obstacles || '.top-controls-wrapper, .leaflet-top .leaflet-control'
+      obstacles: opts.obstacles || '.top-controls-wrapper, .leaflet-top .leaflet-control, .mtb-nav-hud'
     };
   }
 

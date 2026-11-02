@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline data — BMMC</title>
+  <link rel="stylesheet" href="../vendor/fonts/fonts.css" onerror="this.onerror=null;this.href='vendor/fonts/fonts.css'">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --brand: #0284c7;
+      --brand-hover: #0369a1;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --line: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      background: linear-gradient(160deg, #020617 0%, #0f172a 50%, #164e63 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem 1rem 3rem;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    a.back {
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      padding: 0.5rem 0.85rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    h1 {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: 1.35rem;
+      margin: 0;
+      font-weight: 700;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      margin: 0 0 1.25rem;
+      max-width: 36rem;
+    }
+    .banner {
+      display: none;
+      background: #7f1d1d;
+      border: 1px solid #b91c1c;
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .banner.show { display: block; }
+    .pack {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 0.9rem 1rem;
+      margin-bottom: 0.65rem;
+    }
+    .pack input {
+      width: 1.15rem;
+      height: 1.15rem;
+      margin-top: 0.2rem;
+      accent-color: var(--brand);
+    }
+    .pack.disabled { opacity: 0.45; }
+    .pack-body { flex: 1; min-width: 0; }
+    .pack-title {
+      font-weight: 700;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+    .size {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .pack-detail {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 0.25rem;
+      line-height: 1.35;
+    }
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.15);
+      color: var(--ok);
+    }
+    .badge.partial {
+      background: rgba(245,158,11,0.15);
+      color: var(--warn);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.1rem;
+    }
+    button {
+      font: inherit;
+      font-weight: 700;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.7rem 1.1rem;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--brand); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 1.4em;
+    }
+    .status.error { color: #fca5a5; }
+    .bar {
+      margin-top: 0.65rem;
+      height: 0.45rem;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      display: none;
+    }
+    .bar.show { display: block; }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--brand);
+      transition: width 0.25s ease;
+    }
+    .hint {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="index.html">← Hub</a>
+    <h1>Download offline data</h1>
+  </header>
+
+  <p class="lead">
+    Choose packs to save on this phone. Sources are the same Google Sheets and Dropbox
+    URLs the museum already uses. Images still cache on demand when you open them.
+    For basemap tiles, <a href="map-tiles.html" style="color:#7dd3fc;">draw a box and download a map area</a>.
+  </p>
+
+  <div class="banner" id="desktopBanner">
+    This download screen talks to the Android app helper. Open it from the
+    <strong>BMMC Museum</strong> phone app (not a normal browser).
+  </div>
+
+  <div id="packList"></div>
+
+  <div class="actions">
+    <button type="button" class="btn-primary" id="btnDownload">Download selected</button>
+    <button type="button" class="btn-secondary" id="btnClear">Clear selected</button>
+    <button type="button" class="btn-secondary" id="btnRefresh">Refresh status</button>
+  </div>
+
+  <div class="bar" id="progressBar"><span id="progressFill"></span></div>
+  <p class="status" id="statusLine">Loading…</p>
+
+  <p class="hint">
+    CSV ≈ 2&nbsp;MB · Search ≈ 5&nbsp;MB (from this app build) · Heritage ≈ 2&nbsp;MB ·
+    Railway ≈ 3.5&nbsp;MB · MTB ≈ 64&nbsp;MB.
+    <a href="map-tiles.html" style="color:#7dd3fc;">Download a map area</a> (draw a box) for offline basemap tiles.
+  </p>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const listEl = document.getElementById('packList');
+      const statusEl = document.getElementById('statusLine');
+      const barEl = document.getElementById('progressBar');
+      const fillEl = document.getElementById('progressFill');
+      const bannerEl = document.getElementById('desktopBanner');
+      const btnDownload = document.getElementById('btnDownload');
+      const btnClear = document.getElementById('btnClear');
+      const btnRefresh = document.getElementById('btnRefresh');
+
+      let pollTimer = null;
+      let apiOk = false;
+
+      function fmtBytes(n) {
+        if (n == null || n <= 0) return '';
+        if (n < 1000) return n + ' B';
+        if (n < 1e6) return (n / 1e3).toFixed(0) + ' KB';
+        return (n / 1e6).toFixed(n >= 10e6 ? 0 : 1) + ' MB';
+      }
+
+      function selectedIds() {
+        return Array.from(listEl.querySelectorAll('input[type=checkbox]:checked:not(:disabled)'))
+          .map(function (el) { return el.value; });
+      }
+
+      function setBusy(busy) {
+        btnDownload.disabled = busy || !apiOk;
+        btnClear.disabled = busy || !apiOk;
+      }
+
+      function renderPacks(packs) {
+        const prev = {};
+        listEl.querySelectorAll('input[type=checkbox]').forEach(function (el) {
+          prev[el.value] = el.checked;
+        });
+        const hadPrev = Object.keys(prev).length > 0;
+        listEl.innerHTML = '';
+        packs.forEach(function (p) {
+          const row = document.createElement('label');
+          row.className = 'pack' + (p.available === false ? ' disabled' : '');
+          let wantChecked;
+          if (hadPrev && Object.prototype.hasOwnProperty.call(prev, p.id)) wantChecked = prev[p.id];
+          else wantChecked = !p.complete && (p.id === 'csv' || p.id === 'search');
+          const checked = wantChecked ? ' checked' : '';
+          const disabled = p.available === false ? ' disabled' : '';
+          let badge = '';
+          if (p.complete) badge = '<span class="badge">On device</span>';
+          else if (p.presentCount > 0) badge = '<span class="badge partial">Partial</span>';
+          const local = p.localBytes > 0 ? ' · saved ' + fmtBytes(p.localBytes) : '';
+          row.innerHTML =
+            '<input type="checkbox" value="' + p.id + '"' + checked + disabled + ' />' +
+            '<div class="pack-body">' +
+              '<div class="pack-title">' +
+                '<span>' + escapeHtml(p.title) + '</span>' +
+                '<span class="size">~' + fmtBytes(p.approxBytes) + local + '</span>' +
+                badge +
+              '</div>' +
+              '<div class="pack-detail">' + escapeHtml(p.detail) + '</div>' +
+            '</div>';
+          listEl.appendChild(row);
+        });
+      }
+
+      function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, function (m) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m];
+        });
+      }
+
+      function applyStatus(data) {
+        if (data.packs) renderPacks(data.packs);
+        statusEl.textContent = data.message || '';
+        statusEl.classList.toggle('error', !!data.error);
+        const pct = Math.round((data.progress || 0) * 100);
+        if (data.busy) {
+          barEl.classList.add('show');
+          fillEl.style.width = pct + '%';
+        } else {
+          barEl.classList.toggle('show', pct > 0 && pct < 100);
+          fillEl.style.width = pct + '%';
+          if (data.done) fillEl.style.width = data.error ? fillEl.style.width : '100%';
+        }
+        setBusy(!!data.busy);
+        if (data.busy) startPoll();
+        else stopPoll();
+      }
+
+      async function refresh() {
+        try {
+          const res = await fetch('/__bmmc/status', { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          apiOk = true;
+          bannerEl.classList.remove('show');
+          const data = await res.json();
+          applyStatus(data);
+        } catch (e) {
+          apiOk = false;
+          bannerEl.classList.add('show');
+          statusEl.textContent = 'Android download API not available.';
+          statusEl.classList.add('error');
+          setBusy(false);
+          // Static preview of packs when not on the phone app
+          renderPacks([
+            { id: 'csv', title: 'CSV catalogs', detail: 'Exhibits, stamps, gallery, history, trains, maritime, currency, gramophone', approxBytes: 2100000, presentCount: 0, localBytes: 0, complete: false, available: true },
+            { id: 'search', title: 'Search index', detail: 'Hub search & On this day (from this APK build)', approxBytes: 5000000, presentCount: 0, localBytes: 0, complete: false, available: true },
+            { id: 'heritage', title: 'Heritage GeoJSON', detail: 'OSM heritage sites for the history map', approxBytes: 2200000, presentCount: 0, localBytes: 0, complete: false, available: true },
+            { id: 'trains', title: 'Railway GeoJSON', detail: 'Historic rail networks + main trunk', approxBytes: 3500000, presentCount: 0, localBytes: 0, complete: false, available: true },
+            { id: 'mtb', title: 'MTB / cycle GeoJSON', detail: 'Great Rides, DOC, OSM, Christchurch, Heartland, CAP+', approxBytes: 64000000, presentCount: 0, localBytes: 0, complete: false, available: true }
+          ]);
+        }
+      }
+
+      function startPoll() {
+        if (pollTimer) return;
+        pollTimer = setInterval(refresh, 800);
+      }
+      function stopPoll() {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      }
+
+      async function post(path, packs) {
+        const res = await fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ packs: packs })
+        });
+        const data = await res.json().catch(function () { return {}; });
+        if (!res.ok) throw new Error(data.message || ('HTTP ' + res.status));
+        return data;
+      }
+
+      btnDownload.addEventListener('click', async function () {
+        const ids = selectedIds();
+        if (!ids.length) {
+          statusEl.textContent = 'Select at least one pack.';
+          return;
+        }
+        try {
+          setBusy(true);
+          statusEl.classList.remove('error');
+          statusEl.textContent = 'Starting download…';
+          await post('/__bmmc/download', ids);
+          startPoll();
+          await refresh();
+        } catch (e) {
+          statusEl.textContent = e.message || String(e);
+          statusEl.classList.add('error');
+          setBusy(false);
+        }
+      });
+
+      btnClear.addEventListener('click', async function () {
+        const ids = selectedIds();
+        if (!ids.length) {
+          statusEl.textContent = 'Select packs to clear.';
+          return;
+        }
+        if (!confirm('Remove downloaded files for the selected packs?')) return;
+        try {
+          await post('/__bmmc/clear', ids);
+          await refresh();
+        } catch (e) {
+          statusEl.textContent = e.message || String(e);
+          statusEl.classList.add('error');
+        }
+      });
+
+      btnRefresh.addEventListener('click', refresh);
+      refresh();
+    })();
+  </script>
+</body>
+</html>

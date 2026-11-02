@@ -99,6 +99,30 @@
           desc: 'Mosquito Fleet, early arrivals, shipwrecks, whaling & lighthouses' 
         }
       ]
+    },
+    {
+      group: "Hub tools",
+      items: [
+        {
+          href: 'downloads.html',
+          icon: '⬇️',
+          label: 'Download offline data',
+          desc: 'CSV catalogs, search index & GeoJSON packs'
+        },
+        {
+          href: 'map-tiles.html',
+          icon: '🗺️',
+          label: 'Download map area',
+          desc: 'Draw a box for offline basemap tiles'
+        },
+        {
+          href: '#',
+          icon: '🎲',
+          label: 'Surprise Me',
+          desc: 'Random wing / artifact roulette',
+          action: 'surprise'
+        }
+      ]
     }
   ];
 
@@ -147,14 +171,18 @@
     const isChild = depth > 0;
     const href = item.href || '#';
     const active = isLinkActive(href);
+    const actionAttr = item.action ? ` data-bmmc-action="${item.action}"` : '';
 
     // Dynamic tree-indentation styling
     const indentStyles = isChild
       ? `margin-left:${16 * depth}px; padding-left:10px; border-left:2px solid #e2e8f0;`
       : '';
 
+    const tag = item.action ? 'button' : 'a';
+    const hrefAttr = item.action ? 'type="button"' : `href="${href}"`;
+
     let html = `
-      <a href="${href}" class="bmmc-drawer-link ${active ? 'active' : ''}" style="display:flex;align-items:center;gap:10px;padding:${isChild ? '7px 10px' : '9px 12px'};border-radius:8px;text-decoration:none;margin-bottom:2px;${indentStyles}${active ? 'background:rgba(2,132,199,0.12);border-left:3px solid #0284c7;' : ''}">
+      <${tag} ${hrefAttr}${actionAttr} class="bmmc-drawer-link ${active ? 'active' : ''}" style="display:flex;align-items:center;gap:10px;padding:${isChild ? '7px 10px' : '9px 12px'};border-radius:8px;text-decoration:none;margin-bottom:2px;width:100%;border:none;background:${active ? 'rgba(2,132,199,0.12)' : 'transparent'};cursor:pointer;text-align:left;font:inherit;${indentStyles}${active ? 'border-left:3px solid #0284c7;' : ''}">
         <span style="font-size:${isChild ? '16px' : '20px'};line-height:1;flex-shrink:0;">${item.icon || '📁'}</span>
         <div style="min-width:0;flex:1;">
           <div style="font-size:${isChild ? '11.5px' : '12px'};font-weight:800;color:${active ? '#0284c7' : '#1e293b'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" class="dark:text-white">
@@ -162,7 +190,7 @@
           </div>
           ${item.desc ? `<div style="font-size:9.5px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${item.desc}</div>` : ''}
         </div>
-      </a>
+      </${tag}>
     `;
 
     // Process nested children recursively
@@ -220,15 +248,35 @@
           ${generateMenuItemsHTML()}
         </div>
 
-        <div style="padding:14px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;" class="dark:border-slate-800 dark:bg-slate-900">
-          <button id="btnDrawerThemeToggle" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:12px;font-weight:700;cursor:pointer;" class="dark:bg-slate-800 dark:border-slate-700 dark:text-white">
-            <span id="drawerThemeIcon">☀️</span> <span id="drawerThemeLabel">Theme</span>
-          </button>
-          <a href="index.html" style="font-size:12px;font-weight:800;color:#0284c7;text-decoration:none;">Navigation Hub →</a>
+        <div style="padding:14px;border-top:1px solid #e2e8f0;display:flex;flex-direction:column;gap:10px;background:#f8fafc;" class="dark:border-slate-800 dark:bg-slate-900">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <button id="btnDrawerThemeToggle" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:12px;font-weight:700;cursor:pointer;" class="dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+              <span id="drawerThemeIcon">☀️</span> <span id="drawerThemeLabel">Theme</span>
+            </button>
+            <a href="index.html" style="font-size:12px;font-weight:800;color:#0284c7;text-decoration:none;">Navigation Hub →</a>
+          </div>
+          <div id="bmmcDrawerVersion" style="font-size:11px;font-weight:700;color:#64748b;text-align:center;">BMMC</div>
         </div>
       </aside>
     `;
     document.body.appendChild(portal);
+    loadDrawerVersion();
+  }
+
+  async function loadDrawerVersion() {
+    const el = document.getElementById('bmmcDrawerVersion');
+    if (!el) return;
+    try {
+      const res = await fetch('/__bmmc/version', { cache: 'no-store' });
+      if (!res.ok) throw new Error('no api');
+      const data = await res.json();
+      el.textContent = (data.app || 'BMMC') + ' v' + (data.versionName || '?') +
+        (data.versionCode != null ? ' · build ' + data.versionCode : '');
+      el.title = 'Android app version';
+    } catch (_) {
+      el.textContent = 'BMMC web shell';
+      el.title = 'Not running inside the Android app';
+    }
   }
 
   // 7. Fail-safe Drawer Controls
@@ -275,6 +323,21 @@
     if (e.target.closest('#btnCloseDrawer') || e.target.id === 'bmmcBackdrop') {
       e.preventDefault();
       closeDrawer();
+      return;
+    }
+
+    const surpriseBtn = e.target.closest('[data-bmmc-action="surprise"]');
+    if (surpriseBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeDrawer();
+      if (typeof window.bmmcSurpriseMe === 'function') {
+        window.bmmcSurpriseMe();
+      } else if (getCleanCurrentPath() !== 'index.html' && getCleanCurrentPath() !== '' && getCleanCurrentPath() !== '/') {
+        window.location.href = 'index.html?surprise=1';
+      } else {
+        showToast('Open the Hub to run Surprise', '🎲');
+      }
       return;
     }
 

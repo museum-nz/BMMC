@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download map area — BMMC</title>
+  <link rel="stylesheet" href="../vendor/fonts/fonts.css" onerror="this.onerror=null;this.href='vendor/fonts/fonts.css'">
+  <link rel="stylesheet" href="../vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='vendor/leaflet/leaflet.css'">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --brand: #0284c7;
+      --brand-hover: #0369a1;
+      --ok: #22c55e;
+      --err: #ef4444;
+      --line: #334155;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      background: #020617;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(180deg, #0f172a, #020617);
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    a.back {
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      padding: 0.45rem 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    h1 {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: 1.15rem;
+      margin: 0;
+      font-weight: 700;
+    }
+    .panel {
+      padding: 0.75rem 1rem 1rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.4;
+      margin: 0 0 0.75rem;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    label.zoom {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    select {
+      font: inherit;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.55rem;
+    }
+    button {
+      font: inherit;
+      font-weight: 700;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.55rem 0.95rem;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--brand); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .estimate {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.55rem;
+      min-height: 1.25em;
+    }
+    .estimate.warn { color: #fbbf24; }
+    .status {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 0.45rem;
+      min-height: 1.25em;
+    }
+    .status.error { color: #fca5a5; }
+    .bar {
+      margin-top: 0.5rem;
+      height: 0.4rem;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      display: none;
+    }
+    .bar.show { display: block; }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--brand);
+      transition: width 0.2s ease;
+    }
+    .banner {
+      display: none;
+      background: #7f1d1d;
+      border: 1px solid #b91c1c;
+      border-radius: 0.65rem;
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.85rem;
+    }
+    .banner.show { display: block; }
+    #map {
+      flex: 1;
+      min-height: 220px;
+      background: #0b1220;
+    }
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      padding: 0.55rem 1rem 0.85rem;
+      flex-shrink: 0;
+      line-height: 1.35;
+      border-top: 1px solid var(--line);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="downloads.html">← Data</a>
+    <h1>Download map area</h1>
+  </header>
+
+  <div class="panel">
+    <div class="banner" id="desktopBanner">
+      Open this screen from the <strong>BMMC Museum</strong> phone app to download tiles.
+    </div>
+    <p class="lead">
+      Draw mode: drag a box, or tap two opposite corners on a phone. Saves a Protomaps
+      vector cutout (same offline style as the kiosk). Keep boxes city/region sized.
+    </p>
+    <div class="row">
+      <label class="zoom">Max zoom
+        <select id="maxZoom">
+          <option value="11">11</option>
+          <option value="12" selected>12</option>
+          <option value="13">13</option>
+        </select>
+      </label>
+      <button type="button" class="btn-secondary" id="btnClearBox">Clear box</button>
+      <button type="button" class="btn-primary" id="btnDownload" disabled>Download area</button>
+      <button type="button" class="btn-secondary" id="btnClearSaved">Remove saved map</button>
+    </div>
+    <div class="estimate" id="estimate">Draw a box to see size estimate.</div>
+    <div class="bar" id="progressBar"><span id="progressFill"></span></div>
+    <p class="status" id="statusLine">Loading…</p>
+  </div>
+
+  <div id="map"></div>
+  <p class="hint">
+    Source: Protomaps daily planet (OpenStreetMap data). Saved as
+    <code>data/tiles/region.pmtiles</code> and used when map pages fall back to Offline.
+  </p>
+
+  <script src="../vendor/leaflet/leaflet.js" onerror="this.onerror=null;this.src='vendor/leaflet/leaflet.js'"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const MAX_TILES = 2500;
+      const BYTES_PER_TILE = 4000;
+
+      const statusEl = document.getElementById('statusLine');
+      const estimateEl = document.getElementById('estimate');
+      const bannerEl = document.getElementById('desktopBanner');
+      const barEl = document.getElementById('progressBar');
+      const fillEl = document.getElementById('progressFill');
+      const btnDownload = document.getElementById('btnDownload');
+      const btnClearBox = document.getElementById('btnClearBox');
+      const btnClearSaved = document.getElementById('btnClearSaved');
+      const maxZoomEl = document.getElementById('maxZoom');
+
+      let apiOk = false;
+      let pollTimer = null;
+      let bounds = null;
+      let rect = null;
+      let startLatLng = null;
+      let drawing = false;
+
+      const map = L.map('map', {
+        zoomControl: true,
+        // Prefer click/tap for box corners on touch devices
+        tap: true,
+      }).setView([-41.2, 174.0], 5);
+      // Esri World Topo — no API key (Carto free basemaps now require a key).
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 18,
+      }).addTo(map);
+
+      function lonToX(lon, z) {
+        const n = 1 << z;
+        let x = Math.floor((lon + 180) / 360 * n);
+        return Math.max(0, Math.min(n - 1, x));
+      }
+      function latToY(lat, z) {
+        const n = 1 << z;
+        const rad = lat * Math.PI / 180;
+        let y = Math.floor((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2 * n);
+        return Math.max(0, Math.min(n - 1, y));
+      }
+      function countTiles(west, south, east, north, maxZoom) {
+        let total = 0;
+        for (let z = 0; z <= maxZoom; z++) {
+          const x0 = Math.min(lonToX(west, z), lonToX(east, z));
+          const x1 = Math.max(lonToX(west, z), lonToX(east, z));
+          const y0 = Math.min(latToY(north, z), latToY(south, z));
+          const y1 = Math.max(latToY(north, z), latToY(south, z));
+          total += (x1 - x0 + 1) * (y1 - y0 + 1);
+          if (total > MAX_TILES) return total;
+        }
+        return total;
+      }
+      function fmtBytes(n) {
+        if (n < 1e6) return Math.round(n / 1e3) + ' KB';
+        return (n / 1e6).toFixed(n >= 10e6 ? 0 : 1) + ' MB';
+      }
+
+      function updateEstimate() {
+        if (!bounds) {
+          estimateEl.textContent = 'Draw a box to see size estimate.';
+          estimateEl.classList.remove('warn');
+          btnDownload.disabled = true;
+          return;
+        }
+        const west = bounds.getWest();
+        const south = bounds.getSouth();
+        const east = bounds.getEast();
+        const north = bounds.getNorth();
+        const z = parseInt(maxZoomEl.value, 10) || 13;
+        const tiles = countTiles(west, south, east, north, z);
+        const approx = tiles * BYTES_PER_TILE;
+        const tooBig = tiles > MAX_TILES;
+        estimateEl.textContent = tooBig
+          ? 'Too large (~' + tiles.toLocaleString() + ' tiles). Shrink the box or lower max zoom (limit ' + MAX_TILES + ').'
+          : '~' + tiles.toLocaleString() + ' tiles · about ' + fmtBytes(approx) + ' (z0–' + z + ')';
+        estimateEl.classList.toggle('warn', tooBig);
+        btnDownload.disabled = !apiOk || tooBig || tiles < 1;
+      }
+
+      function setRect(b) {
+        bounds = b;
+        if (rect) map.removeLayer(rect);
+        rect = L.rectangle(b, {
+          color: '#38bdf8',
+          weight: 2,
+          fillColor: '#0ea5e9',
+          fillOpacity: 0.15
+        }).addTo(map);
+        updateEstimate();
+      }
+
+      // Draw mode: drag a box (mouse) or tap two corners (touch-friendly).
+      let drawMode = true;
+      let cornerA = null;
+      let cornerMarker = null;
+      const drawBtn = document.createElement('button');
+      drawBtn.type = 'button';
+      drawBtn.className = 'btn-secondary';
+      drawBtn.textContent = 'Draw mode: on';
+      drawBtn.style.borderColor = '#38bdf8';
+      document.querySelector('.row').insertBefore(drawBtn, btnClearBox);
+      map.dragging.disable();
+      drawBtn.addEventListener('click', function () {
+        drawMode = !drawMode;
+        drawBtn.textContent = drawMode ? 'Draw mode: on' : 'Draw mode: off (pan)';
+        drawBtn.style.borderColor = drawMode ? '#38bdf8' : '';
+        if (drawMode) map.dragging.disable();
+        else map.dragging.enable();
+        cornerA = null;
+        if (cornerMarker) { map.removeLayer(cornerMarker); cornerMarker = null; }
+      });
+
+      function clearCornerDraft() {
+        cornerA = null;
+        if (cornerMarker) { map.removeLayer(cornerMarker); cornerMarker = null; }
+      }
+
+      map.on('mousedown', function (e) {
+        if (!drawMode || !e.originalEvent || e.originalEvent.button !== 0) return;
+        // Ignore synthetic mouse from touch — use click (two-corner) for touch instead.
+        if (e.originalEvent.pointerType === 'touch' || e.originalEvent.sourceCapabilities?.firesTouchEvents) {
+          return;
+        }
+        drawing = true;
+        startLatLng = e.latlng;
+        clearCornerDraft();
+        L.DomEvent.preventDefault(e);
+      });
+      map.on('mousemove', function (e) {
+        if (!drawing || !startLatLng) return;
+        setRect(L.latLngBounds(startLatLng, e.latlng));
+      });
+      function endDraw(e) {
+        if (!drawing) return;
+        drawing = false;
+        if (startLatLng && e && e.latlng) setRect(L.latLngBounds(startLatLng, e.latlng));
+        startLatLng = null;
+      }
+      map.on('mouseup', endDraw);
+      map.on('mouseleave', function () {
+        if (drawing) {
+          drawing = false;
+          startLatLng = null;
+        }
+      });
+
+      // Tap two opposite corners (works reliably on phone WebView).
+      map.on('click', function (e) {
+        if (!drawMode || drawing) return;
+        if (!cornerA) {
+          cornerA = e.latlng;
+          if (cornerMarker) map.removeLayer(cornerMarker);
+          cornerMarker = L.circleMarker(e.latlng, {
+            radius: 7, color: '#38bdf8', fillColor: '#0ea5e9', fillOpacity: 0.9, weight: 2,
+          }).addTo(map).bindTooltip('Tap opposite corner', { permanent: true, direction: 'top' }).openTooltip();
+          estimateEl.textContent = 'First corner set — tap the opposite corner.';
+          return;
+        }
+        setRect(L.latLngBounds(cornerA, e.latlng));
+        clearCornerDraft();
+      });
+
+      btnClearBox.addEventListener('click', function () {
+        bounds = null;
+        if (rect) { map.removeLayer(rect); rect = null; }
+        clearCornerDraft();
+        updateEstimate();
+      });
+      maxZoomEl.addEventListener('change', updateEstimate);
+
+      function applyStatus(data) {
+        statusEl.textContent = data.message || '';
+        statusEl.classList.toggle('error', !!data.error);
+        const pct = Math.round((data.progress || 0) * 100);
+        if (data.busy) {
+          barEl.classList.add('show');
+          fillEl.style.width = pct + '%';
+          btnDownload.disabled = true;
+          btnClearSaved.disabled = true;
+        } else {
+          barEl.classList.toggle('show', pct > 0 && pct < 100 && !data.done);
+          fillEl.style.width = data.done && !data.error ? '100%' : pct + '%';
+          btnClearSaved.disabled = false;
+          updateEstimate();
+          if (data.tiles && data.tiles.present) {
+            statusEl.textContent = (data.message || 'Ready.') +
+              ' Saved map on device (' + fmtBytes(data.tiles.localBytes) + ').';
+          }
+        }
+        if (data.busy) startPoll();
+        else stopPoll();
+      }
+
+      async function refresh() {
+        try {
+          const res = await fetch('/__bmmc/status', { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          apiOk = true;
+          bannerEl.classList.remove('show');
+          applyStatus(await res.json());
+        } catch (e) {
+          apiOk = false;
+          bannerEl.classList.add('show');
+          statusEl.textContent = 'Android download API not available.';
+          statusEl.classList.add('error');
+          btnDownload.disabled = true;
+        }
+      }
+      function startPoll() {
+        if (pollTimer) return;
+        pollTimer = setInterval(refresh, 900);
+      }
+      function stopPoll() {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      }
+
+      btnDownload.addEventListener('click', async function () {
+        if (!bounds) return;
+        const payload = {
+          west: bounds.getWest(),
+          south: bounds.getSouth(),
+          east: bounds.getEast(),
+          north: bounds.getNorth(),
+          maxZoom: parseInt(maxZoomEl.value, 10) || 13
+        };
+        try {
+          statusEl.classList.remove('error');
+          statusEl.textContent = 'Starting…';
+          btnDownload.disabled = true;
+          const res = await fetch('/__bmmc/tiles/extract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json().catch(function () { return {}; });
+          if (!res.ok) throw new Error(data.message || ('HTTP ' + res.status));
+          startPoll();
+          await refresh();
+        } catch (e) {
+          statusEl.textContent = e.message || String(e);
+          statusEl.classList.add('error');
+          updateEstimate();
+        }
+      });
+
+      btnClearSaved.addEventListener('click', async function () {
+        if (!confirm('Remove the saved offline map region from this phone?')) return;
+        try {
+          await fetch('/__bmmc/tiles/clear', { method: 'POST' });
+          await refresh();
+        } catch (e) {
+          statusEl.textContent = e.message || String(e);
+          statusEl.classList.add('error');
+        }
+      });
+
+      refresh();
+    })();
+  </script>
+</body>
+</html>

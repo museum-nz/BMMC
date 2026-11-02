@@ -307,10 +307,21 @@
       border-radius: 16px; box-shadow: var(--card-shadow);
       backdrop-filter: blur(14px); padding: 12px 14px;
     }
+    .on-this-day-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 8px;
+    }
     .on-this-day h2 {
-      margin: 0 0 8px; font-size: 0.78rem; font-weight: 800;
+      margin: 0; font-size: 0.78rem; font-weight: 800;
       letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
     }
+    .on-this-day-close {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid var(--card-border); background: var(--filter-bg);
+      color: var(--muted); font-size: 1rem; font-weight: 700; line-height: 1;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .on-this-day-close:hover { color: var(--text); background: var(--filter-active); }
     .on-this-day-list { display: grid; gap: 6px; max-height: 180px; overflow-y: auto; }
     .on-this-day a {
       display: block; text-decoration: none; color: var(--text);
@@ -630,17 +641,13 @@
       </a>
     </div>
 
-    <!-- Right-aligned Actions -->
+    <!-- Right-aligned Actions (Data / Surprise / version live in the Menu drawer) -->
     <div class="hud-actions">
       <div class="search-box" id="hubSearchBox">
         <span class="search-icon" aria-hidden="true">🔍</span>
         <input type="search" id="hubSearchInput" placeholder="Search all wings…" autocomplete="off" aria-label="Search museum wings" />
         <div class="search-results" id="hubSearchResults" role="listbox" aria-label="Search results"></div>
       </div>
-
-      <button class="surprise-btn" id="btnSurprise" title="Surprise Me (Artifact Roulette)">
-        <span>🎲</span> <span>Surprise</span>
-      </button>
     </div>
   </header>
 
@@ -666,7 +673,10 @@
     </div>
 
     <aside class="on-this-day" id="onThisDayPanel" aria-label="On this day in New Zealand history">
-      <h2>On this day</h2>
+      <div class="on-this-day-head">
+        <h2>On this day</h2>
+        <button type="button" class="on-this-day-close" id="onThisDayClose" title="Close" aria-label="Close On this day">×</button>
+      </div>
       <p class="otd-note" id="onThisDayNote">Loading…</p>
       <div class="on-this-day-list" id="onThisDayList"></div>
     </aside>
@@ -754,7 +764,6 @@
             const svg = document.getElementById('spokeConduits');
       const core = document.getElementById('nexusCore');
       const stage = document.getElementById('stageContainer');
-            const btnSurprise = document.getElementById('btnSurprise');
 
       rawBranches.forEach((branch, index) => {
         const wingId = `wing-cluster-${index}`;
@@ -899,18 +908,21 @@
 
       
 
-      // Surprise Roulette Launcher
+      // Surprise Roulette Launcher (also exposed for Menu drawer)
       let isRolling = false;
       function triggerRoulette() {
         if (isRolling) return;
         isRolling = true;
-        btnSurprise.classList.add('rolling');
 
         // Reset any spotlight filters
         const allBtn = document.querySelector('.filter-btn[data-target="all"]');
         if (allBtn) allBtn.click();
 
         const allCards = Array.from(document.querySelectorAll('.spoke-card'));
+        if (!allCards.length) {
+          isRolling = false;
+          return;
+        }
         let step = 0;
         const totalSteps = 16;
         let delay = 60;
@@ -927,8 +939,6 @@
             delay += 18;
             setTimeout(rollStep, delay);
           } else {
-            // Winner locked
-            btnSurprise.classList.remove('rolling');
             isRolling = false;
             if (typeof window.showBMMCToast === 'function') {
               window.showBMMCToast('✨ Opening Surprise Exhibit...', '🎲');
@@ -942,8 +952,15 @@
         rollStep();
       }
 
-      if (btnSurprise) btnSurprise.addEventListener('click', triggerRoulette);
+      window.bmmcSurpriseMe = triggerRoulette;
       if (core) core.addEventListener('click', triggerRoulette);
+      // Deep-link from Menu on other pages: index.html?surprise=1
+      try {
+        if (new URLSearchParams(window.location.search).get('surprise') === '1') {
+          history.replaceState({}, '', 'index.html');
+          setTimeout(triggerRoulette, 400);
+        }
+      } catch (_) {}
 
       // Hotkeys
       window.addEventListener('keydown', (e) => {
@@ -1178,8 +1195,14 @@
         }).join('');
       }
 
+      document.getElementById('onThisDayClose')?.addEventListener('click', () => {
+        const panel = document.getElementById('onThisDayPanel');
+        if (panel) panel.hidden = true;
+      });
+
       renderOnThisDay();
     })();
+
   </script>
 </body>
 </html>

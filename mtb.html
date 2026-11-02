@@ -676,12 +676,27 @@
       border-color: #e11d48;
     }
 
-    /* Popups */
+    /* Popups — keep inside the map viewport on phone / landscape */
+    .leaflet-popup {
+      max-width: min(92vw, 420px) !important;
+    }
+    .leaflet-popup-content-wrapper {
+      max-width: min(92vw, 420px);
+    }
+    .leaflet-popup-content {
+      margin: 10px 12px;
+      max-width: min(88vw, 400px);
+      max-height: min(58vh, 460px);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     .trail-popup-card {
       font-family: system-ui, sans-serif;
-      min-width: min(405px, 80vw);
-      max-width: min(520px, 88vw);
-      padding: 2px 20px 2px 2px;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 2px 4px 2px 2px;
       color: #0f172a;
     }
     .trail-popup-card h3 {
@@ -727,7 +742,7 @@
 
     .popup-stats-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
       gap: 6px;
       margin: 8px 0;
       padding: 8px;
@@ -1290,6 +1305,71 @@
       color: #64748b;
     }
 
+    /* Navigation / Windy / heat UI */
+    .mtb-nav-sheet {
+      position: fixed; inset: 0; z-index: 12000;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 16px;
+    }
+    .mtb-nav-sheet[hidden] { display: none !important; }
+    .mtb-nav-sheet-card {
+      width: min(420px, 100%);
+      background: #0f172a; color: #f8fafc;
+      border: 1px solid #334155; border-radius: 16px;
+      padding: 14px 14px 10px; display: flex; flex-direction: column; gap: 8px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    }
+    .mtb-nav-sheet-title { font-weight: 800; font-size: 1.05rem; }
+    .mtb-nav-sheet-coords { font-size: 0.8rem; color: #94a3b8; font-family: ui-monospace, monospace; }
+    .mtb-nav-action {
+      font: inherit; font-weight: 700; border: none; border-radius: 10px;
+      padding: 0.7rem 0.9rem; cursor: pointer; background: #0284c7; color: #fff; text-align: left;
+    }
+    .mtb-nav-action.secondary { background: #1e293b; border: 1px solid #475569; }
+    .mtb-nav-action.ghost { background: transparent; color: #94a3b8; border: 1px solid #334155; }
+    .mtb-nav-hud {
+      position: fixed; left: 12px; right: 12px; bottom: 18px; z-index: 11000;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(15, 23, 42, 0.94); color: #f8fafc;
+      border: 1px solid #334155; border-radius: 14px; padding: 10px 12px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+    }
+    .mtb-nav-hud[hidden] { display: none !important; }
+    .mtb-nav-hud-main { flex: 1; min-width: 0; }
+    .mtb-nav-turn { font-weight: 800; font-size: 1rem; }
+    .mtb-nav-meta { display: flex; gap: 12px; margin-top: 2px; font-size: 0.82rem; color: #94a3b8; }
+    .mtb-nav-stop {
+      width: 36px; height: 36px; border-radius: 999px; border: 1px solid #475569;
+      background: #1e293b; color: #f8fafc; font-weight: 800; cursor: pointer;
+    }
+    .mtb-windy-panel {
+      position: fixed; inset: 0; z-index: 10500;
+      width: 100%; height: 100%;
+      background: #0b1220;
+      border: none; border-radius: 0;
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    .mtb-windy-panel[hidden] { display: none !important; }
+    .mtb-windy-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px;
+      font-size: 0.9rem; font-weight: 700; color: #e2e8f0;
+      background: rgba(15, 23, 42, 0.96);
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+    }
+    .mtb-windy-bar span { flex: 1; }
+    .mtb-windy-bar button {
+      font: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      border: 1px solid #475569; background: #1e293b; color: #f8fafc;
+      border-radius: 8px; padding: 8px 12px; min-height: 40px;
+    }
+    .mtb-windy-bar button#mtbWindyClose {
+      background: #0284c7; border-color: #0369a1; min-width: 44px;
+    }
+    .mtb-windy-panel iframe { flex: 1; width: 100%; border: 0; background: #000; }
+
   </style>
 </head>
 <body>
@@ -1316,6 +1396,23 @@
             <button id="btnLayerSat" class="layer-option-btn" title="Satellite Imagery"><span>🛰️</span><span>Sat</span></button>
             <button id="btnLayerOffline" class="layer-option-btn" title="Offline NZ vector map (used automatically when online tiles fail)"><span>💾</span><span>Offline</span></button>
           </div>
+
+          <div class="layer-section-divider"></div>
+
+          <div class="layer-section-title">Weather &amp; density</div>
+          <div class="layer-overlay-col">
+            <button id="btnToggleWindy" class="layer-option-btn" type="button" title="Windy.com wind overlay (needs network)">
+              <span class="layer-opt-left"><span>💨</span><span>Windy wind</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+            <button id="btnToggleRideHeat" class="layer-option-btn" type="button" title="Heatmap from loaded / saved / imported rides (Strava Global Heatmap alternative)">
+              <span class="layer-opt-left"><span>🔥</span><span>Ride density</span></span>
+              <span class="layer-status-indicator">✓</span>
+            </button>
+          </div>
+          <p style="margin:6px 0 0;font-size:10.5px;line-height:1.35;color:#64748b;">
+            Strava’s Global Heatmap isn’t freely embeddable. Ride density uses trails and GPX already on this map.
+          </p>
 
           <div class="layer-section-divider"></div>
 
@@ -1406,6 +1503,10 @@
       <!-- GPS Locate / Follow Button -->
       <button id="btnLocateMe" class="top-action-btn" title="Track &amp; Follow My GPS Location">
         <span>📍</span> <span id="lblLocate">Find Me</span>
+      </button>
+
+      <button id="btnNavHelp" class="top-action-btn" type="button" title="Long-press the map to navigate">
+        <span>🧭</span> <span>Navigate</span>
       </button>
 
       <!-- Record Ride Button -->
@@ -1670,7 +1771,9 @@
     }
   </script>
   <script src="../vendor/leaflet/protomaps-leaflet.js" onerror="this.onerror=null;"></script>
+  <script src="../vendor/leaflet/leaflet-heat.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js'"></script>
   <script src="shared-map.js"></script>
+  <script src="mtb-nav.js"></script>
 
   <script>
     // =========================================================================
@@ -1803,6 +1906,8 @@
     // GPS & Recorder State
     let userMarker = null;
     let userCircle = null;
+    let lastUserLatLng = null;
+    let lastUserSpeedKmh = null;
     let isTrackingActive = false;
     let isFollowingUser = false;
     let watchId = null;
@@ -1985,7 +2090,7 @@
           if (layer && typeof layer.openPopup === 'function') {
             layer.openPopup(latlng);
           } else {
-            L.popup({ maxWidth: 520 })
+            L.popup({ maxWidth: 360, maxHeight: 420, autoPan: true, keepInView: true })
               .setLatLng(latlng)
               .setContent(buildTrailPopup(feat.properties))
               .openOn(map);
@@ -2893,6 +2998,9 @@
       const speedMs = pos.coords.speed;
       const speedKmh = (speedMs !== null && speedMs >= 0) ? (speedMs * 3.6).toFixed(1) : '0.0';
       const userLatLng = [lat, lng];
+      lastUserLatLng = userLatLng;
+      lastUserSpeedKmh = parseFloat(speedKmh) || null;
+      if (window.BMMCMtbNav) window.BMMCMtbNav.onGps(userLatLng, lastUserSpeedKmh);
 
       const lblLocate = document.getElementById('lblLocate');
       if (isTrackingActive && lblLocate) lblLocate.textContent = 'Tracking';
@@ -3524,7 +3632,12 @@
           lineJoin: 'round'
         },
         onEachFeature: (feat, layer) => {
-          layer.bindPopup(() => buildImportedPopup(feat.properties, layer), { maxWidth: 510 });
+          layer.bindPopup(() => buildImportedPopup(feat.properties, layer), {
+            maxWidth: 360,
+            maxHeight: 420,
+            autoPan: true,
+            keepInView: true,
+          });
           layer.on('click', (e) => {
             handleTrackSelection(feat, e.originalEvent, layer);
           });
@@ -3705,7 +3818,12 @@
             };
           },
           onEachFeature: (feat, layer) => {
-            layer.bindPopup(() => buildTrailPopup(feat.properties), { maxWidth: 520 });
+            layer.bindPopup(() => buildTrailPopup(feat.properties), {
+              maxWidth: 360,
+              maxHeight: 420,
+              autoPan: true,
+              keepInView: true,
+            });
             layer.on('click', (e) => {
               handleTrackSelection(feat, e.originalEvent, layer);
             });
@@ -3782,6 +3900,7 @@
       }
       totalTrackCount = count;
       document.getElementById('lblDatasetLoading').textContent = `${count.toLocaleString()} trail segments`;
+      if (window.BMMCMtbNav) window.BMMCMtbNav.rebuildHeat();
     }
 
     // =========================================================================
@@ -4130,6 +4249,7 @@
             }
 
             updateTotalStats();
+            if (window.BMMCMtbNav) window.BMMCMtbNav.rebuildHeat();
             document.getElementById('lblDatasetLoading').textContent = `Loaded: ${file.name} (${features.length} segment${features.length > 1 ? 's' : ''})`;
 
             if (features.length === 1) {
@@ -5501,6 +5621,76 @@
       statsEl.textContent = `${dist} km • ${speed} km/h • ${time}`;
     }
 
+    function collectVisibleTrackLatLngs() {
+      const pts = [];
+      const pushLatLngs = (latlngs) => {
+        if (!latlngs) return;
+        if (latlngs[0] && typeof latlngs[0].lat === 'number') {
+          for (const ll of latlngs) pts.push([ll.lat, ll.lng]);
+          return;
+        }
+        for (const part of latlngs) pushLatLngs(part);
+      };
+      const scanGroup = (grp) => {
+        if (!grp || !map.hasLayer(grp)) return;
+        grp.eachLayer((layer) => {
+          if (layer.getLatLngs) pushLatLngs(layer.getLatLngs());
+        });
+      };
+      Object.keys(layerGroups).forEach((id) => scanGroup(layerGroups[id]));
+      scanGroup(importedGpxGroup);
+      return pts;
+    }
+
+    function collectVisibleTrackLines() {
+      const lines = [];
+      const scanGroup = (grp) => {
+        if (!grp || !map.hasLayer(grp)) return;
+        grp.eachLayer((layer) => {
+          if (layer.getLatLngs) lines.push(layer.getLatLngs());
+        });
+      };
+      Object.keys(layerGroups).forEach((id) => scanGroup(layerGroups[id]));
+      scanGroup(importedGpxGroup);
+      return lines;
+    }
+
+    function initMtbNavExtras() {
+      if (!window.BMMCMtbNav || !map) return;
+      BMMCMtbNav.init({
+        map: map,
+        getUserLatLng: () => lastUserLatLng,
+        getUserSpeedKmh: () => lastUserSpeedKmh,
+        collectTrackLatLngs: collectVisibleTrackLatLngs,
+        collectTrackLines: collectVisibleTrackLines,
+        ensureGps: () => {
+          isTrackingActive = true;
+          isFollowingUser = true;
+          updateGpsState();
+          const lbl = document.getElementById('lblLocate');
+          if (lbl) lbl.textContent = 'Tracking';
+        },
+      });
+
+      document.getElementById('btnToggleWindy')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        BMMCMtbNav.toggleWindy();
+      });
+      document.getElementById('btnToggleRideHeat')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        BMMCMtbNav.toggleHeat();
+      });
+      document.getElementById('btnNavHelp')?.addEventListener('click', () => {
+        alert(
+          'Long-press (or right-click) anywhere on the map to set a destination.\n\n' +
+          '• Navigate here (direct) — bearing + distance + ETA\n' +
+          '• Follow nearest trail — guidance along a loaded track\n' +
+          '• Open in Google Maps — full turn-by-turn with alternatives\n\n' +
+          'Windy wind and Ride density are under Layers.',
+        );
+      });
+    }
+
     function startApp() {
       if (!window.L) {
         _leafletWaitAttempts++;
@@ -5517,6 +5707,7 @@
       initElevationEvents();
       initGpsAndRecorder();
       initDimScreenMode();
+      initMtbNavExtras();
 
       window.toggleSaveTrack = toggleSaveTrack;
       window.downloadTrackGPX = downloadTrackGPX;
