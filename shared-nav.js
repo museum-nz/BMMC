@@ -80,6 +80,12 @@
           icon: '🚵',
           label: 'NZ MTB & Cycle Trails',
           desc: 'Interactive Great Rides, Heartland, CCC & DOC network'
+        },
+        {
+          href: 'Interactive_Friction-Drive_Wedge-Lock_Blueprint.html',
+          icon: '🔧',
+          label: 'Friction-Drive Wedge-Lock Blueprint',
+          desc: 'Interactive friction-drive wedge-lock mechanism blueprint'
         }
       ]
     },
