@@ -1,0 +1,33 @@
+# BMMC Showcase
+
+> Digital museum and New Zealand heritage hub: artifact catalog, photo/currency/stamp archives, NZ history maps, and interactive MTB trail maps.
+
+BMMC is a static HTML/JS website. Navigation source of truth: `shared-nav.js`.
+
+For agent reading, prefer the full guide linked below. Use HTML pages when UI or live behaviour matters.
+
+## Docs
+
+- [BMMC full site guide](llms-full.md): Combined clean markdown for all key hub pages (museum, maps, MTB, blueprint)
+
+## Live pages (HTML)
+
+- [Navigation Hub](index.html): Spider directory, search, On this day
+- [Museum Showcase & Catalog](museum.html): Artifacts, 3D models, gramophones (`#stats` analytics)
+- [Museum Artifact Origin Map](2Dmap.html)
+- [Artifact Care & Restoration](restoration-guide.html)
+- [Historical Photo Archives](gallery.html)
+- [NZ Currency & Minting](currency.html)
+- [NZ Stamp Archive](stamps.html)
+- [Philatelic Photo Map](2Dmap_stamps.html)
+- [Trimble NZ History Wall](trimble.html)
+- [NZ MTB & Cycle Trails](mtb.html): GPX/KML/KMZ import, elevation profiles
+- [Friction-Drive Wedge-Lock Blueprint](Interactive_Friction-Drive_Wedge-Lock_Blueprint.html)
+- [Aotearoa NZ History Map](nz_history.html)
+- [Aotearoa NZ Railway Map](trains.html)
+- [Aotearoa NZ Maritime & Coastal Map](maritime.html)
+
+## Optional
+
+- [shared-nav.js](shared-nav.js): Menu / wing directory
+- [shared-map.js](shared-map.js): Leaflet map helpers
