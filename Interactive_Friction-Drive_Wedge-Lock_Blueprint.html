@@ -54,6 +54,7 @@
   --heading-tracking: -0.015em;
   --label-tracking: 0.06em;
   --sky-tint: color-mix(in srgb, var(--tertiary) 12%, transparent);
+  --cyan-tint: color-mix(in srgb, var(--tertiary) 12%, transparent);
   --brass-tint: color-mix(in srgb, var(--primary) 14%, transparent);
   --mint-tint: color-mix(in srgb, var(--data-3) 12%, transparent);
   --coral-tint: color-mix(in srgb, var(--data-4) 14%, transparent);
@@ -377,6 +378,113 @@ header { position: static !important; }
   height: 3px;
   display: inline-block;
   border-radius: 1px;
+}
+.legend-line {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) 0;
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  color: var(--on-surface-variant);
+}
+.graph-well {
+  background-color: var(--background);
+  border: var(--hairline);
+  border-radius: var(--rounded);
+  padding: var(--space-sm);
+  min-height: 280px;
+  margin-top: var(--space-sm);
+}
+#force-graph-svg {
+  width: 100%;
+  height: auto;
+  min-height: 250px;
+  display: block;
+}
+
+/* Parametric geometry controls (under diagram) */
+.parametric-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.panel-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  border-bottom: var(--hairline);
+  padding-bottom: var(--space-sm);
+}
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: var(--space-md);
+}
+.param-card {
+  background-color: var(--background);
+  border: var(--hairline);
+  border-radius: var(--rounded);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.param-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+.param-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-surface-variant);
+}
+.param-locked {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  color: var(--secondary);
+}
+.param-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px;
+  gap: var(--space-sm);
+  align-items: center;
+}
+.num-input {
+  width: 100%;
+  min-height: 36px;
+  padding: var(--space-xs) var(--space-sm);
+  background-color: var(--surface-container);
+  border: var(--hairline-strong);
+  border-radius: var(--rounded);
+  color: var(--on-surface);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.inline-feedback {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  color: var(--tertiary);
+  min-height: 1.25em;
 }
 
 /* SVG styling via CSS tokens (no inline hex in body) */
@@ -1111,9 +1219,112 @@ td.code-col {
                 <input type="number" id="input-torque" class="num-input" min="0.0" max="6.0" step="0.2" value="4.5" aria-label="Motor torque in Newton-meters" oninput="onTorqueNumberInput(this.value)">
               </div>
             </div>
+
+            <div class="control-field">
+              <div class="field-header">
+                <label class="field-label" for="slider-motor-rpm">Motor / Roller RPM</label>
+                <span class="field-value" id="readout-motor-rpm">800 rpm</span>
+              </div>
+              <div class="slider-input-row">
+                <input type="range" id="slider-motor-rpm" min="0" max="4000" step="10" value="800" oninput="syncSpeedFromMotor(this.value)">
+                <input type="number" id="input-motor-rpm" class="num-input" min="0" max="4000" step="10" value="800" aria-label="Motor RPM" oninput="syncSpeedFromMotor(this.value)">
+              </div>
+            </div>
+
+            <div class="control-field">
+              <div class="field-header">
+                <label class="field-label" for="slider-wheel-kmh">Wheel Speed</label>
+                <span class="field-value" id="readout-wheel-kmh">12.5 km/h</span>
+              </div>
+              <div class="slider-input-row">
+                <input type="range" id="slider-wheel-kmh" min="0" max="50" step="0.1" value="12.5" oninput="syncSpeedFromWheel(this.value)">
+                <input type="number" id="input-wheel-kmh" class="num-input" min="0" max="50" step="0.1" value="12.5" aria-label="Wheel speed in km/h" oninput="syncSpeedFromWheel(this.value)">
+              </div>
+            </div>
           </div>
+          <p class="inline-feedback" id="speed-link-feedback" style="margin: var(--space-xs) 0 0;" role="status">
+            Linked by no-slip contact · v = ω<sub>m</sub>·R<sub>roller</sub> = ω<sub>w</sub>·R<sub>tire</sub>
+          </p>
         </div>
       </div>
+
+      <!-- Parametric Geometry Controls — fills space under the main diagram -->
+      <section class="panel parametric-panel" aria-label="Parametric Geometry Controls">
+        <div class="panel-head-row">
+          <div>
+            <p class="section-kicker" style="margin: 0;">Exploration</p>
+            <h2 class="panel-heading" style="margin: var(--space-xs) 0 0;">Parametric Geometry Controls</h2>
+            <div class="data-label" style="font-family: var(--font-label); font-size: var(--label-size); color: var(--on-surface-variant);">Locked Method B defaults vs live custom exploration</div>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn" id="btn-reset-geo" onclick="resetLockedGeometry()">
+              Reset Locked Geometry
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-export-json" onclick="exportSpecJson()">
+              Export Spec JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="param-grid">
+          <div class="param-card">
+            <div class="param-label-row">
+              <label class="param-label" for="num-wheel">Wheel Diameter (mm)</label>
+              <span class="param-locked">Locked: 706</span>
+            </div>
+            <div class="param-inputs">
+              <input type="range" id="slider-wheel" min="550" max="800" step="1" value="706" oninput="syncParamFromSlider('wheel', this.value)">
+              <input type="number" class="num-input" id="num-wheel" min="550" max="800" step="1" value="706" oninput="syncParamFromNumber('wheel', this.value)">
+            </div>
+          </div>
+
+          <div class="param-card">
+            <div class="param-label-row">
+              <label class="param-label" for="num-roller">Roller Diameter (mm)</label>
+              <span class="param-locked">Locked: 83</span>
+            </div>
+            <div class="param-inputs">
+              <input type="range" id="slider-roller" min="50" max="120" step="0.5" value="83" oninput="syncParamFromSlider('roller', this.value)">
+              <input type="number" class="num-input" id="num-roller" min="50" max="120" step="0.5" value="83" oninput="syncParamFromNumber('roller', this.value)">
+            </div>
+          </div>
+
+          <div class="param-card">
+            <div class="param-label-row">
+              <label class="param-label" for="num-arm">Swing Arm C–C (mm)</label>
+              <span class="param-locked">Locked: 75.0</span>
+            </div>
+            <div class="param-inputs">
+              <input type="range" id="slider-arm" min="55" max="110" step="0.5" value="75" oninput="syncParamFromSlider('arm', this.value)">
+              <input type="number" class="num-input" id="num-arm" min="55" max="110" step="0.5" value="75" oninput="syncParamFromNumber('arm', this.value)">
+            </div>
+          </div>
+
+          <div class="param-card">
+            <div class="param-label-row">
+              <label class="param-label" for="num-platform">Platform Height (mm)</label>
+              <span class="param-locked">Locked: 413</span>
+            </div>
+            <div class="param-inputs">
+              <input type="range" id="slider-platform" min="380" max="460" step="0.5" value="413" oninput="syncParamFromSlider('platform', this.value)">
+              <input type="number" class="num-input" id="num-platform" min="380" max="460" step="0.5" value="413" oninput="syncParamFromNumber('platform', this.value)">
+            </div>
+          </div>
+
+          <div class="param-card">
+            <div class="param-label-row">
+              <label class="param-label" for="num-pivotx">Pivot Forward Offset (mm)</label>
+              <span class="param-locked">Locked: 25.0</span>
+            </div>
+            <div class="param-inputs">
+              <input type="range" id="slider-pivotx" min="5" max="60" step="0.5" value="25" oninput="syncParamFromSlider('pivotx', this.value)">
+              <input type="number" class="num-input" id="num-pivotx" min="5" max="60" step="0.5" value="25" oninput="syncParamFromNumber('pivotx', this.value)">
+            </div>
+          </div>
+        </div>
+
+        <div class="inline-feedback" id="param-feedback" role="status" aria-live="polite"></div>
+      </section>
     </div>
 
     <!-- RIGHT: Dynamic Telemetry & Force Balance + Callout Detail -->
@@ -1170,30 +1381,40 @@ td.code-col {
       <!-- Force Vector Balance -->
       <div class="panel">
         <p class="section-kicker">Modeled Force Vector Balance</p>
+        <div class="data-label" style="font-family: var(--font-label); font-size: var(--label-size); color: var(--on-surface-variant); margin-bottom: var(--space-sm);">Force magnitude (N) across engagement sweep</div>
         <div class="readouts-grid">
           <div class="metric-tile">
             <div class="metric-label">Radial Normal N</div>
-            <div class="metric-value" id="val-normal">12 N</div>
+            <div class="metric-value" id="val-normal">0.0 N</div>
             <div class="metric-sub">Tire elastomer load</div>
           </div>
           <div class="metric-tile">
             <div class="metric-label">Traction F<sub>t</sub></div>
-            <div class="metric-value is-accent" id="val-traction">108 N</div>
-            <div class="metric-sub" id="val-traction-sub">Drive reaction (-X)</div>
+            <div class="metric-value is-accent" id="val-traction">0.0 N</div>
+            <div class="metric-sub" id="val-traction-sub">Drive reaction (−X)</div>
           </div>
           <div class="metric-tile">
             <div class="metric-label">M5 Stop Load F<sub>stop</sub></div>
-            <div class="metric-value" id="val-stop-force">0 N</div>
+            <div class="metric-value" id="val-stop-force">0.0 N</div>
             <div class="metric-sub" id="val-stop-sub">Pad disengaged</div>
           </div>
           <div class="metric-tile">
             <div class="metric-label">M8 Pivot Load R<sub>p</sub></div>
-            <div class="metric-value" id="val-pivot-force">109 N</div>
+            <div class="metric-value" id="val-pivot-force">3.3 N</div>
             <div class="metric-sub">Through Ø12.25 bushes</div>
           </div>
         </div>
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-line" style="background: var(--data-2);"></span>N (Normal)</span>
+          <span class="legend-item"><span class="legend-line" style="background: var(--data-3);"></span>Ft (Traction)</span>
+          <span class="legend-item"><span class="legend-line" style="background: var(--data-4);"></span>Fstop (M5 Bolt)</span>
+          <span class="legend-item"><span class="legend-line" style="background: var(--data-1);"></span>Rp (M8 Pivot)</span>
+        </div>
+        <div class="graph-well">
+          <svg id="force-graph-svg" viewBox="0 0 420 260" role="img" aria-label="Force balance curve across swing arm sweep angle"></svg>
+        </div>
         <p style="margin: var(--space-sm) 0 0; font-size: var(--label-size); color: var(--on-surface-variant);">
-          Modeled estimate using 75.0 mm arm geometry, ~120 N/mm tire radial compliance, and μ = 0.75 dry elastomer friction.
+          Rigid-body moment balance about the M8 pivot · tire stiffness calibrated to N = 12 N at wedge lock · μ = 0.75.
         </p>
       </div>
 
@@ -1409,7 +1630,20 @@ td.code-col {
 
 <api-shim></api-shim>
 <script>
-// === Locked Method B Geometry Constants ===
+// === Locked Method B Geometry Defaults ===
+const LOCKED_PARAMS = {
+  wheelDia: 706,
+  rollerDia: 83,
+  armLen: 75.0,
+  platformY: 413.0,
+  pivotX: 25.0,
+  pivotAbovePlatform: 49.5,
+  mu: 0.75
+};
+
+const BOLT_REL_X = 8.42 - 25.0;
+const BOLT_REL_Y = 429.66 - 462.5;
+
 const GEO = {
   R_TIRE: 353.0,
   R_ROLLER: 41.5,
@@ -1465,9 +1699,12 @@ const CALLOUTS = {
 
 // === Application State ===
 const state = {
+  params: { ...LOCKED_PARAMS },
   angle: 18.66,
   slotOffset: 0.0,
   torqueNm: 4.5,
+  motorRpm: 800,
+  wheelKmh: 0,
   viewMode: 'drive',
   bracketStyle: 'metal',
   showVectors: true,
@@ -1486,6 +1723,183 @@ let saveDebounceId = null;
 
 // === Geometry & Physics Helpers ===
 function deg2rad(d) { return (d * Math.PI) / 180; }
+function rad2deg(r) { return (r * 180) / Math.PI; }
+
+// No-slip kinematics: motor drives roller 1:1; peripheral speeds match under contact
+function motorRpmToWheelKmh(rpm) {
+  const vMs = (rpm * 2 * Math.PI * (GEO.R_ROLLER / 1000)) / 60;
+  return vMs * 3.6;
+}
+function wheelKmhToMotorRpm(kmh) {
+  const vMs = kmh / 3.6;
+  const denom = 2 * Math.PI * (GEO.R_ROLLER / 1000);
+  if (denom <= 0) return 0;
+  return (vMs * 60) / denom;
+}
+function wheelRpmFromMotor(rpm) {
+  return rpm * (GEO.R_ROLLER / GEO.R_TIRE);
+}
+function syncSpeedUi() {
+  const sMotor = document.getElementById('slider-motor-rpm');
+  const nMotor = document.getElementById('input-motor-rpm');
+  const sWheel = document.getElementById('slider-wheel-kmh');
+  const nWheel = document.getElementById('input-wheel-kmh');
+  const rMotor = document.getElementById('readout-motor-rpm');
+  const rWheel = document.getElementById('readout-wheel-kmh');
+  const fb = document.getElementById('speed-link-feedback');
+
+  if (sMotor) sMotor.value = String(Math.round(state.motorRpm));
+  if (nMotor) nMotor.value = String(Math.round(state.motorRpm));
+  if (sWheel) sWheel.value = state.wheelKmh.toFixed(1);
+  if (nWheel) nWheel.value = state.wheelKmh.toFixed(1);
+
+  const wRpm = wheelRpmFromMotor(state.motorRpm);
+  const vMs = state.wheelKmh / 3.6;
+  if (rMotor) rMotor.textContent = `${Math.round(state.motorRpm)} rpm`;
+  if (rWheel) rWheel.textContent = `${state.wheelKmh.toFixed(1)} km/h`;
+  if (fb) {
+    const ratio = GEO.R_TIRE / GEO.R_ROLLER;
+    fb.innerHTML = `No-slip link · ratio R<sub>tire</sub>/R<sub>roller</sub> = ${ratio.toFixed(2)} · wheel ${wRpm.toFixed(1)} rpm · ${vMs.toFixed(2)} m/s`;
+  }
+}
+function syncSpeedFromMotor(val) {
+  const rpm = Math.max(0, Math.min(4000, parseFloat(val)));
+  if (Number.isNaN(rpm)) return;
+  state.motorRpm = rpm;
+  state.wheelKmh = Math.max(0, Math.min(50, motorRpmToWheelKmh(rpm)));
+  syncSpeedUi();
+  renderSimulation();
+  scheduleSaveState();
+}
+function syncSpeedFromWheel(val) {
+  const kmh = Math.max(0, Math.min(50, parseFloat(val)));
+  if (Number.isNaN(kmh)) return;
+  state.wheelKmh = kmh;
+  state.motorRpm = Math.max(0, Math.min(4000, wheelKmhToMotorRpm(kmh)));
+  syncSpeedUi();
+  renderSimulation();
+  scheduleSaveState();
+}
+
+function svgEl(tag, attrs, parent) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  if (attrs) {
+    const keys = Object.keys(attrs);
+    for (let i = 0; i < keys.length; i++) {
+      el.setAttribute(keys[i], String(attrs[keys[i]]));
+    }
+  }
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+function solveRestAngle() {
+  const Rw = GEO.R_TIRE;
+  const Rr = GEO.R_ROLLER;
+  const ccTarget = Rw + Rr;
+  const Px = GEO.PX;
+  const Py = GEO.PY;
+  const L = GEO.L_ARM;
+  const OP = Math.hypot(Px, Py);
+  const phiOP = Math.atan2(Px, Py);
+  let cosAlpha = (OP * OP + L * L - ccTarget * ccTarget) / (2 * OP * L);
+  cosAlpha = Math.max(-1, Math.min(1, cosAlpha));
+  return rad2deg(Math.acos(cosAlpha) - phiOP);
+}
+
+function applyGeometryParams() {
+  const p = state.params;
+  GEO.R_TIRE = p.wheelDia / 2;
+  GEO.R_ROLLER = p.rollerDia / 2;
+  GEO.CC_TANGENT = GEO.R_TIRE + GEO.R_ROLLER;
+  GEO.L_ARM = p.armLen;
+  GEO.PX = p.pivotX;
+  GEO.Y_PLATFORM = p.platformY;
+  GEO.PY = p.platformY + p.pivotAbovePlatform;
+  GEO.THETA_REST = solveRestAngle();
+  GEO.BOLT_X_NOM = GEO.PX + BOLT_REL_X;
+  GEO.BOLT_Y_NOM = GEO.PY + BOLT_REL_Y;
+  GEO.SPRING_U_X = -28.0;
+  GEO.SPRING_U_Y = GEO.Y_PLATFORM + 7.0;
+  GEO.Y_LEG_TOP = GEO.Y_PLATFORM + 62.0;
+}
+
+function syncLiveSvgGeometry() {
+  const tireCarcass = document.querySelector('#layer-wheel .bp-tire-carcass');
+  const tireTread = document.querySelector('#layer-wheel .bp-tire-tread');
+  if (tireCarcass) tireCarcass.setAttribute('r', GEO.R_TIRE.toFixed(1));
+  if (tireTread) tireTread.setAttribute('r', (GEO.R_TIRE - 1).toFixed(1));
+
+  const roller = document.querySelector('#arm-rot-group .bp-roller');
+  if (roller) roller.setAttribute('r', GEO.R_ROLLER.toFixed(2));
+
+  const rollerSpin = document.getElementById('roller-spin-group');
+  if (rollerSpin) {
+    rollerSpin.setAttribute('transform', `translate(0, ${GEO.L_ARM.toFixed(2)})`);
+  }
+
+  const parkGhost = document.getElementById('park-roller-ghost');
+  if (parkGhost) {
+    const pg = armLocalToWorld(0, -GEO.L_ARM, GEO.THETA_PARK);
+    parkGhost.setAttribute('cx', pg.x.toFixed(1));
+    parkGhost.setAttribute('cy', (-pg.y).toFixed(1));
+    parkGhost.setAttribute('r', GEO.R_ROLLER.toFixed(2));
+  }
+
+  const platformRect = document.querySelector('#layer-platform .bp-platform');
+  if (platformRect) {
+    platformRect.setAttribute('y', (-GEO.Y_PLATFORM).toFixed(1));
+  }
+  const platformLines = document.querySelectorAll('#layer-platform .bp-dim-line');
+  if (platformLines.length >= 1) {
+    platformLines[0].setAttribute('y1', (-GEO.Y_PLATFORM).toFixed(1));
+    platformLines[0].setAttribute('y2', (-GEO.Y_PLATFORM).toFixed(1));
+  }
+
+  const armPathEl = document.getElementById('arm-capsule-path');
+  const padPathEl = document.getElementById('arm-stop-pad-path');
+  if (armPathEl && padPathEl) {
+    const L = GEO.L_ARM;
+    const sinA = Math.min(0.99, 11.0 / L);
+    const cosA = Math.sqrt(1 - sinA * sinA);
+    const rx1 = (19 * cosA).toFixed(2);
+    const ry1 = (-19 * sinA).toFixed(2);
+    const rx2 = (30 * cosA).toFixed(2);
+    const ry2 = (L - 30 * sinA).toFixed(2);
+    const d1 = 25.0;
+    const d2 = 37.0;
+    const px1 = (-19 * cosA - d1 * sinA).toFixed(2);
+    const py1 = (-19 * sinA + d1 * cosA).toFixed(2);
+    const px1in = (-19 * cosA - d1 * sinA + 2.0 * cosA).toFixed(2);
+    const py1in = (-19 * sinA + d1 * cosA + 2.0 * sinA).toFixed(2);
+    const px2in = (-19 * cosA - d2 * sinA + 2.0 * cosA).toFixed(2);
+    const py2in = (-19 * sinA + d2 * cosA + 2.0 * sinA).toFixed(2);
+    const px2 = (-19 * cosA - d2 * sinA).toFixed(2);
+    const py2 = (-19 * sinA + d2 * cosA).toFixed(2);
+    armPathEl.setAttribute('d',
+      `M -${rx1} ${ry1} A 19 19 0 1 1 ${rx1} ${ry1} L ${rx2} ${ry2} A 30 30 0 1 1 -${rx2} ${ry2} L ${px2} ${py2} L ${px2in} ${py2in} L ${px1in} ${py1in} L ${px1} ${py1} Z`
+    );
+    padPathEl.setAttribute('d',
+      `M ${px1in} ${py1in} L ${px2in} ${py2in} L ${(parseFloat(px2in) + 1.4).toFixed(2)} ${py2in} L ${(parseFloat(px1in) + 1.4).toFixed(2)} ${py1in} Z`
+    );
+  }
+
+  const sweepEl = document.getElementById('sweep-arc-ghost');
+  if (sweepEl) {
+    const stopA = GEO.THETA_REST - 5.0;
+    const p1 = armLocalToWorld(0, -GEO.L_ARM, stopA);
+    const p2 = armLocalToWorld(0, -GEO.L_ARM, GEO.THETA_PARK);
+    sweepEl.setAttribute('d', `M ${p1.x.toFixed(1)} ${(-p1.y).toFixed(1)} A ${GEO.L_ARM} ${GEO.L_ARM} 0 0 0 ${p2.x.toFixed(1)} ${(-p2.y).toFixed(1)}`);
+  }
+
+  const axleLabel = document.querySelector('#layer-wheel text.bp-dim-text-sm');
+  if (axleLabel && axleLabel.textContent && axleLabel.textContent.indexOf('AXLE') !== -1) {
+    axleLabel.textContent = `AXLE (0, 0) · Ø${state.params.wheelDia} TIRE`;
+  }
+
+  renderBracketVariant();
+  renderCalloutPins();
+}
 
 function armLocalToWorld(xLoc, yLoc, thetaDeg) {
   const th = deg2rad(thetaDeg);
@@ -1499,7 +1913,7 @@ function armLocalToWorld(xLoc, yLoc, thetaDeg) {
 
 // Compute signed clearance between rear-neck stop pad and M5 bolt (0 = kissing)
 function padToBoltClearance(thetaDeg, slotOffset) {
-  const sinA = 11.0 / 75.0;
+  const sinA = Math.min(0.99, 11.0 / GEO.L_ARM);
   const cosA = Math.sqrt(1.0 - sinA * sinA);
   const xTang = -18.7945 - 31.124 * sinA;
   const yTang = 2.787 - 31.124 * cosA;
@@ -1532,6 +1946,91 @@ function solveStopAngle(slotOffset) {
   return 0.5 * (lo + hi);
 }
 
+// Reference bite at stop/wedge for tire stiffness calibration (N = 12 N at lock)
+function biteAtStopAngle(stopAngle) {
+  const th = deg2rad(stopAngle);
+  const mx = GEO.PX + GEO.L_ARM * Math.sin(th);
+  const my = GEO.PY - GEO.L_ARM * Math.cos(th);
+  return Math.max(0.2, GEO.CC_TANGENT - Math.hypot(mx, my));
+}
+
+// Kit Specs rigid-body force balance about M8 pivot P
+function computeForceBalance(angleDeg, stopAngle, torqueNm, atStop) {
+  const th = deg2rad(angleDeg);
+  const Mx = GEO.PX + GEO.L_ARM * Math.sin(th);
+  const My = GEO.PY - GEO.L_ARM * Math.cos(th);
+  const ccDist = Math.hypot(Mx, My);
+  const bite = Math.max(0, GEO.CC_TANGENT - ccDist);
+
+  const biteWedge = biteAtStopAngle(stopAngle);
+  const kTire = 12.0 / biteWedge;
+  const normalMag = bite > 0 ? kTire * bite : 0;
+
+  const nx = ccDist > 0 ? Mx / ccDist : 0;
+  const ny = ccDist > 0 ? My / ccDist : 1;
+  const tx = -ny;
+  const ty = nx;
+
+  const driveOn = torqueNm > 0.05;
+  let tractionMag = 0;
+  if (driveOn && bite > 0.01) {
+    const driveReq = (torqueNm * 1000) / GEO.R_ROLLER;
+    tractionMag = Math.min(driveReq, state.params.mu * normalMag);
+  }
+
+  const Nx = normalMag * nx;
+  const Ny = normalMag * ny;
+  const Ftx = tractionMag * tx;
+  const Fty = tractionMag * ty;
+
+  const rx = Mx - GEO.PX;
+  const ry = My - GEO.PY;
+  const tauNormal = rx * Ny - ry * Nx;
+  const tauTraction = rx * Fty - ry * Ftx;
+  const tauStator = driveOn && tractionMag > 0 ? -(tractionMag * GEO.R_ROLLER) : 0;
+
+  // Light return spring (arm local +18, −32) → U-bracket anchor near pivot
+  const axLoc = 18;
+  const ayLoc = -32;
+  const sax = GEO.PX + axLoc * Math.cos(th) - ayLoc * Math.sin(th);
+  const say = GEO.PY + axLoc * Math.sin(th) + ayLoc * Math.cos(th);
+  const bdx = GEO.PX + 9.0;
+  const bdy = GEO.PY + 7.5;
+  const spDx = bdx - sax;
+  const spDy = bdy - say;
+  const spLen = Math.hypot(spDx, spDy) || 1;
+  const spMag = 3.32;
+  const Fsx = spMag * (spDx / spLen);
+  const Fsy = spMag * (spDy / spLen);
+  const tauSpring = (sax - GEO.PX) * Fsy - (say - GEO.PY) * Fsx;
+
+  const netDriveMoment = tauNormal + tauTraction + tauStator + tauSpring;
+  let stopMag = 0;
+  if (atStop && netDriveMoment < 0) {
+    stopMag = (-netDriveMoment) / GEO.PAD_DIST;
+  }
+
+  const stopDirX = Math.cos(th);
+  const stopDirY = Math.sin(th);
+  const FstopX = stopMag * stopDirX;
+  const FstopY = stopMag * stopDirY;
+
+  const Rpx = -(Nx + Ftx + FstopX + Fsx);
+  const Rpy = -(Ny + Fty + FstopY + Fsy);
+  const RpMag = Math.hypot(Rpx, Rpy);
+
+  return {
+    bite,
+    normalMag,
+    tractionMag,
+    stopMag,
+    RpMag,
+    springPull: spMag,
+    Nx, Ny, Ftx, Fty, FstopX, FstopY, Rpx, Rpy,
+    tauNormal, tauTraction, tauStator, tauSpring, netDriveMoment
+  };
+}
+
 function computeKinematics(thetaDeg, slotOffset, torqueNm) {
   const stopAngle = solveStopAngle(slotOffset);
   const clampedTheta = Math.max(stopAngle, Math.min(GEO.THETA_PARK, thetaDeg));
@@ -1542,54 +2041,38 @@ function computeKinematics(thetaDeg, slotOffset, torqueNm) {
 
   const cc = Math.hypot(mx, my);
   const overlap = GEO.CC_TANGENT - cc;
-  const effectiveBite = overlap > 0 ? Math.max(0, overlap - 0.5) : overlap;
 
   const notchDist = Math.hypot(mx - GEO.X_NOTCH_BACK, my - GEO.Y_PLATFORM) - GEO.R_ROLLER;
   const padClearance = Math.max(0, padToBoltClearance(clampedTheta, slotOffset));
   const atStop = padClearance < 0.06;
 
-  const springPull = 8 + Math.max(0, (clampedTheta - 13) * 0.12);
-  let normalN = 0;
-  let tractionN = 0;
-  let stopLoadN = 0;
-  let pivotLoadN = springPull;
-
-  if (overlap >= -0.05) {
-    const basePreload = 12;
-    const compressionN = Math.max(0, overlap) * 120;
-    const driveReq = (torqueNm * 1000) / GEO.R_ROLLER;
-    normalN = basePreload + compressionN;
-    const maxFriction = 0.75 * normalN;
-    tractionN = Math.min(driveReq, maxFriction);
-
-    const wedgeMoment = tractionN * 72 - compressionN * 18;
-    if (atStop && wedgeMoment > 0) {
-      stopLoadN = wedgeMoment / 28.0;
-    }
-    pivotLoadN = Math.hypot(tractionN - stopLoadN, normalN + springPull);
-  } else if (clampedTheta > 54) {
-    pivotLoadN = 18;
-  }
+  const forces = computeForceBalance(clampedTheta, stopAngle, torqueNm, atStop);
+  const normalN = forces.normalMag;
+  const tractionN = forces.tractionMag;
+  const stopLoadN = forces.stopMag;
+  const pivotLoadN = forces.RpMag;
+  const springPull = forces.springPull;
+  const effectiveBite = forces.bite;
 
   let regime = 'swing';
   let regimeTitle = `Free Swing (${clampedTheta.toFixed(1)}°)`;
-  let regimeDesc = `Roller is suspended clear of the Ø706 mm tire. The light extension spring gently pulls the swing arm clockwise toward the 18.7° rest tangent.`;
+  let regimeDesc = `Roller is suspended clear of the Ø${state.params.wheelDia} mm tire. The light extension spring gently pulls the swing arm clockwise toward the ${GEO.THETA_REST.toFixed(1)}° rest tangent.`;
   if (clampedTheta >= 56.5) {
     regime = 'park';
     regimeTitle = `Magnetic Park (${clampedTheta.toFixed(1)}°)`;
-    regimeDesc = `Twin Ø15×1.5 mm rear-catch magnets latch the R19 pivot head flush, holding the Ø83 mm roller ${Math.abs(overlap).toFixed(1)} mm clear of the bicycle tire.`;
+    regimeDesc = `Twin Ø15×1.5 mm rear-catch magnets latch the R19 pivot head flush, holding the Ø${state.params.rollerDia} mm roller ${Math.abs(overlap).toFixed(1)} mm clear of the bicycle tire.`;
   } else if (atStop) {
     regime = 'lock';
     regimeTitle = `Wedge-Lock at M5 Stop (${clampedTheta.toFixed(1)}°)`;
-    regimeDesc = `The 2 mm rear-neck stop pad kisses the M5 bolt shaft at ${stopAngle.toFixed(1)}°, capping radial compression at ${overlap.toFixed(2)} mm (~${effectiveBite.toFixed(1)} mm effective bite) while transmitting traction.`;
+    regimeDesc = `The 2 mm rear-neck stop pad kisses the M5 bolt shaft at ${stopAngle.toFixed(1)}°, capping radial compression at ${overlap.toFixed(2)} mm (~${effectiveBite.toFixed(2)} mm bite) while transmitting traction.`;
   } else if (overlap > 0.05) {
     regime = 'wedge';
     regimeTitle = `Self-Wedging Under Torque (${clampedTheta.toFixed(1)}°)`;
-    regimeDesc = `Tire reaction pushes the roller rearward (−X), pulling the arm clockwise below 18.7° and compressing the tire (${overlap.toFixed(2)} mm overlap) to build normal grip automatically.`;
+    regimeDesc = `Tire reaction pushes the roller rearward (−X), pulling the arm clockwise below ${GEO.THETA_REST.toFixed(1)}° and compressing the tire (${overlap.toFixed(2)} mm overlap) to build normal grip automatically.`;
   } else if (Math.abs(clampedTheta - GEO.THETA_REST) <= 0.45) {
     regime = 'rest';
-    regimeTitle = `Rest Tangent (~18.7°)`;
-    regimeDesc = `Roller tread kisses the Ø706 mm tire at exact 394.5 mm center-to-center distance (0 mm bite). Light spring preload readies the drive for immediate torque wedging.`;
+    regimeTitle = `Rest Tangent (~${GEO.THETA_REST.toFixed(1)}°)`;
+    regimeDesc = `Roller tread kisses the Ø${state.params.wheelDia} mm tire at exact ${GEO.CC_TANGENT.toFixed(1)} mm center-to-center distance (0 mm bite). Light spring preload readies the drive for immediate torque wedging.`;
   }
 
   return {
@@ -1608,6 +2091,7 @@ function computeKinematics(thetaDeg, slotOffset, torqueNm) {
     stopLoadN,
     pivotLoadN,
     springPull,
+    forces,
     regime,
     regimeTitle,
     regimeDesc
@@ -1695,36 +2179,41 @@ function renderBracketVariant() {
   const g = document.getElementById('bracket-geometry');
   if (!g) return;
 
+  const yFloor = (-GEO.Y_PLATFORM).toFixed(1);
+  const yTop = (-GEO.Y_LEG_TOP).toFixed(1);
+  const yCatch = (-(GEO.Y_LEG_TOP - 5)).toFixed(1);
+  const yPivot = (-GEO.PY).toFixed(2);
+
   if (state.bracketStyle === 'metal') {
     g.innerHTML = `
-      <path class="bp-bracket-body" d="M -41 -475 L 39 -475 L 39 -413 L 5 -413 L 5 -409 L -41 -409 Z" />
-      <rect class="bp-bracket-rib" x="-41" y="-413" width="46" height="4" />
-      <line class="bp-notch-highlight" x1="5" y1="-413" x2="39" y2="-413" />
-      <text class="bp-dim-text-sm" x="7" y="-404">64×34 NOTCH (NO LIPS)</text>
-      <rect class="bp-arm-bore" x="-30" y="-413" width="6.5" height="4" />
-      <rect class="bp-arm-bore" x="-5" y="-413" width="6.5" height="4" />
-      <rect class="bp-bracket-rib" x="-41" y="-470" width="47" height="15" />
-      <rect class="bp-magnet" x="4.5" y="-470" width="1.5" height="15" />
+      <path class="bp-bracket-body" d="M -41 ${yTop} L 39 ${yTop} L 39 ${yFloor} L 5 ${yFloor} L 5 ${(-GEO.Y_PLATFORM + 4).toFixed(1)} L -41 ${(-GEO.Y_PLATFORM + 4).toFixed(1)} Z" />
+      <rect class="bp-bracket-rib" x="-41" y="${yFloor}" width="46" height="4" />
+      <line class="bp-notch-highlight" x1="5" y1="${yFloor}" x2="39" y2="${yFloor}" />
+      <text class="bp-dim-text-sm" x="7" y="${(-GEO.Y_PLATFORM + 9).toFixed(1)}">64×34 NOTCH (NO LIPS)</text>
+      <rect class="bp-arm-bore" x="-30" y="${yFloor}" width="6.5" height="4" />
+      <rect class="bp-arm-bore" x="-5" y="${yFloor}" width="6.5" height="4" />
+      <rect class="bp-bracket-rib" x="-41" y="${yCatch}" width="47" height="15" />
+      <rect class="bp-magnet" x="4.5" y="${yCatch}" width="1.5" height="15" />
       <rect class="bp-slot" x="${(GEO.BOLT_X_NOM - 5.5).toFixed(2)}" y="${(-GEO.BOLT_Y_NOM - 2.6).toFixed(2)}" width="11.0" height="5.2" rx="2.6" />
       <circle class="bp-arm-bore" cx="${GEO.SPRING_U_X}" cy="${-GEO.SPRING_U_Y}" r="1.6" />
-      <text class="bp-dim-text-sm" x="-39" y="-479">6061-T6 4.0 MM U-BRACKET (80×72)</text>
+      <text class="bp-dim-text-sm" x="-39" y="${(-GEO.Y_LEG_TOP - 4).toFixed(1)}">6061-T6 4.0 MM U-BRACKET (80×72)</text>
     `;
   } else {
     g.innerHTML = `
-      <path class="bp-bracket-print" d="M -41 -475 L 39 -475 L 39 -413 L 5 -413 L 5 -405 L -41 -405 Z" />
-      <rect class="bp-bracket-rib" x="-41" y="-413" width="46" height="8" />
-      <rect class="bp-bracket-rib" x="-41" y="-475" width="8" height="62" />
-      <circle class="bp-bracket-rib" cx="-31" cy="-466" r="7" />
-      <circle class="bp-bracket-rib" cx="25" cy="-462.5" r="11" />
-      <line class="bp-bracket-rib" x1="-33" y1="-413" x2="-12" y2="-435" />
-      <line class="bp-bracket-rib" x1="-33" y1="-435" x2="14" y2="-462.5" />
-      <line class="bp-notch-highlight" x1="5" y1="-413" x2="39" y2="-413" />
-      <text class="bp-dim-text-sm" x="7" y="-401">64×34 SWEPT BAY</text>
-      <rect class="bp-bracket-rib" x="-33" y="-470" width="39" height="15" />
-      <rect class="bp-magnet" x="4.5" y="-470" width="1.5" height="15" />
+      <path class="bp-bracket-print" d="M -41 ${yTop} L 39 ${yTop} L 39 ${yFloor} L 5 ${yFloor} L 5 ${(-GEO.Y_PLATFORM + 8).toFixed(1)} L -41 ${(-GEO.Y_PLATFORM + 8).toFixed(1)} Z" />
+      <rect class="bp-bracket-rib" x="-41" y="${yFloor}" width="46" height="8" />
+      <rect class="bp-bracket-rib" x="-41" y="${yTop}" width="8" height="62" />
+      <circle class="bp-bracket-rib" cx="-31" cy="${(-(GEO.Y_LEG_TOP - 9)).toFixed(1)}" r="7" />
+      <circle class="bp-bracket-rib" cx="${GEO.PX}" cy="${yPivot}" r="11" />
+      <line class="bp-bracket-rib" x1="-33" y1="${yFloor}" x2="-12" y2="${(-(GEO.Y_PLATFORM + 22)).toFixed(1)}" />
+      <line class="bp-bracket-rib" x1="-33" y1="${(-(GEO.Y_PLATFORM + 22)).toFixed(1)}" x2="${(GEO.PX - 11).toFixed(1)}" y2="${yPivot}" />
+      <line class="bp-notch-highlight" x1="5" y1="${yFloor}" x2="39" y2="${yFloor}" />
+      <text class="bp-dim-text-sm" x="7" y="${(-GEO.Y_PLATFORM + 12).toFixed(1)}">64×34 SWEPT BAY</text>
+      <rect class="bp-bracket-rib" x="-33" y="${yCatch}" width="39" height="15" />
+      <rect class="bp-magnet" x="4.5" y="${yCatch}" width="1.5" height="15" />
       <rect class="bp-slot" x="${(GEO.BOLT_X_NOM - 5.5).toFixed(2)}" y="${(-GEO.BOLT_Y_NOM - 2.6).toFixed(2)}" width="11.0" height="5.2" rx="2.6" />
       <circle class="bp-arm-bore" cx="${GEO.SPRING_U_X}" cy="${-GEO.SPRING_U_Y}" r="1.6" />
-      <text class="bp-dim-text-sm" x="-39" y="-479">REINFORCED CF-PETG (10 MM WALLS · Ø14 TUBE)</text>
+      <text class="bp-dim-text-sm" x="-39" y="${(-GEO.Y_LEG_TOP - 4).toFixed(1)}">REINFORCED CF-PETG (10 MM WALLS · Ø14 TUBE)</text>
     `;
   }
 }
@@ -1733,13 +2222,13 @@ function renderCalloutPins() {
   const g = document.getElementById('layer-callouts');
   if (!g) return;
   const pins = [
-    { id: '1', x: 25, y: -462.5, lx: 46, ly: -486 },
-    { id: '2', x: 8.4, y: -429.7, lx: -18, ly: -437 },
-    { id: '3', x: 14, y: -435, lx: -20, ly: -451 },
-    { id: '4', x: 18, y: -413, lx: 18, ly: -396 },
-    { id: '5', x: 46, y: -393, lx: 78, ly: -380 },
-    { id: '6', x: 5.2, y: -462.5, lx: -15, ly: -466 },
-    { id: '7', x: -28, y: -420, lx: -56, ly: -420 }
+    { id: '1', x: GEO.PX, y: -GEO.PY, lx: GEO.PX + 21, ly: -GEO.PY - 23.5 },
+    { id: '2', x: GEO.BOLT_X_NOM, y: -GEO.BOLT_Y_NOM, lx: GEO.BOLT_X_NOM - 26.4, ly: -GEO.BOLT_Y_NOM - 7.3 },
+    { id: '3', x: GEO.PX - 11, y: -(GEO.PY - 27.5), lx: GEO.PX - 45, ly: -(GEO.PY - 11.5) },
+    { id: '4', x: 18, y: -GEO.Y_PLATFORM, lx: 18, ly: -GEO.Y_PLATFORM + 17 },
+    { id: '5', x: GEO.PX + 21, y: -(GEO.PY - GEO.L_ARM + 2.5), lx: GEO.PX + 53, ly: -(GEO.PY - GEO.L_ARM - 10.5) },
+    { id: '6', x: 5.2, y: -GEO.PY, lx: -15, ly: -GEO.PY - 3.5 },
+    { id: '7', x: GEO.SPRING_U_X, y: -GEO.SPRING_U_Y, lx: GEO.SPRING_U_X - 28, ly: -GEO.SPRING_U_Y }
   ];
 
   let html = '';
@@ -1763,13 +2252,14 @@ function renderSimulation() {
 
   const armGroup = document.getElementById('arm-rot-group');
   if (armGroup) {
-    armGroup.setAttribute('transform', `translate(25, -462.5) rotate(${(-k.theta).toFixed(3)})`);
+    armGroup.setAttribute('transform', `translate(${GEO.PX}, ${(-GEO.PY).toFixed(2)}) rotate(${(-k.theta).toFixed(3)})`);
   }
 
   const boltEl = document.getElementById('m5-bolt-circle');
   const boltX = GEO.BOLT_X_NOM + state.slotOffset;
   if (boltEl) {
     boltEl.setAttribute('cx', boltX.toFixed(2));
+    boltEl.setAttribute('cy', (-GEO.BOLT_Y_NOM).toFixed(2));
   }
 
   const springEl = document.getElementById('spring-path');
@@ -1836,39 +2326,39 @@ function renderSimulation() {
         vHtml += `<line class="vec-spring" x1="${aW.x.toFixed(1)}" y1="${(-aW.y).toFixed(1)}" x2="${spEndX.toFixed(1)}" y2="${spEndY.toFixed(1)}" marker-end="url(#arrow-3)" />`;
       }
 
-      if (k.overlap >= -0.05) {
+      if (k.effectiveBite > 0.01) {
         const cUx = k.mx / k.cc;
         const cUy = k.my / k.cc;
         const contactX = cUx * GEO.R_TIRE;
         const contactY = -cUy * GEO.R_TIRE;
 
-        const normScale = Math.min(44, 10 + k.normalN * 0.09);
+        const normScale = Math.min(44, 12 + k.normalN * 2.2);
         const nxEnd = contactX + cUx * normScale;
         const nyEnd = contactY - cUy * normScale;
         vHtml += `<line class="vec-normal" x1="${contactX.toFixed(1)}" y1="${contactY.toFixed(1)}" x2="${nxEnd.toFixed(1)}" y2="${nyEnd.toFixed(1)}" marker-end="url(#arrow-2)" />`;
-        vHtml += `<text class="vec-label vec-label-2" x="${(nxEnd + 3).toFixed(1)}" y="${(nyEnd - 2).toFixed(1)}">N=${Math.round(k.normalN)}N</text>`;
+        vHtml += `<text class="vec-label vec-label-2" x="${(nxEnd + 3).toFixed(1)}" y="${(nyEnd - 2).toFixed(1)}">N=${k.normalN.toFixed(1)}N</text>`;
 
-        if (k.tractionN > 1) {
+        if (k.tractionN > 0.2) {
           const tUx = -cUy;
           const tUy = cUx;
-          const trScale = Math.min(48, 12 + k.tractionN * 0.28);
+          const trScale = Math.min(48, 12 + k.tractionN * 2.8);
           const txEnd = contactX + tUx * trScale;
           const tyEnd = contactY - tUy * trScale;
           vHtml += `<line class="vec-traction" x1="${contactX.toFixed(1)}" y1="${contactY.toFixed(1)}" x2="${txEnd.toFixed(1)}" y2="${tyEnd.toFixed(1)}" marker-end="url(#arrow-1)" />`;
-          vHtml += `<text class="vec-label vec-label-1" x="${(txEnd - 28).toFixed(1)}" y="${(tyEnd + 7).toFixed(1)}">Fₜ=${Math.round(k.tractionN)}N</text>`;
+          vHtml += `<text class="vec-label vec-label-1" x="${(txEnd - 28).toFixed(1)}" y="${(tyEnd + 7).toFixed(1)}">Fₜ=${k.tractionN.toFixed(1)}N</text>`;
 
-          vHtml += `<path class="vec-traction" fill="none" d="M 35 -448 A 17 17 0 0 1 13 -449" marker-end="url(#arrow-1)" />`;
-          vHtml += `<text class="vec-label vec-label-1" x="34" y="-442">τ_wedge</text>`;
+          vHtml += `<path class="vec-traction" fill="none" d="M ${(GEO.PX + 10).toFixed(1)} ${(-GEO.PY + 14.5).toFixed(1)} A 17 17 0 0 1 ${(GEO.PX - 12).toFixed(1)} ${(-GEO.PY + 13.5).toFixed(1)}" marker-end="url(#arrow-1)" />`;
+          vHtml += `<text class="vec-label vec-label-1" x="${(GEO.PX + 9).toFixed(1)}" y="${(-GEO.PY + 20.5).toFixed(1)}">τ_wedge</text>`;
         }
 
-        if (k.atStop && k.stopLoadN > 1) {
-          const stScale = Math.min(34, 12 + k.stopLoadN * 0.14);
+        if (k.atStop && k.stopLoadN > 0.2) {
+          const stScale = Math.min(34, 12 + k.stopLoadN * 0.7);
           vHtml += `<line class="vec-stop" x1="${boltX.toFixed(1)}" y1="${(-GEO.BOLT_Y_NOM).toFixed(1)}" x2="${(boltX + stScale).toFixed(1)}" y2="${(-GEO.BOLT_Y_NOM - 4).toFixed(1)}" marker-end="url(#arrow-4)" />`;
-          vHtml += `<text class="vec-label vec-label-4" x="${(boltX + stScale + 2).toFixed(1)}" y="${(-GEO.BOLT_Y_NOM - 6).toFixed(1)}">F_stop=${Math.round(k.stopLoadN)}N</text>`;
+          vHtml += `<text class="vec-label vec-label-4" x="${(boltX + stScale + 2).toFixed(1)}" y="${(-GEO.BOLT_Y_NOM - 6).toFixed(1)}">F_stop=${k.stopLoadN.toFixed(1)}N</text>`;
         }
       } else if (k.theta > 53) {
-        vHtml += `<line class="vec-spring" x1="12" y1="-462.5" x2="5" y2="-462.5" marker-end="url(#arrow-3)" />`;
-        vHtml += `<text class="vec-label vec-label-3" x="-26" y="-453">F_mag LATCH</text>`;
+        vHtml += `<line class="vec-spring" x1="${(GEO.PX - 13).toFixed(1)}" y1="${(-GEO.PY).toFixed(1)}" x2="${(GEO.PX - 20).toFixed(1)}" y2="${(-GEO.PY).toFixed(1)}" marker-end="url(#arrow-3)" />`;
+        vHtml += `<text class="vec-label vec-label-3" x="${(GEO.PX - 51).toFixed(1)}" y="${(-GEO.PY + 9.5).toFixed(1)}">F_mag LATCH</text>`;
       }
 
       vecG.innerHTML = vHtml;
@@ -1881,7 +2371,7 @@ function renderSimulation() {
   }
   const rollerSpinEl = document.getElementById('roller-spin-group');
   if (rollerSpinEl) {
-    rollerSpinEl.setAttribute('transform', `translate(0, 75) rotate(${state.rollerRotDeg.toFixed(2)})`);
+    rollerSpinEl.setAttribute('transform', `translate(0, ${GEO.L_ARM.toFixed(2)}) rotate(${state.rollerRotDeg.toFixed(2)})`);
   }
 
   updateReadoutDOM(k);
@@ -1955,7 +2445,7 @@ function updateReadoutDOM(k) {
       valBiteEl.textContent = `${k.overlap.toFixed(2)} mm`;
       valBiteEl.className = 'metric-value is-bite';
     }
-    if (subBiteEl) subBiteEl.textContent = `~${k.effectiveBite.toFixed(1)} mm net tire bite`;
+    if (subBiteEl) subBiteEl.textContent = `${k.effectiveBite.toFixed(2)} mm elastomer compression`;
   } else {
     if (lblBiteEl) lblBiteEl.textContent = `Tire Air Gap`;
     if (valBiteEl) {
@@ -1970,12 +2460,156 @@ function updateReadoutDOM(k) {
   setText('val-pad', `${k.padClearance.toFixed(2)} mm`);
   setText('val-pad-sub', `Stop angle = ${k.stopAngle.toFixed(1)}°`);
 
-  setText('val-normal', `${Math.round(k.normalN)} N`);
-  setText('val-traction', `${Math.round(k.tractionN)} N`);
-  setText('val-traction-sub', k.overlap >= -0.05 ? `Reaction (-X) @ μ=0.75` : `Roller disengaged`);
-  setText('val-stop-force', `${Math.round(k.stopLoadN)} N`);
-  setText('val-stop-sub', k.atStop ? `Pad locked on M5` : `Pad disengaged`);
-  setText('val-pivot-force', `${Math.round(k.pivotLoadN)} N`);
+  setText('val-normal', `${k.normalN.toFixed(1)} N`);
+  setText('val-traction', `${k.tractionN.toFixed(1)} N`);
+  setText('val-traction-sub', k.effectiveBite > 0.01
+    ? (k.tractionN > 0 ? `Reaction (−X) @ μ=${state.params.mu.toFixed(2)}` : `Drive torque off`)
+    : `Roller disengaged`);
+  setText('val-stop-force', `${k.stopLoadN.toFixed(1)} N`);
+  setText('val-stop-sub', k.atStop
+    ? (k.stopLoadN > 0 ? `Pad locked on M5` : `Pad kissing (passive)`)
+    : `Pad disengaged`);
+  setText('val-pivot-force', `${k.pivotLoadN.toFixed(1)} N`);
+
+  renderForceGraph(k);
+}
+
+// === Modeled Force Vector Balance Graph ===
+function renderForceGraph(activeK) {
+  const svg = document.getElementById('force-graph-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+
+  const W = 420;
+  const H = 260;
+  const padL = 44;
+  const padR = 16;
+  const padT = 18;
+  const padB = 34;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const stopAngle = activeK ? activeK.stopAngle : solveStopAngle(state.slotOffset);
+  const restDeg = GEO.THETA_REST;
+  const minAng = Math.floor(stopAngle - 1.0);
+  const maxAng = Math.ceil(restDeg + 2.5);
+
+  const steps = 90;
+  const samples = [];
+  let peak = 30;
+  for (let i = 0; i <= steps; i++) {
+    const a = minAng + (i / steps) * (maxAng - minAng);
+    const f = computeKinematics(a, state.slotOffset, state.torqueNm);
+    samples.push({ a, N: f.normalN, Ft: f.tractionN, Fs: f.stopLoadN, Rp: f.pivotLoadN });
+    peak = Math.max(peak, f.normalN, f.tractionN, f.stopLoadN, f.pivotLoadN);
+  }
+  const maxForce = Math.max(30, Math.ceil(peak / 10) * 10);
+
+  function xOf(ang) {
+    return padL + ((ang - minAng) / (maxAng - minAng)) * plotW;
+  }
+  function yOf(f) {
+    return padT + plotH - (Math.min(maxForce, Math.max(0, f)) / maxForce) * plotH;
+  }
+
+  const xWedge = xOf(stopAngle);
+  const xRest = xOf(restDeg);
+  svgEl('rect', {
+    x: padL, y: padT, width: Math.max(0, xWedge - padL), height: plotH,
+    fill: 'var(--coral-tint)'
+  }, svg);
+  svgEl('rect', {
+    x: xWedge, y: padT, width: Math.max(0, xRest - xWedge), height: plotH,
+    fill: 'var(--cyan-tint)'
+  }, svg);
+
+  const tickStep = maxForce <= 40 ? 5 : (maxForce <= 120 ? 20 : 50);
+  for (let fv = 0; fv <= maxForce; fv += tickStep) {
+    const y = yOf(fv);
+    svgEl('line', {
+      x1: padL, y1: y, x2: W - padR, y2: y,
+      stroke: fv === 0 ? 'var(--outline)' : 'var(--outline-variant)',
+      'stroke-width': fv === 0 ? 1.2 : 0.8
+    }, svg);
+    const t = svgEl('text', {
+      x: padL - 6, y: y + 3.5,
+      'text-anchor': 'end',
+      style: 'font-family: var(--font-label); font-size: 9px; fill: var(--on-surface-variant);'
+    }, svg);
+    t.textContent = String(fv);
+  }
+
+  [
+    { ang: stopAngle, lbl: `Lock ${stopAngle.toFixed(1)}°`, col: 'var(--data-4)' },
+    { ang: restDeg, lbl: `Rest ${restDeg.toFixed(1)}°`, col: 'var(--primary)' }
+  ].forEach(function (mk) {
+    const x = xOf(mk.ang);
+    svgEl('line', {
+      x1: x, y1: padT, x2: x, y2: padT + plotH,
+      stroke: mk.col, 'stroke-width': 1, 'stroke-dasharray': '3 3'
+    }, svg);
+    const tl = svgEl('text', {
+      x: x, y: padT - 5, 'text-anchor': 'middle',
+      style: `font-family: var(--font-label); font-size: 9px; fill: ${mk.col};`
+    }, svg);
+    tl.textContent = mk.lbl;
+  });
+
+  const ptsN = [];
+  const ptsFt = [];
+  const ptsStop = [];
+  const ptsRp = [];
+  for (let i = 0; i < samples.length; i++) {
+    const s = samples[i];
+    const px = xOf(s.a).toFixed(2);
+    ptsN.push(`${px},${yOf(s.N).toFixed(2)}`);
+    ptsFt.push(`${px},${yOf(s.Ft).toFixed(2)}`);
+    ptsStop.push(`${px},${yOf(s.Fs).toFixed(2)}`);
+    ptsRp.push(`${px},${yOf(s.Rp).toFixed(2)}`);
+  }
+
+  svgEl('polyline', { points: ptsN.join(' '), fill: 'none', stroke: 'var(--data-2)', 'stroke-width': 2 }, svg);
+  svgEl('polyline', { points: ptsFt.join(' '), fill: 'none', stroke: 'var(--data-3)', 'stroke-width': 2 }, svg);
+  svgEl('polyline', { points: ptsStop.join(' '), fill: 'none', stroke: 'var(--data-4)', 'stroke-width': 2 }, svg);
+  svgEl('polyline', { points: ptsRp.join(' '), fill: 'none', stroke: 'var(--data-1)', 'stroke-width': 2.2 }, svg);
+
+  for (let a = Math.ceil(minAng); a <= Math.floor(maxAng); a += 2) {
+    const x = xOf(a);
+    const tx = svgEl('text', {
+      x: x, y: padT + plotH + 14, 'text-anchor': 'middle',
+      style: 'font-family: var(--font-label); font-size: 9px; fill: var(--on-surface-variant);'
+    }, svg);
+    tx.textContent = `${a}°`;
+  }
+  const xTitle = svgEl('text', {
+    x: padL + plotW / 2, y: H - 4, 'text-anchor': 'middle',
+    style: 'font-family: var(--font-label); font-size: 9px; fill: var(--on-surface-variant);'
+  }, svg);
+  xTitle.textContent = 'Swing Arm Angle θ (deg) · Fstop = 0 N during intermediate sweep';
+
+  const curAng = activeK ? activeK.theta : state.angle;
+  const clampedAng = Math.max(minAng, Math.min(maxAng, curAng));
+  const curX = xOf(clampedAng);
+  const cur = activeK || computeKinematics(state.angle, state.slotOffset, state.torqueNm);
+
+  svgEl('line', {
+    x1: curX, y1: padT, x2: curX, y2: padT + plotH,
+    stroke: 'var(--on-surface)', 'stroke-width': 1.4
+  }, svg);
+
+  if (curAng <= maxAng) {
+    [
+      { val: cur.normalN, col: 'var(--data-2)' },
+      { val: cur.tractionN, col: 'var(--data-3)' },
+      { val: cur.stopLoadN, col: 'var(--data-4)' },
+      { val: cur.pivotLoadN, col: 'var(--data-1)' }
+    ].forEach(function (dot) {
+      svgEl('circle', {
+        cx: curX, cy: yOf(dot.val), r: 3.5,
+        fill: dot.col, stroke: 'var(--background)', 'stroke-width': 1.2
+      }, svg);
+    });
+  }
 }
 
 // === Animation Cycle ===
@@ -2001,10 +2635,13 @@ function animLoop(ts) {
   state.angle = angleFromCycleT(state.cycleT, stopAngle);
 
   const k = computeKinematics(state.angle, state.slotOffset, state.torqueNm);
-  if (k.overlap >= -0.05 && state.torqueNm > 0.1) {
-    const wheelDegPerSec = 18 + state.torqueNm * 5;
-    state.wheelRotDeg = (state.wheelRotDeg + wheelDegPerSec * dt) % 360;
-    state.rollerRotDeg = (state.rollerRotDeg - wheelDegPerSec * (GEO.R_TIRE / GEO.R_ROLLER) * dt) % 360;
+  if (state.motorRpm > 1) {
+    const rollerDegPerSec = state.motorRpm * 6; // rpm × 360° / 60 s
+    state.rollerRotDeg = (state.rollerRotDeg - rollerDegPerSec * dt) % 360;
+    if (k.effectiveBite > 0.01) {
+      const wheelDegPerSec = rollerDegPerSec * (GEO.R_ROLLER / GEO.R_TIRE);
+      state.wheelRotDeg = (state.wheelRotDeg + wheelDegPerSec * dt) % 360;
+    }
   }
 
   renderSimulation();
@@ -2085,6 +2722,8 @@ function resetSimulator() {
   state.angle = GEO.THETA_REST;
   state.slotOffset = 0.0;
   state.torqueNm = 4.5;
+  state.motorRpm = 800;
+  state.wheelKmh = motorRpmToWheelKmh(800);
   state.cycleT = 0.36;
   const sSlot = document.getElementById('slider-slot');
   const nSlot = document.getElementById('input-slot');
@@ -2094,6 +2733,7 @@ function resetSimulator() {
   if (nSlot) nSlot.value = '0.0';
   if (sTorq) sTorq.value = '4.5';
   if (nTorq) nTorq.value = '4.5';
+  syncSpeedUi();
   renderBracketVariant();
   renderSimulation();
   scheduleSaveState();
@@ -2244,12 +2884,141 @@ function selectCallout(id) {
   scheduleSaveState();
 }
 
+// === Parametric Geometry Controls ===
+function applyParamValue(key, numVal) {
+  if (isNaN(numVal)) return;
+  if (key === 'wheel') state.params.wheelDia = Math.max(550, Math.min(800, numVal));
+  else if (key === 'roller') state.params.rollerDia = Math.max(50, Math.min(120, numVal));
+  else if (key === 'arm') state.params.armLen = Math.max(55, Math.min(110, numVal));
+  else if (key === 'platform') state.params.platformY = Math.max(380, Math.min(460, numVal));
+  else if (key === 'pivotx') state.params.pivotX = Math.max(5, Math.min(60, numVal));
+
+  applyGeometryParams();
+  state.wheelKmh = Math.max(0, Math.min(50, motorRpmToWheelKmh(state.motorRpm)));
+  syncSpeedUi();
+  syncLiveSvgGeometry();
+  const stopA = solveStopAngle(state.slotOffset);
+  state.angle = Number(stopA.toFixed(1));
+  const fb = document.getElementById('param-feedback');
+  if (fb) {
+    fb.textContent = `Custom geometry active · Rest ${GEO.THETA_REST.toFixed(1)}° / Lock ${stopA.toFixed(1)}°`;
+  }
+  renderSimulation();
+  scheduleSaveState();
+}
+
+function syncParamFromSlider(key, val) {
+  const numEl = document.getElementById(`num-${key}`);
+  if (numEl) numEl.value = val;
+  applyParamValue(key, parseFloat(val));
+}
+
+function syncParamFromNumber(key, val) {
+  const sliderEl = document.getElementById(`slider-${key}`);
+  if (sliderEl) sliderEl.value = val;
+  applyParamValue(key, parseFloat(val));
+}
+
+function syncParamInputsToUI() {
+  const map = {
+    wheel: state.params.wheelDia,
+    roller: state.params.rollerDia,
+    arm: state.params.armLen,
+    platform: state.params.platformY,
+    pivotx: state.params.pivotX
+  };
+  const keys = Object.keys(map);
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    const s = document.getElementById(`slider-${k}`);
+    const n = document.getElementById(`num-${k}`);
+    if (s) s.value = map[k];
+    if (n) n.value = map[k];
+  }
+}
+
+function resetLockedGeometry() {
+  state.params = { ...LOCKED_PARAMS };
+  syncParamInputsToUI();
+  applyGeometryParams();
+  state.wheelKmh = Math.max(0, Math.min(50, motorRpmToWheelKmh(state.motorRpm)));
+  syncSpeedUi();
+  syncLiveSvgGeometry();
+  const stopA = solveStopAngle(state.slotOffset);
+  state.angle = Number(stopA.toFixed(1));
+  const fb = document.getElementById('param-feedback');
+  if (fb) {
+    fb.textContent = `Reset to locked Method B geometry (706 mm tire, 83 mm roller, 75.0 mm arm, pivot 25.0 mm).`;
+  }
+  renderSimulation();
+  scheduleSaveState();
+}
+
+function exportSpecJson() {
+  const k = computeKinematics(state.angle, state.slotOffset, state.torqueNm);
+  const spec = {
+    geometry: {
+      wheel_od_mm: state.params.wheelDia,
+      roller_od_mm: state.params.rollerDia,
+      contact_cc_target_mm: Number(GEO.CC_TANGENT.toFixed(2)),
+      arm_cc_mm: state.params.armLen,
+      platform_y_mm: state.params.platformY,
+      pivot_xy_mm: [Number(GEO.PX.toFixed(2)), Number(GEO.PY.toFixed(2))],
+      rest_angle_deg: Number(GEO.THETA_REST.toFixed(2)),
+      wedge_angle_deg: Number(k.stopAngle.toFixed(2)),
+      stop_pad_mm: GEO.PAD_DIST,
+      slot_offset_mm: state.slotOffset
+    },
+        active_state: {
+      arm_angle_deg: Number(k.theta.toFixed(2)),
+      drive_torque_Nm: state.torqueNm,
+      motor_rpm: Number(state.motorRpm.toFixed(1)),
+      wheel_speed_kmh: Number(state.wheelKmh.toFixed(2)),
+      wheel_rpm: Number(wheelRpmFromMotor(state.motorRpm).toFixed(2)),
+      elastomer_bite_mm: Number(k.effectiveBite.toFixed(2)),
+      radial_normal_N: Number(k.normalN.toFixed(2)),
+      traction_force_N: Number(k.tractionN.toFixed(2)),
+      m5_stop_load_N: Number(k.stopLoadN.toFixed(2)),
+      m8_pivot_reaction_N: Number(k.pivotLoadN.toFixed(2)),
+      friction_coeff_mu: state.params.mu
+        }
+  };
+
+  const jsonStr = JSON.stringify(spec, null, 2);
+  if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === 'function') {
+    window.notebookAppApi.triggerFileDownload({
+      content: jsonStr,
+      contentType: 'text/plain',
+      encoding: 'UTF-8',
+      filename: 'method-b-u-bracket-spec.json'
+    });
+  } else {
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'method-b-u-bracket-spec.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  const fb = document.getElementById('param-feedback');
+  if (fb) {
+    fb.textContent = `Exported method-b-u-bracket-spec.json (${k.theta.toFixed(1)}° · N=${k.normalN.toFixed(1)} N, Ft=${k.tractionN.toFixed(1)} N, Rp=${k.pivotLoadN.toFixed(1)} N).`;
+  }
+}
+
 // === State Persistence (notebookAppApi) ===
 function buildSavedPayload() {
   return {
+    params: { ...state.params },
     angle: Number(state.angle.toFixed(2)),
     slotOffset: Number(state.slotOffset.toFixed(1)),
     torqueNm: Number(state.torqueNm.toFixed(1)),
+    motorRpm: Number(state.motorRpm.toFixed(1)),
+    wheelKmh: Number(state.wheelKmh.toFixed(2)),
     viewMode: state.viewMode,
     bracketStyle: state.bracketStyle,
     showVectors: state.showVectors,
@@ -2270,6 +3039,14 @@ function scheduleSaveState() {
 
 function applySavedState(saved) {
   if (!saved || typeof saved !== 'object') return;
+  if (saved.params && typeof saved.params === 'object') {
+    state.params = {
+      ...LOCKED_PARAMS,
+      ...saved.params
+    };
+    syncParamInputsToUI();
+    applyGeometryParams();
+  }
   if (typeof saved.angle === 'number') state.angle = saved.angle;
   if (typeof saved.slotOffset === 'number') {
     state.slotOffset = Math.max(-3.0, Math.min(3.0, saved.slotOffset));
@@ -2285,6 +3062,13 @@ function applySavedState(saved) {
     if (sTorq) sTorq.value = state.torqueNm.toFixed(1);
     if (nTorq) nTorq.value = state.torqueNm.toFixed(1);
   }
+  if (typeof saved.motorRpm === 'number') {
+    state.motorRpm = Math.max(0, Math.min(4000, saved.motorRpm));
+    state.wheelKmh = Math.max(0, Math.min(50, motorRpmToWheelKmh(state.motorRpm)));
+  } else if (typeof saved.wheelKmh === 'number') {
+    state.wheelKmh = Math.max(0, Math.min(50, saved.wheelKmh));
+    state.motorRpm = Math.max(0, Math.min(4000, wheelKmhToMotorRpm(state.wheelKmh)));
+  }
   if (saved.viewMode) setViewMode(saved.viewMode);
   if (saved.bracketStyle) setBracketStyle(saved.bracketStyle);
   if (typeof saved.showVectors === 'boolean' && saved.showVectors !== state.showVectors) toggleVectors();
@@ -2295,13 +3079,19 @@ function applySavedState(saved) {
 
 // === Initialization ===
 async function initApp() {
+  applyGeometryParams();
   buildStaticBlueprintLayers();
+  syncLiveSvgGeometry();
 
   if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
     const saved = await window.notebookAppApi.getAppState();
     if (saved) applySavedState(saved);
+    syncLiveSvgGeometry();
   }
 
+  syncParamInputsToUI();
+  state.wheelKmh = motorRpmToWheelKmh(state.motorRpm);
+  syncSpeedUi();
   renderBracketVariant();
   renderSimulation();
   selectCallout(state.selectedCallout);
