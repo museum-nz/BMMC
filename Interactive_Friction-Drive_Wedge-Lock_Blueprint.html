@@ -176,112 +176,40 @@ header { position: static !important; }
   flex-wrap: wrap;
   gap: var(--space-sm);
   align-items: center;
+  justify-content: flex-end;
 }
-.concept-video-link {
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+.btn-bmmc-menu-trigger {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-top: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
   border-radius: var(--rounded);
-  border: 1px solid color-mix(in srgb, var(--primary) 55%, transparent);
-  background: linear-gradient(
-    105deg,
-    color-mix(in srgb, var(--primary) 22%, transparent),
-    color-mix(in srgb, var(--tertiary) 10%, transparent)
-  );
-  color: var(--on-primary-container);
-  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface-container));
+  color: var(--primary);
   font-family: var(--font-label);
   font-size: var(--label-size);
+  font-weight: 600;
   letter-spacing: var(--label-tracking);
   text-transform: uppercase;
   cursor: pointer;
-  text-align: left;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent),
-              0 8px 24px color-mix(in srgb, var(--primary) 12%, transparent);
-  transition: background-color var(--dur-micro) var(--ease-out),
-              border-color var(--dur-micro) var(--ease-out),
-              transform var(--dur-micro) var(--ease-out);
+  box-shadow: var(--panel-highlight);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
-.concept-video-link:hover {
+.btn-bmmc-menu-trigger:hover {
+  background: color-mix(in srgb, var(--primary) 22%, var(--surface-container-high));
   border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 28%, transparent);
-  transform: translateY(-1px);
+  color: var(--on-primary-container);
 }
-.concept-video-link:focus-visible {
+.btn-bmmc-menu-trigger:focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: 3px;
-}
-.concept-video-kicker {
-  color: var(--primary);
-  font-weight: 600;
-}
-.concept-video-title {
-  color: var(--on-surface);
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0;
-  font-family: var(--font-body);
-  font-size: var(--body-size);
-}
-
-/* Full-page concept video theater */
-.video-theater {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  display: none;
-  flex-direction: column;
-  background: #02060d;
-  color: var(--on-surface);
-}
-.video-theater.is-open {
-  display: flex;
-}
-.video-theater-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  border-bottom: var(--hairline);
-  background: color-mix(in srgb, var(--surface-container) 92%, transparent);
-  flex-shrink: 0;
-}
-.video-theater-title {
-  margin: 0;
-  font-family: var(--font-headline);
-  font-size: var(--subhead-size);
-  font-weight: 500;
-  letter-spacing: var(--heading-tracking);
-}
-.video-theater-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
-.video-theater-stage {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: grid;
-  place-items: center;
-  padding: var(--space-md);
-  background:
-    radial-gradient(ellipse at 50% 20%, rgba(223, 170, 91, 0.08), transparent 55%),
-    #02060d;
-}
-.video-theater-stage video {
-  width: min(100%, 1600px);
-  height: min(100%, calc(100vh - 5.5rem));
-  max-height: calc(100vh - 5.5rem);
-  background: #000;
-  border: var(--hairline);
-  border-radius: var(--rounded);
-  object-fit: contain;
-}
-body.theater-open {
-  overflow: hidden;
+  outline-offset: 2px;
 }
 
 /* Badges & Panels */
@@ -1066,41 +994,26 @@ td.code-col {
 <header class="hero-header">
   <div class="hero-inner">
     <div>
-      <p class="coord-label">Kinematics · Origin = Wheel Axle (0, 0) · Units: mm</p>
+      <p class="coord-label">Method B Kinematics · Origin = Wheel Axle (0, 0) · Units: mm</p>
       <h1 class="title">Self-Wedging Friction Drive — <em>U-Bracket</em> Blueprint</h1>
       <p class="deck-brass">706 mm Bicycle Wheel · 83 mm Roller · 75.0 mm Swing Arm · M5 Slotted Stop</p>
       <p class="hero-lede">
         Explore how forward drive torque pulls the trailing swing-arm roller from its 18.7° rest tangent into the bicycle tire, automatically building radial traction until the rear-neck pad locks cleanly against the M5 stop bolt at ~13.7°.
       </p>
-      <button type="button" class="concept-video-link" id="btn-open-concept-video" onclick="openConceptVideo()">
-        <span class="concept-video-kicker">▶ Concept Video</span>
-        <span class="concept-video-title">Geometry of Grip — watch the self-wedging explanation</span>
-      </button>
     </div>
-    <div class="header-badges">
-      <span class="badge">Pivot (25.0, 462.5)</span>
-      <span class="badge badge-brass">C–C Tangent 394.5 mm</span>
-      <span class="badge badge-mint">Park 58.0°</span>
+    <div class="header-actions">
+      <button type="button" class="btn-bmmc-menu-trigger" id="btnMenuToggle" title="Open Museum Wings Menu" aria-label="Open directory drawer">
+        <span aria-hidden="true">☰</span>
+        <span>Wings</span>
+      </button>
+      <div class="header-badges">
+        <span class="badge">Pivot (25.0, 462.5)</span>
+        <span class="badge badge-brass">C–C Tangent 394.5 mm</span>
+        <span class="badge badge-mint">Park 58.0°</span>
+      </div>
     </div>
   </div>
 </header>
-
-<!-- Full-page self-streaming video theater (local file · no Dropbox chrome) -->
-<div id="concept-video-theater" class="video-theater" role="dialog" aria-modal="true" aria-labelledby="concept-video-heading">
-  <div class="video-theater-bar">
-    <h2 class="video-theater-title" id="concept-video-heading">Geometry of Grip</h2>
-    <div class="video-theater-actions">
-      <button type="button" class="btn" onclick="toggleConceptVideoFullscreen()">Fullscreen</button>
-      <button type="button" class="btn btn-primary" onclick="closeConceptVideo()">Close</button>
-    </div>
-  </div>
-  <div class="video-theater-stage">
-    <video id="concept-video-player" controls playsinline preload="metadata">
-      <!-- Dropbox direct stream (site-safe · no Dropbox chrome) -->
-      <source src="https://dl.dropboxusercontent.com/scl/fi/b4jgtbhm2on92940ytlzh/Geometry_of_Grip.mp4?rlkey=0we252wwsyr3wyrdwfh6qzxf6&amp;st=bywhcrb0&amp;raw=1" type="video/mp4">
-    </video>
-  </div>
-</div>
 
 <main class="page-grid">
 
@@ -1381,7 +1294,7 @@ td.code-col {
           <div>
             <p class="section-kicker" style="margin: 0;">Exploration</p>
             <h2 class="panel-heading" style="margin: var(--space-xs) 0 0;">Parametric Geometry Controls</h2>
-            <div class="data-label" style="font-family: var(--font-label); font-size: var(--label-size); color: var(--on-surface-variant);">Locked defaults vs live custom exploration</div>
+            <div class="data-label" style="font-family: var(--font-label); font-size: var(--label-size); color: var(--on-surface-variant);">Locked Method B defaults vs live custom exploration</div>
           </div>
           <div class="btn-group">
             <button type="button" class="btn" id="btn-reset-geo" onclick="resetLockedGeometry()">
@@ -1683,9 +1596,9 @@ td.code-col {
   </section>
 
   <!-- LOCKED GEOMETRY TABLE -->
-  <section class="reference-section" aria-label="Locked Geometry Reference">
+  <section class="reference-section" aria-label="Locked Method B Geometry Reference">
     <div>
-      <p class="section-kicker">Locked Geometry Constants</p>
+      <p class="section-kicker">Locked Method B Constants</p>
       <h2 class="panel-heading">Dimensional Specification Table</h2>
     </div>
     <div class="panel spec-table-wrap">
@@ -1749,7 +1662,7 @@ td.code-col {
   </section>
 
   <footer class="footer-note">
-    <span>Source: Improved friction-drive parts (locked geometry, README.md &amp; kinematic_page3.png)</span>
+    <span>Source: Improved friction-drive parts (Method B locked geometry, README.md &amp; kinematic_page3.png)</span>
     <span>All dimensions in millimeters · Origin at bicycle wheel axle (0, 0)</span>
   </footer>
 
@@ -1757,7 +1670,7 @@ td.code-col {
 
 <api-shim></api-shim>
 <script>
-// === Locked Geometry Defaults ===
+// === Locked Method B Geometry Defaults ===
 const LOCKED_PARAMS = {
   wheelDia: 706,
   rollerDia: 83,
@@ -3075,7 +2988,7 @@ function resetLockedGeometry() {
   state.angle = Number(stopA.toFixed(1));
   const fb = document.getElementById('param-feedback');
   if (fb) {
-    fb.textContent = `Reset to locked geometry (706 mm tire, 83 mm roller, 75.0 mm arm, pivot 25.0 mm).`;
+    fb.textContent = `Reset to locked Method B geometry (706 mm tire, 83 mm roller, 75.0 mm arm, pivot 25.0 mm).`;
   }
   renderSimulation();
   scheduleSaveState();
@@ -3117,14 +3030,14 @@ function exportSpecJson() {
       content: jsonStr,
       contentType: 'text/plain',
       encoding: 'UTF-8',
-      filename: 'u-bracket-spec.json'
+      filename: 'method-b-u-bracket-spec.json'
     });
   } else {
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'u-bracket-spec.json';
+    link.download = 'method-b-u-bracket-spec.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3133,7 +3046,7 @@ function exportSpecJson() {
 
   const fb = document.getElementById('param-feedback');
   if (fb) {
-    fb.textContent = `Exported u-bracket-spec.json (${k.theta.toFixed(1)}° · N=${k.normalN.toFixed(1)} N, Ft=${k.tractionN.toFixed(1)} N, Rp=${k.pivotLoadN.toFixed(1)} N).`;
+    fb.textContent = `Exported method-b-u-bracket-spec.json (${k.theta.toFixed(1)}° · N=${k.normalN.toFixed(1)} N, Ft=${k.tractionN.toFixed(1)} N, Rp=${k.pivotLoadN.toFixed(1)} N).`;
   }
 }
 
@@ -3205,73 +3118,6 @@ function applySavedState(saved) {
 }
 
 // === Initialization ===
-const CONCEPT_VIDEO_URL =
-  'https://dl.dropboxusercontent.com/scl/fi/b4jgtbhm2on92940ytlzh/Geometry_of_Grip.mp4?rlkey=0we252wwsyr3wyrdwfh6qzxf6&st=bywhcrb0&raw=1';
-
-function openConceptVideo() {
-  const theater = document.getElementById('concept-video-theater');
-  const player = document.getElementById('concept-video-player');
-  if (!theater || !player) return;
-  stopPlayback();
-  theater.classList.add('is-open');
-  document.body.classList.add('theater-open');
-
-  // Force Dropbox stream so the page works on a hosted site without a local MP4
-  if (player.getAttribute('data-src-ready') !== '1') {
-    player.src = CONCEPT_VIDEO_URL;
-    player.setAttribute('data-src-ready', '1');
-    player.load();
-  }
-
-  const tryPlay = function () {
-    const p = player.play();
-    if (p && typeof p.catch === 'function') {
-      p.catch(function () { /* autoplay may be blocked; controls still work */ });
-    }
-  };
-  if (player.readyState >= 2) tryPlay();
-  else player.addEventListener('loadeddata', tryPlay, { once: true });
-  player.focus();
-}
-
-function closeConceptVideo() {
-  const theater = document.getElementById('concept-video-theater');
-  const player = document.getElementById('concept-video-player');
-  if (document.fullscreenElement) {
-    document.exitFullscreen().catch(function () {});
-  }
-  if (player) {
-    player.pause();
-    player.currentTime = 0;
-  }
-  if (theater) theater.classList.remove('is-open');
-  document.body.classList.remove('theater-open');
-  const opener = document.getElementById('btn-open-concept-video');
-  if (opener) opener.focus();
-}
-
-function toggleConceptVideoFullscreen() {
-  const player = document.getElementById('concept-video-player');
-  const theater = document.getElementById('concept-video-theater');
-  const target = theater || player;
-  if (!target) return;
-  if (!document.fullscreenElement) {
-    const req = target.requestFullscreen || target.webkitRequestFullscreen;
-    if (req) req.call(target);
-  } else {
-    document.exitFullscreen().catch(function () {});
-  }
-}
-
-document.addEventListener('keydown', function (ev) {
-  if (ev.key === 'Escape') {
-    const theater = document.getElementById('concept-video-theater');
-    if (theater && theater.classList.contains('is-open')) {
-      closeConceptVideo();
-    }
-  }
-});
-
 async function initApp() {
   applyGeometryParams();
   buildStaticBlueprintLayers();
@@ -3301,5 +3147,6 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 </script>
+<script src="shared-nav.js"></script>
 </body>
 </html>

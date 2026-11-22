@@ -119,7 +119,7 @@
           href: 'whanau/',
           icon: '👨‍👩‍👧‍👦',
           label: 'Whānau',
-          desc: 'Family Lines — Baird · Dun · Spicer · Starling'
+          desc: 'Family Lines — Baird · Dun · Spicer · Starling · password required'
         }
       ]
     },
