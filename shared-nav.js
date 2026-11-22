@@ -73,23 +73,6 @@
       ]
     },
     {
-      group: "NZ MTB & Cycle Trails",
-      items: [
-        {
-          href: 'mtb.html',
-          icon: '🚵',
-          label: 'NZ MTB & Cycle Trails',
-          desc: 'Interactive Great Rides, Heartland, CCC & DOC network'
-        },
-        {
-          href: 'Interactive_Friction-Drive_Wedge-Lock_Blueprint.html',
-          icon: '🔧',
-          label: 'Friction-Drive Wedge-Lock Blueprint',
-          desc: 'Interactive friction-drive wedge-lock mechanism blueprint'
-        }
-      ]
-    },
-    {
       group: "NZ Historical Info Maps",
       items: [
         { 
@@ -109,6 +92,34 @@
           icon: '⚓', 
           label: 'Aotearoa NZ Maritime & Coastal Map', 
           desc: 'Mosquito Fleet, early arrivals, shipwrecks, whaling & lighthouses' 
+        }
+      ]
+    },
+    {
+      group: "NZ MTB & Cycle Trails",
+      items: [
+        {
+          href: 'mtb.html',
+          icon: '🚵',
+          label: 'NZ MTB & Cycle Trails',
+          desc: 'Interactive Great Rides, Heartland, CCC & DOC network'
+        },
+        {
+          href: 'Interactive_Friction-Drive_Wedge-Lock_Blueprint.html',
+          icon: '🔧',
+          label: 'Friction-Drive Wedge-Lock Blueprint',
+          desc: 'Interactive friction-drive wedge-lock mechanism blueprint'
+        }
+      ]
+    },
+    {
+      group: "Whānau",
+      items: [
+        {
+          href: 'whanau/',
+          icon: '👨‍👩‍👧‍👦',
+          label: 'Whānau',
+          desc: 'Family Lines — Baird · Dun · Spicer · Starling'
         }
       ]
     },

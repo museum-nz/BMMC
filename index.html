@@ -420,7 +420,7 @@
     }
 
     .network-flank { display: flex; flex-direction: column; gap: 16px; min-width: 0; max-width: 100%; }
-    /* Right flank: Specialist + NZ Maps side-by-side on desktop */
+    /* Right flank: two stacks — Specialist+Maps | MTB+Whānau */
     .network-flank-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -429,6 +429,12 @@
     }
     @media (min-width: 769px) {
       .network-flank-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .flank-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
     }
     .network-flank-grid .spoke-cards { padding-left: 8px; }
     .network-flank-grid .card-desc { white-space: normal; }
@@ -761,8 +767,11 @@
         </div>
       </div>
 
-      <!-- Right: Specialist + NZ Maps (2-col desktop / 1-col phone) -->
-      <div class="network-flank network-flank-grid" id="rightFlank"></div>
+      <!-- Right: Specialist+Maps | MTB+Whānau (2-col desktop / 1-col phone) -->
+      <div class="network-flank network-flank-grid" id="rightFlank">
+        <div class="flank-stack" id="rightStackSpecialist"></div>
+        <div class="flank-stack" id="rightStackMtb"></div>
+      </div>
     </div>
   </main>
 
@@ -933,17 +942,32 @@
         return cluster;
       }
 
-      // Spider: all page branches — Primary (+ OTD below) left; Specialist/NZ right (2-col)
+      // Spider: Primary (+ OTD) left; right stacks Specialist→Maps | MTB→Whānau
       const otdPanel = document.getElementById('on-this-day');
+      const rightStackSpecialist = document.getElementById('rightStackSpecialist');
+      const rightStackMtb = document.getElementById('rightStackMtb');
+      const groupName = (b) => (b && (b.group || b.name || b.title)) || '';
+
       rawBranches.forEach((branch, index) => {
-        const wingTitle = branch.group || branch.name || branch.title || `Wing ${index + 1}`;
+        const wingTitle = groupName(branch) || `Wing ${index + 1}`;
         const branchItems = branch.items || branch.links || [];
         const colorIdx = index % 3;
-        if (index === 0) {
+        const g = wingTitle.toLowerCase();
+
+        if (index === 0 || g.includes('primary')) {
           appendSpiderCluster(leftFlank, index, wingTitle, branchItems, colorIdx, otdPanel);
-        } else {
-          appendSpiderCluster(rightFlank, index, wingTitle, branchItems, colorIdx, null);
+          return;
         }
+
+        let stack = rightStackSpecialist;
+        if (g.includes('mtb') || g.includes('whānau') || g.includes('whanau')) {
+          stack = rightStackMtb;
+        } else if (g.includes('historical') || g.includes('map')) {
+          stack = rightStackSpecialist;
+        } else if (g.includes('specialist')) {
+          stack = rightStackSpecialist;
+        }
+        appendSpiderCluster(stack || rightFlank, index, wingTitle, branchItems, colorIdx, null);
       });
 
       // Conduit Curves Generator
