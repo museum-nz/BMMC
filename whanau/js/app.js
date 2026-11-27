@@ -71,6 +71,31 @@
       .replace(/"/g, "&quot;");
   }
 
+  /** Extract a Google Drive file id from common Drive URL shapes. */
+  function driveFileId(url) {
+    const s = String(url || "");
+    const m =
+      s.match(/[?&]id=([A-Za-z0-9_-]{20,})/) ||
+      s.match(/\/(?:file\/)?d\/([A-Za-z0-9_-]{20,})/) ||
+      s.match(/thumbnail\?id=([A-Za-z0-9_-]{20,})/) ||
+      s.match(/googleusercontent\.com\/d\/([A-Za-z0-9_-]{20,})/);
+    return m ? m[1] : null;
+  }
+
+  /** URL that works in <img src> (Drive uc?export=view often breaks as a hotlink). */
+  function mediaImgSrc(url) {
+    const id = driveFileId(url);
+    if (!id) return url;
+    return `https://lh3.googleusercontent.com/d/${id}`;
+  }
+
+  /** Open the Drive file page on click. */
+  function mediaOpenHref(url) {
+    const id = driveFileId(url);
+    if (!id) return url;
+    return `https://drive.google.com/file/d/${id}/view`;
+  }
+
   function displayName(p) {
     if (!p) return "(unknown)";
     return [p.given, p.surname].filter(Boolean).join(" ").trim() || "(unnamed)";
@@ -769,8 +794,8 @@
       "media/ancestry/ethnic-makeup-mib-ehb.png";
 
     const couplePhoto = {
-      "baird-dun": "media/portraits/thumbs/baird-ian-and-kathi.jpg",
-      "spicer-starling": "media/portraits/thumbs/spicer-j-m-wedding-enhanced.jpg",
+      "baird-dun": "https://lh3.googleusercontent.com/d/1W9eEhOwS8xhOoYVKx8JWQjn6VJEouOc3",
+      "spicer-starling": "https://lh3.googleusercontent.com/d/1AvgXRVsJr2x2U1WVi1QqxduXHbvDst52",
     };
 
     const couples = (DATA.meta.gateways || [])
@@ -840,7 +865,7 @@
             </div>
           </a>
           <a class="home-explore-card" href="portraits.html">
-            <img src="media/portraits/baird-collage.jpg" alt="" loading="lazy" />
+            <img src="https://lh3.googleusercontent.com/d/1IMzIvXp4XLOecjk_10emS1OsblNe8osG" alt="" loading="lazy" />
             <div>
               <strong>Portraits</strong>
               <span>${portraitCount} portraits · marriage charts</span>
@@ -1533,8 +1558,8 @@
         .map((m) => {
           const title = m.caption || m.label || "";
           return `<figure class="event-thumb">
-            <a href="${esc(m.thumb)}" target="_blank" rel="noopener">
-              <img src="${esc(m.thumb)}" alt="${esc(m.label || "")}" loading="lazy" />
+            <a href="${esc(mediaOpenHref(m.thumb))}" target="_blank" rel="noopener">
+              <img src="${esc(mediaImgSrc(m.thumb))}" alt="${esc(m.label || "")}" loading="lazy" referrerpolicy="no-referrer" />
             </a>
             ${title ? `<figcaption>${esc(title)}</figcaption>` : ""}
           </figure>`;
@@ -1790,8 +1815,8 @@
           .map((m) => {
             const title = m.caption || m.label || "";
             return `<figure class="media-card">
-              <a href="${esc(m.thumb)}" target="_blank" rel="noopener">
-                <img src="${esc(m.thumb)}" alt="${esc(m.label || "")}" loading="lazy" />
+              <a href="${esc(mediaOpenHref(m.thumb))}" target="_blank" rel="noopener">
+                <img src="${esc(mediaImgSrc(m.thumb))}" alt="${esc(m.label || "")}" loading="lazy" referrerpolicy="no-referrer" />
               </a>
               ${title ? `<figcaption>${esc(title)}</figcaption>` : ""}
             </figure>`;
